@@ -1,4 +1,34 @@
-Revision history for Perl extension CPAN.
+1999-05-22  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Applied Ilya's patch for MD5_check_file for READ returning -1.
+
+1999-05-08  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Improved error message if cpan_home can't be created (bug report
+	by Jarkko Hietaniemi <jhi@iki.fi>)
+
+1999-04-19  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Added a note about the correct format of file URLs
+
+	* Added documentation to CPAN.pm for how to write cronjobs that
+	watch The CPAN (thanks to Brian Moseley <ix@cp.net> for asking)
+
+	* FirstTime: initialize urllist to be an empty array, because
+	otherwise it could accidentally become a string
+
+	* Renamed Changes file to ChangeLog and switched format to
+	emacsens ChangeLog format
+
+=head2 March 1999 after 1.48
+
+FirstTime now detects empty MIRRORED.BY.
+
+Updated documentation about private bundle definitions, reflecting the
+new dependency capabilities.
+
+Removed the documentation for keep_source which was a leftover from
+very old times.
 
 =head2 February 1999 after 1.47
 
