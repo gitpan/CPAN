@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.76_01';
+$VERSION = '1.76_51';
 $VERSION = eval $VERSION;
 # $Id: CPAN.pm,v 1.412 2003/07/31 14:53:04 k Exp $
 
@@ -54,6 +54,8 @@ $CPAN::DEBUG ||= 0;
 $CPAN::Signal ||= 0;
 $CPAN::Frontend ||= "CPAN::Shell";
 $CPAN::Defaultsite ||= "ftp://ftp.perl.org/pub/CPAN";
+$CPAN::Perl ||= CPAN::find_perl();
+
 
 package CPAN;
 use strict qw(vars);
@@ -84,6 +86,7 @@ sub AUTOLOAD {
 });
     }
 }
+
 
 #-> sub CPAN::shell ;
 sub shell {
@@ -249,7 +252,7 @@ use vars qw($Ua $Thesite $Themethod);
 
 package CPAN::LWP::UserAgent;
 use vars qw(@ISA $USER $PASSWD $SETUPDONE);
-# we delay requiring LWP::UserAgent and setting up inheritence until we need it
+# we delay requiring LWP::UserAgent and setting up inheritance until we need it
 
 package CPAN::Complete;
 @CPAN::Complete::ISA = qw(CPAN::Debug);
@@ -668,6 +671,32 @@ sub cwd {Cwd::cwd();}
 #-> sub CPAN::getcwd ;
 sub getcwd {Cwd::getcwd();}
 
+#-> sub CPAN::find_perl ;
+sub find_perl {
+    my($perl) = File::Spec->file_name_is_absolute($^X) ? $^X : "";
+    my $pwd  = CPAN::anycwd();
+    my $candidate = File::Spec->catfile($pwd,$^X);
+    $perl ||= $candidate if MM->maybe_command($candidate);
+
+    unless ($perl) {
+	my ($component,$perl_name);
+      DIST_PERLNAME: foreach $perl_name ($^X, 'perl', 'perl5', "perl$]") {
+	    PATH_COMPONENT: foreach $component (File::Spec->path(),
+						$Config::Config{'binexp'}) {
+		  next unless defined($component) && $component;
+		  my($abs) = File::Spec->catfile($component,$perl_name);
+		  if (MM->maybe_command($abs)) {
+		      $perl = $abs;
+		      last DIST_PERLNAME;
+		  }
+	      }
+	  }
+    }
+
+    return $perl;
+}
+
+
 #-> sub CPAN::exists ;
 sub exists {
     my($mgr,$class,$id) = @_;
@@ -774,6 +803,22 @@ sub has_inst {
 
 });
 	sleep 2;
+    } elsif ($mod eq "Module::Signature"){
+	unless ($Have_warned->{"Module::Signature"}++) {
+	    # No point in complaining unless the user can
+	    # reasonably install and use it.
+	    if (eval { require Crypt::OpenPGP; 1 } ||
+		defined $CPAN::Config->{'gpg'}) {
+		$CPAN::Frontend->myprint(qq{
+  CPAN: Module::Signature security checks disabled because Module::Signature
+  not installed.  Please consider installing the Module::Signature module.
+  You may also need to be able to connect over the Internet to the public
+  keyservers like pgp.mit.edu (port 11371).
+
+});
+		sleep 2;
+	    }
+	}
     } else {
 	delete $INC{$file}; # if it inc'd LWP but failed during, say, URI
     }
@@ -1358,8 +1403,8 @@ sub h {
 Display Information
  command  argument          description
  a,b,d,m  WORD or /REGEXP/  about authors, bundles, distributions, modules
- i        WORD or /REGEXP/  about anything of above
- r        NONE              reinstall recommendations
+ i        WORD or /REGEXP/  about any of the above
+ r        NONE              report updatable modules
  ls       AUTHOR            about files in the author's directory
 
 Download, Test, Make, Install...
@@ -1454,13 +1499,14 @@ sub m { # emacs confused here }; sub mimimimimi { # emacs in sync here
 sub i {
     my($self) = shift;
     my(@args) = @_;
-    my(@type,$type,@m);
-    @type = qw/Author Bundle Distribution Module/;
     @args = '/./' unless @args;
     my(@result);
-    for $type (@type) {
+    for my $type (qw/Bundle Distribution Module/) {
 	push @result, $self->expand($type,@args);
     }
+    # Authors are always uppercase.
+    push @result, $self->expand("Author", map { uc $_ } @args);
+
     my $result = @result == 1 ?
 	$result[0]->as_string :
             @result == 0 ?
@@ -1666,9 +1712,9 @@ sub _u_r_common {
              # for metadata cache
         $CPAN::Frontend->myprint(sprintf "%d matches in the database\n", $expand);
     }
-    for $module (@expand) {
+  MODULE: for $module (@expand) {
 	my $file  = $module->cpan_file;
-	next unless defined $file; # ??
+	next MODULE unless defined $file; # ??
 	my($latest) = $module->cpan_version;
 	my($inst_file) = $module->inst_file;
 	my($have);
@@ -1684,18 +1730,18 @@ sub _u_r_common {
 		} elsif ($have == 0){
 		    $version_zeroes++;
 		}
-		next unless CPAN::Version->vgt($latest, $have);
+		next MODULE unless CPAN::Version->vgt($latest, $have);
 # to be pedantic we should probably say:
 #    && !($have eq "undef" && $latest ne "undef" && $latest gt "");
 # to catch the case where CPAN has a version 0 and we have a version undef
 	    } elsif ($what eq "u") {
-		next;
+		next MODULE;
 	    }
 	} else {
 	    if ($what eq "a") {
-		next;
+		next MODULE;
 	    } elsif ($what eq "r") {
-		next;
+		next MODULE;
 	    } elsif ($what eq "u") {
 		$have = "-";
 	    }
@@ -1706,11 +1752,11 @@ sub _u_r_common {
 	    push @result, sprintf "%s %s\n", $module->id, $have;
 	} elsif ($what eq "r") {
 	    push @result, $module->id;
-	    next if $seen{$file}++;
+	    next MODULE if $seen{$file}++;
 	} elsif ($what eq "u") {
 	    push @result, $module->id;
-	    next if $seen{$file}++;
-	    next if $file =~ /^Contact/;
+	    next MODULE if $seen{$file}++;
+	    next MODULE if $file =~ /^Contact/;
 	}
 	unless ($headerdone++){
 	    $CPAN::Frontend->myprint("\n");
@@ -2604,23 +2650,29 @@ sub hosthard {
                                            # success above. Likely a bogus URL
 
 	$self->debug("localizing funkyftpwise[$url]") if $CPAN::DEBUG;
-	my($f,$funkyftp);
-	for $f ('lynx','ncftpget','ncftp','wget') {
-	  next unless exists $CPAN::Config->{$f};
-	  $funkyftp = $CPAN::Config->{$f};
-	  next unless defined $funkyftp;
+
+        # Try the most capable first and leave ncftp* for last as it only 
+        # does FTP.
+	for my $f (qw(curl wget lynx ncftpget ncftp)) {
+          my $funkyftp = $CPAN::Config->{$f};
+          next unless defined $funkyftp;
 	  next if $funkyftp =~ /^\s*$/;
+
 	  my($asl_ungz, $asl_gz);
 	  ($asl_ungz = $aslocal) =~ s/\.gz//;
           $asl_gz = "$asl_ungz.gz";
+
 	  my($src_switch) = "";
 	  if ($f eq "lynx"){
 	    $src_switch = " -source";
 	  } elsif ($f eq "ncftp"){
 	    $src_switch = " -c";
-          } elsif ($f eq "wget"){
-              $src_switch = " -O -";
+	  } elsif ($f eq "wget"){
+	    $src_switch = " -O -";
+	  } elsif ($f eq 'curl'){
+	    $src_switch = ' -L';
 	  }
+
 	  my($chdir) = "";
 	  my($stdout_redir) = " > $asl_ungz";
 	  if ($f eq "ncftpget"){
@@ -2696,7 +2748,7 @@ returned status $estatus (wstat $wstatus)$size
 });
 	  }
           return if $CPAN::Signal;
-	} # lynx,ncftpget,ncftp
+	} # transfer programs
     } # host
 }
 
@@ -3675,6 +3727,18 @@ sub dir_listing {
     my $lc_want =
 	File::Spec->catfile($CPAN::Config->{keep_source_where},
 			    "authors", "id", @$chksumfile);
+
+    my $fh;
+
+    # Purge and refetch old (pre-PGP) CHECKSUMS; they are a security
+    # hazard.  (Without GPG installed they are not that much better,
+    # though.)
+    $fh = FileHandle->new;
+    if (open($fh, $lc_want)) {
+	my $line = <$fh>; close $fh;
+	unlink($lc_want) unless $line =~ /PGP/;
+    }
+
     local($") = "/";
     # connect "force" argument with "index_expire".
     my $force = 0;
@@ -3697,7 +3761,7 @@ sub dir_listing {
     }
 
     # adapted from CPAN::Distribution::MD5_check_file ;
-    my $fh = FileHandle->new;
+    $fh = FileHandle->new;
     my($cksum);
     if (open $fh, $lc_file){
 	local($/);
@@ -3945,9 +4009,9 @@ sub get {
         -d $packagedir and $CPAN::Frontend->myprint("Removing previously used ".
                                                     "$packagedir\n");
         File::Path::rmtree($packagedir);
-        rename($distdir,$packagedir) or
-            Carp::confess("Couldn't rename $distdir to $packagedir: $!");
-        $self->debug(sprintf("renamed distdir[%s] to packagedir[%s] -e[%s]-d[%s]",
+        File::Copy::move($distdir,$packagedir) or
+            Carp::confess("Couldn't move $distdir to $packagedir: $!");
+        $self->debug(sprintf("moved distdir[%s] to packagedir[%s] -e[%s]-d[%s]",
                              $distdir,
                              $packagedir,
                              -e $packagedir,
@@ -3968,7 +4032,7 @@ sub get {
         my($f);
         for $f (@readdir) { # is already without "." and ".."
             my $to = File::Spec->catdir($packagedir,$f);
-            rename($f,$to) or Carp::confess("Couldn't rename $f to $to: $!");
+            File::Copy::move($f,$to) or Carp::confess("Couldn't move $f to $to: $!");
         }
     }
     if ($CPAN::Signal){
@@ -3979,6 +4043,41 @@ sub get {
     $self->{'build_dir'} = $packagedir;
     $self->safe_chdir($builddir);
     File::Path::rmtree("tmp");
+
+    $self->safe_chdir($packagedir);
+    if ($CPAN::META->has_inst("Module::Signature")) {
+        if (-f "SIGNATURE") {
+            $self->debug("Module::Signature is installed, verifying") if $CPAN::DEBUG;
+            my $rv = Module::Signature::verify();
+            if ($rv != Module::Signature::SIGNATURE_OK() and
+                $rv != Module::Signature::SIGNATURE_MISSING()) {
+                $CPAN::Frontend->myprint(
+                                         qq{\nSignature invalid for }.
+                                         qq{distribution file. }.
+                                         qq{Please investigate.\n\n}.
+                                         $self->as_string,
+                                         $CPAN::META->instance(
+                                                               'CPAN::Author',
+                                                               $self->cpan_userid,
+                                                              )->as_string
+                                        );
+
+                my $wrap = qq{I\'d recommend removing $self->{localfile}. Its signature
+is invalid. Maybe you have configured your 'urllist' with
+a bad URL. Please check this array with 'o conf urllist', and
+retry.};
+                $CPAN::Frontend->mydie(Text::Wrap::wrap("","",$wrap));
+            }
+        } else {
+            $CPAN::Frontend->myprint(qq{Package came without SIGNATURE\n\n});
+        }
+    } else {
+	$self->debug("Module::Signature is NOT installed") if $CPAN::DEBUG;
+    }
+    $self->safe_chdir($builddir);
+    return if $CPAN::Signal;
+
+
 
     my($mpl) = File::Spec->catfile($packagedir,"Makefile.PL");
     my($mpl_exists) = -f $mpl;
@@ -4247,10 +4346,44 @@ sub verifyMD5 {
     $self->MD5_check_file($lc_file);
 }
 
+sub SIG_check_file {
+    my($self,$chk_file) = @_;
+    my $rv = eval { Module::Signature::_verify($chk_file) };
+
+    if ($rv == Module::Signature::SIGNATURE_OK()) {
+	$CPAN::Frontend->myprint("Signature for $chk_file ok\n");
+	return $self->{SIG_STATUS} = "OK";
+    } else {
+	$CPAN::Frontend->myprint(qq{\nSignature invalid for }.
+				 qq{distribution file. }.
+				 qq{Please investigate.\n\n}.
+				 $self->as_string,
+				$CPAN::META->instance(
+							'CPAN::Author',
+							$self->cpan_userid
+							)->as_string);
+
+	my $wrap = qq{I\'d recommend removing $chk_file. Its signature
+is invalid. Maybe you have configured your 'urllist' with
+a bad URL. Please check this array with 'o conf urllist', and
+retry.};
+
+	$CPAN::Frontend->mydie(Text::Wrap::wrap("","",$wrap));
+    }
+}
+
 #-> sub CPAN::Distribution::MD5_check_file ;
 sub MD5_check_file {
     my($self,$chk_file) = @_;
     my($cksum,$file,$basename);
+
+    if ($CPAN::META->has_inst("Module::Signature") and Module::Signature->VERSION >= 0.26) {
+	$self->debug("Module::Signature is installed, verifying");
+	$self->SIG_check_file($chk_file);
+    } else {
+	$self->debug("Module::Signature is NOT installed");
+    }
+
     $file = $self->{localfile};
     $basename = File::Basename::basename($file);
     my $fh = FileHandle->new;
@@ -4407,29 +4540,12 @@ sub isa_perl {
   }
 }
 
+
 #-> sub CPAN::Distribution::perl ;
 sub perl {
-    my($self) = @_;
-    my($perl) = File::Spec->file_name_is_absolute($^X) ? $^X : "";
-    my $pwd  = CPAN::anycwd();
-    my $candidate = File::Spec->catfile($pwd,$^X);
-    $perl ||= $candidate if MM->maybe_command($candidate);
-    unless ($perl) {
-	my ($component,$perl_name);
-      DIST_PERLNAME: foreach $perl_name ($^X, 'perl', 'perl5', "perl$]") {
-	    PATH_COMPONENT: foreach $component (File::Spec->path(),
-						$Config::Config{'binexp'}) {
-		  next unless defined($component) && $component;
-		  my($abs) = File::Spec->catfile($component,$perl_name);
-		  if (MM->maybe_command($abs)) {
-		      $perl = $abs;
-		      last DIST_PERLNAME;
-		  }
-	      }
-	  }
-    }
-    $perl;
+    return $CPAN::Perl;
 }
+
 
 #-> sub CPAN::Distribution::make ;
 sub make {
@@ -4739,7 +4855,10 @@ sub test {
         return;
     }
 
-    local $ENV{PERL5LIB} = $ENV{PERL5LIB} || "";
+    local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
+                           ? $ENV{PERL5LIB}
+                           : ($ENV{PERLLIB} || "");
+
     $CPAN::META->set_perl5lib;
     my $system = join " ", $CPAN::Config->{'make'}, "test";
     if (system($system) == 0) {
@@ -5916,6 +6035,11 @@ sub vcmp {
 
   return 0 if $l eq $r; # short circuit for quicker success
 
+  for ($l,$r) {
+      next unless tr/.// > 1;
+      s/^v?/v/;
+      1 while s/\.0+(\d)/.$1/;
+  }
   if ($l=~/^v/ <=> $r=~/^v/) {
       for ($l,$r) {
           next if /^v/;
@@ -5923,14 +6047,17 @@ sub vcmp {
       }
   }
 
-  return
-      ($l ne "undef") <=> ($r ne "undef") ||
-          ($] >= 5.006 &&
+  return (
+          ($l ne "undef") <=> ($r ne "undef") ||
+          (
+           $] >= 5.006 &&
            $l =~ /^v/ &&
            $r =~ /^v/ &&
-           $self->vstring($l) cmp $self->vstring($r)) ||
-               $l <=> $r ||
-                   $l cmp $r;
+           $self->vstring($l) cmp $self->vstring($r)
+          ) ||
+          $l <=> $r ||
+          $l cmp $r
+         );
 }
 
 sub vgt {
@@ -6755,7 +6882,7 @@ added to the search path of the CPAN module before the use() or
 require() statements.
 
 The configuration dialog can be started any time later again by
-issueing the command C< o conf init > in the CPAN shell.
+issuing the command C< o conf init > in the CPAN shell.
 
 Currently the following keys in the hash reference $CPAN::Config are
 defined:
@@ -6904,7 +7031,7 @@ untended.
 
 Thanks to Graham Barr for contributing the following paragraphs about
 the interaction between perl, and various firewall configurations. For
-further informations on firewalls, it is recommended to consult the
+further information on firewalls, it is recommended to consult the
 documentation that comes with the ncftp program. If you are unable to
 go through the firewall with a simple Perl setup, it is very likely
 that you can configure ncftp so that it works for your firewall.
@@ -6993,6 +7120,21 @@ like
     o conf ncftp "/usr/bin/ncftp -f /home/scott/ncftplogin.cfg"
 
 Your mileage may vary...
+
+=head1 Cryptographically signed modules
+
+Since release 1.77 CPAN.pm has been able to verify cryptographically
+signed module distributions using Module::Signature.  The CPAN modules
+can be signed by their authors, thus giving more security.  The simple
+unsigned MD5 checksums that were used before by CPAN protect mainly
+against accidental file corruption.
+
+You will need to have Module::Signature installed, which in turn
+requires that you have at least one of Crypt::OpenPGP module or the
+command-line F<gpg> tool installed.
+
+You will also need to be able to connect over the Internet to the public
+keyservers, like pgp.mit.edu, and their port 11731 (the HKP protocol).
 
 =head1 FAQ
 
