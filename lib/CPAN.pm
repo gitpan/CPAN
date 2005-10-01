@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.76_53';
+$VERSION = '1.76_54';
 $VERSION = eval $VERSION;
 
 use CPAN::Version;
@@ -19,6 +19,7 @@ use Safe ();
 use Text::ParseWords ();
 use Text::Wrap;
 use File::Spec;
+use File::Temp ();
 use Sys::Hostname;
 no lib "."; # we need to run chdir all over and we would get at wrong
             # libraries there
@@ -51,6 +52,8 @@ $CPAN::Signal ||= 0;
 $CPAN::Frontend ||= "CPAN::Shell";
 $CPAN::Defaultsite ||= "ftp://ftp.perl.org/pub/CPAN";
 $CPAN::Perl ||= CPAN::find_perl();
+$CPAN::Defaultdocs ||= "http://search.cpan.org/perldoc?";
+$CPAN::Defaultrecent ||= "http://search.cpan.org/recent";
 
 
 package CPAN;
@@ -58,13 +61,15 @@ use strict qw(vars);
 
 use vars qw($VERSION @EXPORT $AUTOLOAD $DEBUG $META $HAS_USABLE $term
             $Signal $End $Suppress_readline $Frontend
-            $Defaultsite $Have_warned);
+            $Defaultsite $Have_warned $Defaultdocs $Defaultrecent
+            $Be_Silent );
 
 @CPAN::ISA = qw(CPAN::Debug Exporter);
 
 @EXPORT = qw(
 	     autobundle bundle expand force notest get cvs_import
 	     install make readme recompile shell test clean
+             perldoc recent
 	    );
 
 #-> sub CPAN::AUTOLOAD ;
@@ -145,12 +150,11 @@ sub shell {
 
     $CPAN::Frontend->myprint(
 			     sprintf qq{
-cpan shell -- CPAN exploration and modules installation (v%s%s)
+cpan shell -- CPAN exploration and modules installation (v%s)
 ReadLine support %s
 
 },
                              $CPAN::VERSION,
-                             $CPAN::Revision,
                              $rl_avail
                             )
         unless $CPAN::Config->{'inhibit_startup_message'} ;
@@ -255,7 +259,7 @@ package CPAN::Complete;
 @CPAN::Complete::COMMANDS = sort qw(
 		       ! a b d h i m o q r u autobundle clean dump
 		       make test install force readme reload look
-                       cvs_import ls
+                       cvs_import ls perldoc recent
 ) unless @CPAN::Complete::COMMANDS;
 
 package CPAN::Index;
@@ -1245,7 +1249,7 @@ sub _configpmtest {
         unlink $configpm_bak if -f $configpm_bak;
         if( -f $configpmtest ) {	
             if( rename $configpmtest, $configpm_bak ) {  
-                $CPAN::Frontend->mywarn(<<END)
+				$CPAN::Frontend->mywarn(<<END);
 Old configuration file $configpmtest
     moved to $configpm_bak
 END
@@ -1264,7 +1268,9 @@ END
 
 #-> sub CPAN::Config::load ;
 sub load {
-    my($self) = shift;
+    my($self, %args) = @_;
+	$CPAN::Be_Silent++ if $args{be_silent};
+
     my(@miss);
     use Carp;
     eval {require CPAN::Config;};       # We eval because of some
@@ -1300,8 +1306,9 @@ sub load {
 	    $configpmtest = File::Spec->catfile($configpmdir,"MyConfig.pm");
 	    $configpm = _configpmtest($configpmdir,$configpmtest); 
 	    unless ($configpm) {
-		Carp::confess(qq{WARNING: CPAN.pm is unable to }.
-			      qq{create a configuration file.});
+			my $text = qq{WARNING: CPAN.pm is unable to } .
+			  qq{create a configuration file.}; 
+			output($text, 'confess');
 	    }
 	}
     }
@@ -1314,8 +1321,9 @@ END
     $CPAN::Frontend->myprint(qq{
 $configpm initialized.
 });
+
     sleep 2;
-    CPAN::FirstTime::init($configpm);
+    CPAN::FirstTime::init($configpm, %args);
 }
 
 #-> sub CPAN::Config::missing_config_data ;
@@ -1402,6 +1410,7 @@ Display Information
  i        WORD or /REGEXP/  about any of the above
  r        NONE              report updatable modules
  ls       AUTHOR            about files in the author's directory
+ recent   NONE              latest CPAN uploads
 
 Download, Test, Make, Install...
  get                        download
@@ -1411,6 +1420,7 @@ Download, Test, Make, Install...
  clean                      make clean
  look                       open subshell in these dists' directories
  readme                     display these dists' README files
+ perldoc                    display module's POD documentation
 
 Other
  h,?           display this menu       ! perl-code   eval a perl command
@@ -1995,6 +2005,28 @@ sub format_result {
     $result;
 }
 
+#-> sub CPAN::Shell::report_fh ;
+{
+	my $installation_report_fh;
+	my $previously_noticed = 0;
+
+	sub report_fh {
+		return $installation_report_fh if $installation_report_fh;
+
+		$installation_report_fh = new File::Temp(
+												 template => 'cpan_install_XXXX',
+												 suffix   => '.txt',
+												 unlink   => 0,
+												);
+		unless ( $installation_report_fh ) {
+			warn("Couldn't open installation report file; " .
+				 "no report file will be generated."
+				) unless $previously_noticed++;
+	   }
+	}
+}
+
+
 # The only reason for this method is currently to have a reliable
 # debugging utility that reveals which output is going through which
 # channel. No, I don't like the colors ;-)
@@ -2004,6 +2036,12 @@ sub print_ornamented {
     my($self,$what,$ornament) = @_;
     my $longest = 0;
     return unless defined $what;
+
+	if ( $CPAN::Be_Silent ) {
+		local $| = 1; # Flush immediately
+		print {report_fh()} $what;
+		return;
+	}
 
     if ($CPAN::Config->{term_is_latin}){
         # courtesy jhi:
@@ -2193,6 +2231,14 @@ to find objects with matching identifiers.
     }
 }
 
+#-> sub CPAN::Shell::recent ;
+sub recent {
+  my($self) = @_;
+
+  CPAN::Distribution::_display_url( $self, $CPAN::Defaultrecent );
+  return;
+}
+
 #-> sub CPAN::Shell::dump ;
 sub dump    { shift->rematein('dump',@_); }
 #-> sub CPAN::Shell::force ;
@@ -2215,6 +2261,8 @@ sub clean   { shift->rematein('clean',@_); }
 sub look   { shift->rematein('look',@_); }
 #-> sub CPAN::Shell::cvs_import ;
 sub cvs_import   { shift->rematein('cvs_import',@_); }
+#-> sub CPAN::Shell::perldoc ;
+sub perldoc  { shift->rematein('perldoc',@_); }
 
 package CPAN::LWP::UserAgent;
 
@@ -2258,6 +2306,21 @@ sub get_basic_credentials {
     }
     return($USER,$PASSWD);
 }
+
+# mirror(): Its purpose is to deal with proxy authentication. When we
+# call SUPER::mirror, we relly call the mirror method in
+# LWP::UserAgent. LWP::UserAgent will then call
+# $self->get_basic_credentials or some equivalent and this will be
+# $self->dispatched to our own get_basic_credentials method.
+
+# Our own get_basic_credentials sets $USER and $PASSWD, two globals.
+
+# 407 stands for HTTP_PROXY_AUTHENTICATION_REQUIRED. Which means
+# although we have gone through our get_basic_credentials, the proxy
+# server refuses to connect. This could be a case where the username or
+# password has changed in the meantime, so I'm trying once again without
+# $USER and $PASSWD to give the get_basic_credentials routine another
+# chance to set $USER and $PASSWD.
 
 # mirror(): Its purpose is to deal with proxy authentication. When we
 # call SUPER::mirror, we relly call the mirror method in
@@ -3037,7 +3100,7 @@ sub cpl {
     } elsif ($line =~ /^d\s/) {
 	@return = cplx('CPAN::Distribution',$word);
     } elsif ($line =~ m/^(
-                          [mru]|make|clean|dump|get|test|install|readme|look|cvs_import
+                          [mru]|make|clean|dump|get|test|install|readme|look|cvs_import|perldoc|recent
                          )\s/x ) {
         if ($word =~ /^Bundle::/) {
             CPAN::Shell->local_bundles;
@@ -4303,6 +4366,7 @@ with pager "$CPAN::Config->{'pager'}"
 });
     sleep 2;
     $fh_pager->print(<$fh_readme>);
+    $fh_pager->close;
 }
 
 #-> sub CPAN::Distribution::verifyMD5 ;
@@ -5015,6 +5079,181 @@ sub dir {
     shift->{'build_dir'};
 }
 
+#-> sub CPAN::Distribution::perldoc ;
+sub perldoc {
+    my($self) = @_;
+
+    my($dist) = $self->id;
+    my $package = $self->called_for;
+
+    $self->_display_url( $CPAN::Defaultdocs . $package );
+}
+
+#-> sub CPAN::Distribution::_check_binary ;
+sub _check_binary {
+    my ($dist,$shell,$binary) = @_;
+    my ($pid,$readme,$out);
+
+    $CPAN::Frontend->myprint(qq{ + _check_binary($binary)\n})
+      if $CPAN::DEBUG;
+
+    $pid = open $readme, "-|", "which", $binary
+      or $CPAN::Frontend->mydie(qq{Could not fork $binary: $!});
+    while (<$readme>) {
+	$out .= $_;
+    }
+    close $readme;
+
+    $CPAN::Frontend->myprint(qq{   + $out \n})
+      if $CPAN::DEBUG && $out;
+
+    return $out;
+}
+
+#-> sub CPAN::Distribution::_display_url ;
+sub _display_url {
+    my($self,$url) = @_;
+    my($res,$saved_file,$pid,$readme,$out);
+
+    $CPAN::Frontend->myprint(qq{ + _display_url($url)\n})
+      if $CPAN::DEBUG;
+
+    # should we define it in the config instead?
+    my $html_converter = "html2text";
+
+    my $web_browser = $CPAN::Config->{'lynx'} || undef;
+    my $web_browser_out = $web_browser
+      ? CPAN::Distribution->_check_binary($self,$web_browser)
+	: undef;
+
+    my ($tmpout,$tmperr);
+    if (not $web_browser_out) {
+        # web browser not found, let's try text only
+	my $html_converter_out =
+	  CPAN::Distribution->_check_binary($self,$html_converter);
+
+        if ($html_converter_out ) {
+            # html2text found, run it
+            $saved_file = CPAN::Distribution->_getsave_url( $self, $url );
+            $CPAN::Frontend->myprint(qq{ERROR: problems while getting $url, $!\n})
+              unless defined($saved_file);
+
+	    $pid = open $readme, "-|", $html_converter, $saved_file
+	      or $CPAN::Frontend->mydie(qq{
+Could not fork $html_converter $saved_file: $!});
+	    my $fh = FileHandle->new;
+	    my $tmpdir = File::Spec->tmpdir();
+	    my $tmpin  = File::Spec->catfile( $tmpdir,
+					      "cpan__htmlconvert_out.txt" );
+	    if ($fh->open(">$tmpin")) {
+		while (<$readme>) {
+		    $fh->print($_);
+		}
+	    } else {
+		$CPAN::Frontend->mydie(qq{Could not open $tmpin $!});
+	    }
+
+	    close $readme
+	      or $CPAN::Frontend->mydie(qq{Could not close file handle: $!});
+	    $CPAN::Frontend->myprint(qq{
+Run '$html_converter $saved_file' and
+saved output to $tmpin\n})
+              if $CPAN::DEBUG;
+            my $fh_readme = FileHandle->new;
+	    $fh_readme->open($tmpin)
+	      or $CPAN::Frontend->mydie(qq{Could not open "$tmpin": $!});
+            my $fh_pager = FileHandle->new;
+            local($SIG{PIPE}) = "IGNORE";
+            $fh_pager->open("|$CPAN::Config->{'pager'}")
+              or $CPAN::Frontend->mydie(qq{
+Could not open pager $CPAN::Config->{'pager'}: $!});
+	    $CPAN::Frontend->myprint(qq{
+Displaying URL
+  $url
+with pager "$CPAN::Config->{'pager'}"
+});
+	    sleep 2;
+            $fh_pager->print(<$fh_readme>);
+	    $fh_pager->close;
+        } else {
+            # coldn't find the web browser or html converter
+            $CPAN::Frontend->myprint(qq{
+You need to install lynx or $html_converter to use this feature.});
+        }
+    } else {
+        # web browser found, run the action
+	my $browser = $CPAN::Config->{'lynx'};
+        $CPAN::Frontend->myprint(qq{system[$browser $url]})
+	  if $CPAN::DEBUG;
+	$CPAN::Frontend->myprint(qq{
+Displaying URL
+  $url
+with browser $browser
+});
+	sleep 2;
+        system("$browser $url");
+	if ($saved_file) { 1 while unlink($saved_file) }
+    }
+}
+
+#-> sub CPAN::Distribution::_getsave_url ;
+sub _getsave_url {
+    my($dist, $shell, $url) = @_;
+
+    $CPAN::Frontend->myprint(qq{ + _getsave_url($url)\n})
+      if $CPAN::DEBUG;
+
+    my $tmpdir = File::Spec->tmpdir();
+    my $tmpin  = File::Spec->catfile( $tmpdir, "cpan__getsave_url.html" );
+
+    if ($CPAN::META->has_usable('LWP')) {
+        $CPAN::Frontend->myprint("Fetching with LWP:
+  $url
+");
+        my $Ua;
+        CPAN::LWP::UserAgent->config;
+	eval { $Ua = CPAN::LWP::UserAgent->new; };
+	if ($@) {
+	    $CPAN::Frontend->mywarn("ERROR: CPAN::LWP::UserAgent->new dies with $@\n");
+	    return;
+	} else {
+	    my($var);
+	    $Ua->proxy('http', $var)
+	      if $var = $CPAN::Config->{http_proxy} || $ENV{http_proxy};
+	    $Ua->no_proxy($var)
+	      if $var = $CPAN::Config->{no_proxy} || $ENV{no_proxy};
+	}
+
+        my $req = HTTP::Request->new(GET => $url);
+        $req->header('Accept' => 'text/html');
+        my $res = $Ua->request($req);
+          if ($res->is_success) {
+              $CPAN::Frontend->myprint(" + request sucesuful.\n")
+                if $CPAN::DEBUG;
+              my $fh = FileHandle->new;
+	    if ($fh->open(">$tmpin")) {
+		print $fh $res->content;
+		close $fh;
+		$CPAN::Frontend->myprint(qq{ + saved content to $tmpin \n})
+		  if $CPAN::DEBUG;
+		return $tmpin;
+	    } else {
+              $CPAN::Frontend->myprint(qq{ + Could not open $tmpin: $! \n});
+	    }
+          } else {
+              $CPAN::Frontend->myprint(sprintf(
+                                             "LWP failed with code[%s], message[%s]\n",
+                                             $res->code,
+                                             $res->message,
+                                            ));
+              return;
+        }
+    } else {
+        $CPAN::Frontend->myprint("LWP not available\n");
+        return;
+    }
+}
+
 package CPAN::Bundle;
 
 sub look {
@@ -5637,13 +5876,21 @@ sub rematein {
     $pack->called_for($self->id);
     $pack->force($meth) if exists $self->{'force_update'};
     $pack->notest($meth) if exists $self->{'notest'};
-    $pack->$meth();
+    eval {
+	$pack->$meth();
+    };
+    my $err = $@;
     $pack->unforce if $pack->can("unforce") && exists $self->{'force_update'};
     $pack->unnotest if $pack->can("unnotest") && exists $self->{'notest'};
     delete $self->{'force_update'};
     delete $self->{'notest'};
+    if ($err) {
+	die $err;
+    }
 }
 
+#-> sub CPAN::Module::perldoc ;
+sub perldoc { shift->rematein('perldoc') }
 #-> sub CPAN::Module::readme ;
 sub readme { shift->rematein('readme') }
 #-> sub CPAN::Module::look ;
@@ -5793,8 +6040,9 @@ sub gzip {
     my($buffer,$fhw);
     $fhw = FileHandle->new($read)
 	or $CPAN::Frontend->mydie("Could not open $read: $!");
+	my $cwd = `pwd`;
     my $gz = Compress::Zlib::gzopen($write, "wb")
-	or $CPAN::Frontend->mydie("Cannot gzopen $write: $!\n");
+	or $CPAN::Frontend->mydie("Cannot gzopen $write: $! (pwd is $cwd)\n");
     $gz->gzwrite($buffer)
 	while read($fhw,$buffer,4096) > 0 ;
     $gz->gzclose() ;
@@ -6201,12 +6449,14 @@ A C<clean> command results in a
 
 being executed within the distribution file's working directory.
 
-=item get, readme, look module or distribution
+=item get, readme, ,perldoc, look module or distribution
 
 C<get> downloads a distribution file without further action. C<readme>
 displays the README file of the associated distribution. C<Look> gets
 and untars (if not yet done) the distribution file, changes to the
 appropriate directory and opens a subshell process in that directory.
+C<perldoc> displays the pod documentation of the module in html or
+plain text format.
 
 =item ls author
 
@@ -6573,6 +6823,15 @@ otherwise.
 Downloads the README file associated with a distribution and runs it
 through the pager specified in C<$CPAN::Config->{pager}>.
 
+=item CPAN::Distribution::perldoc()
+
+Downloads the pod documentation of the file associated with a
+distribution (in html format) and runs it through the external
+command lynx specified in C<$CPAN::Config->{lynx}>. If lynx
+isn't available, it converts it to plain text with external
+command html2text and runs it through the pager specified
+in C<$CPAN::Config->{pager}>
+
 =item CPAN::Distribution::test()
 
 Changes to the directory where the distribution has been unpacked and
@@ -6675,6 +6934,10 @@ if it is not installed.
 =item CPAN::Module::readme()
 
 Runs a C<readme> on the distribution associated with this module.
+
+=item CPAN::Module::perldoc()
+
+Runs a C<perldoc> on this module.
 
 =item CPAN::Module::test()
 
@@ -7135,12 +7398,20 @@ so that STDOUT is captured in a file for later inspection.
 
 I am not root, how can I install a module in a personal directory?
 
+First of all, you will want to use your own configuration, not the one
+that your root user installed. The following command sequence is a
+possible approach:
+
+    % mkdir -p $HOME/.cpan/CPAN
+    % echo '$CPAN::Config={ };' > $HOME/.cpan/CPAN/MyConfig.pm
+    % cpan
+    [...answer all questions...]
+
 You will most probably like something like this:
 
   o conf makepl_arg "LIB=~/myperl/lib \
                     INSTALLMAN1DIR=~/myperl/man/man1 \
                     INSTALLMAN3DIR=~/myperl/man/man3"
-  install Sybase::Sybperl
 
 You can make this setting permanent like all C<o conf> settings with
 C<o conf commit>.
