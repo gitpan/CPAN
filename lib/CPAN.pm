@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.76_54';
+$VERSION = '1.76_55';
 $VERSION = eval $VERSION;
 
 use CPAN::Version;
@@ -1247,14 +1247,14 @@ sub _configpmtest {
         #_#_# following code dumped core on me with 5.003_11, a.k.
         my $configpm_bak = "$configpmtest.bak";
         unlink $configpm_bak if -f $configpm_bak;
-        if( -f $configpmtest ) {	
-            if( rename $configpmtest, $configpm_bak ) {  
+        if( -f $configpmtest ) {
+            if( rename $configpmtest, $configpm_bak ) {
 				$CPAN::Frontend->mywarn(<<END);
 Old configuration file $configpmtest
     moved to $configpm_bak
 END
 	    }
-	}	
+	}
 	my $fh = FileHandle->new;
 	if ($fh->open(">$configpmtest")) {
 	    $fh->print("1;\n");
@@ -1263,7 +1263,7 @@ END
 	    # Should never happen
 	    Carp::confess("Cannot open >$configpmtest");
 	}
-    } else { return } 
+    } else { return }
 }
 
 #-> sub CPAN::Config::load ;
@@ -1443,19 +1443,35 @@ sub a {
 }
 
 #-> sub CPAN::Shell::ls ;
-sub ls      {
+sub ls {
     my($self,@arg) = @_;
     my @accept;
+    if ($arg[0] eq "*") {
+        @arg = map { $_->id } $self->expand('Author','/./');
+    }
     for (@arg) {
-        unless (/^[A-Z\-]+$/i) {
+        unless (/^[A-Z0-9\-]+$/i) {
             $CPAN::Frontend->mywarn("ls command rejects argument $_: not an author\n");
             next;
         }
         push @accept, uc $_;
     }
+    my $silent = @accept>1;
+    my $last_alpha = "";
     for my $a (@accept){
         my $author = $self->expand('Author',$a) or die "No author found for $a";
-        $author->ls;
+        $author->ls($silent); # silent if more than one author
+        if ($silent) {
+            my $alphadot = substr $author->id, 0, 1;
+            my $ad;
+            if ($alphadot eq $last_alpha) {
+                $ad = ".";
+            } else {
+                $ad = $alphadot;
+                $last_alpha = $alphadot;
+            }
+            $CPAN::Frontend->myprint($ad);
+        }
     }
 }
 
@@ -1640,12 +1656,18 @@ sub reload {
     if ($command =~ /cpan/i) {
         for my $f (qw(CPAN.pm CPAN/FirstTime.pm)) {
             next unless $INC{$f};
-            CPAN->debug("reloading the whole $f") if $CPAN::DEBUG;
+            my $pwd = CPAN::anycwd();
+            CPAN->debug("reloading the whole '$f' from '$INC{$f}' while pwd='$pwd'")
+                if $CPAN::DEBUG;
             my $fh = FileHandle->new($INC{$f});
             local($/);
             my $redef = 0;
+            local $^W = 1;
             local($SIG{__WARN__}) = paintdots_onreload(\$redef);
-            eval <$fh>;
+            my $eval = <$fh>;
+            CPAN->debug("evaling '$eval'")
+                if $CPAN::DEBUG;
+            eval $eval;
             warn $@ if $@;
             $CPAN::Frontend->myprint("\n$redef subroutines redefined\n");
         }
@@ -2007,23 +2029,22 @@ sub format_result {
 
 #-> sub CPAN::Shell::report_fh ;
 {
-	my $installation_report_fh;
-	my $previously_noticed = 0;
+    my $installation_report_fh;
+    my $previously_noticed = 0;
 
-	sub report_fh {
-		return $installation_report_fh if $installation_report_fh;
-
-		$installation_report_fh = new File::Temp(
-												 template => 'cpan_install_XXXX',
-												 suffix   => '.txt',
-												 unlink   => 0,
-												);
-		unless ( $installation_report_fh ) {
-			warn("Couldn't open installation report file; " .
-				 "no report file will be generated."
-				) unless $previously_noticed++;
-	   }
-	}
+    sub report_fh {
+        return $installation_report_fh if $installation_report_fh;
+        $installation_report_fh = File::Temp->new(
+                                                  template => 'cpan_install_XXXX',
+                                                  suffix   => '.txt',
+                                                  unlink   => 0,
+                                                 );
+        unless ( $installation_report_fh ) {
+            warn("Couldn't open installation report file; " .
+                 "no report file will be generated."
+                ) unless $previously_noticed++;
+        }
+    }
 }
 
 
@@ -2037,11 +2058,11 @@ sub print_ornamented {
     my $longest = 0;
     return unless defined $what;
 
-	if ( $CPAN::Be_Silent ) {
-		local $| = 1; # Flush immediately
-		print {report_fh()} $what;
-		return;
-	}
+    local $| = 1; # Flush immediately
+    if ( $CPAN::Be_Silent ) {
+        print {report_fh()} $what;
+        return;
+    }
 
     if ($CPAN::Config->{term_is_latin}){
         # courtesy jhi:
@@ -2125,7 +2146,7 @@ sub rematein {
 	$meth = shift @some;
     }
     setup_output();
-    CPAN->debug("pragma[@pragma]meth[$meth] some[@some]") if $CPAN::DEBUG;
+    CPAN->debug("pragma[@pragma]meth[$meth]some[@some]") if $CPAN::DEBUG;
 
     # Here is the place to set "test_count" on all involved parties to
     # 0. We then can pass this counter on to the involved
@@ -2258,11 +2279,11 @@ sub install { shift->rematein('install',@_); }
 #-> sub CPAN::Shell::clean ;
 sub clean   { shift->rematein('clean',@_); }
 #-> sub CPAN::Shell::look ;
-sub look   { shift->rematein('look',@_); }
+sub look    { shift->rematein('look',@_); }
 #-> sub CPAN::Shell::cvs_import ;
-sub cvs_import   { shift->rematein('cvs_import',@_); }
+sub cvs_import { shift->rematein('cvs_import',@_); }
 #-> sub CPAN::Shell::perldoc ;
-sub perldoc  { shift->rematein('perldoc',@_); }
+sub perldoc    { shift->rematein('perldoc',@_); }
 
 package CPAN::LWP::UserAgent;
 
@@ -3757,28 +3778,29 @@ sub email    { shift->{RO}{EMAIL}; }
 #-> sub CPAN::Author::ls ;
 sub ls {
     my $self = shift;
+    my $silent = shift || 0;
     my $id = $self->id;
 
     # adapted from CPAN::Distribution::verifyMD5 ;
     my(@csf); # chksumfile
     @csf = $self->id =~ /(.)(.)(.*)/;
     $csf[1] = join "", @csf[0,1];
-    $csf[2] = join "", @csf[1,2];
+    $csf[2] = join "", @csf[1,2]; # ("A","AN","ANDK")
     my(@dl);
     @dl = $self->dir_listing([$csf[0],"CHECKSUMS"], 0);
     unless (grep {$_->[2] eq $csf[1]} @dl) {
-        $CPAN::Frontend->myprint("No files in the directory of $id\n");
+        $CPAN::Frontend->myprint("No files in the directory of $id\n") unless $silent ;
         return;
     }
     @dl = $self->dir_listing([@csf[0,1],"CHECKSUMS"], 0);
     unless (grep {$_->[2] eq $csf[2]} @dl) {
-        $CPAN::Frontend->myprint("No files in the directory of $id\n");
+        $CPAN::Frontend->myprint("No files in the directory of $id\n") unless $silent;
         return;
     }
     @dl = $self->dir_listing([@csf,"CHECKSUMS"], 1);
     $CPAN::Frontend->myprint(join "", map {
         sprintf("%8d %10s %s/%s\n", $_->[0], $_->[1], $id, $_->[2])
-    } sort { $a->[2] cmp $b->[2] } @dl);
+    } sort { $a->[2] cmp $b->[2] } @dl) unless $silent;
 }
 
 # returns an array of arrays, the latter contain (size,mtime,filename)
@@ -4043,13 +4065,15 @@ sub get {
     #
     # Unpack the goods
     #
+    $self->debug("local_file[$local_file]") if $CPAN::DEBUG;
     if ($local_file =~ /(\.tar\.(gz|Z)|\.tgz)(?!\n)\Z/i){
         $self->{was_uncompressed}++ unless CPAN::Tarzip->gtest($local_file);
 	$self->untar_me($local_file);
     } elsif ( $local_file =~ /\.zip(?!\n)\Z/i ) {
 	$self->unzip_me($local_file);
-    } elsif ( $local_file =~ /\.pm\.(gz|Z)(?!\n)\Z/) {
+    } elsif ( $local_file =~ /\.pm(\.(gz|Z))?(?!\n)\Z/) {
         $self->{was_uncompressed}++ unless CPAN::Tarzip->gtest($local_file);
+        $self->debug("calling pm2dir for local_file[$local_file]") if $CPAN::DEBUG;
 	$self->pm2dir_me($local_file);
     } else {
 	$self->{archived} = "NO";
@@ -4232,11 +4256,15 @@ sub pm2dir_me {
     my($self,$local_file) = @_;
     $self->{archived} = "pm";
     my $to = File::Basename::basename($local_file);
-    $to =~ s/\.(gz|Z)(?!\n)\Z//;
-    if (CPAN::Tarzip->gunzip($local_file,$to)) {
-	$self->{unwrapped} = "YES";
+    if ($to =~ s/\.(gz|Z)(?!\n)\Z//) {
+        if (CPAN::Tarzip->gunzip($local_file,$to)) {
+            $self->{unwrapped} = "YES";
+        } else {
+            $self->{unwrapped} = "NO";
+        }
     } else {
-	$self->{unwrapped} = "NO";
+        File::Copy::cp($local_file,".");
+        $self->{unwrapped} = "YES";
     }
 }
 
@@ -5141,26 +5169,26 @@ sub _display_url {
 	    $pid = open $readme, "-|", $html_converter, $saved_file
 	      or $CPAN::Frontend->mydie(qq{
 Could not fork $html_converter $saved_file: $!});
-	    my $fh = FileHandle->new;
-	    my $tmpdir = File::Spec->tmpdir();
-	    my $tmpin  = File::Spec->catfile( $tmpdir,
-					      "cpan__htmlconvert_out.txt" );
-	    if ($fh->open(">$tmpin")) {
-		while (<$readme>) {
-		    $fh->print($_);
-		}
-	    } else {
-		$CPAN::Frontend->mydie(qq{Could not open $tmpin $!});
-	    }
-
+	    my $fh = File::Temp->new(
+                                     template => 'cpan_htmlconvert_XXXX',
+                                     suffix => '.txt',
+                                     unlink => 0,
+                                    );
+            while (<$readme>) {
+                $fh->print($_);
+            }
 	    close $readme
 	      or $CPAN::Frontend->mydie(qq{Could not close file handle: $!});
-	    $CPAN::Frontend->myprint(qq{
-Run '$html_converter $saved_file' and
-saved output to $tmpin\n})
-              if $CPAN::DEBUG;
-            my $fh_readme = FileHandle->new;
-	    $fh_readme->open($tmpin)
+            my $tmpin = $fh->filename;
+	    $CPAN::Frontend->myprint(sprintf(qq{
+Run '%s %s' and
+saved output to %s\n},
+                                             $html_converter,
+                                             $saved_file,
+                                             $tmpin,
+                                            )) if $CPAN::DEBUG;
+            close $fh; undef $fh;
+	    open $fh, $tmpin
 	      or $CPAN::Frontend->mydie(qq{Could not open "$tmpin": $!});
             my $fh_pager = FileHandle->new;
             local($SIG{PIPE}) = "IGNORE";
@@ -5173,7 +5201,7 @@ Displaying URL
 with pager "$CPAN::Config->{'pager'}"
 });
 	    sleep 2;
-            $fh_pager->print(<$fh_readme>);
+            $fh_pager->print(<$fh>);
 	    $fh_pager->close;
         } else {
             # coldn't find the web browser or html converter
@@ -5203,9 +5231,12 @@ sub _getsave_url {
     $CPAN::Frontend->myprint(qq{ + _getsave_url($url)\n})
       if $CPAN::DEBUG;
 
-    my $tmpdir = File::Spec->tmpdir();
-    my $tmpin  = File::Spec->catfile( $tmpdir, "cpan__getsave_url.html" );
-
+    my $fh  = File::Temp->new(
+                              template => "cpan_getsave_url_XXXX",
+                              suffix => ".html",
+                              unlink => 0,
+                             );
+    my $tmpin = $fh->filename;
     if ($CPAN::META->has_usable('LWP')) {
         $CPAN::Frontend->myprint("Fetching with LWP:
   $url
@@ -5219,34 +5250,29 @@ sub _getsave_url {
 	} else {
 	    my($var);
 	    $Ua->proxy('http', $var)
-	      if $var = $CPAN::Config->{http_proxy} || $ENV{http_proxy};
+                if $var = $CPAN::Config->{http_proxy} || $ENV{http_proxy};
 	    $Ua->no_proxy($var)
-	      if $var = $CPAN::Config->{no_proxy} || $ENV{no_proxy};
+                if $var = $CPAN::Config->{no_proxy} || $ENV{no_proxy};
 	}
 
         my $req = HTTP::Request->new(GET => $url);
         $req->header('Accept' => 'text/html');
         my $res = $Ua->request($req);
-          if ($res->is_success) {
-              $CPAN::Frontend->myprint(" + request sucesuful.\n")
+        if ($res->is_success) {
+            $CPAN::Frontend->myprint(" + request successful.\n")
                 if $CPAN::DEBUG;
-              my $fh = FileHandle->new;
-	    if ($fh->open(">$tmpin")) {
-		print $fh $res->content;
-		close $fh;
-		$CPAN::Frontend->myprint(qq{ + saved content to $tmpin \n})
-		  if $CPAN::DEBUG;
-		return $tmpin;
-	    } else {
-              $CPAN::Frontend->myprint(qq{ + Could not open $tmpin: $! \n});
-	    }
-          } else {
-              $CPAN::Frontend->myprint(sprintf(
+            print $fh $res->content;
+            close $fh;
+            $CPAN::Frontend->myprint(qq{ + saved content to $tmpin \n})
+                if $CPAN::DEBUG;
+            return $tmpin;
+        } else {
+            $CPAN::Frontend->myprint(sprintf(
                                              "LWP failed with code[%s], message[%s]\n",
                                              $res->code,
                                              $res->message,
                                             ));
-              return;
+            return;
         }
     } else {
         $CPAN::Frontend->myprint("LWP not available\n");
@@ -5537,6 +5563,8 @@ sub xs_file {
 
 #-> sub CPAN::Bundle::force ;
 sub force   { shift->rematein('force',@_); }
+#-> sub CPAN::Bundle::notest ;
+sub notest  { shift->rematein('notest',@_); }
 #-> sub CPAN::Bundle::get ;
 sub get     { shift->rematein('get',@_); }
 #-> sub CPAN::Bundle::make ;
@@ -5892,18 +5920,15 @@ sub rematein {
 #-> sub CPAN::Module::perldoc ;
 sub perldoc { shift->rematein('perldoc') }
 #-> sub CPAN::Module::readme ;
-sub readme { shift->rematein('readme') }
+sub readme  { shift->rematein('readme') }
 #-> sub CPAN::Module::look ;
-sub look { shift->rematein('look') }
+sub look    { shift->rematein('look') }
 #-> sub CPAN::Module::cvs_import ;
 sub cvs_import { shift->rematein('cvs_import') }
 #-> sub CPAN::Module::get ;
-sub get    { shift->rematein('get',@_); }
+sub get     { shift->rematein('get',@_) }
 #-> sub CPAN::Module::make ;
-sub make   {
-    my $self = shift;
-    $self->rematein('make');
-}
+sub make    { shift->rematein('make') }
 #-> sub CPAN::Module::test ;
 sub test   {
     my $self = shift;
@@ -6429,8 +6454,8 @@ the module doesn't need to be updated.
 
 CPAN also keeps track of what it has done within the current session
 and doesn't try to build a package a second time regardless if it
-succeeded or not. The C<force> command takes as a first argument the
-method to invoke (currently: C<make>, C<test>, or C<install>) and executes the
+succeeded or not. The C<force> pragma may precede another command
+(currently: C<make>, C<test>, or C<install>) and executes the
 command from scratch.
 
 Example:
@@ -6442,6 +6467,13 @@ Example:
     OpenGL-0.4/
     OpenGL-0.4/COPYRIGHT
     [...]
+
+The C<notest> pragma may be set to skip the test part in the build
+process.
+
+Example:
+
+    cpan> notest install Tk
 
 A C<clean> command results in a
 

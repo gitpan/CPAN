@@ -1,44 +1,107 @@
-cpan script should accept arguments as suggested by Matt Sergeant:
-   cpan install My::Foo
+2005-10-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-Cache manager should read youngest directories first and start
-deleting without measuring as soon as the cache limit is reached.
+	* Bug: installing scripts without modules? How does it work? How
+	should it work?
 
-Rename 'o conf' to 'set' and 'o debug' to 'set debug'.
+2005-10-18  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-Profiling?
+	* Bug: installing SWETH/IPv4.pm did not seem to work anymore.
+	Fixed in revision 172.
 
-Provide something, so that the next "o conf commit" will not overwrite
-the config file. maybe "myconfig_readonly"?
+	* Bug: there is a directory ZTANG/Text-PORE-102/ on CPAN with a
+	single file README in it. ls chokes on ZTANG because of this. Is
+	it a bug that the directory exists or is it a bug that it has no
+	CHECKSUMS file?
 
-I have a patch by Jochen Wiedmann that implements a per-distribution
-permanent configuration directory. The new containsmods() method in
-1.52 should help to fit the patch with the rest of CPAN.pm.
+2005-10-12  Andreas J Koenig  <akoenig@cellular.de>
 
-Option to skip testing (Ask Bjoern Hansen).
+	* Bug: checksum mismatch on a file is being reported even when the
+	file has 0 bytes. 0 bytes should clearly constitute the right/the
+	duty to overwrite.
 
-Default Argument for make,test,look,etc. could be the last argument???
+	* Bug: what? we still do not support Build.PL? Didn't anybody send
+	me a patch? Try 'install CPAN::Metadata::RDF' and see how this can
+	be fixed as quickly as possible.
 
-Make a preferred download method configurable (allow further download
-methods via plugin?)
+	Try:        look CPAN::Metadata::RDF
+	then there: perl Build.PL;./Build;./Build install
 
-Allow different site preferences for index files and other files
+	This does nothing for the prerequisites. We could lookup META.yml
+	either then or beforehand.
 
-Replace make with Make
+	* Bug: the nonsense command 'force ls andk' should just do a plain
+	'ls andk'. Instead it complains: C<Warning: Cannot ls andk, don't
+	know what it is.>
 
-Maintain the cache at runtime. Currently we only check it at startup.
+2005-10-11  Andreas J Koenig  <akoenig@cellular.de>
 
-Distribute compressed CHECKSUM files
+	* Bug: "o conf foo bar" should complain about invalid key "foo".
+	It does instead set "foo" to "bar" and it happened to me to set
+	"debug" to "all" and then I wondered why debugging was not turned
+	on. Would it have complained, I would have found the correct
+	command ("o debug all") much quicker.
 
-Security layer
+	* Bug: "reload cpan" does not work if the old and the new CPAN.pm
+	have a different path. I installed a new CPAN.pm from CPAN and it
+	did remove the old /usr/share/perl/5.8/CPAN.pm but instelled the
+	new one as /usr/local/share/perl/5.8.7/CPAN.pm. The reload then
+	always just said "0 subroutines redefined".
 
-make plugins configurable, adjust @ISA
+	Same effect can be illustrated by changing to the source's root
+	directory, running 'perl -Ilib -MCPAN -e shell', 'install
+	Tie::CPHash' (or something else???) and then 'reload cpan'....
+	Ahhh, it is a matter of somebody having turned off $^W globally:-)
 
-Make configurable that multiple additional index files can be
-integrated (for Intra-CPANs). I believe CPAN::Site did it right
-anyway, so we might skip this.
+	FIXED
 
-Make the 'make' command itself configurable as suggested by Rujith de
-Silva <rujith.desilva@ps.net>, who wants to run 'sudo make install'
-instead of 'make install'. (Fixing this is delayed, because it
-interacts with Make.pm)
+2003-08-13  Andreas J Koenig
+
+	cpan script should accept arguments as suggested by Matt Sergeant:
+	   cpan install My::Foo
+	
+	Cache manager should read youngest directories first and start
+	deleting without measuring as soon as the cache limit is reached.
+	
+	Rename 'o conf' to 'set' and 'o debug' to 'set debug'.
+	
+	Profiling?
+	
+	Provide something, so that the next "o conf commit" will not overwrite
+	the config file. maybe "myconfig_readonly"?
+	
+	I have a patch by Jochen Wiedmann that implements a per-distribution
+	permanent configuration directory. The new containsmods() method in
+	1.52 should help to fit the patch with the rest of CPAN.pm.
+	
+	Option to skip testing (Ask Bjoern Hansen).
+	
+	Default Argument for make,test,look,etc. could be the last argument???
+	
+	Make a preferred download method configurable (allow further download
+	methods via plugin?)
+	
+	Allow different site preferences for index files and other files
+	
+	Replace make with Make
+	
+	Maintain the cache at runtime. Currently we only check it at startup.
+	
+	Distribute compressed CHECKSUM files
+	
+	Security layer
+	
+	make plugins configurable, adjust @ISA
+	
+	Make configurable that multiple additional index files can be
+	integrated (for Intra-CPANs). I believe CPAN::Site did it right
+	anyway, so we might skip this.
+	
+	Make the 'make' command itself configurable as suggested by Rujith de
+	Silva <rujith.desilva@ps.net>, who wants to run 'sudo make install'
+	instead of 'make install'. (Fixing this is delayed, because it
+	interacts with Make.pm)
+	
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Todo"
+	End:
