@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.76_55';
+$VERSION = '1.76_56';
 $VERSION = eval $VERSION;
 
 use CPAN::Version;
@@ -238,12 +238,22 @@ package CPAN::CacheMgr;
 use File::Find;
 
 package CPAN::Config;
-use vars qw(%can $dot_cpan);
+use vars qw(%can %keys $dot_cpan);
 
 %can = (
   'commit' => "Commit changes to disk",
   'defaults' => "Reload defaults from disk",
   'init'   => "Interactive setting of all options",
+);
+
+%keys = map { $_ => undef } qw(
+    build_cache build_dir cache_metadata cpan_home curl dontload_hash
+    ftp ftp_proxy getcwd gpg gzip histfile histsize http_proxy
+    inactivity_timeout index_expire inhibit_startup_message
+    keep_source_where lynx make make_arg make_install_arg
+    make_install_make_command makepl_arg ncftp ncftpget no_proxy pager
+    prerequisites_policy scan_cache shell tar term_is_latin unzip
+    urllist wait_list wget
 );
 
 package CPAN::FTP;
@@ -1096,6 +1106,9 @@ sub edit {
 	return 1;
     } else {
         CPAN->debug("o[$o]") if $CPAN::DEBUG;
+        unless (exists $keys{$o}) {
+            $CPAN::Frontend->mywarn("Warning: unknown configuration variable '$o'\n");
+        }
 	if ($o =~ /list$/) {
 	    $func = shift @args;
 	    $func ||= "";
@@ -1142,8 +1155,8 @@ sub prettyprint {
   if (ref $v) {
     my(@report) = ref $v eq "ARRAY" ?
         @$v :
-            map { sprintf("   %-18s => %s\n",
-                          $_,
+            map { sprintf("   %-18s => [%s]\n",
+                          map { "[$_]" } $_,
                           defined $v->{$_} ? $v->{$_} : "UNDEFINED"
                          )} keys %$v;
     $CPAN::Frontend->myprint(
@@ -1153,13 +1166,13 @@ sub prettyprint {
                                           "    %-18s\n",
                                           $k
                                          ),
-                                  map {"\t$_\n"} @report
+                                  map {"\t[$_]\n"} @report
                                  )
                             );
   } elsif (defined $v) {
-    $CPAN::Frontend->myprint(sprintf "    %-18s %s\n", $k, $v);
+    $CPAN::Frontend->myprint(sprintf "    %-18s [%s]\n", $k, $v);
   } else {
-    $CPAN::Frontend->myprint(sprintf "    %-18s %s\n", $k, "UNDEFINED");
+    $CPAN::Frontend->myprint(sprintf "    %-18s [%s]\n", $k, "UNDEFINED");
   }
 }
 
@@ -1562,7 +1575,7 @@ sub o {
 	    $CPAN::Frontend->myprint(":\n");
 	    for $k (sort keys %CPAN::Config::can) {
 		$v = $CPAN::Config::can{$k};
-		$CPAN::Frontend->myprint(sprintf "    %-18s %s\n", $k, $v);
+		$CPAN::Frontend->myprint(sprintf "    %-18s [%s]\n", $k, $v);
 	    }
 	    $CPAN::Frontend->myprint("\n");
 	    for $k (sort keys %$CPAN::Config) {
@@ -2182,8 +2195,8 @@ sub rematein {
             $obj->color_cmd_tmps(0,1);
             CPAN::Queue->new($obj->id);
             push @qcopy, $obj;
-	} elsif ($CPAN::META->exists('CPAN::Author',$s)) {
-	    $obj = $CPAN::META->instance('CPAN::Author',$s);
+	} elsif ($CPAN::META->exists('CPAN::Author',uc($s))) {
+	    $obj = $CPAN::META->instance('CPAN::Author',uc($s));
             if ($meth =~ /^(dump|ls)$/) {
                 $obj->$meth();
             } else {
@@ -3787,17 +3800,17 @@ sub ls {
     $csf[1] = join "", @csf[0,1];
     $csf[2] = join "", @csf[1,2]; # ("A","AN","ANDK")
     my(@dl);
-    @dl = $self->dir_listing([$csf[0],"CHECKSUMS"], 0);
+    @dl = $self->dir_listing([$csf[0],"CHECKSUMS"], 0, 1);
     unless (grep {$_->[2] eq $csf[1]} @dl) {
         $CPAN::Frontend->myprint("No files in the directory of $id\n") unless $silent ;
         return;
     }
-    @dl = $self->dir_listing([@csf[0,1],"CHECKSUMS"], 0);
+    @dl = $self->dir_listing([@csf[0,1],"CHECKSUMS"], 0, 1);
     unless (grep {$_->[2] eq $csf[2]} @dl) {
         $CPAN::Frontend->myprint("No files in the directory of $id\n") unless $silent;
         return;
     }
-    @dl = $self->dir_listing([@csf,"CHECKSUMS"], 1);
+    @dl = $self->dir_listing([@csf,"CHECKSUMS"], 1, 1);
     $CPAN::Frontend->myprint(join "", map {
         sprintf("%8d %10s %s/%s\n", $_->[0], $_->[1], $id, $_->[2])
     } sort { $a->[2] cmp $b->[2] } @dl) unless $silent;
@@ -3809,6 +3822,7 @@ sub dir_listing {
     my $self = shift;
     my $chksumfile = shift;
     my $recursive = shift;
+    my $may_ftp = shift;
     my $lc_want =
 	File::Spec->catfile($CPAN::Config->{keep_source_where},
 			    "authors", "id", @$chksumfile);
@@ -3830,19 +3844,29 @@ sub dir_listing {
     if (my @stat = stat $lc_want) {
         $force = $stat[9] + $CPAN::Config->{index_expire}*86400 <= time;
     }
-    my $lc_file = CPAN::FTP->localize("authors/id/@$chksumfile",
-                                      $lc_want,$force);
-    unless ($lc_file) {
-        $CPAN::Frontend->myprint("Trying $lc_want.gz\n");
-	$chksumfile->[-1] .= ".gz";
-	$lc_file = CPAN::FTP->localize("authors/id/@$chksumfile",
-                                       "$lc_want.gz",1);
-	if ($lc_file) {
-	    $lc_file =~ s{\.gz(?!\n)\Z}{}; #};
-	    CPAN::Tarzip->gunzip("$lc_file.gz",$lc_file);
-	} else {
-	    return;
-	}
+    my $lc_file;
+    if ($may_ftp) {
+        $lc_file = CPAN::FTP->localize(
+                                       "authors/id/@$chksumfile",
+                                       $lc_want,
+                                       $force,
+                                      );
+        unless ($lc_file) {
+            $CPAN::Frontend->myprint("Trying $lc_want.gz\n");
+            $chksumfile->[-1] .= ".gz";
+            $lc_file = CPAN::FTP->localize("authors/id/@$chksumfile",
+                                           "$lc_want.gz",1);
+            if ($lc_file) {
+                $lc_file =~ s{\.gz(?!\n)\Z}{}; #};
+                CPAN::Tarzip->gunzip("$lc_file.gz",$lc_file);
+            } else {
+                return;
+            }
+        }
+    } else {
+        $lc_file = $lc_want; # XXX not reached; but if reached some
+                             # day, we'll be wrong because file://
+                             # URLS do not get copied to lc_want
     }
 
     # adapted from CPAN::Distribution::MD5_check_file ;
@@ -3859,8 +3883,10 @@ sub dir_listing {
 	    rename $lc_file, "$lc_file.bad";
 	    Carp::confess($@) if $@;
 	}
-    } else {
+    } elsif ($may_ftp) { # currently always true
 	Carp::carp "Could not open $lc_file for reading";
+    } else {
+	return; # not reached
     }
     my(@result,$f);
     for $f (sort keys %$cksum) {
@@ -3871,7 +3897,7 @@ sub dir_listing {
                 push @dir, $f, "CHECKSUMS";
                 push @result, map {
                     [$_->[0], $_->[1], "$f/$_->[2]"]
-                } $self->dir_listing(\@dir,1);
+                } $self->dir_listing(\@dir,1,$may_ftp);
             } else {
                 push @result, [ 0, "-", $f ];
             }
@@ -3945,6 +3971,7 @@ sub color_cmd_tmps {
 sub as_string {
   my $self = shift;
   $self->containsmods;
+  $self->upload_date;
   $self->SUPER::as_string(@_);
 }
 
@@ -3961,6 +3988,21 @@ sub containsmods {
     $self->{CONTAINSMODS}{$mod_id} = undef if $mod_file eq $dist_id;
   }
   keys %{$self->{CONTAINSMODS}};
+}
+
+#-> sub CPAN::Distribution::upload_date ;
+sub upload_date {
+  my $self = shift;
+  return $self->{UPLOAD_DATE} if exists $self->{UPLOAD_DATE};
+  my(@local_wanted) = split(/\//,$self->id);
+  my $filename = pop @local_wanted;
+  push @local_wanted, "CHECKSUMS";
+  my @dl = CPAN::Shell->expand("Author",$self->cpan_userid)->dir_listing(\@local_wanted,0,1);
+  return unless @dl;
+  my($dirent) = grep { $_->[2] eq $filename } @dl;
+  warn sprintf "dirent[%s]id[%s]", $dirent, $self->id;
+  return unless $dirent->[1];
+  return $self->{UPLOAD_DATE} = $dirent->[1];
 }
 
 #-> sub CPAN::Distribution::uptodate ;
@@ -5077,8 +5119,14 @@ sub install {
         return;
     }
 
-    my $system = join(" ", $CPAN::Config->{'make'},
-		      "install", $CPAN::Config->{make_install_arg});
+    my($make_install_make_command) = $CPAN::Config->{'make_install_make_command'} ||
+        $CPAN::Config->{'make'};
+
+    my($system) = join(" ",
+                       $make_install_make_command,
+                       "install",
+                       $CPAN::Config->{make_install_arg},
+                      );
     my($stderr) = $^O =~ /Win/i ? "" : " 2>&1 ";
     my($pipe) = FileHandle->new("$system $stderr |");
     my($makeout) = "";
@@ -5708,8 +5756,13 @@ sub as_string {
     }
     push @m, sprintf($sprintf, 'CPAN_VERSION', $self->cpan_version)
 	if $self->cpan_version;
-    push @m, sprintf($sprintf, 'CPAN_FILE', $self->cpan_file)
-	if $self->cpan_file;
+    if (my $cpan_file = $self->cpan_file){
+        push @m, sprintf($sprintf, 'CPAN_FILE', $cpan_file);
+        my $upload_date = CPAN::Shell->expand("Distribution",$cpan_file)->upload_date;
+        if ($upload_date) {
+            push @m, sprintf($sprintf, 'UPLOAD_DATE', $upload_date);
+        }
+    }
     my $sprintf3 = "    %-12s %1s%1s%1s%1s (%s,%s,%s,%s)\n";
     my(%statd,%stats,%statl,%stati);
     @statd{qw,? i c a b R M S,} = qw,unknown idea
@@ -7137,6 +7190,9 @@ defined:
   keep_source_where  directory in which to keep the source (if we do)
   make               location of external make program
   make_arg	     arguments that should always be passed to 'make'
+  make_install_make_command
+                     the make command for running 'make install', for
+                     example 'sudo make'
   make_install_arg   same as make_arg for 'make install'
   makepl_arg	     arguments passed to 'perl Makefile.PL'
   pager              location of external program more (or any pager)
