@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.76_56';
+$VERSION = '1.76_57';
 $VERSION = eval $VERSION;
 
 use CPAN::Version;
@@ -2760,18 +2760,18 @@ sub hosthard {
           $asl_gz = "$asl_ungz.gz";
 
 	  my($src_switch) = "";
+	  my($chdir) = "";
+	  my($stdout_redir) = " > $asl_ungz";
 	  if ($f eq "lynx"){
 	    $src_switch = " -source";
 	  } elsif ($f eq "ncftp"){
 	    $src_switch = " -c";
 	  } elsif ($f eq "wget"){
-	    $src_switch = " -O -";
+	    $src_switch = " -O $asl_ungz";
 	  } elsif ($f eq 'curl'){
 	    $src_switch = ' -L';
 	  }
 
-	  my($chdir) = "";
-	  my($stdout_redir) = " > $asl_ungz";
 	  if ($f eq "ncftpget"){
 	    $chdir = "cd $aslocal_dir && ";
 	    $stdout_redir = "";
@@ -3997,10 +3997,12 @@ sub upload_date {
   my(@local_wanted) = split(/\//,$self->id);
   my $filename = pop @local_wanted;
   push @local_wanted, "CHECKSUMS";
-  my @dl = CPAN::Shell->expand("Author",$self->cpan_userid)->dir_listing(\@local_wanted,0,1);
+  my $author = CPAN::Shell->expand("Author",$self->cpan_userid);
+  return unless $author;
+  my @dl = $author->dir_listing(\@local_wanted,0,1);
   return unless @dl;
   my($dirent) = grep { $_->[2] eq $filename } @dl;
-  warn sprintf "dirent[%s]id[%s]", $dirent, $self->id;
+  # warn sprintf "dirent[%s]id[%s]", $dirent, $self->id;
   return unless $dirent->[1];
   return $self->{UPLOAD_DATE} = $dirent->[1];
 }
@@ -5758,9 +5760,11 @@ sub as_string {
 	if $self->cpan_version;
     if (my $cpan_file = $self->cpan_file){
         push @m, sprintf($sprintf, 'CPAN_FILE', $cpan_file);
-        my $upload_date = CPAN::Shell->expand("Distribution",$cpan_file)->upload_date;
-        if ($upload_date) {
-            push @m, sprintf($sprintf, 'UPLOAD_DATE', $upload_date);
+        if (my $dist = CPAN::Shell->expand("Distribution",$cpan_file)) {
+            my $upload_date = $dist->upload_date;
+            if ($upload_date) {
+                push @m, sprintf($sprintf, 'UPLOAD_DATE', $upload_date);
+            }
         }
     }
     my $sprintf3 = "    %-12s %1s%1s%1s%1s (%s,%s,%s,%s)\n";

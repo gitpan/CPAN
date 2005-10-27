@@ -1,4 +1,29 @@
 ------------------------------------------------------------------------
+r187 | k | 2005-10-27 09:04:58 +0200 (Thu, 27 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+patch by Daniel Wingedmail to make wget work more similar to ncftp. Fixes bug on Windows where cmd.exe currupted the file
+------------------------------------------------------------------------
+r186 | k | 2005-10-21 12:55:58 +0200 (Fri, 21 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+bugfix: cant call method upload_date on undefined value...
+------------------------------------------------------------------------
+r185 | k | 2005-10-21 12:37:15 +0200 (Fri, 21 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+notes in Todo
+------------------------------------------------------------------------
+r184 | k | 2005-10-21 12:25:26 +0200 (Fri, 21 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+forgotten debugging code
+------------------------------------------------------------------------
 r183 | k | 2005-10-21 06:56:24 +0200 (Fri, 21 Oct 2005) | 1 line
 Changed paths:
    M /trunk/README
