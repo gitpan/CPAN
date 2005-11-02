@@ -11,6 +11,7 @@ our $VERSION = sprintf "%.3f", 1 + substr(q$Rev: 146 $,4)/1000;
 
 my $version_diff = 0; # we'll have to die if this becomes true
 my $version_from = File::Spec->catfile(qw(lib CPAN.pm));
+my $version_set_manually = 1; # not by SVN
 
 if ($ARGV[0] && $ARGV[0] eq "--setversion") {
   shift @ARGV;
@@ -32,7 +33,7 @@ if ($ARGV[0] && $ARGV[0] eq "--setversion") {
   my($sv_from) = `svn st -u -v $version_from`  =~ /^.{8}\s*(?:\d+)\s*(\d+)/;
   die "Could not determine sv_from or sv_dot"
       unless $sv_from > 0 && $sv_dot > 0;
-  if ($sv_dot > $sv_from) {
+  if (!$version_set_manually && $sv_dot > $sv_from) {
     warn "setting some property to make a checkin of this file possible";
     0==system(svn => "propset",
               "cpan:release",
@@ -47,6 +48,14 @@ if ($ARGV[0] && $ARGV[0] eq "--setversion") {
     $version_diff = 1;
   }
   exit unless $version_diff;
+}
+
+if ($version_diff){
+  die "
+==> I had to update some \$VERSIONs <==
+==> Your Makefile has been rebuilt. <==
+==> Please rerun the make command.  <==
+";
 }
 
 my $prereq_pm = { 'File::Spec' => 0, 'Test::More' => 0 };
@@ -97,8 +106,9 @@ README: lib/CPAN.pm Makefile
 chlog ::
 	LC_ALL=en_GB.utf8 svn log -v -r `svnversion . | perl -ne '/(?:\d+:)?(\d+)[SM]*$$/&&print $$1'`:1 > ChangeLog
 
-Makefile.PL: $(VERSION_FROM)
-	touch $@
+release ::
+	perl -Irelease-lib -Sd release
+
 }
 }
 

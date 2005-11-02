@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.76_57';
+$VERSION = '1.76_58';
 $VERSION = eval $VERSION;
 
 use CPAN::Version;
@@ -82,7 +82,7 @@ sub AUTOLOAD {
     if (exists $EXPORT{$l}){
 	CPAN::Shell->$l(@_);
     } else {
-	$CPAN::Frontend->mywarn(qq{Unknown command "$AUTOLOAD". }.
+	$CPAN::Frontend->mywarn(qq{Unknown CPAN command "$AUTOLOAD". }.
 				qq{Type ? for help.
 });
     }
@@ -247,13 +247,22 @@ use vars qw(%can %keys $dot_cpan);
 );
 
 %keys = map { $_ => undef } qw(
-    build_cache build_dir cache_metadata cpan_home curl dontload_hash
-    ftp ftp_proxy getcwd gpg gzip histfile histsize http_proxy
+    build_cache build_dir
+    cache_metadata cpan_home curl
+    dontload_hash
+    ftp ftp_proxy
+    getcwd gpg gzip
+    histfile histsize http_proxy
     inactivity_timeout index_expire inhibit_startup_message
-    keep_source_where lynx make make_arg make_install_arg
-    make_install_make_command makepl_arg ncftp ncftpget no_proxy pager
-    prerequisites_policy scan_cache shell tar term_is_latin unzip
-    urllist wait_list wget
+    keep_source_where
+    lynx
+    make make_arg make_install_arg make_install_make_command makepl_arg
+    ncftp ncftpget no_proxy pager
+    prerequisites_policy
+    scan_cache shell show_upload_date
+    tar term_is_latin
+    unzip urllist
+    wait_list wget
 );
 
 package CPAN::FTP;
@@ -341,7 +350,7 @@ For this you just need to type
 });
 	}
     } else {
-	$CPAN::Frontend->mywarn(qq{Unknown command '$autoload'. }.
+	$CPAN::Frontend->mywarn(qq{Unknown shell command '$autoload'. }.
 				qq{Type ? for help.
 });
     }
@@ -778,7 +787,6 @@ sub has_inst {
     my $file = $mod;
     my $obj;
     $file =~ s|::|/|g;
-    $file =~ s|/|\\|g if $^O eq 'MSWin32';
     $file .= ".pm";
     if ($INC{$file}) {
 	# checking %INC is wrong, because $INC{LWP} may be true
@@ -1404,7 +1412,11 @@ sub cpl {
     } elsif (@words >= 4) {
 	return ();
     }
-    my(@o_conf) = (keys %CPAN::Config::can, keys %$CPAN::Config);
+    my %seen;
+    my(@o_conf) =  sort grep { !$seen{$_}++ }
+        keys %CPAN::Config::can,
+            keys %$CPAN::Config,
+                keys %CPAN::Config::keys;
     return grep /^\Q$word\E/, @o_conf;
 }
 
@@ -2273,30 +2285,16 @@ sub recent {
   return;
 }
 
-#-> sub CPAN::Shell::dump ;
-sub dump    { shift->rematein('dump',@_); }
-#-> sub CPAN::Shell::force ;
-sub force   { shift->rematein('force',@_); }
-#-> sub CPAN::Shell::notest ;
-sub notest  { shift->rematein('notest',@_); }
-#-> sub CPAN::Shell::get ;
-sub get     { shift->rematein('get',@_); }
-#-> sub CPAN::Shell::readme ;
-sub readme  { shift->rematein('readme',@_); }
-#-> sub CPAN::Shell::make ;
-sub make    { shift->rematein('make',@_); }
-#-> sub CPAN::Shell::test ;
-sub test    { shift->rematein('test',@_); }
-#-> sub CPAN::Shell::install ;
-sub install { shift->rematein('install',@_); }
-#-> sub CPAN::Shell::clean ;
-sub clean   { shift->rematein('clean',@_); }
-#-> sub CPAN::Shell::look ;
-sub look    { shift->rematein('look',@_); }
-#-> sub CPAN::Shell::cvs_import ;
-sub cvs_import { shift->rematein('cvs_import',@_); }
-#-> sub CPAN::Shell::perldoc ;
-sub perldoc    { shift->rematein('perldoc',@_); }
+{
+    # set up the dispatching methods
+    no strict "refs";
+    for my $command (qw(
+                        clean cvs_import dump force get install look
+                        make notest perldoc readme test
+                       )) {
+        *$command = sub { shift->rematein($command, @_); };
+    }
+}
 
 package CPAN::LWP::UserAgent;
 
@@ -2768,6 +2766,7 @@ sub hosthard {
 	    $src_switch = " -c";
 	  } elsif ($f eq "wget"){
 	    $src_switch = " -O $asl_ungz";
+	    $stdout_redir = "";
 	  } elsif ($f eq 'curl'){
 	    $src_switch = ' -L';
 	  }
@@ -3202,7 +3201,8 @@ sub cpl_option {
     } elsif ($words[1] eq 'conf') {
 	return CPAN::Config::cpl(@_);
     } elsif ($words[1] eq 'debug') {
-	return sort grep /^\Q$word\E/, sort keys %CPAN::DEBUG, 'all';
+	return sort grep /^\Q$word\E/,
+            sort keys %CPAN::DEBUG, 'all';
     }
 }
 
@@ -3802,12 +3802,12 @@ sub ls {
     my(@dl);
     @dl = $self->dir_listing([$csf[0],"CHECKSUMS"], 0, 1);
     unless (grep {$_->[2] eq $csf[1]} @dl) {
-        $CPAN::Frontend->myprint("No files in the directory of $id\n") unless $silent ;
+        $CPAN::Frontend->myprint("Directory $csf[1]/ does not exist\n") unless $silent ;
         return;
     }
     @dl = $self->dir_listing([@csf[0,1],"CHECKSUMS"], 0, 1);
     unless (grep {$_->[2] eq $csf[2]} @dl) {
-        $CPAN::Frontend->myprint("No files in the directory of $id\n") unless $silent;
+        $CPAN::Frontend->myprint("Directory $id/ does not exist\n") unless $silent;
         return;
     }
     @dl = $self->dir_listing([@csf,"CHECKSUMS"], 1, 1);
@@ -3864,9 +3864,11 @@ sub dir_listing {
             }
         }
     } else {
-        $lc_file = $lc_want; # XXX not reached; but if reached some
-                             # day, we'll be wrong because file://
-                             # URLS do not get copied to lc_want
+        $lc_file = $lc_want;
+        # we *could* second-guess and if the user has a file: URL,
+        # then we could look there. But on the other hand, if they do
+        # have a file: URL, wy did they choose to set
+        # $CPAN::Config->{show_upload_date} to false?
     }
 
     # adapted from CPAN::Distribution::MD5_check_file ;
@@ -3883,10 +3885,11 @@ sub dir_listing {
 	    rename $lc_file, "$lc_file.bad";
 	    Carp::confess($@) if $@;
 	}
-    } elsif ($may_ftp) { # currently always true
-	Carp::carp "Could not open $lc_file for reading";
+    } elsif ($may_ftp) {
+	Carp::carp "Could not open $lc_file for reading.";
     } else {
-	return; # not reached
+        # Maybe should warn: "You may want to set show_upload_date to a true value"
+	return;
     }
     my(@result,$f);
     for $f (sort keys %$cksum) {
@@ -3999,7 +4002,7 @@ sub upload_date {
   push @local_wanted, "CHECKSUMS";
   my $author = CPAN::Shell->expand("Author",$self->cpan_userid);
   return unless $author;
-  my @dl = $author->dir_listing(\@local_wanted,0,1);
+  my @dl = $author->dir_listing(\@local_wanted,0,$CPAN::Config->{show_upload_date});
   return unless @dl;
   my($dirent) = grep { $_->[2] eq $filename } @dl;
   # warn sprintf "dirent[%s]id[%s]", $dirent, $self->id;
@@ -5144,9 +5147,22 @@ sub install {
     } else {
 	 $self->{'install'} = "NO";
 	 $CPAN::Frontend->myprint("  $system -- NOT OK\n");
-	 if ($makeout =~ /permission/s && $> > 0) {
-	     $CPAN::Frontend->myprint(qq{    You may have to su }.
-				      qq{to root to install the package\n});
+	 if (
+             $makeout =~ /permission/s
+             && $> > 0
+             && (
+                 ! $CPAN::Config->{make_install_make_command}
+                 || $CPAN::Config->{make_install_make_command} eq $CPAN::Config->{make}
+                )
+            ) {
+             $CPAN::Frontend->myprint(
+                                      qq{----\n}.
+                                      qq{  You may have to su }.
+                                      qq{to root to install the package\n}.
+                                      qq{  (Or you may want to run something like\n}.
+                                      qq{    o conf make_install_make_command 'sudo make'\n}.
+                                      qq{  to raise your permissions.}
+                                     );
 	 }
     }
     delete $self->{force_update};
@@ -6538,7 +6554,7 @@ A C<clean> command results in a
 
 being executed within the distribution file's working directory.
 
-=item get, readme, ,perldoc, look module or distribution
+=item get, readme, perldoc, look module or distribution
 
 C<get> downloads a distribution file without further action. C<readme>
 displays the README file of the associated distribution. C<Look> gets
@@ -7541,7 +7557,7 @@ CPAN.pm does not know the dependency tree in advance and cannot sort
 the queue of things to install in a topologically correct order. It
 resolves perfectly well IFF all modules declare the prerequisites
 correctly with the PREREQ_PM attribute to MakeMaker. For bundles which
-fail and you need to install often, it is recommended sort the Bundle
+fail and you need to install often, it is recommended to sort the Bundle
 definition file manually. It is planned to improve the metadata
 situation for dependencies on CPAN in general, but this will still
 take some time.
@@ -7577,6 +7593,36 @@ would be
 
 Extended support for converters will be made available as soon as perl
 becomes stable with regard to charset issues.
+
+=item 11)
+
+When an install fails for some reason and then I correct the error
+condition and retry, CPAN.pm refuses to install the module, saying
+C<Already tried without success>.
+
+Use the force pragma like so
+
+  force install Foo::Bar
+
+This does a bit more than really needed because it untars the
+distribution again and runs make and test and only then install.
+
+Or you can use
+
+  look Foo::Bar
+
+and then 'make install' directly in the subshell.
+
+Or you leave the CPAN shell and start it again.
+
+For the really curious, by accessing internals directly, you I<could>
+
+  ! delete  CPAN::Shell->expand("Distribution", \
+    CPAN::Shell->expand("Module","Foo::Bar") \
+    ->{RO}{CPAN_FILE})->{install}
+
+but this is neither guaranteed to work in the future nor is it a
+decent command.
 
 =back
 

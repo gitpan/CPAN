@@ -1,4 +1,149 @@
 ------------------------------------------------------------------------
+r206 | k | 2005-11-02 04:23:07 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+now already exhausted from fighting against release
+------------------------------------------------------------------------
+r205 | k | 2005-11-02 03:59:20 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+do not make an extra checkin cycle if version is not set via SVN
+------------------------------------------------------------------------
+r204 | k | 2005-11-02 03:52:16 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+Property set for release after_203
+------------------------------------------------------------------------
+r203 | k | 2005-11-02 03:50:50 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+typo in my Release subclass
+------------------------------------------------------------------------
+r202 | k | 2005-11-02 03:30:00 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   A /trunk/.releaserc
+   M /trunk/MANIFEST.SKIP
+   A /trunk/release-lib
+   A /trunk/release-lib/Module
+   A /trunk/release-lib/Module/Release
+   A /trunk/release-lib/Module/Release/ANDK.pm
+
+still trying to tame release
+------------------------------------------------------------------------
+r201 | k | 2005-11-02 03:17:53 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+Property set for release after_200
+------------------------------------------------------------------------
+r200 | k | 2005-11-02 03:14:10 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/MANIFEST.SKIP
+
+very broken MANIFEST.SKIP
+------------------------------------------------------------------------
+r199 | k | 2005-11-02 03:09:07 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+Property set for release after_198
+------------------------------------------------------------------------
+r198 | k | 2005-11-02 03:06:05 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/MANIFEST.SKIP
+   M /trunk/README
+
+trying to release with BDFOY/release
+------------------------------------------------------------------------
+r197 | k | 2005-11-01 21:40:14 +0100 (Tue, 01 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN.pm
+
+rename rename do_ls_on_m_and_d => show_upload_date
+------------------------------------------------------------------------
+r196 | k | 2005-11-01 08:32:41 +0100 (Tue, 01 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+Property set for release after_195
+------------------------------------------------------------------------
+r195 | k | 2005-10-31 23:17:21 +0100 (Mon, 31 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/FirstTime.pm
+
+To prevent people from misunderstanding the second suggestion to sudo as something to copy and paste, change the wording to make clear that this is an example
+------------------------------------------------------------------------
+r194 | k | 2005-10-31 08:35:52 +0100 (Mon, 31 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/Todo
+
+replace the touch with a voluntary die
+------------------------------------------------------------------------
+r193 | k | 2005-10-29 18:04:49 +0200 (Sat, 29 Oct 2005) | 10 lines
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+* Todo: notes
+
+* CPAN.pm: change the wording of the two 'unknown command' error
+  messages so they are not identical;
+  -- refactor the generation of all the CPAN::Shell methods in a loop;
+  -- reword the message/warning if make install fails (curtesy Slaven
+  Rezic);
+  -- add a FAQ about what to do if a make install has failed and
+  you want to repeat
+
+------------------------------------------------------------------------
+r192 | k | 2005-10-28 08:27:42 +0200 (Fri, 28 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+reorder todo items: bring the undone items to the top
+------------------------------------------------------------------------
+r191 | k | 2005-10-28 08:22:53 +0200 (Fri, 28 Oct 2005) | 10 lines
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN.pm
+
+* Todo: notes about a fixed bug
+
+* CPAN/FirstTime.pm: support for do_ls_on_m_and_d
+
+* CPAN.pm: support for do_ls_on_m_and_d; completion of the 'o conf'
+  command now shows all registered variables and also sorts them; ls
+  command now has better feedback messages when a directory does not
+  exist; do_ls_on_m_and_d now plays its role when dir_listing is
+  called from upload_date
+
+------------------------------------------------------------------------
+r190 | k | 2005-10-27 21:21:42 +0200 (Thu, 27 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+patch by Adriano Ferreira to replace touch with the macro TOUCH
+------------------------------------------------------------------------
+r189 | k | 2005-10-27 21:19:37 +0200 (Thu, 27 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+patch by Gisle Aas, applied to blead and brought to my attention by Adriano Ferreira (Thanks!) to silence redefined warnings on Windows
+------------------------------------------------------------------------
+r188 | k | 2005-10-27 21:10:35 +0200 (Thu, 27 Oct 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+another patch from Daniel (whose second name is not Wingedmail:) because I was applying his patch wrongly.
+------------------------------------------------------------------------
 r187 | k | 2005-10-27 09:04:58 +0200 (Thu, 27 Oct 2005) | 1 line
 Changed paths:
    M /trunk/lib/CPAN.pm
