@@ -1,4 +1,137 @@
 ------------------------------------------------------------------------
+r225 | k | 2005-11-03 07:34:38 +0100 (Thu, 03 Nov 2005) | 3 lines
+Changed paths:
+   M /trunk/MANIFEST.SKIP
+   M /trunk/Makefile.PL
+
+Makefile.PL: the dependency on the tarball caused a re-build
+MANIFEST.SKIP: as we want MakeMaker to package the SIGNATURE, we do not have it in MANIFEST which again was not liked by cpansign -v
+
+------------------------------------------------------------------------
+r224 | k | 2005-11-03 07:21:20 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+need eval to get the version numeric
+
+------------------------------------------------------------------------
+r223 | k | 2005-11-03 07:17:23 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+1. Broken pipe; 2. die too early
+
+------------------------------------------------------------------------
+r222 | k | 2005-11-03 07:13:47 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+missing plus
+
+------------------------------------------------------------------------
+r221 | k | 2005-11-03 07:11:30 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+s/ne/!=/
+
+------------------------------------------------------------------------
+r220 | k | 2005-11-03 07:00:30 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+s/echo/ECHO/
+
+------------------------------------------------------------------------
+r219 | k | 2005-11-03 06:58:16 +0100 (Thu, 03 Nov 2005) | 3 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+Now that we have introduced $version_set_manually, we must also
+care for a version comparison between CPAN.pm and Makefile 
+
+------------------------------------------------------------------------
+r218 | k | 2005-11-03 06:43:34 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+Up the version number to _59
+
+------------------------------------------------------------------------
+r217 | k | 2005-11-03 06:42:23 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+More cautious approach of aliasing -- only CODE ref
+
+------------------------------------------------------------------------
+r216 | k | 2005-11-03 06:39:05 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+Write my own disttest target
+
+------------------------------------------------------------------------
+r215 | k | 2005-11-02 08:38:00 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+more notes about what I expect from make release
+------------------------------------------------------------------------
+r214 | k | 2005-11-02 08:16:35 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN/FirstTime.pm
+
+fixed the endless loop bug described in Todo
+------------------------------------------------------------------------
+r213 | k | 2005-11-02 07:03:20 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+notes about new bugs
+------------------------------------------------------------------------
+r212 | k | 2005-11-02 05:00:14 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+short-circuit the dist target
+------------------------------------------------------------------------
+r211 | k | 2005-11-02 04:57:15 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+colon even with ticks not allowed here
+------------------------------------------------------------------------
+r210 | k | 2005-11-02 04:55:24 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+colon not allowed here
+------------------------------------------------------------------------
+r209 | k | 2005-11-02 04:52:52 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+it was not stderr, it was stdout; now matching against explicit string
+------------------------------------------------------------------------
+r208 | k | 2005-11-02 04:46:49 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+stderr broke our expectation
+------------------------------------------------------------------------
+r207 | k | 2005-11-02 04:42:53 +0100 (Wed, 02 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/release-lib/Module/Release/ANDK.pm
+
+release depends on running make dist for finding out the release name; we follow the rule but we do not run make dist when make disttest overwrites the release anyway
+------------------------------------------------------------------------
 r206 | k | 2005-11-02 04:23:07 +0100 (Wed, 02 Nov 2005) | 1 line
 Changed paths:
    M /trunk/Makefile.PL
