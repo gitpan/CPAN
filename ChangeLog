@@ -1,4 +1,14 @@
 ------------------------------------------------------------------------
+r226 | k | 2005-11-03 08:31:34 +0100 (Thu, 03 Nov 2005) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+   A /trunk/Releasenotes
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+add releasenotes, cleanup todos, add releasenotes to manifest, up the version number
+
+------------------------------------------------------------------------
 r225 | k | 2005-11-03 07:34:38 +0100 (Thu, 03 Nov 2005) | 3 lines
 Changed paths:
    M /trunk/MANIFEST.SKIP
