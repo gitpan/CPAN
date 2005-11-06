@@ -1,4 +1,77 @@
 ------------------------------------------------------------------------
+r236 | k | 2005-11-06 11:34:42 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+protect me from using an old perl for the release process
+------------------------------------------------------------------------
+r235 | k | 2005-11-06 11:29:48 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+more signature related targets
+------------------------------------------------------------------------
+r234 | k | 2005-11-06 11:21:05 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+typo/thinko/buglet
+------------------------------------------------------------------------
+r233 | k | 2005-11-06 11:18:57 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+add some signature related targets
+------------------------------------------------------------------------
+r232 | k | 2005-11-06 11:18:37 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/t/vcmp.t
+
+make the output of TEST_VERBOSE=1 easier to read
+------------------------------------------------------------------------
+r231 | k | 2005-11-06 11:06:30 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Admin.pm
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN/Nox.pm
+   M /trunk/lib/CPAN/Version.pm
+   M /trunk/t/version.t
+
+VERSION dependent on subversion -- but with only %.2f instead of .3 
+------------------------------------------------------------------------
+r230 | k | 2005-11-06 10:15:24 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/lib/CPAN/Admin.pm
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN/Nox.pm
+   M /trunk/lib/CPAN/Version.pm
+   M /trunk/lib/CPAN.pm
+   M /trunk/t/Nox.t
+   M /trunk/t/vcmp.t
+   M /trunk/t/version.t
+
+Now runs again under 5.000_03 with List::Util 1.14, Cwd 3.12, Test::Harness 2.56, Test::Simple 0.62, File::Temp 0.16
+------------------------------------------------------------------------
+r229 | k | 2005-11-06 08:59:37 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/MANIFEST
+   M /trunk/Todo
+
+add PAUSE2005.pub to the MANIFEST; update Todo to reflect current state
+------------------------------------------------------------------------
+r228 | k | 2005-11-06 08:48:55 +0100 (Sun, 06 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/cpan
+
+make VERSION dependent on subversion revision
+------------------------------------------------------------------------
+r227 | k | 2005-11-05 18:32:43 +0100 (Sat, 05 Nov 2005) | 1 line
+Changed paths:
+   A /trunk/PAUSE2005.pub
+
+add the batch signing key 2005
+------------------------------------------------------------------------
 r226 | k | 2005-11-03 08:31:34 +0100 (Thu, 03 Nov 2005) | 2 lines
 Changed paths:
    M /trunk/MANIFEST
