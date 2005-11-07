@@ -1,4 +1,28 @@
 ------------------------------------------------------------------------
+r239 | k | 2005-11-07 05:15:40 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+prepare release of 1.76_62
+------------------------------------------------------------------------
+r238 | k | 2005-11-07 05:14:49 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/t/version.t
+
+do not test for CPAN::Admin when in core
+------------------------------------------------------------------------
+r237 | k | 2005-11-06 21:19:53 +0100 (Sun, 06 Nov 2005) | 6 lines
+Changed paths:
+   M /trunk/lib/CPAN/Admin.pm
+   M /trunk/t/version.t
+
+With this simple change in version.t from Sébastien Aperghis-Tramoni,
+we compile and run fine under 5.004_05.
+
+The change in CPAN/Admin.pm silences a warning in very old pod2html
+versions.
+
+------------------------------------------------------------------------
 r236 | k | 2005-11-06 11:34:42 +0100 (Sun, 06 Nov 2005) | 1 line
 Changed paths:
    M /trunk/Makefile.PL
@@ -39,7 +63,7 @@ Changed paths:
 
 VERSION dependent on subversion -- but with only %.2f instead of .3 
 ------------------------------------------------------------------------
-r230 | k | 2005-11-06 10:15:24 +0100 (Sun, 06 Nov 2005) | 1 line
+r230 | k | 2005-11-06 10:15:24 +0100 (Sun, 06 Nov 2005) | 2 lines
 Changed paths:
    M /trunk/Makefile.PL
    M /trunk/lib/CPAN/Admin.pm
@@ -51,7 +75,8 @@ Changed paths:
    M /trunk/t/vcmp.t
    M /trunk/t/version.t
 
-Now runs again under 5.000_03 with List::Util 1.14, Cwd 3.12, Test::Harness 2.56, Test::Simple 0.62, File::Temp 0.16
+Now runs again under 5.005_03 with List::Util 1.14, Cwd 3.12, Test::Harness 2.56, Test::Simple 0.62, File::Temp 0.16
+
 ------------------------------------------------------------------------
 r229 | k | 2005-11-06 08:59:37 +0100 (Sun, 06 Nov 2005) | 1 line
 Changed paths:

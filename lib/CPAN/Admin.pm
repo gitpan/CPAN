@@ -6,7 +6,7 @@ use vars qw(@EXPORT $VERSION);
 use constant PAUSE_IP => "pause.perl.org";
 
 @EXPORT = qw(shell);
-$VERSION = sprintf "%.2f", substr(q$Rev: 231 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 237 $,4)/100;
 push @CPAN::Complete::COMMANDS, qw(register modsearch);
 if ($CPAN::META->has_inst("Term::ANSIColor")) {
   $CPAN::Shell::COLOR_REGISTERED = 1;
@@ -178,11 +178,11 @@ __END__
 
 =head1 NAME
 
-CPAN::Admin - A CPAN Shell for CPAN admins
+ CPAN::Admin - A CPAN Shell for CPAN admins
 
 =head1 SYNOPSIS
 
-perl -MCPAN::Admin -e shell
+ perl -MCPAN::Admin -e shell
 
 =head1 DESCRIPTION
 
