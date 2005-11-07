@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+r244 | k | 2005-11-07 22:51:37 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/MANIFEST.SKIP
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+prepare _64
+------------------------------------------------------------------------
+r243 | k | 2005-11-07 22:49:52 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   A /trunk/cp-to-perl.pl
+
+script to copy the release to a perl tree
+------------------------------------------------------------------------
 r242 | k | 2005-11-07 05:37:38 +0100 (Mon, 07 Nov 2005) | 1 line
 Changed paths:
    M /trunk/lib/CPAN.pm
