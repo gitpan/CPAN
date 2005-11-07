@@ -1,4 +1,25 @@
 ------------------------------------------------------------------------
+r247 | k | 2005-11-07 23:13:52 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   A /trunk/README
+
+Keep in mind: the README must be in the current directory and so it must be in the repository
+------------------------------------------------------------------------
+r246 | k | 2005-11-07 23:07:00 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   D /trunk/README
+
+remove the automatically generated file README
+------------------------------------------------------------------------
+r245 | k | 2005-11-07 23:06:14 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/README
+   M /trunk/cp-to-perl.pl
+   M /trunk/lib/CPAN.pm
+   M /trunk/scripts/cpan
+
+prepare _65
+------------------------------------------------------------------------
 r244 | k | 2005-11-07 22:51:37 +0100 (Mon, 07 Nov 2005) | 1 line
 Changed paths:
    M /trunk/MANIFEST.SKIP
