@@ -1,4 +1,23 @@
 ------------------------------------------------------------------------
+r242 | k | 2005-11-07 05:37:38 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+prepare _63
+------------------------------------------------------------------------
+r241 | k | 2005-11-07 05:35:45 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+add a memo how to release
+------------------------------------------------------------------------
+r240 | k | 2005-11-07 05:32:37 +0100 (Mon, 07 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/MANIFEST
+   D /trunk/cpan
+
+there were two identical cpan scripts starting to diverge
+------------------------------------------------------------------------
 r239 | k | 2005-11-07 05:15:40 +0100 (Mon, 07 Nov 2005) | 1 line
 Changed paths:
    M /trunk/lib/CPAN.pm
