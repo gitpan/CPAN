@@ -1,4 +1,81 @@
 ------------------------------------------------------------------------
+r258 | k | 2005-12-03 11:07:21 +0100 (Sat, 03 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+version typo (off by one:)
+
+------------------------------------------------------------------------
+r257 | k | 2005-12-03 11:03:53 +0100 (Sat, 03 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+Protect me from using a MakeMaker version that doesn't do sign woodoo
+
+------------------------------------------------------------------------
+r256 | k | 2005-12-03 10:59:15 +0100 (Sat, 03 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+Protect me from using old MakeMaker for a release
+
+------------------------------------------------------------------------
+r255 | k | 2005-12-03 10:37:13 +0100 (Sat, 03 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+   M /trunk/Releasenotes
+   M /trunk/lib/CPAN.pm
+   A /trunk/t/pod.t
+
+Up the version number to 1.80, add a quick test for pod, tweak th releasenotes
+
+------------------------------------------------------------------------
+r254 | k | 2005-12-01 07:24:37 +0100 (Thu, 01 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Version.pm
+   M /trunk/lib/CPAN.pm
+
+revisit "use strict"
+------------------------------------------------------------------------
+r253 | k | 2005-12-01 06:11:46 +0100 (Thu, 01 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+fit help page on console size again adding an explanaion what a WORD is (suggested by David Golden)
+------------------------------------------------------------------------
+r252 | k | 2005-12-01 05:47:20 +0100 (Thu, 01 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+remove invalid optimization that supposed that same distro always means same version
+------------------------------------------------------------------------
+r251 | k | 2005-11-30 08:57:56 +0100 (Wed, 30 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+   M /trunk/Todo
+
+notes on a newly discovered bug
+------------------------------------------------------------------------
+r250 | k | 2005-11-24 22:42:02 +0100 (Thu, 24 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+
+typo
+------------------------------------------------------------------------
+r249 | k | 2005-11-24 09:13:29 +0100 (Thu, 24 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+
+notes about the pause indexer
+------------------------------------------------------------------------
+r248 | k | 2005-11-24 09:06:04 +0100 (Thu, 24 Nov 2005) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+   M /trunk/Todo
+
+doc
+------------------------------------------------------------------------
 r247 | k | 2005-11-07 23:13:52 +0100 (Mon, 07 Nov 2005) | 1 line
 Changed paths:
    A /trunk/README
