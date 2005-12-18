@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         CPAN
-version:      1.80
+version:      1.80_51
 version_from: lib/CPAN.pm
 installdirs:  perl
 requires:

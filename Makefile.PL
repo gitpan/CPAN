@@ -46,6 +46,7 @@ if ($HAVE_FILE_SPEC) {
         unless $sv_from > 0 && $sv_dot > 0;
     if ($version_set_manually) {
       # we must control that the VERSION in CPAN.pm is the same as in the Makefile
+      unshift @INC, "lib";
       require $version_from;
       open my $fh, "make the-release-name|" or die;
       my $have_version;
@@ -138,12 +139,13 @@ README: lib/CPAN.pm Makefile
 
 chlog ::
 	LC_ALL=en_GB.utf8 svn log -v -r `svnversion . | perl -ne '/(?:\d+:)?(\d+)[SM]*$$/&&print $$1'`:1 > ChangeLog
+	cat ChangeLog.local >> ChangeLog
 
 the-release-name :
 	$(NOECHO) $(ECHO) 'version ' $(VERSION)
 	$(NOECHO) $(ECHO) 'release-name ' $(DISTVNAME).tar$(SUFFIX)
 
-release ::
+release :: ci sign dist
 	perl -Irelease-lib -S release $(DISTVNAME).tar$(SUFFIX)
 
 sign:

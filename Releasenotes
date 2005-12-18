@@ -1,3 +1,42 @@
+2005-12-17  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 1.80_51
+
+	* Support for Module::Build: to set the preference for
+	Module::Build over MakeMaker, run
+
+	  o conf prefer_installer MB
+	  o conf commit
+
+	* ls command supports globbing:
+
+	  ls KWILLIAMS/P*
+	and
+	  ls JV/make*
+
+	work nicely; even
+
+	  ls */*make*
+
+	works but this is, of course, very slow.
+
+	* META.yml data replace the Makefile parsing code if YAML
+	available
+
+	* support SHA256; stop using MD5
+
+	* support bzip2 compression; can be tested with 'install
+	ARTURAZ/Net-Vypress-Chat-0.72.1.tar.bz2'; the CPAN indexer does
+	not yet index bz2 distros
+
+	* major speedup on all commands that need expansion of regular
+	expressions to module names
+	
+	* prettier r command output: the 4th column of the 'r' command
+	drops the redundant X/XX/ prefix
+
+	* tolerant when you type one colon instead of two on module names
+
 2005-12-03  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* this is release 1.80

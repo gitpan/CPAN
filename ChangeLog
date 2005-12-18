@@ -1,4 +1,147 @@
 ------------------------------------------------------------------------
+r278 | k | 2005-12-18 12:25:48 +0100 (Sun, 18 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+more dependencies
+
+------------------------------------------------------------------------
+r277 | k | 2005-12-18 12:23:23 +0100 (Sun, 18 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/README
+
+readme
+------------------------------------------------------------------------
+r276 | k | 2005-12-18 12:20:32 +0100 (Sun, 18 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+INC
+------------------------------------------------------------------------
+r275 | k | 2005-12-18 12:17:39 +0100 (Sun, 18 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+
+dependency release->dist
+------------------------------------------------------------------------
+r274 | k | 2005-12-18 11:53:38 +0100 (Sun, 18 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+blah
+------------------------------------------------------------------------
+r273 | k | 2005-12-18 11:51:38 +0100 (Sun, 18 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+   M /trunk/Todo
+
+blah
+------------------------------------------------------------------------
+r272 | k | 2005-12-18 11:46:09 +0100 (Sun, 18 Dec 2005) | 1 line
+Changed paths:
+   A /trunk/ChangeLog.local
+   M /trunk/Makefile.PL
+   M /trunk/Releasenotes
+
+let ChangeLog be in text mode
+------------------------------------------------------------------------
+r271 | k | 2005-12-18 11:36:54 +0100 (Sun, 18 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+   M /trunk/Todo
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN.pm
+
+prefer_installer allows to choose MB over EUMM
+------------------------------------------------------------------------
+r270 | k | 2005-12-17 23:03:27 +0100 (Sat, 17 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+blah
+------------------------------------------------------------------------
+r269 | k | 2005-12-17 23:01:08 +0100 (Sat, 17 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+Module::Build seems to work fine, it is current the default chosen whenever a Build.PL exists
+------------------------------------------------------------------------
+r268 | k | 2005-12-17 11:20:04 +0100 (Sat, 17 Dec 2005) | 4 lines
+Changed paths:
+   M /trunk/Releasenotes
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+Fix 'reload cpan' for changes in the now separated files.
+
+Read metadata from META.yml if there is one and YAML is available.
+
+------------------------------------------------------------------------
+r267 | k | 2005-12-17 09:07:21 +0100 (Sat, 17 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+todo
+------------------------------------------------------------------------
+r266 | k | 2005-12-17 07:59:53 +0100 (Sat, 17 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+
+releasenotes
+------------------------------------------------------------------------
+r265 | k | 2005-12-17 07:47:01 +0100 (Sat, 17 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/FirstTime.pm
+
+found an area without use strict
+------------------------------------------------------------------------
+r264 | k | 2005-12-17 07:44:22 +0100 (Sat, 17 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/MANIFEST
+   M /trunk/Todo
+   M /trunk/cp-to-perl.pl
+   A /trunk/lib/CPAN/Debug.pm
+   M /trunk/lib/CPAN/FirstTime.pm
+   A /trunk/lib/CPAN/Tarzip.pm
+   M /trunk/lib/CPAN.pm
+
+bzip2 support
+------------------------------------------------------------------------
+r263 | k | 2005-12-15 06:37:27 +0100 (Thu, 15 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+replace MD5 with SHA256; make tighter strict cleanlines by repeating "use strict" after every package decl, so if we move later, we do not forget
+------------------------------------------------------------------------
+r262 | k | 2005-12-15 05:51:10 +0100 (Thu, 15 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+mak 4th column of r command compact
+------------------------------------------------------------------------
+r261 | k | 2005-12-15 05:35:44 +0100 (Thu, 15 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+allow single colons in module names on the commandline
+------------------------------------------------------------------------
+r260 | k | 2005-12-15 05:29:09 +0100 (Thu, 15 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+while debugging the recently introduced globbing on the ls command, found a major bug in the "expanding objects on regexes" code: fixing that gives a considerable speedup on all regexes on the shell; nonetheless reintroduce some feedback during the expansion of ls-globbing, it can still be very slow
+------------------------------------------------------------------------
+r259 | k | 2005-12-13 01:29:44 +0100 (Tue, 13 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+support limited globbing on the ls command; toss the idea of doing ls * in a silent mode
+------------------------------------------------------------------------
 r258 | k | 2005-12-03 11:07:21 +0100 (Sat, 03 Dec 2005) | 2 lines
 Changed paths:
    M /trunk/Makefile.PL
@@ -2098,3 +2241,7 @@ Changed paths:
 
 blah
 ------------------------------------------------------------------------
+
+Local Variables:
+mode: text
+End:

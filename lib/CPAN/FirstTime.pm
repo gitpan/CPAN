@@ -1,5 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN::Mirrored::By;
+use strict;
 
 sub new { 
     my($self,@arg) = @_;
@@ -18,7 +19,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec;
 use vars qw($VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 231 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 271 $,4)/100;
 
 =head1 NAME
 
@@ -322,7 +323,7 @@ by ENTER.
     my(@path) = split /$Config{'path_sep'}/, $ENV{'PATH'};
     local $^W = $old_warn;
     my $progname;
-    for $progname (qw/gzip tar unzip make
+    for $progname (qw/bzip2 gzip tar unzip make
                       curl lynx wget ncftpget ncftp ftp
                       gpg/)
     {
@@ -379,6 +380,25 @@ by ENTER.
     #
     # Arguments to make etc.
     #
+
+    $CPAN::Frontend->myprint( qq{
+
+When you have Module::Build installed and a module comes with both a
+Makefile.PL and a Build.PL, which shall have precedence? The two
+installer modules we have are the old and well established
+ExtUtils::MakeMaker (for short: EUMM) understands the Makefile.PL and
+the next generation installer Module::Build (MB) works with the
+Build.PL.
+
+});
+
+    $default = $CPAN::Config->{prefer_installer} || "";
+    do {
+      $ans =
+	  prompt("In case you could choose, which installer would you prefer (EUMM or MB)?",
+		 $default);
+    } while ($ans ne 'follow' && $ans ne 'ask' && $ans ne 'ignore');
+    $CPAN::Config->{prefer_installer} = $ans;
 
     $CPAN::Frontend->myprint( qq{
 
