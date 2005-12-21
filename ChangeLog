@@ -1,4 +1,102 @@
 ------------------------------------------------------------------------
+r292 | k | 2005-12-21 13:07:08 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+stricter checking of prereq_pm from YAML
+------------------------------------------------------------------------
+r291 | k | 2005-12-21 12:55:29 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN/HandleConfig.pm
+   M /trunk/lib/CPAN.pm
+
+complete o conf bug
+------------------------------------------------------------------------
+r290 | k | 2005-12-21 12:22:22 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+filter prereq "perl"
+------------------------------------------------------------------------
+r289 | k | 2005-12-21 11:05:10 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+prettyprint bug
+------------------------------------------------------------------------
+r288 | k | 2005-12-21 11:04:34 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+prettyprint bug
+------------------------------------------------------------------------
+r287 | k | 2005-12-21 09:17:45 +0100 (Wed, 21 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+
+add HandleConfig to the MANIFEST
+
+------------------------------------------------------------------------
+r286 | k | 2005-12-21 09:14:57 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   D /trunk/lib/CPAN/Config.pm
+   M /trunk/lib/CPAN/Debug.pm
+   M /trunk/lib/CPAN/FirstTime.pm
+   A /trunk/lib/CPAN/HandleConfig.pm (from /trunk/lib/CPAN/Config.pm:285)
+   M /trunk/lib/CPAN.pm
+
+rename the Config.pm ackage to HandleConfig because we hae used Config.pm for the Config values
+------------------------------------------------------------------------
+r285 | k | 2005-12-21 08:55:17 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Config.pm
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN.pm
+
+complete the M:B support
+------------------------------------------------------------------------
+r284 | k | 2005-12-21 08:33:00 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/cp-to-perl.pl
+
+separate file for Config package
+------------------------------------------------------------------------
+r283 | k | 2005-12-21 08:32:02 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   A /trunk/lib/CPAN/Config.pm
+
+separate file for Config package
+------------------------------------------------------------------------
+r282 | k | 2005-12-21 08:31:48 +0100 (Wed, 21 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+separate file for Config package
+------------------------------------------------------------------------
+r281 | k | 2005-12-20 22:49:41 +0100 (Tue, 20 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Tarzip.pm
+
+patch by Guillaume Filion to drop the long gzip options to support busybox's own gzip
+------------------------------------------------------------------------
+r280 | k | 2005-12-19 06:17:05 +0100 (Mon, 19 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/Bundle/CPAN.pm
+
+revisit Bundle::CPAN
+------------------------------------------------------------------------
+r279 | k | 2005-12-19 06:10:07 +0100 (Mon, 19 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+remove the incommandcolor attribute at the end of rematein
+------------------------------------------------------------------------
 r278 | k | 2005-12-18 12:25:48 +0100 (Sun, 18 Dec 2005) | 2 lines
 Changed paths:
    M /trunk/Makefile.PL
