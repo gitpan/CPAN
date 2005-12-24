@@ -1,4 +1,20 @@
 ------------------------------------------------------------------------
+r295 | k | 2005-12-24 08:21:58 +0100 (Sat, 24 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/Releasenotes
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+docu to make the release ready
+
+------------------------------------------------------------------------
+r294 | k | 2005-12-23 06:09:40 +0100 (Fri, 23 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+fix ls command without a joker
+------------------------------------------------------------------------
 r293 | k | 2005-12-22 09:37:43 +0100 (Thu, 22 Dec 2005) | 1 line
 Changed paths:
    M /trunk/lib/CPAN.pm
