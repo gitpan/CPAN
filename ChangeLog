@@ -1,4 +1,15 @@
 ------------------------------------------------------------------------
+r296 | k | 2005-12-24 10:56:46 +0100 (Sat, 24 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/README
+   M /trunk/Releasenotes
+   M /trunk/cp-to-perl.pl
+   M /trunk/lib/CPAN.pm
+   M /trunk/scripts/cpan
+
+once again finish th release, this time we found a new upstream release of cpan script 
+
+------------------------------------------------------------------------
 r295 | k | 2005-12-24 08:21:58 +0100 (Sat, 24 Dec 2005) | 2 lines
 Changed paths:
    M /trunk/Makefile.PL
