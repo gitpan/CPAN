@@ -1,4 +1,163 @@
 ------------------------------------------------------------------------
+r323 | k | 2005-12-31 12:53:27 +0100 (Sat, 31 Dec 2005) | 2 lines
+Changed paths:
+   M /trunk/Releasenotes
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+Finish _57 instead of goign 1.81 directly -- too many changes
+
+------------------------------------------------------------------------
+r322 | k | 2005-12-31 03:02:08 +0100 (Sat, 31 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+although "force ls" still does not force an immediate new read of the checksum files, we now can at least say "force ls FOO/B*": before this gave us a horrible error message about distributions
+------------------------------------------------------------------------
+r321 | k | 2005-12-31 02:04:52 +0100 (Sat, 31 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+for "reload cpan" search in INC instead of relying on the old path
+------------------------------------------------------------------------
+r320 | k | 2005-12-31 01:30:59 +0100 (Sat, 31 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+remove empty local files that are targets for downloads
+------------------------------------------------------------------------
+r319 | k | 2005-12-31 00:53:33 +0100 (Sat, 31 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Tarzip.pm
+
+honour the return value of $tar->extract (bug reported by Slaven Rezic wrt AQUMSIEH/Tk-ToolBar-0.09.tar.gz)
+------------------------------------------------------------------------
+r318 | k | 2005-12-31 00:48:29 +0100 (Sat, 31 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Tarzip.pm
+   M /trunk/lib/CPAN.pm
+
+s/die/mydie/ and more concise error messages
+------------------------------------------------------------------------
+r317 | k | 2005-12-30 22:06:08 +0100 (Fri, 30 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+try to chmod when modules come with bad directory permissions so that rmtree and chdir are possible and eror messages become more meaningful
+------------------------------------------------------------------------
+r316 | k | 2005-12-30 13:07:21 +0100 (Fri, 30 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+blah
+------------------------------------------------------------------------
+r315 | k | 2005-12-30 12:35:23 +0100 (Fri, 30 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   A /trunk/eg
+   A /trunk/eg/find-module-install-sudo-bugs.pl
+   M /trunk/lib/CPAN/HandleConfig.pm
+   M /trunk/lib/CPAN/Tarzip.pm
+   M /trunk/lib/CPAN.pm
+   M /trunk/t/mirroredby.t
+
+add an eg/ directory; the first eg/ script found several bugs in CPAN.pm and CPAN/Tarzip.pm and problems with distributions that I had overlooked so far; the tar/permission bugs are fixed too -- we still need a test case that proves the basename() fix to be correct
+------------------------------------------------------------------------
+r312 | k | 2005-12-30 01:03:10 +0100 (Fri, 30 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+blah
+------------------------------------------------------------------------
+r311 | k | 2005-12-29 15:34:51 +0100 (Thu, 29 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN/HandleConfig.pm
+   M /trunk/lib/CPAN.pm
+
+update the POD about security
+------------------------------------------------------------------------
+r310 | k | 2005-12-29 14:42:25 +0100 (Thu, 29 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/HandleConfig.pm
+   M /trunk/lib/CPAN.pm
+
+revert the dangerous parts of rev. 305 and clarify the manpage in the "force get" area
+------------------------------------------------------------------------
+r307 | k | 2005-12-29 13:04:25 +0100 (Thu, 29 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+
+blah
+------------------------------------------------------------------------
+r306 | k | 2005-12-29 09:04:33 +0100 (Thu, 29 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+Fix rt.cpan.org #321: when current directory ceases to exist; protect some code from running when our own directory cannot be determined
+------------------------------------------------------------------------
+r305 | k | 2005-12-27 17:09:55 +0100 (Tue, 27 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+dangerous stuff!!! Most probably wrong. Trying to use less memory, doing it partly right and partly wrong. I suppose that the cache becomes degenerated with the current code, maybe there is no update after DSLI changes or some such -- we need a decent test bed
+------------------------------------------------------------------------
+r304 | k | 2005-12-27 11:09:26 +0100 (Tue, 27 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+add an undocumented and experimental method status that displays some stats de-jour
+------------------------------------------------------------------------
+r303 | k | 2005-12-26 12:25:15 +0100 (Mon, 26 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN/Tarzip.pm
+
+protect whitespace in filenames (fixes #3201) fix by Roland Bauer (CORION)
+------------------------------------------------------------------------
+r302 | k | 2005-12-26 12:21:44 +0100 (Mon, 26 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+short dist id
+------------------------------------------------------------------------
+r301 | k | 2005-12-26 09:00:44 +0100 (Mon, 26 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+add "notest" to the completion commands; introduce a better error message when they say "notest" without another argument; introduce a new experimental and undocumented command "failed"
+------------------------------------------------------------------------
+r300 | k | 2005-12-25 21:29:15 +0100 (Sun, 25 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/lib/Bundle/CPAN.pm
+
+add File::Temp to both prereq and bundle
+------------------------------------------------------------------------
+r299 | k | 2005-12-25 20:56:22 +0100 (Sun, 25 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Debug.pm
+
+make less noise when debuging again
+------------------------------------------------------------------------
+r298 | k | 2005-12-25 20:08:22 +0100 (Sun, 25 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/Debug.pm
+   M /trunk/lib/CPAN.pm
+
+make less noise when debuging is on and cpan reload is called
+------------------------------------------------------------------------
+r297 | k | 2005-12-25 19:42:40 +0100 (Sun, 25 Dec 2005) | 1 line
+Changed paths:
+   M /trunk/README
+   M /trunk/lib/CPAN.pm
+
+Fix rt #15580 "Make uptodate message more descriptive"
+------------------------------------------------------------------------
 r296 | k | 2005-12-24 10:56:46 +0100 (Sat, 24 Dec 2005) | 2 lines
 Changed paths:
    M /trunk/README
