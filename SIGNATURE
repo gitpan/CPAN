@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.50.
+signed via the Module::Signature module, version 0.51.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,25 +14,25 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 18c736843d4a7fffa3bed2c5764ba7be5e40153d ChangeLog
+SHA1 cc7738cc0b6a4ef3f4c8369526fdca614ba35cc4 ChangeLog
 SHA1 9b97524a7a91c815e46b19302a33829d3c26bbbf ChangeLog.old
 SHA1 a029ffa2f2252bb8914eb658666244710994d256 Changes.old
 SHA1 0fbd0f7751c77f99d1020a10ca82be0b63fe06c1 MANIFEST
 SHA1 c4090d00f577a0c5b562899afb75abc626805eb6 MANIFEST.SKIP
-SHA1 729dfe870a469c1ad2091e1ec7bbe90090354a8d META.yml
-SHA1 2291c702e915782a962cdf0857fcc7d44b4ba0a1 Makefile.PL
+SHA1 98395b7a428e543dce483b2ac5fea109c39d726e META.yml
+SHA1 7e95a16dc2e04fb32ab9a058d8b25b720377e6c1 Makefile.PL
 SHA1 37e858c51409a297ef5d3fb35dc57cd3b57f9a4d PAUSE2003.pub
 SHA1 af016003ad503ed078c5f8254521d13a3e0c494f PAUSE2005.pub
 SHA1 fc1836c23a1fae2e86169bbc57058f06fd3ad457 README
-SHA1 c4a5ef97dd698874f43530f6d783e2f1f00c018b Releasenotes
-SHA1 ab5037b12e7623d1bc6e0ad9b8d0561d88e0a6f4 Todo
+SHA1 00b973af69c1b356c8491132445e69271651add6 Releasenotes
+SHA1 6c9eb4b95e9acb5928464b09e7d94a4368d63bbd Todo
 SHA1 efbe8e6882a2caa0d741b113959a706830ab5882 inc/Test/Builder.pm
 SHA1 ae1d68262bedc2475e2c6fd478d99b259b4fb109 inc/Test/More.pm
-SHA1 3b1535ca061da9aaccf3726b0dbeaac54e1b684c lib/Bundle/CPAN.pm
-SHA1 00f73462237bc79a09d0bf904464f40e88ead1cc lib/CPAN.pm
+SHA1 22d192b4ce8341dd3202a3f388ce849eaac497aa lib/Bundle/CPAN.pm
+SHA1 f546d8f9f37f7101d85a9bbd12b99973bf7dbb2e lib/CPAN.pm
 SHA1 104fd2b39fdba692143655b53bcf01d36c8ebf68 lib/CPAN/Admin.pm
 SHA1 0dc9b34d14c199a57f26d4d4d9ff7653ca3c5834 lib/CPAN/Debug.pm
-SHA1 ab0b2844394944dca091459ca1779174e94f3c5c lib/CPAN/FirstTime.pm
+SHA1 81a8ac6e948b13af2469cb0fe54e291c10aa0a81 lib/CPAN/FirstTime.pm
 SHA1 6b0fee3de4dda92ffd8e85e3f85494601af416f4 lib/CPAN/HandleConfig.pm
 SHA1 4fa9695417b54fc8d4e29684ad61689bc108274b lib/CPAN/Nox.pm
 SHA1 8726673a1486ca1ddedf022a671d43014f23ddcc lib/CPAN/Tarzip.pm
@@ -48,7 +48,7 @@ SHA1 b505a0db80ed4c835ad5676e9d1cbf09c86e6c34 t/version.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.2 (GNU/Linux)
 
-iD8DBQFDt5n+7IA58KMXwV0RAnKqAJ9084IAxld163GUL+xGxhL6U6+Z+wCg6Rdm
-M8n/VqbwAXcTPRv6iq+w4KE=
-=W26e
+iD8DBQFDubOp7IA58KMXwV0RAu+OAJ9i+LX8Q8k4f1iQa7uOZDagbMy1QACgtyDn
+JP0YtGqehxK4NdKHaFmr1+8=
+=wXWU
 -----END PGP SIGNATURE-----

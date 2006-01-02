@@ -1,4 +1,36 @@
 ------------------------------------------------------------------------
+r332 | k | 2006-01-03 00:12:32 +0100 (Tue, 03 Jan 2006) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/README
+
+Use Debian's pod2text because mine is broken
+
+------------------------------------------------------------------------
+r331 | k | 2006-01-03 00:07:13 +0100 (Tue, 03 Jan 2006) | 2 lines
+Changed paths:
+   M /trunk/Releasenotes
+   M /trunk/Todo
+   M /trunk/lib/Bundle/CPAN.pm
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN.pm
+
+finish up for the release of 1.81 including full documentation in the Releasenotes file
+
+------------------------------------------------------------------------
+r330 | k | 2006-01-01 11:37:48 +0100 (Sun, 01 Jan 2006) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN.pm
+
+bugfix: completion of debug options was not case insensitive
+------------------------------------------------------------------------
+r329 | k | 2006-01-01 11:34:40 +0100 (Sun, 01 Jan 2006) | 1 line
+Changed paths:
+   M /trunk/Todo
+   M /trunk/lib/CPAN.pm
+
+bugfix: installation of distributions was broken for distros without {RO}
+------------------------------------------------------------------------
 r327 | k | 2006-01-01 09:58:29 +0100 (Sun, 01 Jan 2006) | 2 lines
 Changed paths:
    M /trunk/Makefile.PL
