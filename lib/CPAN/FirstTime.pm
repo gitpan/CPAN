@@ -1,6 +1,8 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN::Mirrored::By;
 use strict;
+use vars qw($VERSION);
+$VERSION = sprintf "%.2f", substr(q$Rev: 335 $,4)/100;
 
 sub new { 
     my($self,@arg) = @_;
@@ -19,7 +21,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec;
 use vars qw($VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 331 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 335 $,4)/100;
 
 =head1 NAME
 
