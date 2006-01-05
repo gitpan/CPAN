@@ -2,7 +2,7 @@
 package CPAN::Mirrored::By;
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 335 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 338 $,4)/100;
 
 sub new { 
     my($self,@arg) = @_;
@@ -21,7 +21,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec;
 use vars qw($VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 335 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 338 $,4)/100;
 
 =head1 NAME
 
@@ -394,7 +394,7 @@ Build.PL.
 
 });
 
-    $default = $CPAN::Config->{prefer_installer} || "";
+    $default = $CPAN::Config->{prefer_installer} || "EUMM";
     do {
       $ans =
 	  prompt("In case you could choose, which installer would you prefer (EUMM or MB)?",

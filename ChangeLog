@@ -1,4 +1,17 @@
 ------------------------------------------------------------------------
+r339 | k | 2006-01-05 09:00:54 +0100 (Thu, 05 Jan 2006) | 1 line
+Changed paths:
+   M /trunk/Releasenotes
+
+add releasenotes
+------------------------------------------------------------------------
+r338 | k | 2006-01-05 01:16:49 +0100 (Thu, 05 Jan 2006) | 1 line
+Changed paths:
+   M /trunk/lib/CPAN/FirstTime.pm
+   M /trunk/lib/CPAN.pm
+
+automatic choice of configuration breaks without a default value
+------------------------------------------------------------------------
 r337 | k | 2006-01-04 08:43:17 +0100 (Wed, 04 Jan 2006) | 1 line
 Changed paths:
    M /trunk/lib/CPAN/HandleConfig.pm
