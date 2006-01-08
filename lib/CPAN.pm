@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83';
+$VERSION = '1.83_51';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -3228,21 +3228,40 @@ happen.\a
                       $last_updated);
         $DATE_OF_02 = $last_updated;
 
+        my $age = time;
         if ($CPAN::META->has_inst('HTTP::Date')) {
             require HTTP::Date;
-            my($age) = (time - HTTP::Date::str2time($last_updated))/3600/24;
-            if ($age > 30) {
-
-                $CPAN::Frontend
-                    ->mywarn(sprintf
-                             qq{Warning: This index file is %d days old.
-  Please check the host you chose as your CPAN mirror for staleness.
-  I'll continue but problems seem likely to happen.\a\n},
-                             $age);
-
-            }
+            $age -= HTTP::Date::str2time($last_updated);
         } else {
             $CPAN::Frontend->myprint("  HTTP::Date not available\n");
+            require Time::Local;
+            my(@d) = $last_updated =~ / (\d+) (\w+) (\d+) (\d+):(\d+):(\d+) /;
+            $d[1] = index("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec", $d[1])/4;
+            $age -= $d[1]>=0 ? Time::Local::timegm(@d[5,4,3,0,1,2]) : 0;
+        }
+        $age /= 3600*24;
+        if ($age > 30) {
+
+            $CPAN::Frontend
+                ->mywarn(sprintf
+                         qq{Warning: This index file is %d days old.
+  Please check the host you chose as your CPAN mirror for staleness.
+  I'll continue but problems seem likely to happen.\a\n},
+                         $age);
+
+        } elsif ($age < -1) {
+
+            $CPAN::Frontend
+                ->mywarn(sprintf
+                         qq{Warning: Your system date is %d days behind this index file!
+  System time:          %s
+  Timestamp index file: %s
+  Please fix your system time, problems with the make command expected.\n},
+                         -$age,
+                         scalar gmtime,
+                         $DATE_OF_02,
+                        );
+
         }
     }
 
@@ -4253,9 +4272,13 @@ Could not determine which directory to use for looking at $dist.
     my $pwd  = CPAN::anycwd();
     $self->safe_chdir($dir);
     $CPAN::Frontend->myprint(qq{Working directory is $dir\n});
-    unless (system($CPAN::Config->{'shell'}) == 0) {
-        my $code = $? >> 8;
-        $CPAN::Frontend->mywarn("Subprocess shell exit code $code\n");
+    {
+	local $ENV{CPAN_SHELL_LEVEL} = $ENV{CPAN_SHELL_LEVEL}||0;
+        $ENV{CPAN_SHELL_LEVEL} += 1;
+	unless (system($CPAN::Config->{'shell'}) == 0) {
+	    my $code = $? >> 8;
+	    $CPAN::Frontend->mywarn("Subprocess shell exit code $code\n");
+	}
     }
     $self->safe_chdir($pwd);
 }

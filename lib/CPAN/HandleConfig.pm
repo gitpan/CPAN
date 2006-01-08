@@ -1,28 +1,8 @@
-package CPAN::Config;
-use strict;
-use vars qw($AUTOLOAD);
-
-# formerly CPAN::HandleConfig was known as CPAN::Config
-sub AUTOLOAD {
-  my($l) = $AUTOLOAD;
-  $CPAN::Frontend->mywarn("Dispatching deprecated method '$l' to CPAN::HandleConfig");
-  $l =~ s/.*:://;
-  CPAN::HandleConfig->$l(@_);
-}
-
-# note: J. Nick Koston wrote me that they are using
-# CPAN::Config->commit although undocumented. I suggested
-# CPAN::Shell->o("conf","commit") even when ugly it is at least
-# documented
-
-# that's why I added the CPAN::Config class with autoload and
-# deprecated warning
-
 package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $dot_cpan $VERSION);
 
-$VERSION = sprintf "%.2f", substr(q$Rev: 337 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 353 $,4)/100;
 
 %can = (
   'commit' => "Commit changes to disk",
@@ -109,12 +89,15 @@ sub prettyprint {
   my($self,$k) = @_;
   my $v = $CPAN::Config->{$k};
   if (ref $v) {
-    my(@report) = ref $v eq "ARRAY" ?
-        @$v :
-            map { sprintf("   %-18s => [%s]\n",
-                          map { "[$_]" } $_,
-                          defined $v->{$_} ? $v->{$_} : "UNDEFINED"
-                         )} keys %$v;
+    my(@report);
+    if (ref $v eq "ARRAY") {
+      @report = map {"\t[$_]\n"} @$v;
+    } else {
+      @report = map { sprintf("\t%-18s => %s\n",
+                              map { "[$_]" } $_,
+                              defined $v->{$_} ? $v->{$_} : "UNDEFINED"
+                             )} keys %$v;
+    }
     $CPAN::Frontend->myprint(
                              join(
                                   "",
@@ -122,7 +105,7 @@ sub prettyprint {
                                           "    %-18s\n",
                                           $k
                                          ),
-                                  map {"\t[$_]\n"} @report
+                                  @report
                                  )
                             );
   } elsif (defined $v) {
@@ -378,6 +361,29 @@ sub cpl {
             keys %$CPAN::Config,
                 keys %keys;
     return grep /^\Q$word\E/, @o_conf;
+}
+
+
+package ####::###### #hide from indexer
+    CPAN::Config;
+# note: J. Nick Koston wrote me that they are using
+# CPAN::Config->commit although undocumented. I suggested
+# CPAN::Shell->o("conf","commit") even when ugly it is at least
+# documented
+
+# that's why I added the CPAN::Config class with autoload and
+# deprecated warning
+
+use strict;
+use vars qw($AUTOLOAD $VERSION);
+$VERSION = sprintf "%.2f", substr(q$Rev: 353 $,4)/100;
+
+# formerly CPAN::HandleConfig was known as CPAN::Config
+sub AUTOLOAD {
+  my($l) = $AUTOLOAD;
+  $CPAN::Frontend->mywarn("Dispatching deprecated method '$l' to CPAN::HandleConfig");
+  $l =~ s/.*:://;
+  CPAN::HandleConfig->$l(@_);
 }
 
 1;
