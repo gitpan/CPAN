@@ -1,5 +1,16 @@
+2006-01-09  k
+
+	* Todo: notes
+
 2006-01-08  k
 
+	* t/shell.t: error, error, error
+	* t/shell.t: make run target; add comment about Expect in shell.t; 
+	  remove duplicate strictness
+	* Makefile.PL, t/shell.t: make run target; add comment about 
+	  Expect in shell.t; remove duplicate strictness
+	* Changes, Makefile.PL, Todo, lib/CPAN.pm: finishing touches for a 
+	  devel release
 	* lib/CPAN.pm: CPAN_SHELL_LEVEL protect from unini warnings
 	* lib/CPAN.pm: set envariable CPAN_SHELL_LEVEL in the subshell 
 	  (Slaven Rezic)

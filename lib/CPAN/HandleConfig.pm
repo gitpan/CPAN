@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $dot_cpan $VERSION);
 
-$VERSION = sprintf "%.2f", substr(q$Rev: 353 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 366 $,4)/100;
 
 %can = (
   'commit' => "Commit changes to disk",
@@ -37,8 +37,9 @@ sub edit {
     CPAN->debug("self[$self]args[".join(" | ",@args)."]");
     my($o,$str,$func,$args,$key_exists);
     $o = shift @args;
+    $DB::single = 1;
     if($can{$o}) {
-	$self->$o(@args);
+	$self->$o(args => \@args);
 	return 1;
     } else {
         CPAN->debug("o[$o]") if $CPAN::DEBUG;
@@ -176,13 +177,13 @@ sub defaults {
 }
 
 sub init {
-    my($self) = @_;
+    my($self,@args) = @_;
     undef $CPAN::Config->{'inhibit_startup_message'}; # lazy trick to
                                                       # have the least
                                                       # important
                                                       # variable
                                                       # undefined
-    $self->load;
+    $self->load(@args);
     1;
 }
 
@@ -376,7 +377,7 @@ package ####::###### #hide from indexer
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 353 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 366 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {
