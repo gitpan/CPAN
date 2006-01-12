@@ -1,3 +1,36 @@
+2006-01-11  k
+
+	* Makefile.PL: trying to survive pass XX
+	* Makefile.PL: trying to survive pass XiX
+	* Makefile.PL: trying to survive pass XVIII
+	* Makefile.PL: trying to survive pass IX
+	* lib/CPAN.pm: wherever we mention lockfile, we now also say which 
+	  lockfile
+	* Makefile.PL: trying to survive when everything is checked out 
+	  into an empty directory and there are no remains from a former 
+	  build
+	* Todo: Notes about how Debian does *not* alter the prompt
+	* Todo: blah
+	* Todo: new grouping in the Todo file
+	* Todo, lib/CPAN.pm: introduce brokensig; introduce class 
+	  CPAN::Distrostatus; bring "failed" one step further; collect 
+	  notes about todos in the "failed" area
+
+2006-01-10  k
+
+	* MANIFEST, Makefile.PL: lost META.yml from manifest; need to copy 
+	  it from the tarball before removing it
+	* MANIFEST.SKIP, README: add the t/CPAN/MyConfig
+	* Changes: preparing 1.83_52
+	* Todo, lib/CPAN.pm: document CPAN_SHELL_LEVEL
+	* t/shell.t: fix the shell test for the case that a lockfile was 
+	  lying around
+	* MANIFEST: re-sort MANIFEST and discover that shell.t and 
+	  companion were forgotten last time
+	* lib/CPAN/FirstTime.pm: what a quick shell-test comparison reveals
+	* MANIFEST, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm: Jim's second installment
+
 2006-01-09  k
 
 	* Todo: notes

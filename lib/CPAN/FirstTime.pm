@@ -2,7 +2,7 @@
 package CPAN::Mirrored::By;
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 367 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 386 $,4)/100;
 
 sub new { 
     my($self,@arg) = @_;
@@ -21,7 +21,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec;
 use vars qw($VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 367 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 386 $,4)/100;
 
 =head1 NAME
 
@@ -42,9 +42,9 @@ use vars qw( %prompts );
 
 sub init {
     my($configpm, %args) = @_;
-    my @sections;	# will become an arg sometime
     use Config;
-    my $matcher = $args{args} && @{$args{args}} ? qr/$args{args}[0]/ : qr//;
+    # extra arg in 'o conf init make' selects only $item =~ /make/
+    my $matcher = $args{args} && @{$args{args}} ? $args{args}[0] : '';
 
     unless ($CPAN::VERSION) {
 	require CPAN::Nox;
@@ -155,24 +155,16 @@ Shall we use it as the general CPAN build and cache directory?
     # Cache size, Index expire
     #
 
-    $CPAN::Frontend->myprint($prompts{build_cache});
+    $CPAN::Frontend->myprint($prompts{build_cache_intro});
 
-    $default = $CPAN::Config->{build_cache} || 100; # large enough to
-                                                    # build large
-                                                    # dists like Tk
-    $ans = prompt("Cache size for build directory (in MB)?", $default);
-    $CPAN::Config->{build_cache} = $ans;
+    # large enough to build large dists like Tk
+    my_dflt_prompt(build_cache => 100, $matcher);
 
     # XXX This the time when we refetch the index files (in days)
     $CPAN::Config->{'index_expire'} = 1;
 
-    $CPAN::Frontend->myprint($prompts{scan_cache});
-
-    $default = $CPAN::Config->{scan_cache} || 'atstart';
-    do {
-        $ans = prompt("Perform cache scanning (atstart or never)?", $default);
-    } while ($ans ne 'atstart' && $ans ne 'never');
-    $CPAN::Config->{scan_cache} = $ans;
+    $CPAN::Frontend->myprint($prompts{scan_cache_intro});
+    my_prompt_loop(scan_cache => 'atstart', $matcher, 'atstart|never');
 
     #
     # cache_metadata
@@ -219,7 +211,7 @@ Shall we use it as the general CPAN build and cache directory?
     #
     # do an ls on the m or the d command
     #
-    $CPAN::Frontend->myprint($prompts{show_upload_date});
+    $CPAN::Frontend->myprint($prompts{show_upload_date_intro});
 
     defined($default = $CPAN::Config->{show_upload_date}) or
         $default = 'n';
@@ -227,20 +219,19 @@ Shall we use it as the general CPAN build and cache directory?
                   ($default ? 'yes' : 'no'));
     $CPAN::Config->{show_upload_date} = ($ans =~ /^[y1]/i ? 1 : 0);
 
+    #my_prompt_loop(show_upload_date => 'n', $matcher,
+		   #'follow|ask|ignore');
+
     #
     # prerequisites_policy
     # Do we follow PREREQ_PM?
     #
 
-    $CPAN::Frontend->myprint($prompts{prerequisites_policy});
+    $CPAN::Frontend->myprint($prompts{prerequisites_policy_intro});
 
-    $default = $CPAN::Config->{prerequisites_policy} || 'ask';
-    do {
-      $ans =
-	  prompt("Policy on building prerequisites (follow, ask or ignore)?",
-		 $default);
-    } while ($ans ne 'follow' && $ans ne 'ask' && $ans ne 'ignore');
-    $CPAN::Config->{prerequisites_policy} = $ans;
+    my_prompt_loop(prerequisites_policy => 'ask', $matcher,
+		   'follow|ask|ignore');
+
 
     #
     # External programs
@@ -261,6 +252,8 @@ Shall we use it as the general CPAN build and cache directory?
           $CPAN::Config->{$progname} = 'not_here';
           next;
       }
+      next if $matcher && $progname !~ /$matcher/;
+
       my $progcall = $progname;
       # we don't need ncftp if we have ncftpget
       next if $progname eq "ncftp" && $CPAN::Config->{ncftpget} gt " ";
@@ -311,37 +304,32 @@ Shall we use it as the general CPAN build and cache directory?
     # Arguments to make etc.
     #
 
-    $CPAN::Frontend->myprint($prompts{prefer_installer});
+    $CPAN::Frontend->myprint($prompts{prefer_installer_intro});
 
-    $default = $CPAN::Config->{prefer_installer} || "EUMM";
-    do {
-      $ans =
-	  prompt("In case you could choose, which installer would you prefer (EUMM or MB)?",
-		 $default);
-    } while (uc $ans ne 'MB' && uc $ans ne 'EUMM');
-    $CPAN::Config->{prefer_installer} = $ans;
+    my_prompt_loop(prefer_installer => 'EUMM', $matcher, 'MB|EUMM');
+
 
     $CPAN::Frontend->myprint($prompts{makepl_arg_intro});
 
+    my_dflt_prompt(makepl_arg => "", $matcher);
 
-    my_dflt_prompt(makepl_arg => "");
+    my_dflt_prompt(make_arg => "", $matcher);
 
-    my_dflt_prompt(make_arg => "");
+    my_dflt_prompt(make_install_make_command => $CPAN::Config->{make} || "",
+		   $matcher);
 
-    my_dflt_prompt(make_install_make_command => $CPAN::Config->{make} || "");
-
-    my_dflt_prompt(make_install_arg => $CPAN::Config->{make_arg} || "");
-
+    my_dflt_prompt(make_install_arg => $CPAN::Config->{make_arg} || "", 
+		   $matcher);
 
     $CPAN::Frontend->myprint($prompts{mbuildpl_arg_intro});
 
-    my_dflt_prompt(mbuildpl_arg => "");
+    my_dflt_prompt(mbuildpl_arg => "", $matcher);
 
-    my_dflt_prompt(mbuild_arg => "");
+    my_dflt_prompt(mbuild_arg => "", $matcher);
 
-    my_dflt_prompt(mbuild_install_build_command => "./Build");
+    my_dflt_prompt(mbuild_install_build_command => "./Build", $matcher);
 
-    my_dflt_prompt(mbuild_install_arg => "");
+    my_dflt_prompt(mbuild_install_arg => "", $matcher);
 
     #
     # Alarm period
@@ -401,14 +389,31 @@ Shall we use it as the general CPAN build and cache directory?
     CPAN::HandleConfig->commit($configpm);
 }
 
-sub my_dflt_prompt {	# no name clash - you dont swear
-
-    my ($item, $dflt) = @_;
-
+sub my_dflt_prompt {
+    my ($item, $dflt, $m) = @_;
     my $default = $CPAN::Config->{$item} || $dflt;
-    $CPAN::Config->{$item} =
-	prompt($prompts{$item}, $default);
 
+    $DB::single = 1;
+    if (!$m || $item =~ /$m/) {
+	$CPAN::Config->{$item} = prompt($prompts{$item}, $default);
+    } else {
+	$CPAN::Config->{$item} = $default;
+    }
+}
+
+sub my_prompt_loop {
+    my ($item, $dflt, $m, $ok) = @_;
+    my $default = $CPAN::Config->{$item} || $dflt;
+    my $ans;
+
+    $DB::single = 1;
+    if (!$m || $item =~ /$m/) {
+	do { $ans = prompt($prompts{$item}, $default);
+	} until $ans =~ /$ok/;
+	$CPAN::Config->{$item} = $ans;
+    } else {
+	$CPAN::Config->{$item} = $default;
+    }
 }
 
 
@@ -701,20 +706,26 @@ you don\'t want me to keep a cache, answer 0.)
 
 },
 
-build_cache => qq{
+build_cache_intro => qq{
 
 How big should the disk cache be for keeping the build directories
 with all the intermediate files\?
 
 },
 
-scan_cache => qq{
+build_cache =>
+"Cache size for build directory (in MB)?",
+
+
+scan_cache_intro => qq{
 
 By default, each time the CPAN module is started, cache scanning is
 performed to keep the cache size in sync. To prevent this, answer
 'never'.
 
 },
+
+scan_cache => "Perform cache scanning (atstart or never)?",
 
 cache_metadata => qq{
 
@@ -748,7 +759,7 @@ set this variable, please hit SPACE RETURN to the following question.
 
 },
 
-show_upload_date => qq{
+show_upload_date_intro => qq{
 
 The 'd' and the 'm' command normally only show you information they
 have in their in-memory database and thus will never connect to the
@@ -759,7 +770,10 @@ net connection to get at the upload date.
 
 },
 
-prerequisites_policy => qq{
+show_upload_date =>
+"Always try to show upload date with 'd' and 'm' command (yes/no)?",
+
+prerequisites_policy_intro => qq{
 
 The CPAN module can detect when a module which you are trying to build
 depends on prerequisites. If this happens, it can build the
@@ -768,6 +782,9 @@ confirmation ('ask'), or just ignore them ('ignore'). Please set your
 policy to one of the three values.
 
 },
+
+prerequisites_policy =>
+               qq{Policy on building prerequisites (follow, ask or ignore)?},
 
 external_progs => qq{
 
@@ -779,7 +796,7 @@ by ENTER.
 
 },
 
-prefer_installer => qq{
+prefer_installer_intro => qq{
 
 When you have Module::Build installed and a module comes with both a
 Makefile.PL and a Build.PL, which shall have precedence? The two
@@ -789,6 +806,9 @@ the next generation installer Module::Build (MB) works with the
 Build.PL.
 
 },
+
+prefer_installer =>
+qq{In case you could choose, which installer would you prefer (EUMM or MB)?},
 
 makepl_arg_intro => qq{
 

@@ -1,12 +1,80 @@
+2006-01-12  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Bug: We cannot determine the prereequisites of File::Find::Rule
+	because we have no YAML installed and Richard uses Module::Build, so we
+	have no Makefile to parse. There is some MB interface to get them. fixed
+	in rev. 396
+
+	* Bug: "install Bundle::CPAN Expect Test::Pod" currently failes
+	correctly when we reach YAML because we cannot verify the signature. But
+	we must not die, we must only set the correct status so the rest of the
+	gang can be installed. Fixed in rev. 384
+
+2006-01-11  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* what happens to "failed" when we reload the index?
+
+	* Todo: Write a bunch of distros and upload them with the sole purpose
+	of testing CPAN.pm. Also helps Test::Prereq and others.
+	PITA::Test::Dummy::Perl5::Make and PITA::Test::Dummy::Perl5::Build? A
+	start is done in t/shell.t
+
+	* upgrade: new command that does nothing but
+	CPAN::Shell->install(CPAN::Shell->r)?
+
+	* DBM::Deep for a hash behind $CPAN::META. See 2005-12-28 for issues and
+	branches/1.80_56plus for a few lines that probably went in the wrong
+	direction. Split the loading of Authors/Modules/Distros/Bundles into
+	separate pieces and make them lazy. Consider 'reload index', the
+	storable Metadata file, readonly/readwrite, changes of the DSLIP thingy,
+	offsets into an uncompressed 02xxx file. Remember RT #4943.
+
+	* readline: offer the choice between Gnu and Perl
+
+	* force: I'd expect 'force ls' to always fetch fresh CHECKSUMS
+	files. Currently it doesn't.
+
+	* optimize "ls dowens": currently fetches D/CHECKSUMS and D/DO/CHECKSUMS
+	even if we already have D/DO/DOWENS/CHECKSUMS. Is it worth fixing?
+
+	* Bug: installing scripts without modules? How does it work? How
+	should it work? getting the latest version ad-hoc?
+
+	* get rid of the summary currently provided by install bundle, its
+	superceded by failed().
+
+	* Todo: document "failed" (and "status"?)
+
+	* Todo: see the newest cpan by brian.
+
+	* today's rev. 374 of CPAN.pm should be partially reverted: while
+	failed() looks good most of the time, it looks ugly that 'force install
+	version' installs version and still failed reports:
+
+Writing /usr/local/perl-5.8.0@26774/lib/site_perl/5.9.3/i686-linux-64int/auto/version/vxs/.packlist
+  ./Build install --uninst 1 -- OK
+Failed installations in this command:
+  JPEACOCK/version-0.53.tar.gz                 : make_test NO
+
+cpan> failed               
+Failed installations in this session:
+  BDFOY/Test-Prereq-1.029.tar.gz               : make_test NO
+  JPEACOCK/version-0.53.tar.gz                 : make_test NO
+
+	Correct behaviour should be that the 'make_test NO' bit be nuked. FIXED
+	in rev. 387
+
+	Above that, the "prompt" change was only interesting during debugging.
+	Nobody wants to see the internal number of commands in his prompt. FIXED
+	in rev. 388
+
+	* Bug: YAML fails to unpack because of bad signature. Retrying leads to
+	prereq Test::Base failing due to bad signature. Retrying leads to
+	running make test on YAML. dump reveals that somehow SIG_STATUS was set
+	to YES. Ahh, that's the signature on the CHECKSUMS file. Need a new
+	attribute for broken signatures. FIXED in rev. 374
+
 2006-01-09  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* document CPAN_SHELL_LEVEL DONE
-
-2006-01-08  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* find out why Expect is so noisy and when this did start DONE
-
-2006-01-06  Andreas J Koenig  <akoenig@cellular.de>
 
 	* Jim Cromie suggests: tweak shell to allow cpan> o conf init @sections
 	tweak FirstTime::init() interface to accept optional @sections
@@ -17,11 +85,26 @@
 	candidate sections: progs - external prog selection make - all make
 	options
 
+	* hr ================ no todos below this line ================ /hr
+	
+	* document CPAN_SHELL_LEVEL DONE
+
+	* find out why Expect is so noisy and when this did start DONE
+
 	* Slaven suggests: How to discover that we are in the subshell?
 	Environment? Prompt? Level? PS1 as an environment variable? How does
 	Debian's apt-get solve that? HALF-DONE in rev. 360: We now have the
 	envariable CPAN_SHELL_LEVEL but I'd still like to make a change to the
-	prompt.
+	prompt. Update: Debian does not mangle the prompt, they just say 'Type
+	exit when you're done':
+
+	*** dvorak (Y/I/N/O/D/Z) [default=N] ? z
+Type `exit' when you're done.
+Abstaining from writing .zhistory, is younger than stats.dbhash at /root/bin/commandhistory.pl line 513.
+Zsh version 4.3.0-dev-2
+Linux dev05 2.6.12.6-xen0 #2 Tue Jan 10 17:34:37 CET 2006 i686 GNU/Linux
+
+	So this Todo can also be CLOSED.
 
 	* Rename Releasenotes to Changes and make the ChangeLog in the
 	traditional format, there is some XSLT stylesheet somewhere that does
@@ -33,14 +116,7 @@
 	* Give every command a number and store that number in the object,
 	something like incommandcolor but without removing it at the end of the
 	command. With such a number we can make failed(commandnumber) filter on
-	that commandnumber and have instant per-command-failed.
-
-	* Todo: document "failed" and "status" but only after 1.81
-
-	* Todo: Write a bunch of distros and upload them with the sole purpose
-	of testing CPAN.pm. Also helps Test::Prereq and others.
-	PITA::Test::Dummy::Perl5::Make and PITA::Test::Dummy::Perl5::Build? A
-	start is done in t/shell.t
+	that commandnumber and have instant per-command-failed. DONE in rev 374
 
 2005-12-31  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
@@ -48,32 +124,11 @@
 	Module::Load::Conditional declared but nobody installs it.
 	FIXED in rev. 329
 
-	* upgrade: new command that does nothing but
-	CPAN::Shell->install(CPAN::Shell->r)?
-
 2005-12-30  Andreas J Koenig  <akoenig@cellular.de>
-
-	* DBM::Deep for a hash behind $CPAN::META. See 2005-12-28 for issues and
-	branches/1.80_56plus for a few lines that probably went in the wrong
-	direction.
-
-	* readline: offer the choice between Gnu and Perl
-
-	* extend the "failed" idea to the current command and get rid of the
-	summary currently provided by install bundle.
 
 	* FirstTime needs a structure over each question or questiongroup so
 	that we can ask single questions. Structure was brought by Jim Comie
 	around rev. 355
-
-	* force: I'd expect 'force ls' to always fetch fresh CHECKSUMS
-	files. Currently it doesn't.
-
-	* optimize "ls dowens": currently fetches D/CHECKSUMS and D/DO/CHECKSUMS
-	even if we already have D/DO/DOWENS/CHECKSUMS. Is it worth fixing?
-
-	* Bug: installing scripts without modules? How does it work? How
-	should it work? getting the latest version ad-hoc?
 
 	* Bug: "reload cpan" does not work if the old and the new CPAN.pm
 	have a different path. I installed a new CPAN.pm from CPAN and it
@@ -107,19 +162,6 @@
 	* branching and merging: make current HEAD a branch "1.80_56plus" and
 	roll HEAD back to contain only the zero-risk stuff (for maybe later
 	releasing that as 1.81?) DONE
-
-2005-12-28  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* memory: split the loading of Authors/Modules/Distros/Bundles into
-	separate pieces and make them lazy. Consider 'reload index', the
-	storable Metadata file, readonly/readwrite, changes of the DSLIP thingy,
-	offsets into an uncompressed 02xxx file.
-
-2005-12-26  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* rt.cpan.org: #4943 about memory consumption??? QJZHOU/uncpan???
-
-2005-12-24  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 2005-12-21  Andreas J Koenig  <akoenig@cellular.de>
 

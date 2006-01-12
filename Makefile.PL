@@ -119,7 +119,7 @@ WriteMakefile(
                (ABSTRACT_FROM  => 'lib/CPAN.pm', # retrieve abstract from module
                 AUTHOR         => 'Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>') : ()),
               'dist' => {
-                         DIST_DEFAULT => 'Makefile setversion README all chlog tardist',
+                         DIST_DEFAULT => 'Makefile META.yml setversion README all chlog tardist',
                          COMPRESS => 'gzip -9f'
                         },
 );
@@ -132,24 +132,26 @@ if ($version_diff){
 ";
 }
 
-sub MY::postamble {
+package MY;
+
+sub postamble {
   q{
 setversion:
 	$(PERL) Makefile.PL --setversion
 
 README: lib/CPAN.pm Makefile
 	chmod +w $@
-	/usr/bin/pod2text lib/CPAN.pm > $@
+	-/usr/bin/pod2text lib/CPAN.pm > $@
 
 chlog :: chlog-svn chlog-xml chlog-trad
 
 # got this from http://ch.tudelft.nl/~arthur/svn2cl/
 chlog-svn :
-	LC_ALL=en_GB.utf8 svn log -v -r `svnversion . | perl -ne '/(?:\d+:)?(\d+)[SM]*$$/&&print $$1'`:1 > ChangeLog.svn
-	cat ChangeLog.local >> ChangeLog.svn
+	-LC_ALL=en_GB.utf8 svn log -v -r `svnversion . | perl -ne '/(?:\d+:)?(\d+)[SM]*$$/&&print $$1'`:1 > ChangeLog.svn
+	-cat ChangeLog.local >> ChangeLog.svn
 
 chlog-trad :
-	/home/src/devel/svn/svn2cl/svn2cl-current/svn2cl.sh --strip-prefix trunk --group-by-day > ChangeLog
+	-/home/src/devel/svn/svn2cl/svn2cl-current/svn2cl.sh --strip-prefix trunk --group-by-day > ChangeLog
 
 # for debugging
 chlog-xml :
@@ -162,6 +164,7 @@ the-release-name :
 release ::
 	/usr/bin/perl -Irelease-lib -S release $(DISTVNAME).tar$(SUFFIX)
 	$(CP) $(DISTVNAME)/SIGNATURE ./SIGNATURE
+	$(CP) $(DISTVNAME)/META.yml  ./META.yml
 	rm -rf $(DISTVNAME)
 
 run :
@@ -182,16 +185,19 @@ upload-batch-signing-key:
 
 howto-release:
 	@$(ECHO) make ci dist \&\& make release
+
+META.yml:
+	$(ECHO) -n "" >> META.yml
 }
 }
 
-sub MY::dist_ci {
+sub dist_ci {
   return qq{ci :
 	svn ci
 };
 }
 
-sub MY::dist_test {
+sub dist_test {
   return q{
 # if we depend on $(DISTVNAME).tar$(SUFFIX), then the rest of the
 # Makefile breaks our intent to NOT remake dist
@@ -201,5 +207,18 @@ disttest :
 	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL
 	cd $(DISTVNAME) && $(MAKE) $(PASTHRU)
 	cd $(DISTVNAME) && $(MAKE) test $(PASTHRU)
+
+distdir ::
+	$(CP) $(DISTVNAME)/SIGNATURE ./SIGNATURE
+	$(CP) $(DISTVNAME)/META.yml  ./META.yml
+	$(CP) $(DISTVNAME)/MANIFEST  ./MANIFEST
+
 }
+}
+
+sub distdir {
+  my $self = shift;
+  my $out = $self->SUPER::distdir;
+  $out =~ s/distdir :/distdir ::/g;
+  return $out;
 }

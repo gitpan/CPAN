@@ -4,6 +4,7 @@ Changes
 Changes.old
 MANIFEST
 MANIFEST.SKIP
+META.yml
 Makefile.PL
 PAUSE2003.pub
 PAUSE2005.pub
@@ -30,5 +31,4 @@ t/shell.t
 t/signature.t
 t/vcmp.t
 t/version.t
-META.yml                                 Module meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)
