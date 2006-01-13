@@ -5,7 +5,6 @@ no warnings 'redefine';
 BEGIN {
     chdir 't' if -d 't';
     unshift @INC, '../lib';
-    $ENV{PERL5LIB} = '.:../lib';    # so children will see it too
     require Config;
     unless ($Config::Config{osname} eq "linux" or @ARGV) {
 	print "1..0 # Skip: test is only validated onf linux\n";
@@ -41,6 +40,8 @@ my $exp = Expect->new;
 my $prompt = "empty prompt next line";
 $exp->spawn(
             $^X,
+            "-I.",                 # get this test's own MyConfig
+            "-I../lib",
             "-MCPAN::MyConfig",
             "-MCPAN",
             # (@ARGV) ? "-d" : (), # force subtask into debug, maybe useful
@@ -48,20 +49,34 @@ $exp->spawn(
             "\$CPAN::Suppress_readline=1;shell('$prompt\n')",
            );
 my $timeout = 6;
-# $exp->log_stdout(0);
+$exp->log_stdout(0);
 $exp->notransfer(1);
+
+# shamelessly stolen from Test::Builder
+sub mydiag {
+    my(@msgs) = @_;
+    my $msg = join '', map { defined($_) ? $_ : 'undef' } @msgs;
+    # Escape each line with a #.
+    $msg =~ s/^/# /gm;
+    # Stick a newline on the end if it needs it.
+    $msg .= "\n" unless $msg =~ /\n\Z/;
+    print $msg;
+}
+
 $exp->expect(
              $timeout,
              [ eof => sub { exit } ],
              [ timeout => sub {
                    my $self = $exp;
-                   print "timed out\n";
+                   print "# timed out\n";
                    my $got = $self->clear_accum;
                    if ($got =~ /lockfile/) {
-		       print "- due to lockfile, proceeding\n";
+		       mydiag " - due to lockfile, proceeding\n";
                        $self->send("y\n");
                    } else {
-		       print "- unknown reason, got: $got\n";
+                       $got = substr($got,0,60)."..." if length($got)>63;
+		       mydiag "- unknown reason, got: [$got]\n";
+                       mydiag "Giving up this test\n";
                        exit;
                    }
                    Expect::exp_continue;
@@ -83,12 +98,12 @@ for my $i (0..$#prgs){
     $exp->send("$prog\n");
     $exp->expect(
                  [ eof => sub { exit } ],
-                 [ timeout => sub { print "timed out on $i: $prog\n"; exit } ],
+                 [ timeout => sub { mydiag "timed out on $i: $prog\n"; exit } ],
                  '-re', $expected
                 );
     my $got = $exp->clear_accum;
     # warn "# DEBUG: prog[$prog]expected[$expected]got[$got]";
-    print "\n";
+    mydiag "$got\n";
     ok(1, $prog);
 }
 
