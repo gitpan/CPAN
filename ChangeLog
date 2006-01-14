@@ -1,3 +1,78 @@
+2006-01-14  k
+
+	* t/shell.t: test if o conf commit works
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm: o conf commit was broken
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm: re-introduce the living 
+	  prompt becuae I need it again for debugging -- leaving 
+	  undocumented
+	* lib/CPAN.pm: make skipping the signature test possible with 
+	  "force"
+	* Todo: prepare for _55
+	* t/shell.t: let them switch the test on with an environment 
+	  variable
+	* Changes, README, lib/CPAN/HandleConfig.pm, t/shell.t: do not try 
+	  to require CPAN::Config when CPAN::MyConfig is already in %INC 
+	  (should fix the long standing shell.t bug)
+	* lib/CPAN.pm: preparing for release _55
+	* lib/CPAN.pm: improve error handling on Net::FTP connections (R. 
+	  Hauser; fixes rt #1572)
+	* lib/CPAN.pm: double fix buglet in usage of a Distrostatus object 
+	  by using overload/fallback
+	* lib/CPAN.pm: fix buglet in usage of a Distrostatus object
+
+2006-01-13  k
+
+	* Todo: notes about a newly discovered bug
+	* Todo: notes about the resistent bug in shell.t that was worked 
+	  around in rev 411
+	* t/shell.t: this patch fixes shell.t on Slavens box
+	* MANIFEST.SKIP: MANIFEST.SKIP ignores more files
+	* Changes: prepare 1.83_54
+	* Changes, lib/CPAN.pm: prepare 1.83_54
+	* t/shell.t: give credits
+	* Changes, t/shell.t: shell.t wrote to stderr what I intended to 
+	  go to stdout
+	* lib/CPAN.pm: patch from Gisle Aas that makes it convenient to 
+	  let $Config->{make} empty
+	* Changes, Todo: just notes
+	* scripts/cpan: grabbed the newest cpan from brian on his 
+	  invitation
+	* Todo: shuffle todos
+	* Todo, lib/CPAN.pm: make force ls work as a force to refetch the 
+	  checksums files
+	* t/shell.t: make test output TAP conform
+	* lib/CPAN/FirstTime.pm: Change 239877 by gisle@rogn on 2006/01/12 
+	  09:15:51
+	  
+	  Camel: Provide a default shell for Windows.
+	  A shell is needed for look command.
+	* t/shell.t: this must be the reason why shell.t fails for Jim
+
+2006-01-12  k
+
+	* MANIFEST, README: automatic files from make dist on 1.83_53
+	* Changes, Todo, lib/CPAN.pm: fixed failing determination of 
+	  prereqs when neither YAML available nor a Makefile produced
+	* Todo: notes about a new buglet
+	* lib/CPAN.pm: typo
+	* Changes: once again prepare the release of 1.83_53
+	* lib/CPAN.pm: bugfix for the b command: $ro not always available, 
+	  e.g. for not published bundles
+	* Makefile.PL: make sure we have the same MANIFEST as the last 
+	  distro had
+	* Todo, lib/CPAN.pm: missing bracket from rev 387
+	* Changes, lib/CPAN.pm: prepare release 1.83_53
+	* lib/CPAN.pm: remove the CPAN::Prompt package, I have currently 
+	  no use for it. For the record: it displayed the current command 
+	  id and a fun variant changed the cpan promt randomly
+	* Changes, Todo, lib/CPAN.pm: replace the NO from make_test with a 
+	  FAILED-but when force_update is in effect
+	* lib/CPAN/FirstTime.pm: bringing back a few lost dialoges
+	* lib/CPAN/FirstTime.pm, t/shell.t: Jim's patch 3 as it arrived
+	* Todo, lib/CPAN.pm: remove the die() after a failed signature 
+	  check and replace it with the nosayer mechanism; introduce 
+	  mysleep
+
 2006-01-11  k
 
 	* Makefile.PL: trying to survive pass XX

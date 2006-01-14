@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_54';
+$VERSION = '1.83_55';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -81,7 +81,7 @@ sub shell {
     $Suppress_readline = ! -t STDIN unless defined $Suppress_readline;
     CPAN::HandleConfig->load unless $CPAN::Config_loaded++;
 
-    my $oprompt = shift || "cpan> ";
+    my $oprompt = shift || CPAN::Prompt->new;
     my $prompt = $oprompt;
     my $commandline = shift || "";
     $CPAN::CurrentCommandId ||= 1;
@@ -191,7 +191,7 @@ ReadLine support %s
 	    my $command = shift @line;
 	    eval { CPAN::Shell->$command(@line) };
 	    warn $@ if $@;
-            if ($command =~ /^(make|test|install)$/) {
+            if ($command =~ /^(make|test|install|force|notest)$/) {
                 CPAN::Shell->failed($CPAN::CurrentCommandId,1);
             }
             soft_chdir_with_alternatives(\@cwd);
@@ -326,8 +326,30 @@ sub as_string {
             ".\nCannot continue.\n";
 }
 
+package CPAN::Prompt; use overload '""' => "as_string";
+our $prompt = "cpan> ";
+$CPAN::CurrentCommandId ||= 0;
+sub as_randomly_capitalized_string {
+    # pure fun variant
+    substr($prompt,$_,1)=rand()<0.5 ?
+        uc(substr($prompt,$_,1)) :
+            lc(substr($prompt,$_,1)) for 0..3;
+    $prompt;
+}
+sub new {
+    bless {}, shift;
+}
+sub as_string {
+    if ($CPAN::Config->{commandnumber_in_prompt}) {
+        sprintf "cpan[%d]> ", $CPAN::CurrentCommandId;
+    } else {
+        "cpan> ";
+    }
+}
+
 package CPAN::Distrostatus;
-use overload '""' => "as_string";
+use overload '""' => "as_string",
+    fallback => 1;
 sub new {
     my($class,$arg) = @_;
     bless {
@@ -2255,31 +2277,38 @@ use strict;
 
 #-> sub CPAN::FTP::ftp_get ;
 sub ftp_get {
-  my($class,$host,$dir,$file,$target) = @_;
-  $class->debug(
-		qq[Going to fetch file [$file] from dir [$dir]
+    my($class,$host,$dir,$file,$target) = @_;
+    $class->debug(
+                  qq[Going to fetch file [$file] from dir [$dir]
 	on host [$host] as local [$target]\n]
-		      ) if $CPAN::DEBUG;
-  my $ftp = Net::FTP->new($host);
-  return 0 unless defined $ftp;
-  $ftp->debug(1) if $CPAN::DEBUG{'FTP'} & $CPAN::DEBUG;
-  $class->debug(qq[Going to login("anonymous","$Config::Config{cf_email}")]);
-  unless ( $ftp->login("anonymous",$Config::Config{'cf_email'}) ){
-    warn "Couldn't login on $host";
-    return;
-  }
-  unless ( $ftp->cwd($dir) ){
-    warn "Couldn't cwd $dir";
-    return;
-  }
-  $ftp->binary;
-  $class->debug(qq[Going to ->get("$file","$target")\n]) if $CPAN::DEBUG;
-  unless ( $ftp->get($file,$target) ){
-    warn "Couldn't fetch $file from $host\n";
-    return;
-  }
-  $ftp->quit; # it's ok if this fails
-  return 1;
+                 ) if $CPAN::DEBUG;
+    my $ftp = Net::FTP->new($host);
+    unless ($ftp) {
+        $CPAN::Frontend->mywarn("  Could not connect to host '$host' with Net::FTP\n");
+        return;
+    }
+    return 0 unless defined $ftp;
+    $ftp->debug(1) if $CPAN::DEBUG{'FTP'} & $CPAN::DEBUG;
+    $class->debug(qq[Going to login("anonymous","$Config::Config{cf_email}")]);
+    unless ( $ftp->login("anonymous",$Config::Config{'cf_email'}) ){
+        my $msg = $ftp->message;
+        $CPAN::Frontend->mywarn("  Couldn't login on $host: $msg");
+        return;
+    }
+    unless ( $ftp->cwd($dir) ){
+        my $msg = $ftp->message;
+        $CPAN::Frontend->mywarn("  Couldn't cwd $dir: $msg");
+        return;
+    }
+    $ftp->binary;
+    $class->debug(qq[Going to ->get("$file","$target")\n]) if $CPAN::DEBUG;
+    unless ( $ftp->get($file,$target) ){
+        my $msg = $ftp->message;
+        $CPAN::Frontend->mywarn("  Couldn't fetch $file from $host: $msg");
+        return;
+    }
+    $ftp->quit; # it's ok if this fails
+    return 1;
 }
 
 # If more accuracy is wanted/needed, Chris Leach sent me this patch...
@@ -4168,7 +4197,8 @@ a bad URL. Please check this array with 'o conf urllist', and
 retry. For more information, try opening a subshell with
   look %s
 and there run
-  cpansign -v},
+  cpansign -v
+},
                             $self->{localfile},
                             $self->pretty_id,
                            );
@@ -4632,7 +4662,7 @@ sub force {
  )) {
     delete $self->{$att};
   }
-  if ($method && $method eq "install") {
+  if ($method && $method =~ /make|test|install/) {
     $self->{"force_update"}++; # name should probably have been force_install
   }
 }
@@ -4726,8 +4756,10 @@ or
         !$self->{unwrapped} || $self->{unwrapped} eq "NO" and push @e,
         "Had problems unarchiving. Please build manually";
 
-        exists $self->{signature_verify} and $self->{signature_verify}->failed
-            and push @e, "Did not pass the signature test.";
+        unless ($self->{force_update}) {
+            exists $self->{signature_verify} and $self->{signature_verify}->failed
+                and push @e, "Did not pass the signature test.";
+        }
 
         exists $self->{writemakefile} &&
             $self->{writemakefile} =~ m/ ^ NO\s* ( .* ) /sx and push @e,
@@ -5218,7 +5250,7 @@ sub install {
             }
         }
 	exists $self->{'install'} and push @e,
-	$self->{'install'} eq "YES" ?
+	$self->{'install'}->text eq "YES" ?
 	    "Already done" : "Already tried without success";
 
         exists $self->{later} and length($self->{later}) and
@@ -6455,8 +6487,9 @@ that break the alignment of the result.
 
 =item failed
 
-The C<failed> command reports all distributions that failed for some
-reason in the current session.
+The C<failed> command reports all distributions that failed on one of
+C<make>, C<test> or C<install> for some reason in the currently
+running shell session.
 
 =item Signals
 

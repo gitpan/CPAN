@@ -6,10 +6,11 @@ BEGIN {
     chdir 't' if -d 't';
     unshift @INC, '../lib';
     require Config;
-    unless ($Config::Config{osname} eq "linux" or @ARGV) {
-	print "1..0 # Skip: test is only validated onf linux\n";
-	print "# pls try it on your box  and inform me if it works\n";
-	print "# ie: ls try it on your box  and inform me if it works\n";
+    unless ($Config::Config{osname} eq "linux" or $ENV{CPAN_RUN_SHELL_TEST}) {
+	print "1..0 # Skip: test is only validated on linux\n";
+  warn "\n\n\a Skipping tests! If you want to run the test
+  please set environment variable \$CPAN_RUN_SHELL_TEST to 1.\n
+  Pls try it on your box and inform me if it works\n";
 	exit 0;
     }
     eval { require Expect };
@@ -25,6 +26,12 @@ BEGIN {
 use File::Copy qw(cp);
 cp "CPAN/TestConfig.pm", "CPAN/MyConfig.pm" or die; # because commit will overwrite it
 
+sub read_myconfig () {
+    open my $fh, "CPAN/MyConfig.pm" or die;
+    local $/;
+    eval <$fh>;
+}
+
 my @prgs;
 {
     local $/;
@@ -33,7 +40,10 @@ my @prgs;
 }
 
 use Test::More;
-plan tests => scalar @prgs;
+plan tests => scalar @prgs + 2;
+
+read_myconfig;
+is($CPAN::Config->{histsize},100);
 
 $Expect::Multiline_Matching = 0;
 my $exp = Expect->new;
@@ -109,6 +119,9 @@ for my $i (0..$#prgs){
 
 $exp->soft_close;
 
+read_myconfig;
+is($CPAN::Config->{histsize},101);
+
 __END__
 ########
 o conf build_cache
@@ -120,6 +133,14 @@ o conf init
 initialized
 ########
 nothanks
+~~like~~
+wrote
+########
+o conf histsize 101
+~~like~~
+histsize.*101
+########
+o conf commit
 ~~like~~
 wrote
 ########

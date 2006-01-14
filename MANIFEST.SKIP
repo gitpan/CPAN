@@ -1,5 +1,6 @@
 ,v$
 .svn
+.orig$
 \bRCS/
 ^CPAN-.+/.+
 ^CPAN-.+gz$
@@ -17,9 +18,11 @@
 ^blib/
 ^blibdirs
 ^cp-to-perl.pl
+^eg/
 ^lib/CPAN/Config\.pm
 ^lib/CPAN\.pm\.wrong_idea_for_cleanup
 ^mail
+^make-test-
 ^memo
 ^patches
 ^pm_to_blib
