@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_55';
+$VERSION = '1.83_56';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -582,7 +582,8 @@ sub checklock {
 	    $otherhost ne '' && $thishost ne '' &&
 	    $otherhost ne $thishost) {
             $CPAN::Frontend->mydie(sprintf("CPAN.pm panic: Lockfile '$lockfile'\n".
-                                           "reports other host $otherhost and other process $otherpid.\n".
+                                           "reports other host $otherhost and other ".
+                                           "process $otherpid.\n".
                                            "Cannot proceed.\n"));
 	}
 	elsif (defined $otherpid && $otherpid) {
@@ -1049,14 +1050,20 @@ sub disk_usage {
     return if exists $self->{SIZE}{$dir};
     return if $CPAN::Signal;
     my($Du) = 0;
-    unless (-x $dir) {
-      unless (chmod 0755, $dir) {
-        $CPAN::Frontend->mywarn("I have neither the -x permission nor the permission ".
-                                "to change the permission; cannot estimate disk usage ".
-                                "of '$dir'\n");
-        sleep 5;
+    if (-e $dir) {
+        unless (-x $dir) {
+            unless (chmod 0755, $dir) {
+                $CPAN::Frontend->mywarn("I have neither the -x permission nor the ".
+                                        "permission to change the permission; cannot ".
+                                        "estimate disk usage of '$dir'\n");
+                $CPAN::Frontend->mysleep(5);
+                return;
+            }
+        }
+    } else {
+        $CPAN::Frontend->mywarn("Directory '$dir' has gone. Cannot continue.\n");
+        $CPAN::Frontend->mysleep(2);
         return;
-      }
     }
     find(
          sub {
@@ -1455,33 +1462,8 @@ sub reload {
         my $failed;
       MFILE: for my $f (qw(CPAN.pm CPAN/HandleConfig.pm CPAN/FirstTime.pm CPAN/Tarzip.pm
                       CPAN/Debug.pm CPAN/Version.pm)) {
-            next unless $INC{$f};
-            my $pwd = CPAN::anycwd();
-            CPAN->debug("reloading the whole '$f' from '$INC{$f}' while pwd='$pwd'")
-                if $CPAN::DEBUG;
-            my $read;
-            for my $inc (@INC) {
-                $read = File::Spec->catfile($inc,split /\//, $f);
-                last if -f $read;
-            }
-            unless (-f $read) {
-                $failed++;
-                $CPAN::Frontend->mywarn("Found no file to reload for '$f'\n");
-                next MFILE;
-            }
-            my $fh = FileHandle->new($read) or
-                $CPAN::Frontend->mydie("Could not open $read: $!");
-            local($/);
-            local $^W = 1;
             local($SIG{__WARN__}) = paintdots_onreload(\$redef);
-            my $eval = <$fh>;
-            CPAN->debug(sprintf("evaling [%s...]\n",substr($eval,0,64)))
-                if $CPAN::DEBUG;
-            eval $eval;
-            if ($@){
-                $failed++;
-                warn $@;
-            }
+            $self->reload_this($f) or $failed++;
         }
         $CPAN::Frontend->myprint("\n$redef subroutines redefined\n");
         $failed++ unless $redef;
@@ -1495,6 +1477,39 @@ sub reload {
       $CPAN::Frontend->myprint(qq{cpan     re-evals the CPAN.pm file
 index    re-reads the index files\n});
     }
+}
+
+sub reload_this {
+    my($self,$f) = @_;
+    return 1 unless $INC{$f};
+    my $pwd = CPAN::anycwd();
+    CPAN->debug("reloading the whole '$f' from '$INC{$f}' while pwd='$pwd'")
+        if $CPAN::DEBUG;
+    my $read;
+    for my $inc (@INC) {
+        $read = File::Spec->catfile($inc,split /\//, $f);
+        last if -f $read;
+    }
+    unless (-f $read) {
+        $read = $INC{$f};
+    }
+    unless (-f $read) {
+        $CPAN::Frontend->mywarn("Found no file to reload for '$f'\n");
+        return;
+    }
+    my $fh = FileHandle->new($read) or
+        $CPAN::Frontend->mydie("Could not open $read: $!");
+    local($/);
+    local $^W = 1;
+    my $eval = <$fh>;
+    CPAN->debug(sprintf("evaling [%s...]\n",substr($eval,0,64)))
+        if $CPAN::DEBUG;
+    eval $eval;
+    if ($@){
+        warn $@;
+        return;
+    }
+    return 1;
 }
 
 #-> sub CPAN::Shell::_binary_extensions ;
@@ -1674,7 +1689,7 @@ sub u {
 #-> sub CPAN::Shell::failed ;
 sub failed {
     my($self,$only_id,$silent) = @_;
-    my $print = "";
+    my @failed;
   DIST: for my $d ($CPAN::META->all_objects("CPAN::Distribution")) {
         my $failed = "";
         for my $nosayer (qw(signature_verify make make_test install)) {
@@ -1687,15 +1702,20 @@ sub failed {
         next DIST if $only_id && $only_id != $d->{$failed}->commandid;
         my $id = $d->id;
         $id =~ s|^./../||;
-        $print .= sprintf(
-                          "  %-45s: %s %s\n",
-                          $id,
-                          $failed,
-                          $d->{$failed}->text,
-                          );
+        #$print .= sprintf(
+        #                  "  %-45s: %s %s\n",
+        push @failed, [
+                       $d->{$failed}->commandid,
+                       $id,
+                       $failed,
+                       $d->{$failed}->text,
+                      ];
     }
     my $scope = $only_id ? "command" : "session";
-    if ($print) {
+    if (@failed) {
+        my $print = join "",
+            map { sprintf "  %-45s: %s %s\n", @$_[1,2,3] }
+                sort { $a->[0] <=> $b->[0] } @failed;
         $CPAN::Frontend->myprint("Failed installations in this $scope:\n$print");
     } elsif (!$only_id || !$silent) {
         $CPAN::Frontend->myprint("No installations failed in this $scope\n");
@@ -4015,16 +4035,20 @@ sub safe_chdir {
     $self->debug(sprintf "changed directory to %s", CPAN::anycwd())
         if $CPAN::DEBUG;
   } else {
-    unless (-x $todir) {
-      unless (chmod 0755, $todir) {
-        my $cwd = CPAN::anycwd();
-        $CPAN::Frontend->mywarn("I have neither the -x permission nor the permission ".
-                                "to change the permission; cannot chdir ".
-                                "to '$todir'\n");
-        sleep 5;
-        $CPAN::Frontend->mydie(qq{Could not chdir from cwd[$cwd] }.
-                               qq{to todir[$todir]: $!});
-      }
+    if (-e $todir) {
+        unless (-x $todir) {
+            unless (chmod 0755, $todir) {
+                my $cwd = CPAN::anycwd();
+                $CPAN::Frontend->mywarn("I have neither the -x permission nor the ".
+                                        "permission to change the permission; cannot ".
+                                        "chdir to '$todir'\n");
+                $CPAN::Frontend->mysleep(5);
+                $CPAN::Frontend->mydie(qq{Could not chdir from cwd[$cwd] }.
+                                       qq{to todir[$todir]: $!});
+            }
+        }
+    } else {
+        $CPAN::Frontend->mydie("Directory '$todir' has gone. Cannot continue.\n");
     }
     if (chdir $todir) {
       $self->debug(sprintf "changed directory to %s", CPAN::anycwd())
@@ -4241,7 +4265,7 @@ and there run
         }
     }
     if (lc($prefer_installer) eq "mb") {
-        $self->{modulebuild} = "YES";
+        $self->{modulebuild} = 1;
     } elsif (! $mpl_exists) {
         $self->debug(sprintf("makefilepl[%s]anycwd[%s]",
                              $mpl,
@@ -4834,7 +4858,7 @@ or
 	} else {
 	  $ret = system($system);
 	  if ($ret != 0) {
-	    $self->{writemakefile} = "NO Makefile.PL returned status $ret";
+	    $self->{writemakefile} = "NO '$system' returned status $ret";
 	    return;
 	  }
 	}
@@ -4843,7 +4867,7 @@ or
           delete $self->{make_clean}; # if cleaned before, enable next
 	} else {
 	  $self->{writemakefile} =
-	      qq{NO Makefile.PL refused to write a Makefile.};
+	      qq{NO -- Unknown reason.};
 	  # It's probably worth it to record the reason, so let's retry
 	  # local $/;
 	  # my $fh = IO::File->new("$system |"); # STDERR? STDIN?
@@ -5008,7 +5032,7 @@ sub prereq_pm {
         exists $self->{prereq_pm_detected} && $self->{prereq_pm_detected};
     return unless $self->{writemakefile}  # no need to have succeeded
                                           # but we must have run it
-        || $self->{mudulebuild};
+        || $self->{modulebuild};
     my $req;
     if (my $yaml = $self->read_yaml) {
         $req =  $yaml->{requires};
@@ -5080,6 +5104,15 @@ sub prereq_pm {
                 $req = Module::Build->current->requires();
             }
         }
+    }
+    if (-f "Build.PL" && ! -f "Makefile.PL" && ! exists $req->{"Module::Build"}) {
+        $CPAN::Frontend->mywarn("  Warning: CPAN.pm discovered Module::Build as ".
+                                "undeclared prerequisite.\n".
+                                "  Adding it now as a prerequisite.\n"
+                               );
+        $CPAN::Frontend->mysleep(5);
+        $req->{"Module::Build"} = 0;
+        delete $self->{writemakefile};
     }
     $self->{prereq_pm_detected}++;
     return $self->{prereq_pm} = $req;
@@ -5845,6 +5878,11 @@ sub description {
     $ro->{description}
 }
 
+sub distribution {
+    my($self) = @_;
+    CPAN::Shell->expand("Distribution",$self->cpan_file);
+}
+
 sub undelay {
     my $self = shift;
     delete $self->{later};
@@ -6322,7 +6360,23 @@ Batch mode:
 
   use CPAN;
 
-  autobundle, clean, install, make, recompile, test
+  # modules:
+
+  $mod = "Acme::Meta";
+  install $mod;
+  CPAN::Shell->install($mod);                    # same thing
+  CPAN::Shell->expandany($mod)->install;         # same thing
+  CPAN::Shell->expand("Module",$mod)->install;   # same thing
+  CPAN::Shell->expand("Module",$mod)
+    ->distribution->install;                     # same thing
+
+  # distributions:
+
+  $distro = "NWCLARK/Acme-Meta-0.01.tar.gz";
+  install $distro;                                # same thing
+  CPAN::Shell->install($distro);                  # same thing
+  CPAN::Shell->expandany($distro)->install;       # same thing
+  CPAN::Shell->expand("Module",$distro)->install; # same thing
 
 =head1 STATUS
 
@@ -6337,9 +6391,9 @@ stalled.
 =head1 DESCRIPTION
 
 The CPAN module is designed to automate the make and install of perl
-modules and extensions. It includes some primitive searching capabilities and
-knows how to use Net::FTP or LWP (or lynx or an external ftp client)
-to fetch the raw data from the net.
+modules and extensions. It includes some primitive searching
+capabilities and knows how to use Net::FTP or LWP (or some external
+download clients) to fetch the raw data from the net.
 
 Modules are fetched from one or more of the mirrored CPAN
 (Comprehensive Perl Archive Network) sites and unpacked in a dedicated
@@ -6356,15 +6410,7 @@ session. The cache manager keeps track of the disk space occupied by
 the make processes and deletes excess space according to a simple FIFO
 mechanism.
 
-For extended searching capabilities there's a plugin for CPAN available,
-L<C<CPAN::WAIT>|CPAN::WAIT>. C<CPAN::WAIT> is a full-text search engine
-that indexes all documents available in CPAN authors directories. If
-C<CPAN::WAIT> is installed on your system, the interactive shell of
-CPAN.pm will enable the C<wq>, C<wr>, C<wd>, C<wl>, and C<wh> commands
-which send queries to the WAIT server that has been configured for your
-installation.
-
-All other methods provided are accessible in a programmer style and in an
+All methods provided are accessible in a programmer style and in an
 interactive shell style.
 
 =head2 Interactive Mode
@@ -6405,7 +6451,7 @@ The principle is that the number of found objects influences how an
 item is displayed. If the search finds one item, the result is
 displayed with the rather verbose method C<as_string>, but if we find
 more than one, we display each object with the terse method
-<as_glimpse>.
+C<as_glimpse>.
 
 =item make, test, install, clean  modules or distributions
 
@@ -6415,7 +6461,7 @@ file name (recognized by embedded slashes), it is processed. If it is
 a module, CPAN determines the distribution file in which this module
 is included and processes that, following any dependencies named in
 the module's META.yml or Makefile.PL (this behavior is controlled by
-I<prerequisites_policy>.)
+the configuration parameter C<prerequisites_policy>.)
 
 Any C<make> or C<test> are run unconditionally. An
 
@@ -6433,7 +6479,7 @@ CPAN also keeps track of what it has done within the current session
 and doesn't try to build a package a second time regardless if it
 succeeded or not. The C<force> pragma may precede another command
 (currently: C<make>, C<test>, or C<install>) and executes the
-command from scratch.
+command from scratch and tries to continue in case of some errors.
 
 Example:
 
@@ -6490,6 +6536,20 @@ that break the alignment of the result.
 The C<failed> command reports all distributions that failed on one of
 C<make>, C<test> or C<install> for some reason in the currently
 running shell session.
+
+=item Lockfile
+
+Interactive sessions maintain a lockfile, per default C<~/.cpan/.lock>
+(but the directory can be configured via the C<cpan_home> config
+variable). The shell is a bit picky if you try to start another CPAN
+session. It dies immediately if there is a lockfile and the lock seems
+to belong to a running process. In case you want to run a second shell
+session, it is probably safest to maintain another directory, say
+C<~/.cpan-for-X/> and a C<~/.cpan-for-X/CPAN/MyConfig.pm> that
+contains the configuration options. Then you can start the second
+shell with
+
+  perl -I ~/.cpan-for-X -MCPAN::MyConfig -MCPAN -e shell
 
 =item Signals
 
