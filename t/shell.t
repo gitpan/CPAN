@@ -24,13 +24,14 @@ BEGIN {
 }
 
 use File::Copy qw(cp);
-cp "CPAN/TestConfig.pm", "CPAN/MyConfig.pm" or die; # because commit will overwrite it
+cp "CPAN/TestConfig.pm", "CPAN/MyConfig.pm"
+    or die "Could not cp t/CPAN/TestConfig.pm over t/CPAN/MyConfig.pm: $!";
 
 use Cwd;
 my $cwd = Cwd::cwd;
 
 sub read_myconfig () {
-    open my $fh, "CPAN/MyConfig.pm" or die;
+    open my $fh, "CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
     local $/;
     eval <$fh>;
 }
@@ -46,7 +47,7 @@ use Test::More;
 plan tests => scalar @prgs + 2;
 
 read_myconfig;
-is($CPAN::Config->{histsize},100);
+is($CPAN::Config->{histsize},100,"histsize is 100");
 
 my $exp = Expect->new;
 my $prompt = "cpan> ";
@@ -80,15 +81,15 @@ $exp->expect(
              [ eof => sub { exit } ],
              [ timeout => sub {
                    my $self = $exp;
-                   print "# timed out\n";
+                   mydiag "+++timed out+++\n";
                    my $got = $self->clear_accum;
+                   mydiag "GOT: $got\n";
                    if ($got =~ /lockfile/) {
-		       mydiag " - due to lockfile, proceeding\n";
+		       mydiag "+++due to lockfile, proceeding+++\n";
                        $self->send("y\n");
                    } else {
-                       $got = substr($got,0,60)."..." if length($got)>63;
-		       mydiag "- unknown reason, got: [$got]\n";
-                       mydiag "Giving up this test\n";
+		       mydiag "+++unknown reason+++\n";
+                       mydiag "+++giving up this whole test+++\n";
                        exit;
                    }
                    Expect::exp_continue;
@@ -96,6 +97,8 @@ $exp->expect(
              '-re', $prompt
             );
 
+my $got = $exp->clear_accum;
+mydiag "GOT: $got\n";
 $timeout = 60;
 $|=1;
 for my $i (0..$#prgs){
@@ -111,6 +114,8 @@ for my $i (0..$#prgs){
     }
     mydiag "NEXT: $prog";
     $exp->send("$prog\n");
+    $expected .= "(?s:.*$prompt)" unless $expected =~ /\(/;
+    mydiag "EXPECT: $expected";
     $exp->expect(
                  $timeout,
                  [ eof => sub { exit } ],
@@ -124,7 +129,7 @@ expected[$expected]\ngot[$got]\n\n";
                 );
     my $got = $exp->clear_accum;
     mydiag "GOT: $got\n";
-    ok(1, $prog);
+    ok(1, $prog||"\"\\n\"");
 }
 
 $exp->soft_close;
@@ -140,7 +145,7 @@ build_cache
 ########
 o conf init
 ~~like~~
-initialized
+initialized(?s:.*manual.*configuration.*\])
 ########
 nothanks
 ~~like~~
@@ -167,6 +172,7 @@ histsize.+101
 ########
 quit
 ~~like~~
+(removed\.)
 ########
 
 # Local Variables:
