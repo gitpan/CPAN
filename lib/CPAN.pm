@@ -1,6 +1,5 @@
-# -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_57';
+$VERSION = '1.83_58';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -1685,7 +1684,6 @@ sub u {
     shift->_u_r_common("u",@_);
 }
 
-# XXX intentionally undocumented because not considered enough
 #-> sub CPAN::Shell::failed ;
 sub failed {
     my($self,$only_id,$silent) = @_;
@@ -1716,13 +1714,15 @@ sub failed {
         my $print = join "",
             map { sprintf "  %-45s: %s %s\n", @$_[1,2,3] }
                 sort { $a->[0] <=> $b->[0] } @failed;
-        $CPAN::Frontend->myprint("Failed installations in this $scope:\n$print");
+        $CPAN::Frontend->myprint("Failed during this $scope:\n$print");
     } elsif (!$only_id || !$silent) {
-        $CPAN::Frontend->myprint("No installations failed in this $scope\n");
+        $CPAN::Frontend->myprint("Nothing failed in this $scope\n");
     }
 }
 
-# XXX intentionally undocumented because not considered enough
+# XXX intentionally undocumented because completely bogus, unportable,
+# useless, etc.
+
 #-> sub CPAN::Shell::status ;
 sub status {
     my($self) = @_;
@@ -3933,6 +3933,7 @@ sub cpan_comment {
     $ro->{CPAN_COMMENT}
 }
 
+# CPAN::Distribution::undelay
 sub undelay {
     my $self = shift;
     delete $self->{later};
@@ -4837,8 +4838,13 @@ or
 	defined $self->{'make'} and push @e,
             "Has already been processed within this session";
 
-        exists $self->{later} and length($self->{later}) and
-            push @e, $self->{later};
+        if (exists $self->{later} and length($self->{later})) {
+            if ($self->unsat_prereq) {
+                push @e, $self->{later};
+            } else {
+                delete $self->{later};
+            }
+        }
 
 	$CPAN::Frontend->myprint(join "", map {"  $_\n"} @e) and return if @e;
     }
@@ -4945,6 +4951,7 @@ sub _make_command {
     return $CPAN::Config->{'make'} || $Config::Config{make} || 'make';
 }
 
+#-> sub CPAN::Distribution::follow_prereqs ;
 sub follow_prereqs {
     my($self) = shift;
     my(@prereq) = grep {$_ ne "perl"} @_;
@@ -5928,6 +5935,7 @@ sub distribution {
     CPAN::Shell->expand("Distribution",$self->cpan_file);
 }
 
+# sub CPAN::Module::undelay
 sub undelay {
     my $self = shift;
     delete $self->{later};
@@ -5980,12 +5988,13 @@ sub as_glimpse {
         $color_on = Term::ANSIColor::color("green");
         $color_off = Term::ANSIColor::color("reset");
     }
-    push @m, sprintf("%-15s %s%-15s%s (%s)\n",
+    push @m, sprintf("%-8s %s%-22s%s (%s)\n",
                      $class,
                      $color_on,
                      $self->id,
                      $color_off,
-		     $self->cpan_file);
+		     $self->distribution->pretty_id,
+                    );
     join "", @m;
 }
 
@@ -6140,6 +6149,10 @@ sub manpage_headline {
     }
     close $fh;
     last if @result;
+  }
+  for (@result) {
+      s/^\s+//;
+      s/\s+$//;
   }
   join " ", @result;
 }
@@ -7700,6 +7713,7 @@ cpan(1), CPAN::Nox(3pm), CPAN::Version(3pm)
 =cut
 
 # Local Variables:
+# coding: utf-8;
 # mode: cperl
 # cperl-indent-level: 4
 # End:

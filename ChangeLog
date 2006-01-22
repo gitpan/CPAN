@@ -1,5 +1,76 @@
+2006-01-21  k
+
+	* Makefile.PL: make the LC_ALL settable on the commandline for the 
+	  chlog target of the Makefile
+	* Todo, lib/CPAN.pm: remove leading and trailing spaces from 
+	  MANPAGE parts
+	* Todo, lib/CPAN.pm: toss the word "installations" in the "failed" 
+	  command, it may talk about make/test/install, not only 
+	  installation
+	* Todo, lib/CPAN.pm: bugfix: double check the later attribute 
+	  before you excuse and unset it if it is obsolete
+	* Todo, lib/CPAN.pm: make the output of the Module->as_glimpse 
+	  method more space efficient and prettier
+	* lib/CPAN.pm: remove the emacs line at the top and fix the one at 
+	  the end of the file
+	* lib/CPAN/Version.pm: give Version.pm a handmade version number
+
+2006-01-20  k
+
+	* lib/CPAN/FirstTime.pm: Jan Dubois has another COMSPEC patch that 
+	  was brought to my attention by Gisle Aas
+	* lib/CPAN/FirstTime.pm: Jim's "redone-prep.patch"
+	* t/vcmp.t: another round of tests
+	* t/vcmp.t: yet more tests and comparison wih version.pm
+	* t/vcmp.t: add some more tests and compare to Sort::Versions
+	* lib/CPAN/Version.pm: add a vlt method and add some docu
+	* lib/CPAN/Debug.pm, lib/CPAN/FirstTime.pm: enable "o debug 
+	  FirstTime"
+	* README, lib/CPAN/FirstTime.pm: Jim Cromie's "final prep patch" 
+	  applied
+
+2006-01-19  k
+
+	* README, lib/CPAN.pm: factor out an unrecoverable_error method 
+	  for the two new error cases
+	* Changes, lib/CPAN.pm: better error dialog on unrecoverable 
+	  errors; preparing _57
+
+2006-01-18  k
+
+	* t/shell.t: and catch two die()s with proper messages
+	* t/shell.t: and the greeting before the first prompt too
+	* t/shell.t: want to see the lockfile dialog
+	* t/shell.t: sanitize the output of shell.t for better debugging
+	* Changes, README: README automatically built and Changes updated 
+	  to reflect _56
+	* Todo, lib/CPAN.pm: prepare _56
+	* Todo, lib/CPAN.pm: Fix rt #17089 (Adam Kennedy) that the 
+	  existance of a Build.PL without a Makefile.PL implies a 
+	  Module::Build dependency
+
+2006-01-17  k
+
+	* Todo: a note about #17089
+
+2006-01-15  k
+
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm, t/shell.t: fix "o conf 
+	  default" and add tests for it
+
 2006-01-14  k
 
+	* lib/CPAN.pm: revised docs: remove CPAN::WAIT, add a paragraph 
+	  about the Lockfile (a sad trade)
+	* lib/CPAN.pm: adding documentation; adding the method 
+	  CPAN::Module::distribution; fixing a few places that tested for 
+	  -x directory without checking -e directory first
+	* eg/who-wrote-broken-sig.pl: found again a script that I had to 
+	  write a few weeks ago. Checking in to have a blueprint for 
+	  similar tasks
+	* lib/CPAN.pm: failed() produces output in the order in that the 
+	  events happened
+	* MANIFEST.SKIP: skip
 	* t/shell.t: test if o conf commit works
 	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm: o conf commit was broken
 	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm: re-introduce the living 
