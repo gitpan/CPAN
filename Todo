@@ -1,3 +1,43 @@
+2006-01-25  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Bug: META.yml may contain build_requires which for example File::BOM
+	specifies. It doesn't matter that I believe that it is not a
+	build_requires, it is really a requires because only tests fail, not the
+	build process. But I must merge the two hashes. FIXED in rev. 471
+
+	* Foreign bug: YAML with bleadperl fails a test which succeeds with
+	maintperl.
+
+	* Bug: with 1.8358 from the core CPAN says after the start
+	"lib/CPAN/Config.pm initialized" and goes into the init dialog. After ^C
+	I find a lib/CPAN/Config.pm file.
+
+	Ahhh, that's how 'o conf commit' had written my dontload_hash: producing
+	a syntax error. FIXED in  rev. 466
+
+2006-01-24  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* dontload: make a dontload_list and deprecate dontload_hash
+
+	* 5 new bugs from in RT: 17237 17238 17241 17242 17266
+
+	17237 may be fixed with rev. 464 but not yet tested.
+
+	rev. 465 continued to work on 17237 and I consider it fixed now.
+
+	rev. 467 fixes 17238
+
+	rev. 465 also is an answer to 17241 because this was most likely not a bug
+
+	rev. 469 fixes 17266
+
+	17242 is the request to work with Win32::OLE which I could only reply to
+	with 'patches welcome'
+
+	* Bug: setting "o conf dontload_hash ''" breaks the shell: C<Can't use
+	string ("") as a HASH ref while "strict refs" in use at lib/CPAN.pm line
+	833.> FIXED in rev 464.
+
 2006-01-22  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* document and provide a dialog for commandnumber_in_prompt or provide a
@@ -9,7 +49,8 @@
 	start is done in t/shell.t
 
 	* upgrade: new command that does nothing but
-	CPAN::Shell->install(CPAN::Shell->r)?
+	CPAN::Shell->install(CPAN::Shell->r)? Do not forget that we still may
+	have perl distros in the "r" list.
 
 	* DBM::Deep for a hash behind $CPAN::META. See 2005-12-28 for issues and
 	branches/1.80_56plus for a few lines that probably went in the wrong
