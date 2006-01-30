@@ -1,3 +1,90 @@
+2006-01-30  k
+
+	* lib/CPAN.pm: preparing _61
+	* Makefile.PL: trivial warning fix in Makefile.PL
+	* Changes: preparing for _61
+	* lib/CPAN.pm: whitespace problems at the wrong moment. I had to 
+	  bring the emacs stanza back to the first line, otherwise it 
+	  seemed to have no effect, at least not the indent line
+	* lib/CPAN.pm: This should provide a full fix against Randy's 
+	  bugreports, in case the code somehow can slip through the 
+	  previous bugfix 488
+	* lib/CPAN/HandleConfig.pm: I suspect this will fix Randy Kobes 
+	  bug with "./Build install", but I will continue to look for 
+	  holes to plug
+	* Makefile.PL: subversion stuff
+	* README, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: 
+	  rethinking how we should handle the Windows case for sudo 
+	  support: I believe we better disable the two keys as a whole and 
+	  make other places react to the existance of the key;
+	* Changes, lib/CPAN.pm: rename Thesite to ThesiteURL so a reload 
+	  cpan cannot break the logic with a leftover integer from pre-467 
+	  code
+	* Changes, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm: Do not use 
+	  ./Build directly on Windows, it must be called together with the 
+	  perl (fixes #17313)
+
+2006-01-28  k
+
+	* Todo, lib/CPAN.pm: this whole patch may be reverted after 1.85 
+	  or so because then it is garanteed that these objects are 
+	  objects, but now during an "update cpan" they may still be 
+	  strings
+
+2006-01-27  k
+
+	* Todo, lib/CPAN.pm: more words about ftp_passive
+	* Todo, lib/CPAN.pm: bugfix: if a META.yml specifies a 
+	  prerequisite module that we do not
+	  know, the whole prereq_pm became undef
+
+2006-01-26  k
+
+	* lib/CPAN.pm: revisited FAQ section of the manpage
+	* Makefile.PL, Todo: add a cjheckout target
+	* Todo, lib/CPAN.pm: bugfix: both curl and lynx could trick 
+	  CPAN.pm to believe that a failed download succeeded (bugreport 
+	  from Tyler MacDonald)
+	* Todo, lib/CPAN/HandleConfig.pm: drop unknown config variable at 
+	  "o conf commit" time
+	* Todo, lib/CPAN/HandleConfig.pm: resetting a config hash can now 
+	  be done with "o conf xxx_hash \"\""
+
+2006-01-25  k
+
+	* MANIFEST.SKIP, README: add .rej to manifest.skip
+	* Changes, Todo: notes
+	* Changes, Makefile.PL, lib/CPAN.pm: honour build_requires which 
+	  was ignored
+	* Changes, Todo, lib/CPAN.pm: start the release process for _59
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: 
+	  make ftp_passive a configure item and default it to 1 and set 
+	  envariable FTP_PASSIVE accordingly
+	* Todo, lib/CPAN.pm: discovered unnecessary code in the faq
+	* Todo, lib/CPAN.pm: have 2 Default Hosts instead of one; fixes rt 
+	  #17238 (Adam Kennedy)
+	* Makefile.PL, Todo, lib/CPAN/HandleConfig.pm: add rundb target to 
+	  the makefile; replace MakeMaker::neatvalue with our own
+	* Todo, lib/CPAN.pm: be much more verbose when reaching the last 
+	  ressort external; fixes rt #17237
+
+2006-01-24  k
+
+	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: protect 
+	  dontload_hash from being edited wrongly by enabling real editing 
+	  with {@args}
+	* lib/CPAN.pm: revisit ls: let the methods return the result; 
+	  better docs;
+	* lib/CPAN.pm: give the cwd command more flexibility (stimulated 
+	  by Ashley M. Kirchner)
+
+2006-01-22  k
+
+	* t/vcmp.t: silence version.pm in the CPAN::Version tests
+	* Changes: releasenotes for _58
+	* Todo, lib/CPAN.pm: notes
+	* Makefile.PL: Fix the process of README creation
+
 2006-01-21  k
 
 	* Makefile.PL: make the LC_ALL settable on the commandline for the 

@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $dot_cpan $VERSION);
 
-$VERSION = sprintf "%.2f", substr(q$Rev: 485 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 488 $,4)/100;
 
 %can = (
   'commit' => "Commit changes to disk",
@@ -30,8 +30,17 @@ $VERSION = sprintf "%.2f", substr(q$Rev: 485 $,4)/100;
     wait_list wget
 );
 if ($^O eq "MSWin32") {
-    delete $keys{mbuild_install_build_command};
-    delete $keys{make_install_make_command};
+    for my $k (qw(
+                  mbuild_install_build_command
+                  make_install_make_command
+                 )) {
+        delete $keys{$k};
+        if (exists $CPAN::Config->{$k}) {
+            $CPAN::Frontend->mywarn("deleting previously set config variable ".
+                                    "'$k' => '$CPAN::Config->{$k}'");
+            delete $CPAN::Config->{$k};
+        }
+    }
 }
 
 # returns true on successful action
@@ -429,7 +438,7 @@ package ####::###### #hide from indexer
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 485 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 488 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {
