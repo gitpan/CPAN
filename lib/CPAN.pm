@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_61';
+$VERSION = '1.83_62';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -52,10 +52,26 @@ use vars qw($VERSION @EXPORT $AUTOLOAD $DEBUG $META $HAS_USABLE $term
 
 @CPAN::ISA = qw(CPAN::Debug Exporter);
 
+# note that these functions live in CPAN::Shell and get executed via
+# AUTOLOAD when called directly
 @EXPORT = qw(
-	     autobundle bundle expand force notest get cvs_import
-	     install make readme recompile shell test clean
-             perldoc recent
+             autobundle
+             bundle
+             clean
+             cvs_import
+             expand
+             force
+             get
+             install
+             make
+             mkmyconfig
+             notest
+             perldoc
+             readme
+             recent
+             recompile
+             shell
+             test
 	    );
 
 sub soft_chdir_with_alternatives ($);
@@ -239,6 +255,7 @@ Trying to chdir to "$cwd->[1]" instead.
         }
     }
 }
+
 package CPAN::CacheMgr;
 use strict;
 @CPAN::CacheMgr::ISA = qw(CPAN::InfoObj CPAN);
@@ -267,12 +284,15 @@ use strict;
                                     install
                                     look
                                     ls
-                                    make test
+                                    make
+                                    mkmyconfig
                                     notest
                                     perldoc
                                     readme
                                     recent
+                                    recompile
                                     reload
+                                    test
 );
 
 package CPAN::Index;
@@ -654,7 +674,7 @@ Please make sure the directory exists and is writable.
 };
 	$CPAN::Frontend->mydie($diemess);
       }
-    }
+    } # $@ after eval mkpath $dotcpan
     my $fh;
     unless ($fh = FileHandle->new(">$lockfile")) {
 	if ($! =~ /Permission/) {
@@ -676,8 +696,18 @@ this variable in either
     $incc
 or
     $myincc
-
 });
+            if(!$INC{'CPAN/MyConfig.pm'}) {
+                $CPAN::Frontend->myprint("You don't seem to have a user ".
+                                         "configuration (MyConfig.pm) yet.\n");
+                my $new = ExtUtils::MakeMaker::prompt("Do you want to create a ".
+                                                      "user configuration now? (Y/n)",
+                                                      "yes");
+                if($new =~ m{^y}i) {
+                    CPAN::Shell->mkmyconfig();
+                    return &checklock;
+                }
+            }
 	}
 	$CPAN::Frontend->mydie("Could not open >$lockfile: $!");
     }
@@ -1522,6 +1552,26 @@ sub reload_this {
         return;
     }
     return 1;
+}
+
+#-> sub CPAN::Shell::mkmyconfig ;
+sub mkmyconfig {
+    my($self, $cpanpm, %args) = @_;
+    require CPAN::FirstTime;
+    $cpanpm = $INC{'CPAN/MyConfig.pm'} || "$ENV{HOME}/.cpan/CPAN/MyConfig.pm";
+    File::Path::mkpath(File::Basename::dirname($cpanpm)) unless -e $cpanpm;
+    if(!$INC{'CPAN/Config.pm'}) {
+        eval { require CPAN::Config; };
+    }
+    $CPAN::Config ||= {};
+    $CPAN::Config = {
+        %$CPAN::Config,
+        build_dir           =>  undef,
+        cpan_home           =>  undef,
+        keep_source_where   =>  undef,
+        histfile            =>  undef,
+    };
+    CPAN::FirstTime::init($cpanpm, %args);
 }
 
 #-> sub CPAN::Shell::_binary_extensions ;
@@ -6798,6 +6848,12 @@ perl breaks binary compatibility. If one of the modules that CPAN uses
 is in turn depending on binary compatibility (so you cannot run CPAN
 commands), then you should try the CPAN::Nox module for recovery.
 
+=head2 mkmyconfig
+
+mkmyconfig() writes your own CPAN::MyConfig file into your ~/.cpan/
+directory so that you can save your own preferences instead of the
+system wide ones.
+
 =head2 The four C<CPAN::*> Classes: Author, Bundle, Module, Distribution
 
 Although it may be considered internal, the class hierarchy does matter
@@ -7720,15 +7776,24 @@ so that STDOUT is captured in a file for later inspection.
 I am not root, how can I install a module in a personal directory?
 
 First of all, you will want to use your own configuration, not the one
-that your root user installed. The following command sequence is a
-possible approach:
+that your root user installed. If you do not have permission to write
+in the cpan directory that root has configured, you will be asked if
+you want to create your own config. Answering "yes" will bring you into
+CPAN's configuration stage, using the system config for all defaults except
+things that have to do with CPAN's work directory, saving your choices to
+your MyConfig.pm file.
 
-    % mkdir -p $HOME/.cpan/CPAN
-    % echo '1;' > $HOME/.cpan/CPAN/MyConfig.pm
-    % cpan
-    [...answer all questions...]
+You can also manually initiate this process with the following command:
 
-You will most probably like something like this:
+    % perl -MCPAN -e 'mkmyconfig'
+
+or by running
+
+    mkmyconfig
+
+from the CPAN shell.
+
+You will most probably also want to configure something like this:
 
   o conf makepl_arg "LIB=~/myperl/lib \
                     INSTALLMAN1DIR=~/myperl/man/man1 \
@@ -7843,6 +7908,29 @@ For the really curious, by accessing internals directly, you I<could>
 
 but this is neither guaranteed to work in the future nor is it a
 decent command.
+
+=item 12)
+
+How do I install a "DEVELOPER RELEASE" of a module?
+
+By default, CPAN will install the latest non-developer release of a module.
+If you want to install a dev release, you have to specify a partial path to
+the tarball you wish to install, like so:
+
+    cpan> install KWILLIAMS/Module-Build-0.27_06.tar.gz
+
+=item 13)
+
+How do I install a module and all it's dependancies from the commandline,
+without being prompted for anything, despite my CPAN configuration
+(or lack thereof)?
+
+CPAN uses ExtUtils::MakeMaker's prompt() function to ask it's questions, so
+if you set the PERL_MM_USE_DEFAULT environment variable, you shouldn't be
+asked any questions at all (assuming the modules you are installing are
+nice about obeying that variable as well):
+
+    % PERL_MM_USE_DEFAULT=1 perl -MCPAN -e 'install My::Module'
 
 =back
 
