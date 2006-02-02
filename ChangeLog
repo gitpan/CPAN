@@ -1,3 +1,12 @@
+2006-02-02  k
+
+	* Changes, lib/CPAN.pm: prepare 1.83_64
+	* Changes, Todo, lib/CPAN.pm: bugfix: when M:B specifies both 
+	  requires AND build_requires AND then
+	  has no YAML to write the META.yml file, THEN we did not merge 
+	  the two
+	  requiries.
+
 2006-02-01  k
 
 	* MANIFEST.SKIP: give skip the fodder for letting cover_db live

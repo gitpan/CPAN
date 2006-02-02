@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_63';
+$VERSION = '1.83_64';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -5323,7 +5323,9 @@ sub prereq_pm {
             }
         } elsif (-f "Build") {
             if ($CPAN::META->has_inst("Module::Build")) {
-                $req = Module::Build->current->requires();
+                my $requires  = Module::Build->current->requires();
+                my $brequires = Module::Build->current->build_requires();
+                $req = { %$requires, %$brequires };
             }
         }
     }
