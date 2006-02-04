@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_64';
+$VERSION = '1.83_65';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -1394,7 +1394,6 @@ sub o {
     $o_type ||= "";
     CPAN->debug("o_type[$o_type] o_what[".join(" | ",@o_what)."]\n");
     if ($o_type eq 'conf') {
-	shift @o_what if @o_what && $o_what[0] eq 'help';
 	if (!@o_what) { # print all things, "o conf"
 	    my($k,$v);
 	    $CPAN::Frontend->myprint("CPAN::Config options");
@@ -2592,7 +2591,8 @@ sub localize {
     }
     @levels = qw/easy/ if $^O eq 'MacOS';
     my($levelno);
-    local $ENV{FTP_PASSIVE} = $CPAN::Config->{ftp_passive} if exists $CPAN::Config->{ftp_passive};
+    local $ENV{FTP_PASSIVE} = $CPAN::Config->{ftp_passive}
+        if exists $CPAN::Config->{ftp_passive};
     for $levelno (0..$#levels) {
         my $level = $levels[$levelno];
 	my $method = "host$level";
@@ -2661,13 +2661,21 @@ sub hosteasy {
 		$l =~ s|^file:||;                   # assume they
                                                     # meant
                                                     # file://localhost
-		$l =~ s|^/||s unless -f $l;         # e.g. /P:
-		$self->debug("without URI::URL we try local file $l") if $CPAN::DEBUG;
+		$l =~ s|^/||s
+                    if ! -f $l && $l =~ m|^/\w:|;   # e.g. /P:
 	    }
+            $self->debug("local file[$l]") if $CPAN::DEBUG;
 	    if ( -f $l && -r _) {
 		$ThesiteURL = $ro_url;
 		return $l;
 	    }
+            if ($l =~ /(.+)\.gz$/) {
+                my $ungz = $1;
+                if ( -f $ungz && -r _) {
+                    $ThesiteURL = $ro_url;
+                    return $ungz;
+                }
+            }
 	    # Maybe mirror has compressed it?
 	    if (-f "$l.gz") {
 		$self->debug("found compressed $l.gz") if $CPAN::DEBUG;
@@ -5398,6 +5406,8 @@ sub test {
                            : ($ENV{PERLLIB} || "");
 
     $CPAN::META->set_perl5lib;
+    local $ENV{MAKEFLAGS}; # protect us from outer make calls
+
     my $system;
     if ($self->{modulebuild}) {
         $system = sprintf "%s test", $self->_build_command();

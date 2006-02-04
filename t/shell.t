@@ -1,10 +1,86 @@
 use strict;
 no warnings 'redefine';
 
+=pod
+
+Notes about coverage
+
+2006-02-03 after rev. 517 we have this coverage:
+----------------------------------- ------ ------ ------ ------ ------ ------
+File                                  stmt   bran   cond    sub   time  total
+----------------------------------- ------ ------ ------ ------ ------ ------
+blib/lib/CPAN.pm                      20.1   10.2    7.9   37.0   37.9   16.7
+blib/lib/CPAN/Admin.pm                12.9    0.0    0.0   62.5    0.0   11.8
+blib/lib/CPAN/Debug.pm                63.6   40.0    0.0  100.0    0.1   55.3
+blib/lib/CPAN/FirstTime.pm            55.6   33.0   27.8   79.3   40.1   44.6
+blib/lib/CPAN/HandleConfig.pm         61.6   47.5   32.1   88.2   21.6   54.6
+blib/lib/CPAN/Nox.pm                 100.0   50.0    n/a  100.0    0.0   95.0
+blib/lib/CPAN/Tarzip.pm                6.8    0.0    0.0   28.6    0.0    5.2
+blib/lib/CPAN/Version.pm              83.3   54.5   84.0  100.0    0.3   78.6
+Total                                 25.6   13.9   15.5   45.2  100.0   22.0
+----------------------------------- ------ ------ ------ ------ ------ ------
+
+Admin.pm is kind of deprecated, but if we ever would like to test it,
+we would issue C<! use CPAN::Admin> rather late in the testing which
+would activate the override. C<reload cpan> would then switch back.
+
+After rev. 523:
+----------------------------------- ------ ------ ------ ------ ------ ------
+File                                  stmt   bran   cond    sub   time  total
+----------------------------------- ------ ------ ------ ------ ------ ------
+blib/lib/CPAN.pm                      26.7   15.6   10.4   42.6    4.2   22.5
+blib/lib/CPAN/Admin.pm                12.9    0.0    0.0   62.5    0.0   11.8
+blib/lib/CPAN/Debug.pm                63.6   40.0    0.0  100.0    0.1   55.3
+blib/lib/CPAN/FirstTime.pm            55.6   33.0   27.8   79.3   61.8   44.6
+blib/lib/CPAN/HandleConfig.pm         61.6   47.5   32.1   88.2   33.4   54.6
+blib/lib/CPAN/Nox.pm                 100.0   50.0    n/a  100.0    0.0   95.0
+blib/lib/CPAN/Tarzip.pm               17.6    6.6    0.0   50.0    0.1   14.8
+blib/lib/CPAN/Version.pm              83.3   54.5   84.0  100.0    0.4   78.6
+Total                                 31.2   18.5   17.1   50.4  100.0   26.8
+----------------------------------- ------ ------ ------ ------ ------ ------
+
+The time for the CPAN.pm tests is down because we're now using the
+local, test-specific index files. Next thing to do: upload the demo
+distro so that we can add a signed CHECKSUMS file.
+
+After 525:
+----------------------------------- ------ ------ ------ ------ ------ ------
+File                                  stmt   bran   cond    sub   time  total
+----------------------------------- ------ ------ ------ ------ ------ ------
+blib/lib/CPAN.pm                      41.0   26.3   21.5   57.8   44.1   35.4
+blib/lib/CPAN/Admin.pm                12.9    0.0    0.0   62.5    0.0   11.8
+blib/lib/CPAN/Debug.pm                63.6   40.0    0.0  100.0    0.1   55.3
+blib/lib/CPAN/FirstTime.pm            55.6   33.0   27.8   79.3   35.8   44.6
+blib/lib/CPAN/HandleConfig.pm         61.6   47.5   32.1   88.2   19.3   54.6
+blib/lib/CPAN/Nox.pm                 100.0   50.0    n/a  100.0    0.0   95.0
+blib/lib/CPAN/Tarzip.pm               36.9   18.9   22.2   71.4    0.4   31.8
+blib/lib/CPAN/Version.pm              83.3   54.5   84.0  100.0    0.3   78.6
+Total                                 43.1   27.5   24.9   63.0  100.0   37.4
+----------------------------------- ------ ------ ------ ------ ------ ------
+
+All sub values over 50%!
+
+After 527:
+----------------------------------- ------ ------ ------ ------ ------ ------
+File                                  stmt   bran   cond    sub   time  total
+----------------------------------- ------ ------ ------ ------ ------ ------
+blib/lib/CPAN.pm                      43.6   28.6   22.2   60.4   44.3   37.8
+blib/lib/CPAN/Admin.pm                12.9    0.0    0.0   62.5    0.0   11.8
+blib/lib/CPAN/Debug.pm                63.6   40.0    0.0  100.0    0.0   55.3
+blib/lib/CPAN/FirstTime.pm            55.6   33.0   27.8   79.3   35.7   44.6
+blib/lib/CPAN/HandleConfig.pm         61.6   47.5   32.1   88.2   19.3   54.6
+blib/lib/CPAN/Nox.pm                 100.0   50.0    n/a  100.0    0.0   95.0
+blib/lib/CPAN/Tarzip.pm               36.9   18.9   22.2   71.4    0.4   31.8
+blib/lib/CPAN/Version.pm              83.3   54.5   84.0  100.0    0.3   78.6
+Total                                 45.1   29.3   25.4   65.1  100.0   39.3
+----------------------------------- ------ ------ ------ ------ ------ ------
+
+
+=cut
 
 BEGIN {
-    chdir 't' if -d 't';
-    unshift @INC, '../lib';
+    #chdir 't' if -d 't';
+    unshift @INC, './lib';
     require Config;
     unless ($Config::Config{osname} eq "linux" or $ENV{CPAN_RUN_SHELL_TEST}) {
 	print "1..0 # Skip: test is only validated on linux\n";
@@ -23,15 +99,20 @@ BEGIN {
     }
 }
 
+use File::Path qw(rmtree);
+rmtree "t/dot-cpan/sources";
+rmtree "t/dot-cpan/build";
+unlink "t/dot-cpan/Metadata";
+
 use File::Copy qw(cp);
-cp "CPAN/TestConfig.pm", "CPAN/MyConfig.pm"
+cp "t/CPAN/TestConfig.pm", "t/CPAN/MyConfig.pm"
     or die "Could not cp t/CPAN/TestConfig.pm over t/CPAN/MyConfig.pm: $!";
 
 use Cwd;
 my $cwd = Cwd::cwd;
 
 sub read_myconfig () {
-    open my $fh, "CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
+    open my $fh, "t/CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
     local $/;
     eval <$fh>;
 }
@@ -50,16 +131,18 @@ read_myconfig;
 is($CPAN::Config->{histsize},100,"histsize is 100");
 
 my $exp = Expect->new;
-my $prompt = "cpan> ";
+my $prompt = "cpan>";
 $exp->spawn(
             $^X,
-            "-I$cwd",                 # get this test's own MyConfig
-            "-I../lib",
+            "-I$cwd/t",                 # get this test's own MyConfig
+            "-Mblib",
             "-MCPAN::MyConfig",
             "-MCPAN",
+            ($INC{"Devel/Cover.pm"} ? "-MDevel::Cover" : ()),
             # (@ARGV) ? "-d" : (), # force subtask into debug, maybe useful
             "-e",
-            "\$CPAN::Suppress_readline=1;shell('$prompt\n')",
+            # "\$CPAN::Suppress_readline=1;shell('$prompt\n')",
+            "\@CPAN::Defaultsites = (); shell('$prompt\n')",
            );
 my $timeout = 6;
 $exp->log_stdout(0);
@@ -94,7 +177,7 @@ $exp->expect(
                    }
                    Expect::exp_continue;
                }],
-             '-re', $prompt
+             '-re', "(?s:ReadLine support enabled.*".quotemeta($prompt).")"
             );
 
 my $got = $exp->clear_accum;
@@ -113,7 +196,9 @@ for my $i (0..$#prgs){
       s/\s+\z//;
     }
     mydiag "NEXT: $prog";
-    $exp->send("$prog\n");
+    my $sendprog = $prog;
+    $sendprog =~ s/\\t/\t/g;
+    $exp->send("$sendprog\n");
     $expected .= "(?s:.*$prompt)" unless $expected =~ /\(/;
     mydiag "EXPECT: $expected";
     $exp->expect(
@@ -169,6 +254,96 @@ o conf defaults
 o conf histsize
 ~~like~~
 histsize.+101
+########
+o conf urllist
+~~like~~
+file:///.*CPAN
+########
+!print$ENV{HARNESS_PERL_SWITCHES},$/
+~~like~~
+########
+rtlprnft
+~~like~~
+Unknown
+########
+o conf ftp ""
+~~like~~
+########
+m Fcntl
+~~like~~
+Defines fcntl
+########
+a JHI
+~~like~~
+Hietaniemi
+########
+a ANDK JHI
+~~like~~
+(?s:Andreas.*Hietaniemi.*items found)
+########
+b
+~~like~~
+(?s:Bundle::CPAN.*Bundle::CpanTestDummies.*items found)
+########
+b Bundle::CpanTestDummies
+~~like~~
+\sCONTAINS\s+CPAN::Test::Dummy::Perl5::Make
+########
+d ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz
+~~like~~
+CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
+########
+ls ANDK
+~~like~~
+(?s:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy.*\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump)
+########
+ls ANDK/CPAN*
+~~like~~
+(?s:Text::Glob\s+loaded\s+ok.*CPAN-Test-Dummy)
+########
+test CPAN::Test::Dummy::Perl5::Make
+~~like~~
+test\s+--\s+OK
+########
+dump CPAN::Test::Dummy::Perl5::Make
+~~like~~
+(?s:bless.*ID.*CPAN_FILE.*CPAN_USERID.*CPAN_VERSION)
+########
+test CPAN::Test::Dummy::Perl5::NotExists
+~~like~~
+Warning:
+########
+failed
+~~like~~
+Nothing
+########
+reload index
+~~like~~
+staleness
+########
+m /l/
+~~like~~
+(?s:Perl5.*Fcntl)
+########
+i /l/
+~~like~~
+(?s:CPAN.*Dummies.*Dummy.*Perl5.*Fcntl)
+########
+h
+~~like~~
+(?s:make.*test.*install.*force.*notest.*reload)
+########
+o conf
+~~like~~
+(?s:commit.*build_cache.*cpan_home.*inhibit_startup_message.*urllist)
+########
+o conf help
+~~like~~
+(?s:commit.*defaults.*help.*init.*urllist)
+########
+o conf inhibit_\t
+~~like~~
+inhibit_startup_message
 ########
 quit
 ~~like~~

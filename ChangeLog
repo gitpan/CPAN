@@ -1,3 +1,85 @@
+2006-02-04  k
+
+	* MANIFEST.SKIP: skip was still not correct
+	* MANIFEST.SKIP: skip was still not correct
+	* Changes, lib/CPAN.pm: prepare for _65
+	* MANIFEST.SKIP: forgot some MANIFEST.SKIP
+	* MANIFEST: forgot the CHECKSUMS in the MANIFEST
+	* MANIFEST: missed our Bundle in the manifest
+	* t/shell.t: adding another few easy commands
+	* Makefile.PL, bin/post-prc-coverage.pl: make the subrouting 
+	  coverage html of CPAN.pm better readable
+	* bin/cp-to-perl.pl, cp-to-perl.pl: move to bin what bin is
+	* bin, cp-to-perl.pl: about to introduce a bin directory
+	* t/dot-cpan, t/dot-cpan/Bundle, 
+	  t/dot-cpan/Bundle/CpanTestDummies.pm, t/shell.t: with bundles we 
+	  reached the 60% sub coverage in CPAN.pm
+	* lib/CPAN.pm: bugfix: protect "make test" from outer environment 
+	  variable MAKEFLAGS
+
+2006-02-03  k
+
+	* t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS, 
+	  t/CPAN/authors/id/A/AN/CHECKSUMS, t/CPAN/authors/id/A/CHECKSUMS, 
+	  t/CPAN/authors/id/CHECKSUMS, t/shell.t: All sub values over 50%
+	* t/shell.t: notes about coverage
+	* lib/CPAN.pm, t/shell.t: allow the case that a file we want to 
+	  localize is already uncompressed on the local disk
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz:
+	   it seems more practical to have the test distro in the 
+	  repository than to build them again and again
+	* Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib/CPAN/Test/Dummy/Perl5/Make.pm:
+	   refinement
+	* MANIFEST, Makefile.PL, t/CPAN/authors/01mailrc.txt, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/Makefile.PL,
+	   t/CPAN/modules/02packages.details.txt, 
+	  t/CPAN/modules/03modlist.data, t/shell.t: enter our own test 
+	  distribution
+	* t/CPAN/authors/id, t/CPAN/authors/id/A, t/CPAN/authors/id/A/AN, 
+	  t/CPAN/authors/id/A/AN/ANDK, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib/CPAN,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib/CPAN/Test,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib/CPAN/Test/Dummy,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib/CPAN/Test/Dummy/Perl5,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/t/00_load.t:
+	   steal a dummy from PITA
+	* t/shell.t: typo
+	* t/shell.t: notes about coverage
+	* t/shell.t: test early that readline is enabled so a tester does 
+	  not have to guess long what happens without readline
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm, t/shell.t: bring "o conf 
+	  help" back which was lost; and enable testing of readline 
+	  functions
+	* t/shell.t, t/vcmp.t: adding Unknonw Command and "h"
+	* t/CPAN/TestConfig.pm, t/shell.t: getting the switches right so 
+	  that Devel::Cover really works
+	* t/CPAN/TestConfig.pm, t/shell.t: enable coverage analysis for 
+	  shell.t if we turn it on for the whole testsuite
+	* Todo, t/CPAN/TestConfig.pm, t/CPAN/authors, 
+	  t/CPAN/authors/01mailrc.txt, t/CPAN/modules, 
+	  t/CPAN/modules/02packages.details.txt, 
+	  t/CPAN/modules/03modlist.data, t/shell.t: start populating our 
+	  own CPAN mirror with index files
+
 2006-02-02  k
 
 	* Changes, lib/CPAN.pm: prepare 1.83_64
