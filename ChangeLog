@@ -1,5 +1,10 @@
 2006-02-04  k
 
+	* Changes, README: prepare 1.83_66
+	* lib/CPAN.pm: add a new method CPAN::Distribution::author; 
+	  protect the usage of Text::Glob with a has_inst; add a new 
+	  experimental and undocumented method fast_yaml; document 
+	  CPAN::Module::distribution; alphabetize the documentation again
 	* MANIFEST.SKIP: skip was still not correct
 	* MANIFEST.SKIP: skip was still not correct
 	* Changes, lib/CPAN.pm: prepare for _65
