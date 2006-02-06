@@ -1,3 +1,72 @@
+2006-02-06  k
+
+	* MANIFEST.SKIP, Makefile.PL, lib/CPAN.pm, 
+	  t/CPAN/modules/02packages.details.txt, t/README.shell.txt, 
+	  t/dot-cpan/Bundle/CpanTestDummies.pm, t/shell.t: the new distros 
+	  as of yesterday included in new tests
+
+2006-02-05  k
+
+	* Makefile.PL: we did this CP step both in distdir and release, 
+	  the former should do
+	* Todo, t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS: update the checksums
+	* MANIFEST, t/README.shell.txt, t/shell.t: missing checkins, docs
+	* t/README.shell.txt: docs
+	* MANIFEST.SKIP, Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/lib/CPAN/Test/Dummy/Perl5/Build,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/lib/CPAN/Test/Dummy/Perl5/Build/Fails.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/t/00_load.t,
+	   t/README.shell.txt: failing MBuild script
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/MANIFEST,
+	   t/README.shell.txt: step "finished .tar.gz"
+	* Makefile.PL: s/MAKE/Build/ in the top Makefile.PL
+	* Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/MANIFEST,
+	   t/README.shell.txt: let us drop the README from the dummies
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/lib/CPAN/Test/Dummy/Perl5/Build.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/t/00_load.t:
+	   untested
+	* MANIFEST.SKIP, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   t/README.shell.txt: verifying the new t/README.shell.txt, step 1
+	* ChangeLog.local, MANIFEST, Todo, t/README.shell.txt: docs only
+
 2006-02-04  k
 
 	* Changes, README: prepare 1.83_66
