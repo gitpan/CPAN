@@ -1,5 +1,48 @@
+2006-02-08  k
+
+	* lib/CPAN.pm: preparing 1.83_68 (previous checkin comment was 
+	  wrong, _67 is already out)
+	* Changes: svn diffprepare 1.83_67
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm: working around all 
+	  limitations we have to face when running 5.004; hopefully this 
+	  makes us more robust in other broken environments too -- at 
+	  least it forces me to revisit code that seemed untouched or 
+	  untested for a long time
+	* t/30shell.t: test the incredients to the expect soup beforehand
+	* Todo: notes
+
+2006-02-07  k
+
+	* MANIFEST, Makefile.PL, Todo, t/30shell.t: continue the renaming 
+	  and discover that the shell.t can run under 5.004_05 if one is 
+	  stubborn enough
+	* bin/cp-to-perl.pl, t/00signature.t, t/01loadme.t, t/02nox.t, 
+	  t/03pkgs.t, t/10version.t, t/11mirroredby.t, t/30shell.t, 
+	  t/50pod.t, t/Nox.t, t/loadme.t, t/mirroredby.t, t/pod.t, 
+	  t/shell.t, t/signature.t, t/vcmp.t, t/version.t: the big rename 
+	  in the t/ Directory
+	* Todo: contemplating
+	* bin/cp-to-perl.pl: express clearer which tests, so we recognize 
+	  them after a rename
+	* lib/CPAN/Admin.pm, lib/CPAN/Debug.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm, lib/CPAN/Nox.pm, lib/CPAN/Tarzip.pm, 
+	  lib/CPAN/Version.pm: unify pkg version handling
+	* t/version.t: getting an overview how we handle our pkg versions 
+	  right now
+	* Makefile.PL, t/shell.t: new target testallperls
+
 2006-02-06  k
 
+	* Makefile.PL, lib/CPAN.pm, t/shell.t, t/vcmp.t: Ken Williams sent 
+	  me a patch to silence a 5.8.1 warning; which reminded me about 
+	  testing with 5.004_05 and this patch at least passes the test 
+	  suite when the 5.004_05 user installs all prerequisites despite 
+	  errors in their test suites
+	* Makefile.PL: run the shell test conveniently
+	* lib/CPAN.pm: close #17498: we now warn about missing Digest::SHA 
+	  with the eye attraction only once and from then on with a single 
+	  line
+	* Changes: forgot these release notes before uploading
 	* MANIFEST.SKIP, Makefile.PL, lib/CPAN.pm, 
 	  t/CPAN/modules/02packages.details.txt, t/README.shell.txt, 
 	  t/dot-cpan/Bundle/CpanTestDummies.pm, t/shell.t: the new distros 

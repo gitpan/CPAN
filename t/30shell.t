@@ -1,5 +1,4 @@
 use strict;
-no warnings 'redefine';
 
 =pod
 
@@ -128,9 +127,10 @@ use Cwd;
 my $cwd = Cwd::cwd;
 
 sub read_myconfig () {
-    open my $fh, "t/CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
+    local *FH;
+    open *FH, "t/CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
     local $/;
-    eval <$fh>;
+    eval <FH>;
 }
 
 my @prgs;
@@ -141,8 +141,15 @@ my @prgs;
 }
 
 use Test::More;
-plan tests => scalar @prgs + 2;
+plan tests => scalar @prgs + 5;
 
+for my $m (qw(
+              Term::ReadKey
+              Term::ReadLine
+              Text::Glob
+             )) {
+    use_ok($m);
+}
 read_myconfig;
 is($CPAN::Config->{histsize},100,"histsize is 100");
 
@@ -335,7 +342,7 @@ test\s+--\s+NOT OK
 ########
 dump CPAN::Test::Dummy::Perl5::Make
 ~~like~~
-(?s:bless.*ID.*CPAN_FILE.*CPAN_USERID.*CPAN_VERSION)
+(?s:bless.+('(ID|CPAN_FILE|CPAN_USERID|CPAN_VERSION)'.+){4})
 ########
 test CPAN::Test::Dummy::Perl5::NotExists
 ~~like~~

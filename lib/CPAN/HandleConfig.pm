@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $dot_cpan $VERSION);
 
-$VERSION = sprintf "%.2f", substr(q$Rev: 515 $,4)/100;
+$VERSION = sprintf "%.6f", substr(q$Rev: 568 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -424,8 +424,8 @@ sub cpl {
 }
 
 
-package ####::###### #hide from indexer
-    CPAN::Config;
+package
+    CPAN::Config; ####::###### #hide from indexer
 # note: J. Nick Koston wrote me that they are using
 # CPAN::Config->commit although undocumented. I suggested
 # CPAN::Shell->o("conf","commit") even when ugly it is at least
@@ -436,7 +436,7 @@ package ####::###### #hide from indexer
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 515 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 568 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {

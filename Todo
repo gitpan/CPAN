@@ -1,3 +1,14 @@
+2006-02-08  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* http://www.flight.us/misc/FirstTime.pm_AStrebkov.htm and
+	http://groups.google.com/group/comp.lang.perl.misc/browse_thread/thread/a3f172fedc02c280/5814e81793793b64#5814e81793793b64
+	by Andrew Strebkov makes the URL selection nicer.
+
+	* Bug: when Running "Makefile.PL" fails, then the case is not reachable
+	for the failed routine. Need another Naysayer category?? Try
+	Digest-SHA-5.34.tar.gz under perl-5.004_05 before Module::Signature is
+	installed.
+
 2006-02-05  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* Bug: RDF::Simple installs although I see failing tests?
@@ -45,7 +56,7 @@
 	when they used 'perl -MCPAN -eshell' (David Golden)
 
 	* RT 17353: Flag outdated CPAN sites and move them to the end of the
-	list when they have reached 291 hours.
+	list when they have reached 291 hours. (Note: $CPAN/authors/02STAMP)
 
 	* Feature request: integrate more than one source into a common index.
 
@@ -69,15 +80,12 @@
 
 	* dontload: make a dontload_list and deprecate dontload_hash. It seems
 	OK to keep $META->{dontload_hash} but it would be nice if changes on
-	$Config->{dontload_list} would always adjust the dontload_hash.
+	$Config->{dontload_list} would always adjust the dontload_hash. Needs
+	deprecation cycle!
 
 	* document and provide a dialog for commandnumber_in_prompt or provide a
-	sprintf based solution
-
-	* Todo: Write a bunch of distros and upload them with the sole purpose
-	of testing CPAN.pm. Also helps Test::Prereq and others.
-	PITA::Test::Dummy::Perl5::Make and PITA::Test::Dummy::Perl5::Build? A
-	start is done in t/shell.t
+	sprintf based solution. Or just leave it as it is. Just like
+	inhibit_startup_message.
 
 	* upgrade: new command that does nothing but
 	CPAN::Shell->install(CPAN::Shell->r)? Do not forget that we still may
@@ -106,6 +114,11 @@
 	options
 
 	* hr ================ no todos below this line ================ /hr
+
+	* Todo: Write a bunch of distros and upload them with the sole purpose
+	of testing CPAN.pm. Also helps Test::Prereq and others.
+	PITA::Test::Dummy::Perl5::Make and PITA::Test::Dummy::Perl5::Build? A
+	start is done in t/shell.t STARTED around rev. 519
 
 	* Bug: with bleadperl and CPAN 1.83_62 I first install Bundle::CPAN.
 	Then I try to install Net::LDAP and answer all questions from

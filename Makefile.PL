@@ -86,10 +86,17 @@ if ($HAVE_FILE_SPEC) {
   }
 }
 
+# for 5.004_05 I installed all of them manually despite errors;
+# version hints as of 2006-02
 my $prereq_pm = {
-                 'File::Temp' => 0,
-                 'File::Spec' => 0,
-                 'Test::More' => 0,
+                 'Test::More' => 0,   # MSCHWERN;
+                                      # Test-Simple-0.62.tar.gz;
+                 'File::Temp' => 0,   # JTENNESS; requires Test::More;
+                 'File::Spec' => 0,   # KWILLIAMS; requires
+                                      # Scalar::Util;
+                                      # PathTools-3.16.tar.gz
+                 'Scalar::Util' => 0, # GBARR;
+                                      # Scalar-List-Utils-1.18.tar.gz;
                 };
 
 if ($HAVE_FILE_SPEC) {
@@ -143,6 +150,10 @@ package MY;
 sub macro {
     q{
 LC_ALL_noexport=en_GB.utf8
+
+ALL_PERLS = /usr/bin/perl /usr/local/bin/perl \
+            /usr/local/perl-5.004_05/bin/perl \
+            /usr/local/perl-5.005_04/bin/perl
 }
 }
 
@@ -220,7 +231,8 @@ testdistros: t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz 
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz
 
 testshell-with-protocol:
-	$(MAKE) test TEST_FILES=t/shell.t TEST_VERBOSE=1 > protocols/make-test-`date +%Y%m%dT%H%M%S`
+	[ -d protocols ] || mkdir protocols
+	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | tee protocols/make-test-`date +%Y%m%dT%H%M%S`
 	ls -ltr protocols | tail
 
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz: \
@@ -256,6 +268,12 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz: \
 		./Build dist && \
 		mv CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz ..
 
+testallperls :
+	:>SIGNATURE
+	for p in $(ALL_PERLS); do $$p Makefile.PL && $(MAKE) test; done
+
+
+
 }
 }
 
@@ -287,6 +305,14 @@ distdir ::
 sub distdir {
   my $self = shift;
   my $out = $self->SUPER::distdir;
+  $out =~ s/distdir :/distdir ::/g;
+  return $out;
+}
+
+# dist_dir was the name in very old MakeMaker as of 5.005_04
+sub dist_dir {
+  my $self = shift;
+  my $out = $self->SUPER::dist_dir;
   $out =~ s/distdir :/distdir ::/g;
   return $out;
 }
