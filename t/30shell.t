@@ -91,9 +91,45 @@ Total                                 46.9   31.2   27.5   67.4  100.0   41.1
 
 Time goes up now that we have 3 distros and the other values rise only slowly.
 
+After 590 (bleadperl@27154):
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+blib/lib/CPAN.pm               50.4   35.4   30.8   69.4   47.7   84.8   44.9
+blib/lib/CPAN/Admin.pm         12.9    0.0    0.0   62.5    0.0    0.0   11.7
+blib/lib/CPAN/Debug.pm         63.6   40.0    0.0  100.0    0.0    0.0   53.8
+blib/lib/CPAN/FirstTime.pm     55.6   33.0   27.8   79.3    n/a    9.7   44.6
+.../lib/CPAN/HandleConfig.pm   60.6   45.2   32.0   88.2    0.0    5.2   52.2
+blib/lib/CPAN/Nox.pm          100.0   50.0    n/a  100.0    n/a    0.0   95.0
+blib/lib/CPAN/Tarzip.pm        46.6   25.5   22.2   78.6    0.0    0.3   39.2
+blib/lib/CPAN/Version.pm       83.3   54.5   84.0  100.0    0.0    0.0   74.3
+Total                          50.8   34.9   31.3   72.4   34.8  100.0   44.9
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+Relevant patches: added the zip and the failearly distro, removing
+unused code, low hanging fruits
+
+After 597:
+----------------------------------- ------ ------ ------ ------ ------ ------
+File                                  stmt   bran   cond    sub   time  total
+----------------------------------- ------ ------ ------ ------ ------ ------
+blib/lib/CPAN.pm                      50.9   36.1   32.7   70.7   88.5   45.6
+blib/lib/CPAN/Admin.pm                12.9    0.0    0.0   62.5    0.0   11.8
+blib/lib/CPAN/Debug.pm                63.6   40.0    0.0  100.0    0.0   55.3
+blib/lib/CPAN/FirstTime.pm            55.6   33.0   27.8   79.3    7.1   44.6
+blib/lib/CPAN/HandleConfig.pm         60.6   45.2   32.0   88.2    3.9   53.5
+blib/lib/CPAN/Nox.pm                 100.0   50.0    n/a  100.0    0.0   95.0
+blib/lib/CPAN/Tarzip.pm               40.3   20.8   22.2   78.6    0.4   34.8
+blib/lib/CPAN/Version.pm              83.3   54.5   84.0  100.0    0.1   78.6
+Total                                 50.9   35.3   32.6   73.5  100.0   45.4
+----------------------------------- ------ ------ ------ ------ ------ ------
+
+added the BuildOrMake distro
+
 =cut
 
 BEGIN {
+    $|++;
     #chdir 't' if -d 't';
     unshift @INC, './lib';
     require Config;
@@ -110,7 +146,7 @@ BEGIN {
     # everywhere.
     if ($@) {
 	print "1..0 # Skip: no Expect\n";
-	exit 0;
+	eval "require POSIX; 1" and POSIX::_exit(0);
     }
 }
 
@@ -155,6 +191,7 @@ is($CPAN::Config->{histsize},100,"histsize is 100");
 
 my $exp = Expect->new;
 my $prompt = "cpan>";
+my $prompt_re = "cpan[^>]*>";
 $exp->spawn(
             $^X,
             "-I$cwd/t",                 # get this test's own MyConfig
@@ -165,7 +202,7 @@ $exp->spawn(
             # (@ARGV) ? "-d" : (), # force subtask into debug, maybe useful
             "-e",
             # "\$CPAN::Suppress_readline=1;shell('$prompt\n')",
-            "\@CPAN::Defaultsites = (); shell('$prompt\n')",
+            "\@CPAN::Defaultsites = (); shell",
            );
 my $timeout = 6;
 $exp->log_stdout(0);
@@ -182,6 +219,8 @@ sub mydiag {
     print $msg;
 }
 
+my $waiting_for = "(?s:ReadLine support enabled.*".$prompt_re.")";
+# warn "WAITING FOR: $waiting_for";
 $exp->expect(
              $timeout,
              [ eof => sub { exit } ],
@@ -200,7 +239,7 @@ $exp->expect(
                    }
                    Expect::exp_continue;
                }],
-             '-re', "(?s:ReadLine support enabled.*".quotemeta($prompt).")"
+             '-re', $waiting_for
             );
 
 my $got = $exp->clear_accum;
@@ -222,7 +261,7 @@ for my $i (0..$#prgs){
     my $sendprog = $prog;
     $sendprog =~ s/\\t/\t/g;
     $exp->send("$sendprog\n");
-    $expected .= "(?s:.*$prompt)" unless $expected =~ /\(/;
+    $expected .= "(?s:.*$prompt_re)" unless $expected =~ /\(/;
     mydiag "EXPECT: $expected";
     $exp->expect(
                  $timeout,
@@ -316,6 +355,10 @@ d ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz
 ~~like~~
 CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
 ########
+d ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz
+~~like~~
+CPAN_USERID.*ANDK.*Andreas
+########
 ls ANDK
 ~~like~~
 (?s:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy.*\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump)
@@ -324,11 +367,19 @@ ls ANDK/CPAN*
 ~~like~~
 (?s:Text::Glob\s+loaded\s+ok.*CPAN-Test-Dummy)
 ########
+force ls ANDK/CPAN*
+~~like~~
+(?s:CPAN-Test-Dummy)
+########
 test CPAN::Test::Dummy::Perl5::Make
 ~~like~~
 test\s+--\s+OK
 ########
 test CPAN::Test::Dummy::Perl5::Build
+~~like~~
+test\s+--\s+OK
+########
+test CPAN::Test::Dummy::Perl5::Make::Zip
 ~~like~~
 test\s+--\s+OK
 ########
@@ -344,13 +395,32 @@ dump CPAN::Test::Dummy::Perl5::Make
 ~~like~~
 (?s:bless.+('(ID|CPAN_FILE|CPAN_USERID|CPAN_VERSION)'.+){4})
 ########
+install CPAN::Test::Dummy::Perl5::Make::Failearly
+~~like~~
+(?s:Failed during this command.+writemakefile NO)
+########
 test CPAN::Test::Dummy::Perl5::NotExists
 ~~like~~
 Warning:
 ########
+test Bundle::CpanTestDummies
+~~like~~
+Test-Dummy-Perl5-Build-Fails-\S+\s+make_test\s+NO
+########
 failed
 ~~like~~
 Test-Dummy-Perl5-Build-Fails.*make_test NO
+########
+failed
+~~like~~
+Test-Dummy-Perl5-Make-Failearly.*writemakefile NO
+########
+o conf commandnumber_in_prompt 1
+~~like~~
+########
+o conf build_cache 0.1
+~~like~~
+build_cache
 ########
 reload index
 ~~like~~
@@ -362,15 +432,45 @@ m /l/
 ########
 i /l/
 ~~like~~
-(?s:CPAN.*Dummies.*Dummy.*Perl5.*Fcntl)
+(?s:CPAN.*?Dummies.*?Dummy.*?Perl5.*?Fcntl)
 ########
 h
 ~~like~~
-(?s:make.*test.*install.*force.*notest.*reload)
+(?s:make.*?test.*?install.*?force.*?notest.*?reload)
 ########
 o conf
 ~~like~~
-(?s:commit.*build_cache.*cpan_home.*inhibit_startup_message.*urllist)
+(?s:commit.*?build_cache.*?cpan_home.*?inhibit_startup_message.*?urllist)
+########
+o conf prefer_installer EUMM
+~~like~~
+########
+make CPAN::Test::Dummy::Perl5::BuildOrMake
+~~like~~
+(?s:Running make.*Writing Makefile.*make\s+-- OK)
+########
+o conf prefer_installer MB
+~~like~~
+########
+force get CPAN::Test::Dummy::Perl5::BuildOrMake
+~~like~~
+Removing previously used
+########
+make CPAN::Test::Dummy::Perl5::BuildOrMake
+~~like~~
+(?s:Running Build.*Creating new.*Build\s+-- OK)
+########
+r
+~~like~~
+(All modules are up to date|installed modules)
+########
+notest
+~~like~~
+Pragma.*method
+########
+autobundle
+~~like~~
+Wrote bundle file
 ########
 o conf help
 ~~like~~

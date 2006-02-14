@@ -1,3 +1,78 @@
+2006-02-14  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Foreign bug: Module-Build-0.27_07 fails the test runthrough.t with
+	blead@27166:
+
+t/runthrough......ok 14/28                                                   
+#   Failed test 'Check version used to create META.yml: 0.2707 == 0.270700'
+#   in t/runthrough.t at line 142.
+#          got: '0.2707'
+#     expected: '0.270700'
+t/runthrough......NOK 19# Looks like you failed 1 test of 28.                
+t/runthrough......dubious                                                    
+        Test returned status 1 (wstat 256, 0x100)
+
+	Ditto for 27154, 27016; 26919 is OK. Hmmm, several perls in between are
+	OK. So far these are debugging perls. No, 27088 is another one that is
+	OK and it is nondebugging.
+
+	If YAML is not installed, the test is skipped, so I must make sure that
+	YAML is installed, but this is difficult because YAML was broken by perl
+	until recently.
+
+	OK, looked into the code instead and wrote bug report to the M:B mailing
+	list. DONE.
+
+2006-02-13  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Bug: Randal reports that Zoidberg has both a Makefile.PL and a
+	Build.PL and he has prefer_installer EUMM and yet CPAN chose to run the
+	Build.PL. rt #17612. RESOLVED as not a bug in CPAN.pm
+
+2006-02-11  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Bug?: Somehow I managed to get POE to fail the installation, maybe
+	AutoInstall was involved. I then installed LWP and then tried POE again.
+	It succeeded in all tests, but make install said, it had "Already tried
+	without success". In such a moment this is simply the wrong thing, we
+	would much rather that CPAN.pm retried, especially as the test suite
+	runs forever!
+
+	So is this a bug? I cannot tell before I know why the first installation
+	attempt failed.
+
+	* Foreign bug: POE with bleadperl@27154 fails a few tests with
+
+	*** glibc detected *** double free or corruption (!prev): 0x085ed6e0 ***
+tests/30_loops/30_event/comp_tcp_concurrent.........dubious                  
+        Test returned status 0 (wstat 6, 0x6)
+DIED. FAILED tests 1-42
+        Failed
+
+tests/30_loops/10_select/comp_tcp    0     6    42   42 100.00%  1-42
+tests/30_loops/20_poll/comp_tcp_c    0     6    42   42 100.00%  1-42
+tests/30_loops/30_event/comp_tcp_    0     6    42   42 100.00%  1-42
+44 tests and 16 subtests skipped.
+
+	Does not fail with 5.8.8.	Blame? 27059! REPORTED
+
+2006-02-10  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Foreign bug: t/37-translator-graph....Can't locate object method
+	"is_trivial_link" via package "GLOB" at
+	/home/k/.cpan/build/SQL-Translator-0.07/blib/lib/SQL/Translator/Schema/Graph.pm
+	line 46.
+
+	with bleadperl@17102 when trying to test SQL::Translator. Happends on
+	blead, not on 5.8.8 but with 5.8.8 I have other (and much more) failures
+
+	With #16852 I have already a ticket there for the signasture.
+
+	I regret that I did not include the full command needed to upload one's
+	key. Here it is:
+
+    gpg -a --keyserver hkp://pgp.mit.edu:11371 --send-keys YOURID
+
 2006-02-08  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* http://www.flight.us/misc/FirstTime.pm_AStrebkov.htm and
@@ -7,7 +82,7 @@
 	* Bug: when Running "Makefile.PL" fails, then the case is not reachable
 	for the failed routine. Need another Naysayer category?? Try
 	Digest-SHA-5.34.tar.gz under perl-5.004_05 before Module::Signature is
-	installed.
+	installed. FIXED in rev. 580
 
 2006-02-05  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
@@ -38,7 +113,7 @@
 	/usr/local/perl-5.8.7/bin/perl
 	/usr/local/perl-5.8.8/bin/perl
 
-	Stepping in the debugger through 27088 and and 5.8.8:
+	Stepping in the debugger through bleadperl@27088 and 5.8.8:
 
 	27088 has Test::Harness 2.56 while my 5.8.8 has 2.57_03. Apparently a
 	Test::Harness bug. REPORTED as #17490
@@ -80,8 +155,8 @@
 
 	* dontload: make a dontload_list and deprecate dontload_hash. It seems
 	OK to keep $META->{dontload_hash} but it would be nice if changes on
-	$Config->{dontload_list} would always adjust the dontload_hash. Needs
-	deprecation cycle!
+	$Config->{dontload_list} would always adjust the dontload_hash. DONE in
+	rev. 581
 
 	* document and provide a dialog for commandnumber_in_prompt or provide a
 	sprintf based solution. Or just leave it as it is. Just like

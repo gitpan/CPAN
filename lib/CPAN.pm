@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_68';
+$VERSION = '1.83_69';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -394,11 +394,7 @@ sub text {
 }
 sub as_string {
     my($self) = @_;
-    if (0) { # called from rematein during install?
-        require Carp;
-        Carp::cluck("HERE");
-    }
-    $self->{TEXT};
+    $self->text;
 }
 
 package CPAN::Shell;
@@ -866,11 +862,12 @@ sub has_inst {
     my($self,$mod,$message) = @_;
     Carp::croak("CPAN->has_inst() called without an argument")
 	unless defined $mod;
-    if (defined $message && $message eq "no"
+    my %dont = map { $_ => 1 } keys %{$CPAN::META->{dontload_hash}||{}},
+        keys %{$CPAN::Config->{dontload_hash}||{}},
+            @{$CPAN::Config->{dontload_list}||[]};
+    if (defined $message && $message eq "no"  # afair only used by Nox
         ||
-        exists $CPAN::META->{dontload_hash}{$mod} # unsafe meta access, ok
-        ||
-        exists $CPAN::Config->{dontload_hash}{$mod}
+        $dont{$mod}
        ) {
       $CPAN::META->{dontload_hash}{$mod}||=1; # unsafe meta access, ok
       return 0;
@@ -1761,7 +1758,13 @@ sub failed {
     my @failed;
   DIST: for my $d ($CPAN::META->all_objects("CPAN::Distribution")) {
         my $failed = "";
-        for my $nosayer (qw(signature_verify make make_test install)) {
+        for my $nosayer (
+                         "writemakefile",
+                         "signature_verify",
+                         "make",
+                         "make_test",
+                         "install",
+                        ) {
             next unless exists $d->{$nosayer};
             next unless (
                          $d->{$nosayer}->can("failed") ?
@@ -2122,11 +2125,11 @@ sub mywarn {
     $self->print_ornamented($what, 'bold red on_yellow');
 }
 
-sub myconfess {
-    my($self,$what) = @_;
-    $self->print_ornamented($what, 'bold red on_white');
-    Carp::confess "died";
-}
+#sub myconfess {
+#    my($self,$what) = @_;
+#    $self->print_ornamented($what, 'bold red on_white');
+#    Carp::confess "died";
+#}
 
 sub mydie {
     my($self,$what) = @_;
@@ -2603,8 +2606,9 @@ sub localize {
     }
     @levels = qw/easy/ if $^O eq 'MacOS';
     my($levelno);
-    local $ENV{FTP_PASSIVE} = $CPAN::Config->{ftp_passive}
-        if exists $CPAN::Config->{ftp_passive};
+    local $ENV{FTP_PASSIVE} = 
+        exists $CPAN::Config->{ftp_passive} ?
+        $CPAN::Config->{ftp_passive} : 1;
     for $levelno (0..$#levels) {
         my $level = $levels[$levelno];
 	my $method = "host$level";
@@ -3854,7 +3858,8 @@ sub as_string {
 	# next if m/^(ID|RO)$/;
 	my $extra = "";
 	if ($_ eq "CPAN_USERID") {
-            $extra .= " (".$self->author;
+            $extra .= " (";
+            $extra .= $self->fullname;
             my $email; # old perls!
             if ($email = $CPAN::META->instance("CPAN::Author",
                                                $self->cpan_userid
@@ -3879,7 +3884,7 @@ sub as_string {
 	  push @m, sprintf(
 			   "    %-12s %s\n",
 			   $_,
-			   join(" ",keys %{$self->{$_}}),
+			   join(" ",sort keys %{$self->{$_}}),
                           );
 	} else {
 	  push @m, sprintf "    %-12s %s\n", $_, $self->{$_};
@@ -3888,8 +3893,8 @@ sub as_string {
     join "", @m, "\n";
 }
 
-#-> sub CPAN::InfoObj::author ;
-sub author {
+#-> sub CPAN::InfoObj::fullname ;
+sub fullname {
     my($self) = @_;
     $CPAN::META->instance("CPAN::Author",$self->cpan_userid)->fullname;
 }
@@ -3898,6 +3903,8 @@ sub author {
 sub dump {
   my($self) = @_;
   require Data::Dumper;
+  local $Data::Dumper::Sortkeys;
+  $Data::Dumper::Sortkeys = 1;
   print Data::Dumper::Dumper($self);
 }
 
@@ -4118,6 +4125,7 @@ sub normalize {
     $s;
 }
 
+#-> sub CPAN::Distribution::author ;
 sub author {
     my($self) = @_;
     my($authorid) = $self->pretty_id =~ /^([\w\-]+)/;
@@ -4529,7 +4537,7 @@ and there run
 Package comes with a Makefile and without a Makefile.PL.
 We\'ll try to build it with that Makefile then.
 });
-            $self->{writemakefile} = "YES";
+            $self->{writemakefile} = CPAN::Distrostatus->new("YES");
             sleep 2;
         } else {
             my $cf = $self->called_for || "unknown";
@@ -4779,6 +4787,7 @@ sub verifyCHECKSUM {
     $self->CHECKSUM_check_file($lc_file);
 }
 
+#-> sub CPAN::Distribution::SIG_check_file ;
 sub SIG_check_file {
     my($self,$chk_file) = @_;
     my $rv = eval { Module::Signature::_verify($chk_file) };
@@ -4938,11 +4947,14 @@ sub eq_CHECKSUM {
 # routine, and immediately before we check for a Signal. I hope this
 # works out in one of v1.57_53ff
 
+# "Force get forgets previous error conditions"
+
+#-> sub CPAN::Distribution::force ;
 sub force {
   my($self, $method) = @_;
   for my $att (qw(
   CHECKSUM_STATUS archived build_dir localfile make install unwrapped
-  writemakefile modulebuild
+  writemakefile modulebuild make_test
  )) {
     delete $self->{$att};
   }
@@ -5032,6 +5044,10 @@ or
       }
     }
     $self->get;
+    if ($CPAN::Signal){
+      delete $self->{force_update};
+      return;
+    }
   EXCUSE: {
         my @e;
         !$self->{archived} || $self->{archived} eq "NO" and push @e,
@@ -5049,9 +5065,21 @@ or
                 and push @e, "Did not pass the signature test.";
         }
 
-        exists $self->{writemakefile} &&
-            $self->{writemakefile} =~ m/ ^ NO\s* ( .* ) /sx and push @e,
-                $1 || "Had some problem writing Makefile";
+        if (exists $self->{writemakefile} &&
+            (
+             $self->{writemakefile}->can("failed") ?
+             $self->{writemakefile}->failed :
+             $self->{writemakefile} =~ /^NO/
+            )) {
+            # XXX maybe a retry would be in order?
+            my $err = $self->{writemakefile}->can("text") ?
+                $self->{writemakefile}->text :
+                    $self->{writemakefile};
+            $err =~ s/^NO\s*//;
+            $err ||= "Had some problem writing Makefile";
+            $err .= ", won't make";
+            push @e, $err;
+        }
 
 	defined $self->{'make'} and push @e,
             "Has already been processed within this session";
@@ -5065,6 +5093,10 @@ or
         }
 
 	$CPAN::Frontend->myprint(join "", map {"  $_\n"} @e) and return if @e;
+    }
+    if ($CPAN::Signal){
+      delete $self->{force_update};
+      return;
     }
     $CPAN::Frontend->myprint("\n  CPAN.pm: Going to build ".$self->id."\n\n");
     my $builddir = $self->dir or
@@ -5090,7 +5122,11 @@ or
 #	$switch = "-MExtUtils::MakeMaker ".
 #	    "-Mops=:default,:filesys_read,:filesys_open,require,chdir"
 #	    if $] > 5.00310;
-	$system = "$perl $switch Makefile.PL $CPAN::Config->{makepl_arg}";
+	$system = sprintf("%s%s Makefile.PL%s",
+                          $perl,
+                          $switch ? " $switch" : "",
+                          $CPAN::Config->{makepl_arg} ? " $CPAN::Config->{makepl_arg}" : "",
+                         );
     }
     unless (exists $self->{writemakefile}) {
 	local($SIG{ALRM}) = sub { die "inactivity_timeout reached\n" };
@@ -5120,27 +5156,24 @@ or
 		kill 9, $pid;
 		waitpid $pid, 0;
 		$CPAN::Frontend->myprint($@);
-		$self->{writemakefile} = "NO $@";
+		$self->{writemakefile} = CPAN::Distrostatus->new("NO $@");
 		$@ = "";
 		return;
 	    }
 	} else {
 	  $ret = system($system);
 	  if ($ret != 0) {
-	    $self->{writemakefile} = "NO '$system' returned status $ret";
+	    $self->{writemakefile} = CPAN::Distrostatus
+                ->new("NO '$system' returned status $ret");
 	    return;
 	  }
 	}
 	if (-f "Makefile" || -f "Build") {
-	  $self->{writemakefile} = "YES";
+	  $self->{writemakefile} = CPAN::Distrostatus->new("YES");
           delete $self->{make_clean}; # if cleaned before, enable next
 	} else {
-	  $self->{writemakefile} =
-	      qq{NO -- Unknown reason.};
-	  # It's probably worth it to record the reason, so let's retry
-	  # local $/;
-	  # my $fh = IO::File->new("$system |"); # STDERR? STDIN?
-	  # $self->{writemakefile} .= <$fh>;
+	  $self->{writemakefile} = CPAN::Distrostatus
+              ->new(qq{NO -- Unknown reason.});
 	}
     }
     if ($CPAN::Signal){
@@ -5159,7 +5192,7 @@ or
 	 $CPAN::Frontend->myprint("  $system -- OK\n");
 	 $self->{'make'} = CPAN::Distrostatus->new("YES");
     } else {
-	 $self->{writemakefile} ||= "YES";
+	 $self->{writemakefile} ||= CPAN::Distrostatus->new("YES");
 	 $self->{'make'} = CPAN::Distrostatus->new("NO");
 	 $CPAN::Frontend->myprint("  $system -- NOT OK\n");
     }
@@ -5424,8 +5457,10 @@ sub test {
     }
   EXCUSE: {
 	my @e;
-	exists $self->{make} or exists $self->{later} or push @e,
-	"Make had some problems, maybe interrupted? Won't test";
+        unless (exists $self->{make} or exists $self->{later}) {
+            push @e,
+                "Make had some problems, won't test";
+        }
 
 	exists $self->{make} and
 	    (
@@ -5555,8 +5590,10 @@ sub install {
 	my @e;
 	exists $self->{build_dir} or push @e, "Has no own directory";
 
-	exists $self->{make} or exists $self->{later} or push @e,
-	"Make had some problems, maybe interrupted? Won't install";
+	unless (exists $self->{make} or exists $self->{later}) {
+            push @e,
+                "Make had some problems, won't install";
+        }
 
 	exists $self->{make} and
 	    (
@@ -5580,9 +5617,17 @@ sub install {
                     "won't install without force"
             }
         }
-	exists $self->{'install'} and push @e,
-	$self->{'install'}->text eq "YES" ?
-	    "Already done" : "Already tried without success";
+	if (exists $self->{'install'}) {
+            if ($self->{'install'}->can("text") ?
+                $self->{'install'}->text eq "YES" :
+                $self->{'install'} =~ /^YES/
+               ) {
+                push @e, "Already done";
+            } else {
+                # comment in Todo on 2006-02-11; maybe retry?
+                push @e, "Already tried without success";
+            }
+        }
 
         exists $self->{later} and length($self->{later}) and
             push @e, $self->{later};
@@ -6635,14 +6680,6 @@ sub inst_version {
     local($^W) = 0 if $] < 5.00303 && $ExtUtils::MakeMaker::VERSION < 5.38;
     my $have;
 
-    # there was a bug in 5.6.0 that let lots of unini warnings out of
-    # parse_version. Fixed shortly after 5.6.0 by PMQS. We can remove
-    # the following workaround after 5.6.1 is out.
-    local($SIG{__WARN__}) =  sub { my $w = shift;
-                                   return if $w =~ /uninitialized/i;
-                                   warn $w;
-                                 };
-
     $have = MM->parse_version($parsefile) || "undef";
     $have =~ s/^ //; # since the %vd hack these two lines here are needed
     $have =~ s/ $//; # trailing whitespace happens all the time
@@ -7541,7 +7578,7 @@ defined:
   build_dir          locally accessible directory to build modules
   cache_metadata     use serializer to cache metadata
   cpan_home          local directory reserved for this package
-  dontload_hash      anonymous hash: modules in the keys will not be
+  dontload_list      arrayref: modules in the list will not be
                      loaded by the CPAN::has_inst() routine
   getcwd             see below
   gzip		     location of external program gzip
@@ -7568,9 +7605,11 @@ defined:
                      in the install stage, for example 'sudo ./Build'
   mbuildpl_arg       arguments passed to 'perl Build.PL'
   pager              location of external program more (or any pager)
-  prefer_installer   legal values are MB and EUMM: if a module
-                     comes with both a Makefile.PL and a Build.PL, use
-                     the former (EUMM) or the latter (MB)
+  prefer_installer   legal values are MB and EUMM: if a module comes
+                     with both a Makefile.PL and a Build.PL, use the
+                     former (EUMM) or the latter (MB); if the module
+                     comes with only one of the two, that one will be
+                     used in any case
   prerequisites_policy
                      what to do if you are missing module prerequisites
                      ('follow' automatically, 'ask' me, or 'ignore')
@@ -7699,10 +7738,10 @@ already set.
 
 When the config variable ftp_passive is set, all downloads will be run
 with the environment variable FTP_PASSIVE set to this value. This is
-in general a good idea. The same effect can be achieved by starting
-the cpan shell with the environment variable. If Net::FTP is
-installed, then it can also be configured to always set passive mode
-(run libnetcfg).
+in general a good idea as it influences both Net::FTP and LWP based
+connections. The same effect can be achieved by starting the cpan
+shell with this environment variable set. For Net::FTP alone, one can
+also always set passive mode by running libnetcfg.
 
 =head1 POPULATE AN INSTALLATION WITH LOTS OF MODULES
 
@@ -7792,15 +7831,9 @@ This is the firewall implemented in the Linux kernel, it allows you to
 hide a complete network behind one IP address. With this firewall no
 special compiling is needed as you can access hosts directly.
 
-For accessing ftp servers behind such firewalls you may need to set
-the environment variable C<FTP_PASSIVE> to a true value, e.g.
-
-    env FTP_PASSIVE=1 perl -MCPAN -eshell
-
-or
-
-    perl -MCPAN -e '$ENV{FTP_PASSIVE} = 1; shell'
-
+For accessing ftp servers behind such firewalls you usually need to
+set the environment variable C<FTP_PASSIVE> or the config variable
+ftp_passive to a true value.
 
 =back
 

@@ -1,5 +1,122 @@
+2006-02-14  k
+
+	* MANIFEST.SKIP: prepare 1.83_69
+	* Changes, README: prepare 1.83_69
+	* lib/CPAN.pm: prepare 1.83_69
+	* Todo, lib/CPAN.pm, t/30shell.t: prepare 1.83_69
+	* t/30shell.t, t/CPAN/modules/02packages.details.txt: add the test 
+	  that proves prefer_installer to work
+	* lib/CPAN.pm, t/30shell.t, t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS, 
+	  t/CPAN/modules/02packages.details.txt: update CHECKSUMS after 
+	  the upload of BuildOrMake; switch to non-greedy matching in some 
+	  tests to safe on backtracking; sort Dumper on the dump command
+
+2006-02-13  k
+
+	* MANIFEST: mostly finished with the build-or-make
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, Todo, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/lib/CPAN/Test/Dummy/Perl5/Build.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/lib/CPAN/Test/Dummy/Perl5/BuildOrMake.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/t/00_load.t:
+	   mostly finished with the build-or-make
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/Makefile.PL:
+	   starting work on a new pseudodistro buildormake
+
+2006-02-12  k
+
+	* lib/CPAN.pm: more often check $Signal, I just tried a ^C that 
+	  did not return as quickly as one would expect
+	* Todo, lib/CPAN.pm: lost a branch while patching to rev. 588
+	* bin/post-prc-coverage.pl, lib/CPAN.pm, t/30shell.t: remove 
+	  unused code, add tests, sub coverage nearly 70%
+
+2006-02-11  k
+
+	* t/30shell.t, t/CPAN/modules/02packages.details.txt: finish the 
+	  zip thingie
+	* Todo, lib/CPAN.pm, t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS: use 
+	  the newest CHECKSUMS file from CPAN; find another spot where we 
+	  could protect a typical Distrostatus object with a can()
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, t/README.shell.txt: zip 
+	  distro finished and uploaded to CPAN, waiting for CHECKSUMS
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip:
+	   adding the distro itself
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/lib/CPAN/Test/Dummy/Perl5/Make/Zip.pm:
+	   working on zip
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/lib/CPAN/Test/Dummy/Perl5/Make/Zip.pm:
+	   working on zip
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/lib/CPAN/Test/Dummy/Perl5/Make:
+	   working on zip
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Makefile.PL:
+	   starting with a zip distro
+	* README, Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm, 
+	  t/30shell.t: deprecate dontload_hash, introduce dontload_list; 
+	  add make_test to the error conditions that are reset on force
+	* Todo, lib/CPAN.pm, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS, 
+	  t/CPAN/modules/02packages.details.txt: made the writemakefile 
+	  attribute a distrostatus object so that a fail during perl 
+	  Makefile.PL is visible by the failed command; added Failearly 
+	  dummy distro to test for this effect
+
+2006-02-10  k
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz:
+	   add the failearly testdistro
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/SURVIVE:
+	   need SURVIVE to build
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/MANIFEST.SKIP,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/lib/CPAN/Test/Dummy/Perl5/Make/Failearly.pm:
+	   new distro failearly finished
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/lib/CPAN/Test/Dummy/Perl5/Make,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/t:
+	   nearly complete
+	* lib/CPAN.pm: sort the module names when displaying a HASH 
+	  (containsmods looks better that way)
+	* lib/CPAN.pm: rename method InfoObject::author to fullname so 
+	  that Distribution::author does not override
+	* Todo, lib/CPAN.pm: env FTP_PASSIVE now set to true also when 
+	  config variable ftp_passive does not exist
+
 2006-02-08  k
 
+	* t/30shell.t: patch by Sebastien Aperghis-Tramoni to avoid a SEGV 
+	  with 5.004_05 which happens when exit is called within BEGIN
 	* lib/CPAN.pm: preparing 1.83_68 (previous checkin comment was 
 	  wrong, _67 is already out)
 	* Changes: svn diffprepare 1.83_67
