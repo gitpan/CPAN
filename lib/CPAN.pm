@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.83_69';
+$VERSION = '1.84';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -3853,7 +3853,10 @@ sub as_string {
     my $class = ref($self);
     $class =~ s/^CPAN:://;
     push @m, $class, " id = $self->{ID}\n";
-    my $ro = $self->ro;
+    my $ro;
+    unless ($ro = $self->ro) {
+        $CPAN::Frontend->mydie("Unknown distribution $self->{ID}");
+    }
     for (sort keys %$ro) {
 	# next if m/^(ID|RO)$/;
 	my $extra = "";
@@ -4153,7 +4156,7 @@ sub fast_yaml {
     unless ($local_file =
             CPAN::FTP->localize("authors/id/$norm",
                                 $local_wanted)) {
-        $CPAN::Frontend->mydie("Giving up on '$local_wanted'\n");
+        $CPAN::Frontend->mydie("Giving up on downloading yaml file '$local_wanted'\n");
     }
     if ($CPAN::META->has_inst("YAML")) {
         my $yaml = YAML::LoadFile($local_file);
@@ -5518,6 +5521,11 @@ sub clean {
     my($self) = @_;
     my $make = $self->{modulebuild} ? "Build" : "make";
     $CPAN::Frontend->myprint("Running $make clean\n");
+    unless (exists $self->{archived}) {
+        $CPAN::Frontend->mywarn("Distribution seems to have never been unzipped".
+                                "/untarred, nothing done\n");
+        return 1;
+    }
     unless (exists $self->{build_dir}) {
         $CPAN::Frontend->mywarn("Distribution has no own directory, nothing to do.\n");
         return 1;
@@ -7953,8 +7961,10 @@ including
 
 or setting the PERL5LIB environment variable.
 
-Another thing you should bear in mind is that the UNINST parameter
-should never be set if you are not root.
+Another thing you should bear in mind is that the UNINST parameter can
+be dnagerous when you are installing into a private area because you
+might accidentally remove modules that other people depend on that are
+not using the private area.
 
 =item 6)
 
@@ -8060,15 +8070,15 @@ By default, CPAN will install the latest non-developer release of a module.
 If you want to install a dev release, you have to specify a partial path to
 the tarball you wish to install, like so:
 
-    cpan> install KWILLIAMS/Module-Build-0.27_06.tar.gz
+    cpan> install KWILLIAMS/Module-Build-0.27_07.tar.gz
 
 =item 13)
 
-How do I install a module and all it's dependancies from the commandline,
+How do I install a module and all its dependencies from the commandline,
 without being prompted for anything, despite my CPAN configuration
 (or lack thereof)?
 
-CPAN uses ExtUtils::MakeMaker's prompt() function to ask it's questions, so
+CPAN uses ExtUtils::MakeMaker's prompt() function to ask its questions, so
 if you set the PERL_MM_USE_DEFAULT environment variable, you shouldn't be
 asked any questions at all (assuming the modules you are installing are
 nice about obeying that variable as well):
@@ -8079,12 +8089,12 @@ nice about obeying that variable as well):
 
 =head1 BUGS
 
-If a Makefile.PL requires special customization of libraries, prompts
-the user for special input, etc. then you may find CPAN is not able to
-build the distribution. In that case it is recommended to attempt the
-traditional method of building a Perl module package from a shell, for
-example by using the 'look' command to open a subshell in the
-distribution's own directory.
+Please report bugs via http://rt.cpan.org/
+
+Before submitting a bug, please make sure that the traditional method
+of building a Perl module package from a shell by following the
+installation instructions of that package still works in your
+environment.
 
 =head1 AUTHOR
 

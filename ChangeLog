@@ -1,5 +1,16 @@
+2006-02-15  k
+
+	* README: preparing 1.84
+	* lib/CPAN.pm: preparing 1.84
+	* lib/CPAN.pm: preparing 1.84
+	* README: preparing 1.84
+	* Changes, Todo, lib/CPAN.pm, t/30shell.t: preparing 1.84
+
 2006-02-14  k
 
+	* Todo, lib/CPAN.pm: going through old bugs in my own Todo file, 
+	  found one about clean against an inexistent distro
+	* Todo: notes
 	* MANIFEST.SKIP: prepare 1.83_69
 	* Changes, README: prepare 1.83_69
 	* lib/CPAN.pm: prepare 1.83_69
