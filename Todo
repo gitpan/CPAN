@@ -1,3 +1,77 @@
+2006-02-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Bug: with 'o debug all' we did not reach 'Distribution seems to have
+	never been unzipped/untarred, nothing done' but instead some "Unknown
+	distribution" or so. Fixed in 625
+
+	* Bug: in the last test run we did not detect that
+	ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz was not in the CHECKSUMS
+	file. We had the 
+
+	#     CHECKSUM_STATUS NIL -- distro not in CHECKSUMS file
+
+	in the "d" output but we did not pass he code that shouts. Fixed in 624
+
+2006-02-18  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* To: Tyler MacDonald <tyler@yi.org>
+
+	 >> If I understand the problem right, it is that you wish to use a module in the
+	 >> current distribution (a subclass of Module::Build) to do the installing.
+	 >> If this is correct, you only need to put a 'use lib "lib";' in your Build.PL
+	 >> for it to be picked up properly.  (It does not need to be installed in the
+	 >> standard places before you use it.)
+	
+		> 	Nope, that problem is handled already in
+		> DBIx::Migration::Directories.
+	
+		> 	I now have a Schema::RDBMS::AUS package, which needs the subclass
+		> that DBIx::Migration::Directories supplies.
+		> DBIx::Migration::Directories::Build needs to be available at the time
+		> Build.PL is run so that it can alter Module::Build's config and supply extra
+		> actions.
+	
+	Add it to your "requires" hash, that way it will end up in META.yml and
+	if people have YAML installed, they can read it.
+	
+	If people have YAML not installed they will call either the
+	Makefile.PL or the Build.PL to hopefully find out what the
+	prerequisites are. That way you get the prerequisites but as you have
+	noticed, it is too late for your build process.
+	
+	I don't know how I will fix that. Suggestions welcome. I put it into my
+	Todo file.
+	
+
+2006-02-17  Andreas J Koenig  <akoenig@cellular.de>
+
+	* Bug: on a system without make installed, CPAN happily tries
+
+	Checking if your kit is complete...
+	Looks good
+	Writing Makefile for CPAN
+			-- NOT OK
+	Running make test
+		Can't test without successful make
+	Running make install
+		make had returned bad status, install seems impossible
+
+	REJECT: this is a bugreport against an old CPAN.pm
+
+2006-02-17  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* watch http://perlmonks.org/?node_id=530600
+
+	Does anybody answer my question 'How do you run nmake when it is in a
+	path that contains spaces?'?
+
+2006-02-16  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Todo: rewrite the 30shell.t test for Open3 (or just a tempfile) by
+	concatenating all regexes or split on the prompt. When we succeed with
+	this, make a version that runs within the core of perl, maybe filter out
+	just those tests that do not require additional resources.
+
 2006-02-15  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* http://www.flight.us/misc/FirstTime.pm_AStrebkov.htm and

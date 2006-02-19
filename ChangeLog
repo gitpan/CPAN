@@ -1,5 +1,77 @@
+2006-02-19  k
+
+	* MANIFEST.SKIP, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz:
+	   prepare 1.85
+	* Makefile.PL, README, Todo, lib/CPAN.pm, t/30shell.t: a few edges 
+	  uncovered by testallperls, mainly 5.005_04 was choking a few 
+	  places
+	* Changes, MANIFEST, Makefile.PL, Todo, 
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS, 
+	  t/CPAN/modules/02packages.details.txt: prepare 1.85
+	* t/30shell.t: test more bundle stuff and cover the case that lead 
+	  to the 1.85 release
+	* lib/CPAN.pm: local_bundles id list nonsense files not fiting the 
+	  perl identifier rules; be a bit stricter
+	* MANIFEST, MANIFEST.SKIP, lib/Bundle/CPAN.pm, related, 
+	  related/Bundle-CPAN, related/Bundle-CPAN/CPAN.pm, 
+	  related/Bundle-CPAN/MANIFEST, related/Bundle-CPAN/Makefile.PL: 
+	  move Bundle::CPAN in its own distro because due to a bug in all 
+	  versions up to 1.84 the Bundle could not be installed on Windows 
+	  when both Bundle/CPAN.pm and CPAN.pm were living in the ame 
+	  distro
+	* lib/CPAN.pm: in debug mode we should never call methods that 
+	  might change the flow: remove calls to asstring indebugging mode
+	* lib/CPAN.pm: error condition "disto not in CHECKSUMS file" was 
+	  broken -- reactivated now
+	* MANIFEST, Makefile.PL, lib/CPAN.pm, t/README.shell.txt: 
+	  testdistro finished
+	* Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/MANIFEST, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/Bundle,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/Bundle/CpanTestDummies.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/CPAN/Test/Dummy/Perl5/Make.pm:
+	   prepare a new version of our "Make" testdistro that contains a 
+	  bundle file
+
+2006-02-18  k
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01, 
+	  t/dot-cpan/Bundle/CpanTestDummies-1.55.pm, 
+	  t/dot-cpan/Bundle/CpanTestDummies.pm: rename the directory where 
+	  CPAN-Test-Dummy-Perl5-Make lies to contain no version number
+	* Makefile.PL: another idea about the root of #17701 (cannot mix 
+	  single and group recipe lines), but I leave the previously 
+	  invented $HAVE_MAKE thing in place
+	* lib/CPAN.pm: Adam Kennedy analysed a long standing bug that only 
+	  happened on Windows in ticket #17699 and I turned it into this 
+	  change tht also renames variables to clarify the intent
+	* Todo: notes
+	* lib/CPAN.pm: talk about older perls; fixes #17706
+	* Makefile.PL, lib/CPAN.pm: dmake has issues with my Makefile; 
+	  maybe fixes 17701
+	* Todo, lib/CPAN.pm, t/00signature.t: move safe_chdir up in the 
+	  inheritance tre so we inherit it in CPAN::Bundle too and use it 
+	  there
+
+2006-02-17  k
+
+	* Todo: bugreport from a box without make
+
+2006-02-16  k
+
+	* Makefile.PL: better clean target in the top level
+	* Todo: note about 30shell future direction
+
 2006-02-15  k
 
+	* t/03pkgs.t: patch 27193 from bleadperl
 	* README: preparing 1.84
 	* lib/CPAN.pm: preparing 1.84
 	* lib/CPAN.pm: preparing 1.84

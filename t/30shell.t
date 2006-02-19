@@ -126,6 +126,23 @@ Total                                 50.9   35.3   32.6   73.5  100.0   45.4
 
 added the BuildOrMake distro
 
+After 628
+----------------------------------- ------ ------ ------ ------ ------ ------
+File                                  stmt   bran   cond    sub   time  total
+----------------------------------- ------ ------ ------ ------ ------ ------
+blib/lib/CPAN.pm                      52.2   37.0   32.8   71.4   89.7   46.6
+blib/lib/CPAN/Admin.pm                12.9    0.0    0.0   62.5    0.0   11.8
+blib/lib/CPAN/Debug.pm                63.6   40.0    0.0  100.0    0.0   55.3
+blib/lib/CPAN/FirstTime.pm            55.6   33.0   27.8   79.3    6.4   44.6
+blib/lib/CPAN/HandleConfig.pm         60.6   45.2   32.0   88.2    3.4   53.5
+blib/lib/CPAN/Nox.pm                 100.0   50.0    n/a  100.0    0.0   95.0
+blib/lib/CPAN/Tarzip.pm               40.3   20.8   22.2   78.6    0.4   34.8
+blib/lib/CPAN/Version.pm              83.3   54.5   84.0  100.0    0.0   78.6
+Total                                 51.9   36.1   32.7   74.0  100.0   46.2
+----------------------------------- ------ ------ ------ ------ ------ ------
+
+added a Bundle to the "Make" testdistro
+
 =cut
 
 BEGIN {
@@ -150,21 +167,30 @@ BEGIN {
     }
 }
 
+use File::Spec;
+
+sub _f ($) {
+    File::Spec->catfile(split /\//, shift);
+}
 use File::Path qw(rmtree);
-rmtree "t/dot-cpan/sources";
-rmtree "t/dot-cpan/build";
-unlink "t/dot-cpan/Metadata";
+rmtree _f"t/dot-cpan/sources";
+rmtree _f"t/dot-cpan/build";
+unlink _f"t/dot-cpan/Metadata";
 
 use File::Copy qw(cp);
-cp "t/CPAN/TestConfig.pm", "t/CPAN/MyConfig.pm"
+cp _f"t/CPAN/TestConfig.pm", _f"t/CPAN/MyConfig.pm"
     or die "Could not cp t/CPAN/TestConfig.pm over t/CPAN/MyConfig.pm: $!";
+cp _f"t/dot-cpan/Bundle/CpanTestDummies-1.55.pm",
+    _f"t/dot-cpan/Bundle/CpanTestDummies.pm" or die
+    "Could not cp t/dot-cpan/Bundle/CpanTestDummies-1.55.pm over ".
+    "t/dot-cpan/Bundle/CpanTestDummies-1.55.pm: $!";
 
 use Cwd;
 my $cwd = Cwd::cwd;
 
 sub read_myconfig () {
     local *FH;
-    open *FH, "t/CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
+    open *FH, _f"t/CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
     local $/;
     eval <FH>;
 }
@@ -175,15 +201,21 @@ my @prgs;
     @prgs = split /########.*/, <DATA>;
     close DATA;
 }
+my @modules = qw(
+                 Digest::SHA
+                 Term::ReadKey
+                 Term::ReadLine
+                 Text::Glob
+                );
 
 use Test::More;
-plan tests => scalar @prgs + 5;
+plan tests => (
+               scalar @prgs
+               + 2                     # histsize tests
+               + scalar @modules
+              );
 
-for my $m (qw(
-              Term::ReadKey
-              Term::ReadLine
-              Text::Glob
-             )) {
+for my $m (@modules) {
     use_ok($m);
 }
 read_myconfig;
@@ -192,9 +224,10 @@ is($CPAN::Config->{histsize},100,"histsize is 100");
 my $exp = Expect->new;
 my $prompt = "cpan>";
 my $prompt_re = "cpan[^>]*>";
+my $t = File::Spec->catfile($cwd,"t");
 $exp->spawn(
             $^X,
-            "-I$cwd/t",                 # get this test's own MyConfig
+            "-I$t",                 # get this test's own MyConfig
             "-Mblib",
             "-MCPAN::MyConfig",
             "-MCPAN",
@@ -298,6 +331,9 @@ nothanks
 ~~like~~
 wrote
 ########
+# o debug all
+~~like~~
+########
 o conf histsize 101
 ~~like~~
 .  histsize.+101
@@ -343,19 +379,30 @@ a ANDK JHI
 ~~like~~
 (?s:Andreas.*Hietaniemi.*items found)
 ########
+autobundle
+~~like~~
+Wrote bundle file
+########
 b
 ~~like~~
-(?s:Bundle::CPAN.*Bundle::CpanTestDummies.*items found)
+(?s:Bundle::CpanTestDummies.*items found)
 ########
 b Bundle::CpanTestDummies
 ~~like~~
-\sCONTAINS.+CPAN::Test::Dummy::Perl5::Make
+\sCONTAINS.+CPAN::Test::Dummy::Perl5::Make.+CPAN::Test::Dummy::Perl5::Make::Zip
 ########
-d ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz
+install ANDK/NotInChecksums-0.000.tar.gz
+~~like~~
+(?s:awry.*yes)
+########
+n
+~~like~~
+########
+d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
 ~~like~~
 CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
 ########
-d ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz
+d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
 ~~like~~
 CPAN_USERID.*ANDK.*Andreas
 ########
@@ -407,10 +454,6 @@ clean NOTEXISTS/Notxists-0.000.tar.gz
 ~~like~~
 nothing done
 ########
-test Bundle::CpanTestDummies
-~~like~~
-Test-Dummy-Perl5-Build-Fails-\S+\s+make_test\s+NO
-########
 failed
 ~~like~~
 Test-Dummy-Perl5-Build-Fails.*make_test NO
@@ -436,7 +479,7 @@ m /l/
 ########
 i /l/
 ~~like~~
-(?s:CPAN.*?Dummies.*?Dummy.*?Perl5.*?Fcntl)
+(?s:Dummies.*?Dummy.*?Perl5.*?Fcntl)
 ########
 h
 ~~like~~
@@ -464,17 +507,17 @@ make CPAN::Test::Dummy::Perl5::BuildOrMake
 ~~like~~
 (?s:Running Build.*Creating new.*Build\s+-- OK)
 ########
+test Bundle::CpanTestDummies
+~~like~~
+Test-Dummy-Perl5-Build-Fails-\S+\s+make_test\s+NO
+########
 r
 ~~like~~
-(All modules are up to date|installed modules)
+(All modules are up to date|installed modules|Fcntl)
 ########
 notest
 ~~like~~
 Pragma.*method
-########
-autobundle
-~~like~~
-Wrote bundle file
 ########
 o conf help
 ~~like~~

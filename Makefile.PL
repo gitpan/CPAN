@@ -5,6 +5,8 @@ use ExtUtils::MakeMaker qw(:DEFAULT);
 use File::Path;
 eval { require File::Spec; };
 my $HAVE_FILE_SPEC = !$@;
+require Config;
+my $HAVE_MAKE = $Config::Config{make} eq "make"; # file-scoped!
 use strict;
 use vars qw($VERSION);
 
@@ -152,12 +154,14 @@ sub macro {
 LC_ALL_noexport=en_GB.utf8
 
 ALL_PERLS = /usr/bin/perl /usr/local/bin/perl \
+	    /usr/local/perl-5.8.0/bin/perl \
             /usr/local/perl-5.004_05/bin/perl \
             /usr/local/perl-5.005_04/bin/perl
 }
 }
 
 sub postamble {
+  return unless $HAVE_MAKE; # dmake has unknown issues with my Makfile
   q{
 setversion:
 	$(PERL) Makefile.PL --setversion
@@ -226,17 +230,25 @@ testcover:
 	`dirname $(PERL)`/cover
 	$(PERL) bin/post-prc-coverage.pl cover_db/blib-lib-CPAN-pm--subroutine.html
 
-testdistros: t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz \
+testdistros: t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz \
-	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip \
+        t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz
 
+# sorry, unix centric
 testshell-with-protocol:
-	[ -d protocols ] || mkdir protocols
-	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | tee protocols/make-test-`date +%Y%m%dT%H%M%S`
+	$(PERL) -e 'for ("protocols"){-d $$_ or mkdir $$_, 0755}'
+	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | \
+		tee protocols/make-test-`date +%Y%m%dT%H%M%S`
 	ls -ltr protocols | tail
+
+t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz :
+	echo " ----No content---- " > t/CPAN/authors/id/A/AN/ANDK/tempfile
+	cd t/CPAN/authors/id/A/AN/ANDK && tar cvzf NotInChecksums-0.000.tar.gz tempfile
+	$(RM) t/CPAN/authors/id/A/AN/ANDK/tempfile
 
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/MANIFEST \
@@ -247,18 +259,21 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz: \
 	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake && \
 		$(PERL) Build.PL && \
 		./Build dist && \
-		mv CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz ..
+		mv CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz .. && \
+		./Build clean
 
-t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz: \
-	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/Changes \
-	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/MANIFEST \
-	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/Makefile.PL \
-	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/lib/CPAN/Test/Dummy/Perl5/Make.pm \
-	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01/t/00_load.t
-	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01 && \
+t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz: \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Changes \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/MANIFEST \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/Bundle/CpanTestDummies.pm \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/CPAN/Test/Dummy/Perl5/Make.pm \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/t/00_load.t
+	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make && \
 		$(PERL) Makefile.PL && \
 		$(MAKE) dist && \
-		mv CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz ..
+		mv CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz .. && \
+		$(MAKE) clean
 
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/MANIFEST \
@@ -268,7 +283,8 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip: \
 	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip && \
 		$(PERL) Makefile.PL && \
 		$(MAKE) dist && \
-		mv CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip ..
+		mv CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip .. && \
+		$(MAKE) clean
 
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/MANIFEST \
@@ -277,7 +293,8 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz: \
 	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01 && \
 		$(PERL) Makefile.PL && \
 		$(MAKE) dist && \
-		mv CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz ..
+		mv CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz .. && \
+		$(MAKE) clean
 
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01/Changes \
@@ -288,7 +305,8 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz: \
 	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01 && \
 		$(PERL) Build.PL && \
 		./Build dist && \
-		mv CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz ..
+		mv CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz .. && \
+		./Build clean
 
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01/Changes \
@@ -299,12 +317,18 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz: \
 	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01 && \
 		$(PERL) Build.PL && \
 		./Build dist && \
-		mv CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz ..
+		mv CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz .. && \
+		./Build clean
 
 testallperls :
 	:>SIGNATURE
 	for p in $(ALL_PERLS); do $$p Makefile.PL && $(MAKE) test; done
 
+clean ::
+	$(RM) t/CPAN/authors/id/A/AN/ANDK/*/Build \
+		t/CPAN/authors/id/A/AN/ANDK/*/Makefile.old \
+		t/CPAN/authors/id/A/AN/ANDK/*/META.yml
+	$(RM_RF) t/CPAN/authors/id/A/AN/ANDK/*/_build
 
 
 }
