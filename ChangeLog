@@ -1,5 +1,20 @@
+2006-02-20  k
+
+	* Changes, Todo: prepare 1.86
+	* Todo, lib/CPAN.pm, t/30shell.t: revert a few hot changes I did 
+	  yesterday after the 1.85 release and fix the bug that is 
+	  described in Todo as of 2006-02-20 against old hecksums files
+
 2006-02-19  k
 
+	* t/30shell.t: keep a record of the state of the coverage
+	* t/12cpan.t, t/CPAN/modules/02packages.details.txt: nothing but 
+	  coverage
+	* t/30shell.t: nothing but coverage
+	* MANIFEST, lib/CPAN.pm, t/12cpan.t, t/30shell.t: more coverage 
+	  with a new test and removal of unused code
+	* bin/post-prc-coverage.pl: error handling of the coverage 
+	  postprocessing script
 	* MANIFEST.SKIP, 
 	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz:
 	   prepare 1.85
