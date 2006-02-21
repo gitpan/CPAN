@@ -1,5 +1,37 @@
+2006-02-21  k
+
+	* MANIFEST.SKIP: prepare 1.86_51
+	* MANIFEST.SKIP, README, t/30shell.t: prepare 1.86_51
+	* Changes: prepare 1.86_51
+	* lib/CPAN.pm: it tuned out that we need 0.52 of File::HomeDir -- 
+	  if at all
+	* t/30shell.t: shell.t now can run without Expec, but still 
+	  disabled without Expect per default; can be enabled with 
+	  CPAN_RUN_SHELL_TEST envariable
+	* t/12cpan.t: silence the qr test on 5.004
+	* Makefile.PL, bin/no_CR.pl: make sure that none of our files 
+	  contain a CR
+	* t/12cpan.t, t/CPAN/TestConfig.pm: AAAAARGH! revert partially 
+	  647, we require people to set mbuild_install_build_command if 
+	  NOT on Windows
+	* lib/CPAN/HandleConfig.pm, t/CPAN/TestConfig.pm: fix #17770: do 
+	  not try to use $CPAN::Frontend before it exists (on Windows)
+	* Makefile.PL: return empty string instead of undef when HAVE_MAKE 
+	  is false; fixes #17768
+	* t/30shell.t: limit the use of the Expect object to ~30 lines
+	* t/30shell.t: significantly simplified the expect portion in 
+	  30shell.t by moving the first sample into DATA
+	* Changes, MANIFEST, lib/CPAN.pm, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS@588: for 30shell.t add an 
+	  old CHECKSUMS file to the cache so that we test the behaviour 
+	  against oudated cache entries
+	* Todo: remove a spurious CARRIAGE RETURN in the Todo file: it 
+	  breaks Module::Signature on Windows:(((
+
 2006-02-20  k
 
+	* lib/CPAN.pm, related/Bundle-CPAN/CPAN.pm: try fixing #17759: the 
+	  concept of a home directory on Windows
 	* Changes, Todo: prepare 1.86
 	* Todo, lib/CPAN.pm, t/30shell.t: revert a few hot changes I did 
 	  yesterday after the 1.85 release and fix the bug that is 

@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $dot_cpan $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 581 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 647 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -67,8 +67,9 @@ if ($^O eq "MSWin32") {
                  )) {
         delete $keys{$k};
         if (exists $CPAN::Config->{$k}) {
-            $CPAN::Frontend->mywarn("deleting previously set config variable ".
-                                    "'$k' => '$CPAN::Config->{$k}'");
+            for ("deleting previously set config variable '$k' => '$CPAN::Config->{$k}'") {
+                $CPAN::Frontend ? $CPAN::Frontend->mywarn($_) : warn $_;
+            }
             delete $CPAN::Config->{$k};
         }
     }
@@ -471,7 +472,7 @@ package
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 581 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 647 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {

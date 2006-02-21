@@ -1,4 +1,14 @@
+BEGIN {
+    $|++;
+    local $^W;
+    eval "qr/qr/";
+    if ($@) {
+	print "1..0 # Skip: no qr//\n";
+	eval "require POSIX; 1" and POSIX::_exit(0);
+    }
+}
 use Test::More tests => 3;
+use File::Spec;
 sub _f ($) {
     File::Spec->catfile(split /\//, shift);
 }
