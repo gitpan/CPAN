@@ -1,3 +1,12 @@
+2006-02-22  k
+
+	* Changes, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm, t/30shell.t: simplification of the 
+	  concepts of home and of the CPAN/MyConfig.pm and
+	  the CPAN/Config.pm. There were too many place that tried to do 
+	  the same
+	  thing. Should now be centralized and consistent.
+
 2006-02-21  k
 
 	* MANIFEST.SKIP: prepare 1.86_51
