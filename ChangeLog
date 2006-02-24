@@ -1,3 +1,25 @@
+2006-02-24  k
+
+	* t/30shell.t: cleaup temporary file
+	* Makefile.PL, lib/CPAN.pm, t/30shell.t: several small cleanups 
+	  for 5.004, unfortunately 30shell.t fails on this platform with 
+	  SEGV. Comment about that in 30shell.t
+	* Changes, Todo: prepare 1.86_53
+	* t/30shell.t: add filtering capability to shel test so that we 
+	  now pass 100% on bare 5.8.8 when CPAN_RUN_SHELL_TEST is set
+	* t/30shell.t: use a different format for the tests to make room 
+	  for a filter
+
+2006-02-23  k
+
+	* lib/CPAN.pm, t/30shell.t, t/CPAN/TestConfig.pm: fixing ticket 
+	  #17816 on rt.cpan.org (Adam Kennedy): t/30shell emits two test 
+	  headers
+	* Todo, t/30shell.t: a small step towards the user of the 
+	  30shell.t test script that leads the way to test success
+	* Todo, lib/CPAN.pm, lib/CPAN/Tarzip.pm: make Tarzip work better 
+	  on uncompresed files; lets test 12cpan work under mre conditions
+
 2006-02-22  k
 
 	* Changes, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 

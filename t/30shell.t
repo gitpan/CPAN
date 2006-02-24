@@ -159,28 +159,29 @@ Total                                 53.3   36.8   33.0   75.5  100.0   47.2
 ----------------------------------- ------ ------ ------ ------ ------ ------
 
 
+2006-02-24: Notes about 5.004_05: t30shell.t segfaults when trying to
+parse the test.out. One would have to look through the test.out output
+and find an alternate method of walking through the results tha works
+for 5.004_05. But it would have to be guesswork to find out what is
+triggering the SEGV.
+
+
 =cut
 
-use vars qw($HAVE_EXPECT $RUN_EXPECT);
+use vars qw($HAVE_EXPECT $RUN_EXPECT $HAVE);
 BEGIN {
     $|++;
     #chdir 't' if -d 't';
     unshift @INC, './lib';
     require Config;
     unless ($Config::Config{osname} eq "linux" or $ENV{CPAN_RUN_SHELL_TEST}) {
-	print "1..0 # Skip: test is only validated on linux\n";
-
-#  warn "\n\n\a Skipping tests! If you want to run the test
-#  please set environment variable \$CPAN_RUN_SHELL_TEST to 1.\n
-#  Pls try it on your box and inform me if it works\n";
-
-	print "1..0 # Skip: no linux\n";
+	print "1..0 # Skip: only validated on linux; maybe try env CPAN_RUN_SHELL_TEST=1\n";
 	eval "require POSIX; 1" and POSIX::_exit(0);
     }
     eval { require Expect };
     if ($@) {
         unless ($ENV{CPAN_RUN_SHELL_TEST}) {
-            print "1..0 # Skip: no Expect\n";
+            print "1..0 # Skip: no Expect, maybe try env CPAN_RUN_SHELL_TEST=1\n";
             eval "require POSIX; 1" and POSIX::_exit(0);
         }
     } else {
@@ -204,6 +205,9 @@ cp _f"t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS\@588",
     _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS"
     or die "Could not cp t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS\@588 ".
     "over t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS: $!";
+END {
+    unlink _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS";
+}
 cp _f"t/CPAN/TestConfig.pm", _f"t/CPAN/MyConfig.pm"
     or die "Could not cp t/CPAN/TestConfig.pm over t/CPAN/MyConfig.pm: $!";
 cp _f"t/dot-cpan/Bundle/CpanTestDummies-1.55.pm",
@@ -232,6 +236,9 @@ my @modules = qw(
                  Term::ReadKey
                  Term::ReadLine
                  Text::Glob
+                 Module::Build
+                 Archive::Zip
+                 Data::Dumper
                 );
 
 use Test::More;
@@ -239,11 +246,17 @@ plan tests => (
                scalar @prgs
                + 2                     # 2 histsize tests
                + 1                     # 1 RUN_EXPECT feedback
-               + scalar @modules
+               # + scalar @modules
               );
 
-for my $m (@modules) {
-    use_ok($m);
+sub mreq ($) {
+    my $m = shift;
+    eval "require $m; 1";
+}
+
+my $m;
+for $m (@modules) {
+    $HAVE->{$m}++ if mreq $m;
 }
 read_myconfig;
 is($CPAN::Config->{histsize},100,"histsize is 100");
@@ -293,12 +306,33 @@ if ($RUN_EXPECT) {
     open SYSTEM, "| $system" or die;
 }
 
-PAIR: for my $i (0..$#prgs){
+sub splitchunk ($) {
+    my $ch = shift;
+    my @s = split /(^[A-Z]:)/m, $ch;
+    shift @s;
+    for (my $i = 0; $i < @s; $i+=2) {
+        $s[$i] =~ s/://;
+    }
+    @s;
+}
+
+TUPL: for my $i (0..$#prgs){
     my $chunk = $prgs[$i];
-    my($prog,$expected) = split(/~~like~~.*/, $chunk);
+    my %h = splitchunk $chunk;
+    my($prog,$expected,$req) = @h{qw(P E R)};
     unless (defined $expected) {
         ok(1,"empty test");
-        next PAIR;
+        next TUPL;
+    }
+    if ($req) {
+        my @req = split " ", $req;
+        my $r;
+        for $r (@req) {
+            if (not $HAVE->{$r}) {
+                ok(1,"test skipped because $r missing");
+                next TUPL;
+            }
+        }
     }
     for ($prog,$expected) {
       s/^\s+//;
@@ -311,6 +345,7 @@ PAIR: for my $i (0..$#prgs){
             mydiag "NEXT: $prog";
             $expo->send("$sendprog\n");
         } else {
+            print SYSTEM "# NEXT: $sendprog\n";
             print SYSTEM "$sendprog\n";
         }
     }
@@ -348,6 +383,7 @@ if ($RUN_EXPECT) {
     open SYSTEM, "test.out" or die "Could not open test.out for reading: $!";
     local $/;
     my $got = <SYSTEM>;
+    close SYSTEM;
     my $pair;
     for $pair (@PAIRS) {
         my($prog,$expected) = @$pair;
@@ -363,232 +399,197 @@ is($CPAN::Config->{histsize},101);
 
 __END__
 ########
-~~like~~
-(?s:ReadLine support (enabled|suppressed).*?cpan[^>]*?>)
+P:
+E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*?>)
 ########
-o conf build_cache
-~~like~~
-build_cache
+P:o conf build_cache
+E:build_cache
 ########
-o conf init
-~~like~~
-initialized(?s:.*?manual.*?configuration.*?\])
+P:o conf init
+E:initialized(?s:.*?manual.*?configuration.*?\])
 ########
-nothanks
-~~like~~
-wrote
+P:nothanks
+E:wrote
 ########
-# o debug all
-~~like~~
+P:# o debug all
+E:
 ########
-o conf histsize 101
-~~like~~
-.  histsize.+?101
+P:o conf histsize 101
+E:.  histsize.+?101
 ########
-o conf commit
-~~like~~
-wrote
+P:o conf commit
+E:wrote
 ########
-o conf histsize 102
-~~like~~
-.  histsize.+?102
+P:o conf histsize 102
+E:.  histsize.+?102
 ########
-o conf defaults
-~~like~~
+P:o conf defaults
+E:
 ########
-o conf histsize
-~~like~~
-histsize.+?101
+P:o conf histsize
+E:histsize.+?101
 ########
-o conf urllist
-~~like~~
-file:///.*?CPAN
+P:o conf urllist
+E:file:///.*?CPAN
 ########
-!print$ENV{HARNESS_PERL_SWITCHES}||"",$/
-~~like~~
+P:!print$ENV{HARNESS_PERL_SWITCHES}||"",$/
+E:
 ########
-!print $INC{"CPAN/Config.pm"} || "NoCpAnCoNfIg",$/
-~~like~~
-NoCpAnCoNfIg
+P:!print $INC{"CPAN/Config.pm"} || "NoCpAnCoNfIg",$/
+E:NoCpAnCoNfIg
 ########
-!print $INC{"CPAN/MyConfig.pm"},$/
-~~like~~
-CPAN/MyConfig.pm
+P:!print $INC{"CPAN/MyConfig.pm"},$/
+E:CPAN/MyConfig.pm
 ########
-rtlprnft
-~~like~~
-Unknown
+P:rtlprnft
+E:Unknown
 ########
-o conf ftp ""
-~~like~~
+P:o conf ftp ""
+E:
 ########
-m Fcntl
-~~like~~
-Defines fcntl
+P:m Fcntl
+E:Defines fcntl
 ########
-a JHI
-~~like~~
-Hietaniemi
+P:a JHI
+E:Hietaniemi
 ########
-a ANDK JHI
-~~like~~
-(?s:Andreas.*?Hietaniemi.*?items found)
+P:a ANDK JHI
+E:(?s:Andreas.*?Hietaniemi.*?items found)
 ########
-autobundle
-~~like~~
-Wrote bundle file
+P:autobundle
+E:Wrote bundle file
 ########
-b
-~~like~~
-(?s:Bundle::CpanTestDummies.*?items found)
+P:b
+E:(?s:Bundle::CpanTestDummies.*?items found)
 ########
-b Bundle::CpanTestDummies
-~~like~~
-\sCONTAINS.+?CPAN::Test::Dummy::Perl5::Make.+?CPAN::Test::Dummy::Perl5::Make::Zip
+P:b Bundle::CpanTestDummies
+E:\sCONTAINS.+?CPAN::Test::Dummy::Perl5::Make.+?CPAN::Test::Dummy::Perl5::Make::Zip
+R:Archive::Zip
 ########
-install ANDK/NotInChecksums-0.000.tar.gz
-~~like~~
-(?s:awry.*?yes)
+P:install ANDK/NotInChecksums-0.000.tar.gz
+E:(?s:awry.*?yes)
+R:Digest::SHA
 ########
-n
-~~like~~
+P:n
+E:
+R:Digest::SHA
 ########
-d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
-~~like~~
-CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
+P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
+E:CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
 ########
-d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
-~~like~~
-CPAN_USERID.*?ANDK.*?Andreas
+P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
+E:CPAN_USERID.*?ANDK.*?Andreas
 ########
-ls ANDK
-~~like~~
-(?s:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy.*?\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump)
+P:ls ANDK
+E:(?s:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy.*?\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump)
 ########
-ls ANDK/CPAN*
-~~like~~
-(?s:Text::Glob\s+loaded\s+ok.*?CPAN-Test-Dummy)
+P:ls ANDK/CPAN*
+E:(?s:Text::Glob\s+loaded\s+ok.*?CPAN-Test-Dummy)
+R:Text::Glob
 ########
-force ls ANDK/CPAN*
-~~like~~
-(?s:CPAN-Test-Dummy)
+P:force ls ANDK/CPAN*
+E:(?s:CPAN-Test-Dummy)
+R:Text::Glob
 ########
-test CPAN::Test::Dummy::Perl5::Make
-~~like~~
-test\s+--\s+OK
+P:test CPAN::Test::Dummy::Perl5::Make
+E:test\s+--\s+OK
 ########
-test CPAN::Test::Dummy::Perl5::Build
-~~like~~
-test\s+--\s+OK
+P:test CPAN::Test::Dummy::Perl5::Build
+E:test\s+--\s+OK
+R:Module::Build
 ########
-test CPAN::Test::Dummy::Perl5::Make::Zip
-~~like~~
-test\s+--\s+OK
+P:test CPAN::Test::Dummy::Perl5::Make::Zip
+E:test\s+--\s+OK
+R:Archive::Zip
 ########
-failed
-~~like~~
-Nothing
+P:failed
+E:Nothing
 ########
-test CPAN::Test::Dummy::Perl5::Build::Fails
-~~like~~
-test\s+--\s+NOT OK
+P:test CPAN::Test::Dummy::Perl5::Build::Fails
+E:test\s+--\s+NOT OK
+R:Module::Build
 ########
-dump CPAN::Test::Dummy::Perl5::Make
-~~like~~
-(?s:bless.+?('(ID|CPAN_FILE|CPAN_USERID|CPAN_VERSION)'.+?){4})
+P:dump CPAN::Test::Dummy::Perl5::Make
+E:(?s:bless.+?('(ID|CPAN_FILE|CPAN_USERID|CPAN_VERSION)'.+?){4})
+R:Data::Dumper
 ########
-install CPAN::Test::Dummy::Perl5::Make::Failearly
-~~like~~
-(?s:Failed during this command.+?writemakefile NO)
+P:install CPAN::Test::Dummy::Perl5::Make::Failearly
+E:(?s:Failed during this command.+?writemakefile NO)
 ########
-test CPAN::Test::Dummy::Perl5::NotExists
-~~like~~
-Warning:
+P:test CPAN::Test::Dummy::Perl5::NotExists
+E:Warning:
 ########
-clean NOTEXISTS/Notxists-0.000.tar.gz
-~~like~~
-nothing done
+P:clean NOTEXISTS/Notxists-0.000.tar.gz
+E:nothing done
 ########
-failed
-~~like~~
-Test-Dummy-Perl5-Build-Fails.*?make_test NO
+P:failed
+E:Test-Dummy-Perl5-Build-Fails.*?make_test NO
+R:Module::Build
 ########
-failed
-~~like~~
-Test-Dummy-Perl5-Make-Failearly.*?writemakefile NO
+P:failed
+E:Test-Dummy-Perl5-Make-Failearly.*?writemakefile NO
 ########
-o conf commandnumber_in_prompt 1
-~~like~~
+P:o conf commandnumber_in_prompt 1
+  E:
 ########
-o conf build_cache 0.1
-~~like~~
-build_cache
+P:o conf build_cache 0.1
+E:build_cache
 ########
-reload index
-~~like~~
-staleness
+P:reload index
+E:staleness
 ########
-m /l/
-~~like~~
-(?s:Perl5.*?Fcntl)
+P:m /l/
+E:(?s:Perl5.*?Fcntl)
 ########
-i /l/
-~~like~~
-(?s:Dummies.*?Dummy.*?Perl5.*?Fcntl)
+P:i /l/
+E:(?s:Dummies.*?Dummy.*?Perl5.*?Fcntl)
 ########
-h
-~~like~~
-(?s:make.*?test.*?install.*?force.*?notest.*?reload)
+P:h
+E:(?s:make.*?test.*?install.*?force.*?notest.*?reload)
 ########
-o conf
-~~like~~
-(?s:commit.*?build_cache.*?cpan_home.*?inhibit_startup_message.*?urllist)
+P:o conf
+E:(?s:commit.*?build_cache.*?cpan_home.*?inhibit_startup_message.*?urllist)
 ########
-o conf prefer_installer EUMM
-~~like~~
+P:o conf prefer_installer EUMM
+E:
 ########
-make CPAN::Test::Dummy::Perl5::BuildOrMake
-~~like~~
-(?s:Running make.*?Writing Makefile.*?make\s+-- OK)
+P:make CPAN::Test::Dummy::Perl5::BuildOrMake
+E:(?s:Running make.*?Writing Makefile.*?make\s+-- OK)
 ########
-o conf prefer_installer MB
-~~like~~
+P:o conf prefer_installer MB
+E:
+R:Module::Build
 ########
-force get CPAN::Test::Dummy::Perl5::BuildOrMake
-~~like~~
-Removing previously used
+P:force get CPAN::Test::Dummy::Perl5::BuildOrMake
+E:Removing previously used
+R:Module::Build
 ########
-make CPAN::Test::Dummy::Perl5::BuildOrMake
-~~like~~
-(?s:Running Build.*?Creating new.*?Build\s+-- OK)
+P:make CPAN::Test::Dummy::Perl5::BuildOrMake
+E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
+R:Module::Build
 ########
-test Bundle::CpanTestDummies
-~~like~~
-Test-Dummy-Perl5-Build-Fails-\S+\s+make_test\s+NO
+P:test Bundle::CpanTestDummies
+E:Test-Dummy-Perl5-Build-Fails-\S+\s+make_test\s+NO
+R:Module::Build
 ########
-r
-~~like~~
-(All modules are up to date|installed modules|Fcntl)
+P:r
+E:(All modules are up to date|installed modules|Fcntl)
 ########
-u /--/
-~~like~~
-No modules found for
+P:u /--/
+E:No modules found for
 ########
-notest
-~~like~~
-Pragma.*?method
+P:notest
+E:Pragma.*?method
 ########
-o conf help
-~~like~~
-(?s:commit.*?defaults.*?help.*?init.*?urllist)
+P:o conf help
+E:(?s:commit.*?defaults.*?help.*?init.*?urllist)
 ########
-o conf inhibit_\t
-~~like~~
-inhibit_startup_message
+P:o conf inhibit_\t
+E:inhibit_startup_message
+R:Term::ReadKey
 ########
-quit
-~~like~~
-(removed\.)
+P:quit
+E:(removed\.)
 ########
 
 # Local Variables:

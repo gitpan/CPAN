@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.86_52';
+$VERSION = '1.86_53';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -416,7 +416,7 @@ For this you just need to type
 });
 	}
     } else {
-	$CPAN::Frontend->mywarn(qq{Unknown shell command '$autoload'. }.
+	$CPAN::Frontend->mywarn(qq{Unknown shell command '$autoload @_'. }.
 				qq{Type ? for help.
 });
     }
@@ -3949,7 +3949,9 @@ sub fullname {
 #-> sub CPAN::InfoObj::dump ;
 sub dump {
   my($self) = @_;
-  require Data::Dumper;
+  unless ($CPAN::META->has_inst("Data::Dumper")) {
+      $CPAN::Frontend->mydie("dump command requires Data::Dumper installed");
+  }
   local $Data::Dumper::Sortkeys;
   $Data::Dumper::Sortkeys = 1;
   print Data::Dumper::Dumper($self);
@@ -4944,14 +4946,17 @@ going awry right now.
 #-> sub CPAN::Distribution::eq_CHECKSUM ;
 sub eq_CHECKSUM {
     my($self,$fh,$expect) = @_;
-    my $dg = Digest::SHA->new(256);
-    my($data);
-    while (read($fh, $data, 4096)){
-      $dg->add($data);
+    if ($CPAN::META->has_inst("Digest::SHA")) {
+        my $dg = Digest::SHA->new(256);
+        my($data);
+        while (read($fh, $data, 4096)){
+            $dg->add($data);
+        }
+        my $hexdigest = $dg->hexdigest;
+        # warn "fh[$fh] hex[$hexdigest] aexp[$expectMD5]";
+        return $hexdigest eq $expect;
     }
-    my $hexdigest = $dg->hexdigest;
-    # warn "fh[$fh] hex[$hexdigest] aexp[$expectMD5]";
-    $hexdigest eq $expect;
+    return 1;
 }
 
 #-> sub CPAN::Distribution::force ;
@@ -5687,7 +5692,7 @@ sub install {
                          );
     }
 
-    my($stderr) = $^O =~ /Win/i ? "" : " 2>&1 ";
+    my($stderr) = $^O eq "MSWin32" ? "" : " 2>&1 ";
     my($pipe) = FileHandle->new("$system $stderr |");
     my($makeout) = "";
     while (<$pipe>){
