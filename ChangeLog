@@ -1,3 +1,30 @@
+2006-02-27  k
+
+	* Changes: release notes for 1.87
+	* MANIFEST, README: forgot 30hell.pod in the manifest
+	* lib/CPAN.pm, t/30shell.pod, t/30shell.t: bugfix: when make clean 
+	  failed, we did not list this as a fail
+	* related/Bundle-CPAN/CPAN.pm, related/Bundle-CPAN/Makefile.PL: a 
+	  new release of the Bundle::CPAN because Archive::Zip was missing
+	* lib/CPAN.pm, t/30shell.pod, t/30shell.t: small cosmetics in the 
+	  shell test and cheap 2.5% coverage gain
+
+2006-02-26  k
+
+	* related/Bundle-CPAN/CPAN.pm, t/30shell.pod: coverage break-in???
+	* t/30shell.pod, t/30shell.t: move the coverage memos out of the 
+	  30shell.t in a separate pod file
+	* t/dot-cpan: make the dot-cpan directory empty in te repository; 
+	  we must always start with an empty one to have predictable tests
+	* MANIFEST, Todo, lib/CPAN.pm, t/30shell.t, 
+	  t/CPAN/CpanTestDummies-1.55.pm, 
+	  t/dot-cpan/Bundle/CpanTestDummies-1.55.pm: new method on 
+	  Modules: dslip_status
+
+2006-02-25  k
+
+	* Makefile.PL: a bit reformatting and simplifying
+
 2006-02-24  k
 
 	* t/30shell.t: cleaup temporary file
