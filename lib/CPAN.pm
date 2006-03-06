@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.87';
+$VERSION = '1.87_51';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -42,9 +42,6 @@ $CPAN::Perl ||= CPAN::find_perl();
 $CPAN::Defaultdocs ||= "http://search.cpan.org/perldoc?";
 $CPAN::Defaultrecent ||= "http://search.cpan.org/recent";
 
-
-package CPAN;
-use strict;
 
 use vars qw($VERSION @EXPORT $AUTOLOAD $DEBUG $META $HAS_USABLE $term
             $Signal $Suppress_readline $Frontend
@@ -1404,13 +1401,15 @@ sub o {
     if ($o_type eq 'conf') {
 	if (!@o_what) { # print all things, "o conf"
 	    my($k,$v);
-	    $CPAN::Frontend->myprint("CPAN::Config options");
+	    $CPAN::Frontend->myprint("\$CPAN::Config options from ");
+            my @from;
 	    if (exists $INC{'CPAN/Config.pm'}) {
-	      $CPAN::Frontend->myprint(" from $INC{'CPAN/Config.pm'}");
+                push @from, $INC{'CPAN/Config.pm'};
 	    }
 	    if (exists $INC{'CPAN/MyConfig.pm'}) {
-	      $CPAN::Frontend->myprint(" and $INC{'CPAN/MyConfig.pm'}");
+                push @from, $INC{'CPAN/MyConfig.pm'};
 	    }
+            $CPAN::Frontend->myprint(join " and ", map {"'$_'"} @from);
 	    $CPAN::Frontend->myprint(":\n");
 	    for $k (sort keys %CPAN::HandleConfig::can) {
 		$v = $CPAN::HandleConfig::can{$k};
@@ -2824,7 +2823,7 @@ sub hosthard {
         # Try the most capable first and leave ncftp* for last as it only 
         # does FTP.
       DLPRG: for my $f (qw(curl wget lynx ncftpget ncftp)) {
-          my $funkyftp = $CPAN::Config->{$f};
+          my $funkyftp = CPAN::HandleConfig->safe_quote($CPAN::Config->{$f});
           next unless defined $funkyftp;
 	  next if $funkyftp =~ /^\s*$/;
 
@@ -3589,13 +3588,14 @@ happen.\a
             local($^W)= 0;
             if ($version > $CPAN::VERSION){
                 $CPAN::Frontend->myprint(qq{
-  There's a new CPAN.pm version (v$version) available!
-  [Current version is v$CPAN::VERSION]
+  New CPAN.pm version (v$version) available.
+  [Currently running version is v$CPAN::VERSION]
   You might want to try
     install CPAN
     reload cpan
-  without quitting the current session. It should be a seamless upgrade
-  while we are running...
+  to both upgrade CPAN.pm and run the new version without leaving
+  the current session.
+
 }); #});
                 sleep 2;
 		$CPAN::Frontend->myprint(qq{\n});
@@ -4675,7 +4675,8 @@ Could not determine which directory to use for looking at $dist.
     {
 	local $ENV{CPAN_SHELL_LEVEL} = $ENV{CPAN_SHELL_LEVEL}||0;
         $ENV{CPAN_SHELL_LEVEL} += 1;
-	unless (system($CPAN::Config->{'shell'}) == 0) {
+	my $shell = CPAN::HandleConfig->safe_quote($CPAN::Config->{'shell'});
+	unless (system($shell) == 0) {
 	    my $code = $? >> 8;
 	    $CPAN::Frontend->mywarn("Subprocess shell exit code $code\n");
 	}
@@ -4706,6 +4707,7 @@ sub cvs_import {
     }
     my $cvs_log = qq{"imported $package $version sources"};
     $version =~ s/\./_/g;
+    # XXX cvs
     my @cmd = ('cvs', '-d', $cvs_root, 'import', '-m', $cvs_log,
 	       "$cvs_dir", $userid, "v$version");
 
@@ -4716,6 +4718,7 @@ sub cvs_import {
 
     $CPAN::Frontend->myprint(qq{@cmd\n});
     system(@cmd) == 0 or
+    # XXX cvs
 	$CPAN::Frontend->mydie("cvs import failed");
     chdir($pwd) or $CPAN::Frontend->mydie(qq{Could not chdir to "$pwd": $!});
 }
@@ -5033,7 +5036,12 @@ sub isa_perl {
 
 #-> sub CPAN::Distribution::perl ;
 sub perl {
-    return $CPAN::Perl;
+    my ($self) = @_;
+    if (! $self) {
+        use Carp qw(carp);
+        carp __PACKAGE__ . "::perl was called without parameters.";
+    }
+    return CPAN::HandleConfig->safe_quote($CPAN::Perl);
 }
 
 
@@ -5208,10 +5216,11 @@ or
     if (my @prereq = $self->unsat_prereq){
       return 1 if $self->follow_prereqs(@prereq); # signal success to the queuerunner
     }
+    # XXX modulebuild / make
     if ($self->{modulebuild}) {
         $system = sprintf "%s %s", $self->_build_command(), $CPAN::Config->{mbuild_arg};
     } else {
-        $system = join " ", _make_command(), $CPAN::Config->{make_arg};
+        $system = join " ", $self->_make_command(), $CPAN::Config->{make_arg};
     }
     if (system($system) == 0) {
 	 $CPAN::Frontend->myprint("  $system -- OK\n");
@@ -5224,7 +5233,19 @@ or
 }
 
 sub _make_command {
-    return $CPAN::Config->{make} || $Config::Config{make} || 'make';
+    my ($self) = @_;
+    if ($self) {
+        return
+          CPAN::HandleConfig
+                ->safe_quote(
+                             $CPAN::Config->{make} || $Config::Config{make} || 'make'
+                            );
+    } else {
+        # Old style call, without object. Deprecated
+        Carp::confess("CPAN::_make_command() used as function. Don't Do That.");
+        return
+          safe_quote(undef, $CPAN::Config->{make} || $Config::Config{make} || 'make');
+    }
 }
 
 #-> sub CPAN::Distribution::follow_prereqs ;
@@ -5524,7 +5545,7 @@ sub test {
     if ($self->{modulebuild}) {
         $system = sprintf "%s test", $self->_build_command();
     } else {
-        $system = join " ", _make_command(), "test";
+        $system = join " ", $self->_make_command(), "test";
     }
     if (system($system) == 0) {
 	 $CPAN::Frontend->myprint("  $system -- OK\n");
@@ -5570,7 +5591,7 @@ sub clean {
     if ($self->{modulebuild}) {
         $system = sprintf "%s clean", $self->_build_command();
     } else {
-        $system  = join " ", _make_command(), "clean";
+        $system  = join " ", $self->_make_command(), "clean";
     }
     if (system($system) == 0) {
       $CPAN::Frontend->myprint("  $system -- OK\n");
@@ -5686,7 +5707,7 @@ sub install {
                          );
     } else {
         my($make_install_make_command) = $CPAN::Config->{make_install_make_command} ||
-            _make_command();
+            $self->_make_command();
         $system = sprintf("%s install %s",
                           $make_install_make_command,
                           $CPAN::Config->{make_install_arg},
@@ -5784,7 +5805,7 @@ sub _display_url {
 
     if ($web_browser_out) {
         # web browser found, run the action
-	my $browser = $CPAN::Config->{'lynx'};
+	my $browser = CPAN::HandleConfig->safe_quote($CPAN::Config->{'lynx'});
         $CPAN::Frontend->myprint(qq{system[$browser $url]})
 	  if $CPAN::DEBUG;
 	$CPAN::Frontend->myprint(qq{
@@ -5799,6 +5820,7 @@ with browser $browser
         # web browser not found, let's try text only
 	my $html_converter_out =
 	  CPAN::Distribution->_check_binary($self,$html_converter);
+        $html_converter_out = CPAN::HandleConfig->safe_quote($html_converter_out);
 
         if ($html_converter_out ) {
             # html2text found, run it
@@ -5930,6 +5952,7 @@ sub _build_command {
     if ($^O eq "MSWin32") { # special code needed at least up to
                             # Module::Build 0.2611 and 0.2706; a fix
                             # in M:B has been promised 2006-01-30
+                            
         my($perl) = $self->perl or $CPAN::Frontend->mydie("Couldn't find executable perl\n");
         return "$perl ./Build";
     }
@@ -6434,11 +6457,12 @@ sub as_string {
                      $sprintf3,
                      'DSLIP_STATUS',
                      @{$dslip}{qw(D S L I P DV SV LV IV PV)},
-                    );
+                    ) if $dslip->{D};
     my $local_file = $self->inst_file;
     unless ($self->{MANPAGE}) {
+        my $manpage;
         if ($local_file) {
-            $self->{MANPAGE} = $self->manpage_headline($local_file);
+            $manpage = $self->manpage_headline($local_file);
         } else {
             # If we have already untarred it, we should look there
             my $dist = $CPAN::META->instance('CPAN::Distribution',
@@ -6474,10 +6498,11 @@ sub as_string {
                 my $lfl_abs = File::Spec->catfile($dist->{build_dir},$lfl);
                 # warn "lfl_abs[$lfl_abs]";
                 if (-f $lfl_abs) {
-                    $self->{MANPAGE} = $self->manpage_headline($lfl_abs);
+                    $manpage = $self->manpage_headline($lfl_abs);
                 }
             }
         }
+        $self->{MANPAGE} = $manpage if $manpage;
     }
     my($item);
     for $item (qw/MANPAGE/) {
@@ -7693,6 +7718,10 @@ defined:
   build_cache        size of cache for directories to build modules
   build_dir          locally accessible directory to build modules
   cache_metadata     use serializer to cache metadata
+  commands_quote     prefered character to use for quoting external
+                     commands when running them. Defaults to double
+                     quote on Windows, single tick everywhere else;
+                     can be set to space to disable quoting
   cpan_home          local directory reserved for this package
   dontload_list      arrayref: modules in the list will not be
                      loaded by the CPAN::has_inst() routine
@@ -8218,6 +8247,13 @@ Before submitting a bug, please make sure that the traditional method
 of building a Perl module package from a shell by following the
 installation instructions of that package still works in your
 environment.
+
+=head1 SECURITY ADVICE
+
+This software enables you to upgrade software on your computer and so
+is inherently dangerous because the newly installed software may
+contain bugs and may alter the way your computer works or even make it
+unusable. Please consider backing up your data before every upgrade.
 
 =head1 AUTHOR
 

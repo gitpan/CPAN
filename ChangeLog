@@ -1,5 +1,57 @@
+2006-03-06  k
+
+	* README, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz,
+	   t/README.shell.txt: fetch the distro from CPAN and take it 
+	  under version control; explain the reaoning in t/README.shell.t
+	* Changes, Todo, lib/CPAN.pm: prepare 1.87_51
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm, lib/CPAN/Tarzip.pm: move 
+	  safe_quote to HandleConfig; document commands_quote
+	* lib/CPAN/FirstTime.pm: s/100/300/
+	* t/30shell.t: speciy the requirement for tab completion more 
+	  precicely: it is not ReadKey but one of the ReadLine packages
+	* related/Bundle-CPAN/CPAN.pm: readline cannot be a bundle member 
+	  because of its irregular behaviour wrt require: one needs to 
+	  C<require Term::ReadLine::readline> in order to get he package 
+	  C<readline> and this cannot be mapped to bundle files except by 
+	  naming the distro directly
+	* related/Bundle-CPAN/Makefile.PL: prepare a new Bundle::CPAN 
+	  release
+	* related/Bundle-CPAN/Makefile.PL: prepare a new Bundle::CPAN 
+	  release
+	* related/Bundle-CPAN/CPAN.pm: prepare a new Bundle::CPAN release
+	* related/Bundle-CPAN/Makefile.PL: prepare a new Bundle::CPAN 
+	  release
+	* related/Bundle-CPAN/Makefile.PL: prepare a new Bundle::CPAN 
+	  release
+	* related/Bundle-CPAN/Makefile.PL: prepare a new Bundle::CPAN 
+	  release
+	* related/Bundle-CPAN/Makefile.PL: prepare a new Bundle::CPAN 
+	  release
+	* related/Bundle-CPAN/Makefile.PL: prepare a new Bundle::PAN 
+	  release
+
+2006-03-05  k
+
+	* related/Bundle-CPAN/CPAN.pm: add File::Which and readline and 
+	  add a comment on Readline
+	* lib/CPAN.pm: now we pass make test again
+	* lib/CPAN.pm: applied a patch from Max Maischein to fix commands 
+	  with spaces in them
+	* lib/CPAN.pm: do not print dslip if it is empty
+
+2006-02-28  k
+
+	* Todo: bugreport
+	* patches/HandleConfig.diff, patches/sanity_check.t: two patches 
+	  from Max Maischein
+	* lib/CPAN.pm: cosmetics on the "o conf" command
+	* bin/cp-to-perl.pl: cp-to-perl.pl silence a perlwarning and 
+	  remove a self written one
+
 2006-02-27  k
 
+	* lib/CPAN.pm: security advice; fixes #17868 (hopefully)
 	* Changes: release notes for 1.87
 	* MANIFEST, README: forgot 30hell.pod in the manifest
 	* lib/CPAN.pm, t/30shell.pod, t/30shell.t: bugfix: when make clean 

@@ -1,3 +1,21 @@
+2006-03-06  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* feature request by Martin Sluka: the upgrade command, as described
+	further down; to catch the isa_perl issue, we must instantiate a
+	Distrostatus object instead of the bare "return" in line 5077. And test
+	thoroughly what happens the second time around and later when the user
+	finally says "force";
+
+	* feature request by Juergen Christoffel: have time stamps on the
+	history and a history command to see them
+
+2006-02-28  Andreas J Koenig  <akoenig@cellular.de>
+
+	* Bug: it seems that a user who is in /bin and has "." in the beginning
+	of the path gets ./sh as his shell from FirstTime. If we encounter . in
+	the path we should rather ignore it. But first we must verify the
+	behaviour. Reported by Slaven Rezic on behalf of Tino Schulze.
+
 2006-02-26  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* dslip status shows only 4 fields instead of 5. For license infos from

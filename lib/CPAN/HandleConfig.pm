@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 657 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 706 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -272,6 +272,59 @@ sub defaults {
     1;
 }
 
+=head2 C<< CLASS->safe_quote ITEM >>
+
+Quotes an item to become safe against spaces
+in shell interpolation. An item is enclosed
+in double quotes if:
+
+  - the item contains spaces in the middle
+  - the item does not start with a quote
+
+This happens to avoid shell interpolation
+problems when whitespace is present in
+directory names.
+
+This method uses C<commands_quote> to determine
+the correct quote. If C<commands_quote> is
+a space, no quoting will take place.
+
+
+if it starts an ends with the same quote character: leave it as it is
+
+if it contains no whitespace: leave it as it is
+
+if it contains whitespace, then
+
+if it contains quotes: better leave it as it is
+
+else: quote it with the correct quote type for the box we're on
+
+=cut
+
+{
+    # Instead of patching the guess, set commands_quote
+    # to the right value
+    my ($quotes,$use_quote)
+        = $^O eq 'MSWin32'
+            ? ('"', '"')
+                : (q<"'>, "'")
+                    ;
+
+    sub safe_quote {
+        my ($self, $command) = @_;
+        # Set up quote/default quote
+        my $quote = $CPAN::Config->{commands_quote} || $quotes;
+
+        if ($quote ne ' '
+            and $command =~ /\s/
+            and $command !~ /[$quote]/) {
+            return qq<$use_quote$command$use_quote>
+        }
+        return $command;
+    }
+}
+
 sub init {
     my($self,@args) = @_;
     undef $CPAN::Config->{'inhibit_startup_message'}; # lazy trick to
@@ -486,7 +539,7 @@ package
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 657 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 706 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {
