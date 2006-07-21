@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.87_51';
+$VERSION = '1.87_52';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -558,6 +558,22 @@ $META ||= CPAN->new; # In case we re-eval ourselves we need the ||
 # from here on only subs.
 ################################################################################
 
+sub suggest_myconfig () {
+  SUGGEST_MYCONFIG: if(!$INC{'CPAN/MyConfig.pm'}) {
+        $CPAN::Frontend->myprint("You don't seem to have a user ".
+                                 "configuration (MyConfig.pm) yet.\n");
+        my $new = ExtUtils::MakeMaker::prompt("Do you want to create a ".
+                                              "user configuration now? (Y/n)",
+                                              "yes");
+        if($new =~ m{^y}i) {
+            CPAN::Shell->mkmyconfig();
+            return &checklock;
+        } else {
+            $CPAN::Frontend->mydie("OK, giving up.");
+        }
+    }
+}
+
 #-> sub CPAN::all_objects ;
 sub all_objects {
     my($mgr,$class) = @_;
@@ -635,36 +651,37 @@ You may want to kill it and delete the lockfile, maybe. On UNIX try:
     my $dotcpan = $CPAN::Config->{cpan_home};
     eval { File::Path::mkpath($dotcpan);};
     if ($@) {
-      # A special case at least for Jarkko.
-      my $firsterror = $@;
-      my $seconderror;
-      my $symlinkcpan;
-      if (-l $dotcpan) {
-	$symlinkcpan = readlink $dotcpan;
-	die "readlink $dotcpan failed: $!" unless defined $symlinkcpan;
-	eval { File::Path::mkpath($symlinkcpan); };
-	if ($@) {
-	  $seconderror = $@;
-	} else {
-	  $CPAN::Frontend->mywarn(qq{
+        # A special case at least for Jarkko.
+        my $firsterror = $@;
+        my $seconderror;
+        my $symlinkcpan;
+        if (-l $dotcpan) {
+            $symlinkcpan = readlink $dotcpan;
+            die "readlink $dotcpan failed: $!" unless defined $symlinkcpan;
+            eval { File::Path::mkpath($symlinkcpan); };
+            if ($@) {
+                $seconderror = $@;
+            } else {
+                $CPAN::Frontend->mywarn(qq{
 Working directory $symlinkcpan created.
 });
-	}
-      }
-      unless (-d $dotcpan) {
-	my $diemess = qq{
+            }
+        }
+        unless (-d $dotcpan) {
+            my $mess = qq{
 Your configuration suggests "$dotcpan" as your
 CPAN.pm working directory. I could not create this directory due
 to this error: $firsterror\n};
-	$diemess .= qq{
+            $mess .= qq{
 As "$dotcpan" is a symlink to "$symlinkcpan",
 I tried to create that, but I failed with this error: $seconderror
 } if $seconderror;
-	$diemess .= qq{
+            $mess .= qq{
 Please make sure the directory exists and is writable.
 };
-	$CPAN::Frontend->mydie($diemess);
-      }
+            $CPAN::Frontend->myprint($mess);
+            return suggest_myconfig;
+        }
     } # $@ after eval mkpath $dotcpan
     my $fh;
     unless ($fh = FileHandle->new(">$lockfile")) {
@@ -684,19 +701,8 @@ points to a directory where you can write a .lock file. You can set
 this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
 \@INC path;
 });
-            if(!$INC{'CPAN/MyConfig.pm'}) {
-                $CPAN::Frontend->myprint("You don't seem to have a user ".
-                                         "configuration (MyConfig.pm) yet.\n");
-                my $new = ExtUtils::MakeMaker::prompt("Do you want to create a ".
-                                                      "user configuration now? (Y/n)",
-                                                      "yes");
-                if($new =~ m{^y}i) {
-                    CPAN::Shell->mkmyconfig();
-                    return &checklock;
-                }
-            }
+            return suggest_myconfig;
 	}
-	$CPAN::Frontend->mydie("Could not open >$lockfile: $!");
     }
     $fh->print($$, "\n");
     $fh->print(hostname(), "\n");
@@ -834,7 +840,7 @@ sub has_usable {
                                    sub {require File::HomeDir;
                                         unless (File::HomeDir->VERSION >= 0.52){
                                             for ("Will not use File::HomeDir, need 0.52\n") {
-                                                warn $_;
+                                                $CPAN::Frontend->mywarn($_);
                                                 die $_;
                                             }
                                         }
@@ -913,7 +919,9 @@ sub has_inst {
             sleep 2;
         }
     } elsif ($mod eq "Module::Signature"){
-	unless ($Have_warned->{"Module::Signature"}++) {
+        if (not $CPAN::Config->{check_sigs}) {
+            # they do not want us:-(
+        } elsif (not $Have_warned->{"Module::Signature"}++) {
 	    # No point in complaining unless the user can
 	    # reasonably install and use it.
 	    if (eval { require Crypt::OpenPGP; 1 } ||
@@ -2527,7 +2535,8 @@ sub localize {
         } else {
             # empty file from a previous unsuccessful attempt to download it
             unlink $aslocal or
-                $CPAN::Frontend->mydie("Found a zero-length '$aslocal' that I could not remove.");
+                $CPAN::Frontend->mydie("Found a zero-length '$aslocal' that I ".
+                                       "could not remove.");
         }
     }
     my($restore) = 0;
@@ -4469,25 +4478,26 @@ EOF
     File::Path::rmtree("tmp");
 
     $self->safe_chdir($packagedir);
-    if ($CPAN::META->has_inst("Module::Signature")) {
-        if (-f "SIGNATURE") {
-            $self->debug("Module::Signature is installed, verifying") if $CPAN::DEBUG;
-            my $rv = Module::Signature::verify();
-            if ($rv != Module::Signature::SIGNATURE_OK() and
-                $rv != Module::Signature::SIGNATURE_MISSING()) {
-                $CPAN::Frontend->myprint(
-                                         qq{\nSignature invalid for }.
-                                         qq{distribution file. }.
-                                         qq{Please investigate.\n\n}.
-                                         $self->as_string,
-                                         $CPAN::META->instance(
-                                                               'CPAN::Author',
-                                                               $self->cpan_userid,
-                                                              )->as_string
-                                        );
+    if ($CPAN::Config->{check_sigs}) {
+        if ($CPAN::META->has_inst("Module::Signature")) {
+            if (-f "SIGNATURE") {
+                $self->debug("Module::Signature is installed, verifying") if $CPAN::DEBUG;
+                my $rv = Module::Signature::verify();
+                if ($rv != Module::Signature::SIGNATURE_OK() and
+                    $rv != Module::Signature::SIGNATURE_MISSING()) {
+                    $CPAN::Frontend->myprint(
+                                             qq{\nSignature invalid for }.
+                                             qq{distribution file. }.
+                                             qq{Please investigate.\n\n}.
+                                             $self->as_string,
+                                             $CPAN::META->instance(
+                                                                   'CPAN::Author',
+                                                                   $self->cpan_userid,
+                                                                  )->as_string
+                                            );
 
-                my $wrap =
-                    sprintf(qq{I'd recommend removing %s. Its signature
+                    my $wrap =
+                        sprintf(qq{I'd recommend removing %s. Its signature
 is invalid. Maybe you have configured your 'urllist' with
 a bad URL. Please check this array with 'o conf urllist', and
 retry. For more information, try opening a subshell with
@@ -4495,20 +4505,22 @@ retry. For more information, try opening a subshell with
 and there run
   cpansign -v
 },
-                            $self->{localfile},
-                            $self->pretty_id,
-                           );
-                $self->{signature_verify} = CPAN::Distrostatus->new("NO");
-                $CPAN::Frontend->mywarn(Text::Wrap::wrap("","",$wrap));
-                $CPAN::Frontend->mysleep(5) if $CPAN::Frontend->can("mysleep");
+                                $self->{localfile},
+                                $self->pretty_id,
+                               );
+                    $self->{signature_verify} = CPAN::Distrostatus->new("NO");
+                    $CPAN::Frontend->mywarn(Text::Wrap::wrap("","",$wrap));
+                    $CPAN::Frontend->mysleep(5) if $CPAN::Frontend->can("mysleep");
+                } else {
+                    $self->{signature_verify} = CPAN::Distrostatus->new("YES");
+                    $self->debug("Module::Signature has verified") if $CPAN::DEBUG;
+                }
             } else {
-                $self->{signature_verify} = CPAN::Distrostatus->new("YES");
+                $CPAN::Frontend->myprint(qq{Package came without SIGNATURE\n\n});
             }
         } else {
-            $CPAN::Frontend->myprint(qq{Package came without SIGNATURE\n\n});
+            $self->debug("Module::Signature is NOT installed") if $CPAN::DEBUG;
         }
-    } else {
-	$self->debug("Module::Signature is NOT installed") if $CPAN::DEBUG;
     }
     $self->safe_chdir($builddir);
     return if $CPAN::Signal;
@@ -4749,15 +4761,16 @@ sub readme {
 
     my $fh_pager = FileHandle->new;
     local($SIG{PIPE}) = "IGNORE";
-    $fh_pager->open("|$CPAN::Config->{'pager'}")
-	or die "Could not open pager $CPAN::Config->{'pager'}: $!";
+    my $pager = $CPAN::Config->{'pager'} || "cat";
+    $fh_pager->open("|$pager")
+	or die "Could not open pager $pager\: $!";
     my $fh_readme = FileHandle->new;
     $fh_readme->open($local_file)
 	or $CPAN::Frontend->mydie(qq{Could not open "$local_file": $!});
     $CPAN::Frontend->myprint(qq{
 Displaying file
   $local_file
-with pager "$CPAN::Config->{'pager'}"
+with pager "$pager"
 });
     sleep 2;
     $fh_pager->print(<$fh_readme>);
@@ -4844,11 +4857,13 @@ sub CHECKSUM_check_file {
 
     $sloppy ||= 0;
     $self->debug("chk_file[$chk_file]sloppy[$sloppy]") if $CPAN::DEBUG;
-    if ($CPAN::META->has_inst("Module::Signature") and Module::Signature->VERSION >= 0.26) {
-	$self->debug("Module::Signature is installed, verifying");
-	$self->SIG_check_file($chk_file);
-    } else {
-	$self->debug("Module::Signature is NOT installed");
+    if ($CPAN::Config->{check_sigs}) {
+        if ($CPAN::META->has_inst("Module::Signature") and Module::Signature->VERSION >= 0.26) {
+            $self->debug("Module::Signature is installed, verifying");
+            $self->SIG_check_file($chk_file);
+        } else {
+            $self->debug("Module::Signature is NOT installed");
+        }
     }
 
     $file = $self->{localfile};
@@ -5370,6 +5385,11 @@ sub read_yaml {
             $CPAN::Frontend->mywarn("Error while parsing META.yml: $@");
             return;
         }
+        if (not exists $self->{yaml_content}{dynamic_config}
+            or $self->{yaml_content}{dynamic_config}
+           ) {
+            $self->{yaml_content} = undef;
+        }
     }
     $self->debug("yaml_content[$self->{yaml_content}]") if $CPAN::DEBUG;
     return $self->{yaml_content};
@@ -5864,13 +5884,14 @@ saved output to %s\n},
                 or $CPAN::Frontend->mydie(qq{Could not open "$tmpin": $!});
             my $fh_pager = FileHandle->new;
             local($SIG{PIPE}) = "IGNORE";
-            $fh_pager->open("|$CPAN::Config->{'pager'}")
+            my $pager = $CPAN::Config->{'pager'} || "cat";
+            $fh_pager->open("|pager")
                 or $CPAN::Frontend->mydie(qq{
-Could not open pager $CPAN::Config->{'pager'}: $!});
+Could not open pager $pager\: $!});
             $CPAN::Frontend->myprint(qq{
 Displaying URL
   $url
-with pager "$CPAN::Config->{'pager'}"
+with pager "$pager"
 });
             sleep 2;
             $fh_pager->print(<FH>);
@@ -7722,6 +7743,7 @@ defined:
                      commands when running them. Defaults to double
                      quote on Windows, single tick everywhere else;
                      can be set to space to disable quoting
+  check_sigs         if signatures should be verified
   cpan_home          local directory reserved for this package
   dontload_list      arrayref: modules in the list will not be
                      loaded by the CPAN::has_inst() routine
@@ -7868,6 +7890,9 @@ command-line F<gpg> tool installed.
 
 You will also need to be able to connect over the Internet to the public
 keyservers, like pgp.mit.edu, and their port 11731 (the HKP protocol).
+
+The configuration parameter check_sigs is there to turn signature
+checking on or off.
 
 =head1 EXPORT
 
@@ -8228,9 +8253,8 @@ nice about obeying that variable as well):
 
 =item 14)
 
-I only know the usual options for ExtUtils::MakeMaker(Module::Build),
-how do I find out the corresponding options in
-Module::Build(ExtUtils::MakeMaker)?
+How do I create a Module::Build based Build.PL derived from an 
+ExtUtils::MakeMaker focused Makefile.PL?
 
 http://search.cpan.org/search?query=Module::Build::Convert
 

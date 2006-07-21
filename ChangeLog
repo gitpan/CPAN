@@ -1,5 +1,65 @@
+2006-07-21  k
+
+	* Makefile.PL, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm: support for check_sigs parameter
+	* related/Bundle-CPAN/MANIFEST: we need to test the validity of 
+	  the sig before uploading
+	* related/Bundle-CPAN/MANIFEST, related/Bundle-CPAN/t, 
+	  related/Bundle-CPAN/t/00signature.t: we need to test the 
+	  validity of the sig before uploading
+	* related/Bundle-CPAN/CPAN.pm, related/Bundle-CPAN/Makefile.PL: 
+	  remove Module::Signature as prereq and update ReadLine; add a 
+	  release target to the Makefile
+
+2006-07-12  k
+
+	* Makefile.PL, Todo: comments
+
+2006-04-26  k
+
+	* lib/CPAN.pm: honour the spirit of META.yml:dynamic_config
+	* Todo, patches/enzer-matisse-CPAN-1.87.patch: got a patch from 
+	  Matisse Enzer
+
+2006-04-19  k
+
+	* Todo: notes
+	* lib/CPAN.pm: applied a patch by Steven Schubiger to the docs 
+	  about Module::Build::Convert
+
+2006-04-14  k
+
+	* Todo: blah
+
+2006-03-17  k
+
+	* lib/CPAN.pm: since #18196 is resolved now, remove the local($_) 
+	  again
+
+2006-03-16  k
+
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm, lib/CPAN/Tarzip.pm, 
+	  t/12cpan.t: make test 12 wor again since we commented some 
+	  TestConfig varibles out to have less Linux centrism; and 
+	  inspired by RT ticket #18196 I added another test to verify that 
+	  $_ surives a call to xpand
+
+2006-03-12  k
+
+	* Todo: comment
+	* Todo, lib/CPAN/HandleConfig.pm: Vassilii in #18011 suggests 
+	  propaating erros during loading of Config files. I think, the 
+	  suggestion boils dow to this change in the trunk (untested!)
+
+2006-03-10  k
+
+	* t/CPAN/TestConfig.pm: rid of external programs in TestConfig 
+	  because they may provoe warnings on other systems than mine
+
 2006-03-06  k
 
+	* lib/CPAN.pm: address #18011: suggest_myconfig as a method to 
+	  convince new users that we do not bite
 	* README, 
 	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz,
 	   t/README.shell.txt: fetch the distro from CPAN and take it 

@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 706 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 725 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -12,10 +12,12 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 706 $,4)/1000000 + 5.4;
 );
 
 %keys = map { $_ => undef } (
+                             #  allow_unauthenticated ?? some day...
                              "build_cache",
                              "build_dir",
                              "bzip2",
                              "cache_metadata",
+                             "check_sigs",
                              "commandnumber_in_prompt",
                              "cpan_home",
                              "curl",
@@ -290,7 +292,7 @@ the correct quote. If C<commands_quote> is
 a space, no quoting will take place.
 
 
-if it starts an ends with the same quote character: leave it as it is
+if it starts and ends with the same quote character: leave it as it is
 
 if it contains no whitespace: leave it as it is
 
@@ -372,8 +374,16 @@ sub require_myconfig_or_config () {
     my $home = home();
     unshift @INC, File::Spec->catdir($home,'.cpan');
     eval { require CPAN::MyConfig };
+    my $err_myconfig = $@;
+    if ($err_myconfig and $err_myconfig !~ m#locate CPAN/MyConfig\.pm#) {
+        die "Error while requiring CPAN::MyConfig:\n$err_myconfig";
+    }
     unless ($INC{"CPAN/MyConfig.pm"}) { # this guy has settled his needs already
       eval {require CPAN::Config;}; # not everybody has one
+      my $err_config = $@;
+      if ($err_config and $err_config !~ m#locate CPAN/Config\.pm#) {
+          die "Error while requiring CPAN::Config:\n$err_config";
+      }
     }
 }
 
@@ -454,12 +464,12 @@ sub missing_config_data {
          "cache_metadata",
          "cpan_home",
          "ftp_proxy",
-         "gzip",
+         #"gzip",
          "http_proxy",
          "index_expire",
          "inhibit_startup_message",
          "keep_source_where",
-         "make",
+         #"make",
          "make_arg",
          "make_install_arg",
          "makepl_arg",
@@ -468,11 +478,11 @@ sub missing_config_data {
          "mbuild_install_build_command",
          "mbuildpl_arg",
          "no_proxy",
-         "pager",
+         #"pager",
          "prerequisites_policy",
          "scan_cache",
-         "tar",
-         "unzip",
+         #"tar",
+         #"unzip",
          "urllist",
         ) {
         next unless exists $keys{$_};
@@ -539,7 +549,7 @@ package
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 706 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 725 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {

@@ -138,7 +138,7 @@ WriteMakefile(
                                         'Makefile no_CR META.yml setversion README '.
                                         'testdistros all chlog tardist'
                                        ),
-                       COMPRESS => 'gzip -9f'
+                       COMPRESS => 'gzip -9f',
                       },
              );
 
@@ -164,7 +164,7 @@ ALL_PERLS = /usr/bin/perl /usr/local/bin/perl \
 }
 
 sub postamble {
-  return "" unless $HAVE_MAKE; # dmake has unknown issues with my Makfile
+  return "" unless $HAVE_MAKE; # dmake has unknown issues with my Makefile
   q{
 setversion:
 	$(PERL) Makefile.PL --setversion
@@ -219,6 +219,9 @@ show-imported:
 # seems to need at least gnupg 1.4.2:
 upload-batch-signing-key:
 	gpg --send-key 450F89EC
+
+diff::
+	svn diff | less
 
 howto-release:
 	@$(ECHO) make ci dist \&\& make release
