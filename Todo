@@ -1,72 +1,10 @@
-2006-07-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+2006-07-22  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* From: Adam Kennedy <adam@phase-n.com>
-	  Subject: Re: CPAN.pm, META.yml, PREREQ_PM and dynamic dependencies
-	  To: "Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>
-	  Date: Tue, 11 Jul 2006 16:58:34 +1000
-	  
-	  Andreas
-	  
-	  dynamic_config was a major major design mistake, that they got
-	  entirely backwards. It relies on authors to not forget to set the
-	  dynamic flag, or it results in a failed install.
-	  
-	  But of course, nobody ever does remember to set it, and we have a huge
-	  number of existing modules that don't do this properly.
-	  
-	  There is no problem at all in us having the requires values considered
-	  to be "advisory" only, and then "localize" the dependencies.
-	  
-	  In short, the flag should have actually been the other way around
-	  (i.e. static_config) and so dynamic_config should ALWAYS be 1, unless
-	  you have it EXPLICITLY set to 0.
-	  
-	  We may or may not be able to get the spec revised later on, but in the
-	  mean time, dynamic_config should aways be 1 unless you have an
-	  explicit 0, not just when there is no requires field.
-	  
-	  This makes installation potentially a bit slower, and less able to
-	  shortcut, but it makes sure that installation remains correct.
+	* RT has 21 open and new tickets...
 
-	I just tried to make this a Todo item but then checked the code and
-	found it bahaves already as Adam suggests. ---> DONE
-
-2006-06-15  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* make signature-checking a feature that can be turned on or off and
-	which defaults to off. (requested by Adam Kennedy)
-
-2006-04-26  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* apply patch by
-
-From: "Enzer, Matisse BGI SF" <matisse.enzer@barclaysglobal.com>
-Subject: CPAN 1.87 - proposed patch to add Basic Auth for non-proxy URLs
-To: "Andreas Koenig" <andk@cpan.org>
-Cc: "Thalhammer, Jeffrey BGI SF" <Jeff.Thalhammer@barclaysglobal.com>
-Date: Tue, 25 Apr 2006 22:17:35 -0700
-
-	which is stored at patches/enzer-matisse-CPAN-1.87.patch
-
-2006-04-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* Recap branches:
-
-% svn ls https://pause.perl.org:5460/svn/cpanpm/branches
-1.80_56plus/
-1.87-dbmdeep-hackery/
-1.87-install-scripts/
-
-	Merge in 1.87-install-scripts without much further ado.
-
-	Try to recall how broken 1.87-dbmdeep-hackery was. It was very broken
-	but I do not remember details.
-
-	* dynamic_config => 1 means that I must throw away the contents of the
-	META.yml and if the key is missing, I must default it to 1. DONE in rev
-	720
-
-2006-04-02  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+	* branch 1.87-dbmdeep-hackery revive? It was very broken but I do not
+	remember details. Hint: DBM::Deep promises significant memory savings
+	and in that branch we tried to see how it can be made to work for us.
 
 	* Todo: JV suggests treating build_dependencies differently
 
@@ -113,6 +51,145 @@ Date: Tue, 25 Apr 2006 22:17:35 -0700
 	andreas
 
 
+	* feature request by Juergen Christoffel: have time stamps on the
+	history and a history command to see them
+
+	* Bug: it seems that a user who is in /bin and has "." in the beginning
+	of the path gets ./sh as his shell from FirstTime. If we encounter . in
+	the path we should rather ignore it. But first we must verify the
+	behaviour. Reported by Slaven Rezic on behalf of Tino Schulze.
+
+	* Todo: investigate what BUGHUNTING in Tarzip means "today".
+
+	* Todo: write a test for dot-cpan/Metadata usage
+
+	* http://www.flight.us/misc/FirstTime.pm_AStrebkov.htm and
+	http://groups.google.com/group/comp.lang.perl.misc/browse_thread/thread/a3f172fedc02c280/5814e81793793b64#5814e81793793b64
+	by Andrew Strebkov makes the URL selection nicer.
+
+	* prerequisites: require perl version xxx: we should not delete that
+	information but honour it.
+
+	* RT 17353: Flag outdated CPAN sites and move them to the end of the
+	list when they have reached 291 hours. (Note: $CPAN/authors/02STAMP)
+
+	* Locking: Linda W writes
+
+	>I'm not sure I understand the reason for the lock file
+	>placed in cpan_home.  If I have two different architectures
+	>with different build directories, I'm not sure I understand
+	>where the conflict is -- is it in storing/listing Bundles,
+	>the history file, the Metafile or the shared source?
+	
+	>I can understand private history, but the Bundles aren't
+	>updated often, the sources should be fairly static (unless
+	>new files are downloaded), The metafile would be updated about
+	>once a day (default).
+	
+	>If the build directories are separate, why would there be a
+	>need for locking more in interactive use vs. batch use?
+
+	And I promise to try out a more granular locking mechanism.
+
+	* Jim Cromie suggests: tweak shell to allow cpan> o conf init @sections
+	tweak FirstTime::init() interface to accept optional @sections
+
+	put various interactive Qs into groups of conditionals: if ( !@sections
+	     or grep /$this_sect_name/, @sections)
+
+	candidate sections: progs - external prog selection make - all make
+	options
+
+	* hr ================ no todos below this line ================ /hr
+
+	* How do I merge the branch 1.87-install-scripts into current code base?
+
+	The problem is, I do not remember where the branch started. Is this a
+	problem? I have the branches already checked out in ../SVN-branches/.
+
+	There I find the train hackathon result was in 689 and 686 was the copy
+	that started the branch.
+
+	So I guess the merge command would have to be
+
+	svn merge -r 686:689 https://pause.perl.org:5460/svn/cpanpm/branches/1.87-install-scripts
+
+	YES, this did it and is now to be checked in as rev. 733
+
+	'install ANDK/keepcool-0.344' works now like a charm, the stored script
+	name is even 'keepcool' and not 'keepcool-0.344'.
+
+2006-07-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* From: Adam Kennedy <adam@phase-n.com>
+	  Subject: Re: CPAN.pm, META.yml, PREREQ_PM and dynamic dependencies
+	  To: "Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>
+	  Date: Tue, 11 Jul 2006 16:58:34 +1000
+	  
+	  Andreas
+	  
+	  dynamic_config was a major major design mistake, that they got
+	  entirely backwards. It relies on authors to not forget to set the
+	  dynamic flag, or it results in a failed install.
+	  
+	  But of course, nobody ever does remember to set it, and we have a huge
+	  number of existing modules that don't do this properly.
+	  
+	  There is no problem at all in us having the requires values considered
+	  to be "advisory" only, and then "localize" the dependencies.
+	  
+	  In short, the flag should have actually been the other way around
+	  (i.e. static_config) and so dynamic_config should ALWAYS be 1, unless
+	  you have it EXPLICITLY set to 0.
+	  
+	  We may or may not be able to get the spec revised later on, but in the
+	  mean time, dynamic_config should aways be 1 unless you have an
+	  explicit 0, not just when there is no requires field.
+	  
+	  This makes installation potentially a bit slower, and less able to
+	  shortcut, but it makes sure that installation remains correct.
+
+	I just tried to make this a Todo item but then checked the code and
+	found it bahaves already as Adam suggests. ---> DONE
+
+2006-06-15  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* make signature-checking a feature that can be turned on or off and
+	which defaults to off. (requested by Adam Kennedy) DONE in rev. 726 or
+	so
+
+2006-04-26  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* apply patch by
+
+From: "Enzer, Matisse BGI SF" <matisse.enzer@barclaysglobal.com>
+Subject: CPAN 1.87 - proposed patch to add Basic Auth for non-proxy URLs
+To: "Andreas Koenig" <andk@cpan.org>
+Cc: "Thalhammer, Jeffrey BGI SF" <Jeff.Thalhammer@barclaysglobal.com>
+Date: Tue, 25 Apr 2006 22:17:35 -0700
+
+	which is stored at patches/enzer-matisse-CPAN-1.87.patch DONE in rev 729
+
+2006-04-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Recap branches:
+
+% svn ls https://pause.perl.org:5460/svn/cpanpm/branches
+1.80_56plus/
+1.87-dbmdeep-hackery/
+1.87-install-scripts/
+
+	Merge in 1.87-install-scripts without much further ado. DONE in rev. 733
+
+	Try to recall how broken 1.87-dbmdeep-hackery was. It was very broken
+	but I do not remember details.
+
+	* dynamic_config => 1 means that I must throw away the contents of the
+	META.yml and if the key is missing, I must default it to 1. DONE in rev
+	720
+
+2006-04-02  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
 2006-03-12  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* test the change that I made on Vassilii's suggestion in #18011,
@@ -124,22 +201,13 @@ Date: Tue, 25 Apr 2006 22:17:35 -0700
 	further down; to catch the isa_perl issue, we must instantiate a
 	Distrostatus object instead of the bare "return" in line 5077. And test
 	thoroughly what happens the second time around and later when the user
-	finally says "force";
-
-	* feature request by Juergen Christoffel: have time stamps on the
-	history and a history command to see them
-
-2006-02-28  Andreas J Koenig  <akoenig@cellular.de>
-
-	* Bug: it seems that a user who is in /bin and has "." in the beginning
-	of the path gets ./sh as his shell from FirstTime. If we encounter . in
-	the path we should rather ignore it. But first we must verify the
-	behaviour. Reported by Slaven Rezic on behalf of Tino Schulze.
+	finally says "force"; DONE in rev. 727
 
 2006-02-26  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* dslip status shows only 4 fields instead of 5. For license infos from
-	META.yml see http://www.thepierianspring.org/perl/meta/.
+	META.yml see http://www.thepierianspring.org/perl/meta/. DONE in rev.
+	669
 
 2006-02-24  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
@@ -154,11 +222,7 @@ Date: Tue, 25 Apr 2006 22:17:35 -0700
 
 	When we succeed with this, make a version that runs within the core of
 	perl, maybe filter out just those tests that do not require additional
-	resources.
-
-	* Todo: investigate what BUGHUNTING in Tarzip means "today".
-
-	* Todo: write a test for dot-cpan/Metadata usage
+	resources. REJECT: provides no extra utility
 
 	* To: Tyler MacDonald <tyler@yi.org>
 
@@ -188,34 +252,6 @@ Date: Tue, 25 Apr 2006 22:17:35 -0700
 	I don't know how I will fix that. Suggestions welcome. I put it into my
 	Todo file.
 	
-	* http://www.flight.us/misc/FirstTime.pm_AStrebkov.htm and
-	http://groups.google.com/group/comp.lang.perl.misc/browse_thread/thread/a3f172fedc02c280/5814e81793793b64#5814e81793793b64
-	by Andrew Strebkov makes the URL selection nicer.
-
-	* prerequisites: require perl version xxx: we should not delete that
-	information but honour it.
-
-	* RT 17353: Flag outdated CPAN sites and move them to the end of the
-	list when they have reached 291 hours. (Note: $CPAN/authors/02STAMP)
-
-	* Locking: Linda W writes
-
-	>I'm not sure I understand the reason for the lock file
-	>placed in cpan_home.  If I have two different architectures
-	>with different build directories, I'm not sure I understand
-	>where the conflict is -- is it in storing/listing Bundles,
-	>the history file, the Metafile or the shared source?
-	
-	>I can understand private history, but the Bundles aren't
-	>updated often, the sources should be fairly static (unless
-	>new files are downloaded), The metafile would be updated about
-	>once a day (default).
-	
-	>If the build directories are separate, why would there be a
-	>need for locking more in interactive use vs. batch use?
-
-	And I promise to try out a more granular locking mechanism.
-
 	* Feature request: when asking 'm /svn::notify/', then I would like to
 	see in the list which of the modules are installed locally. Was that
 	what Admin was doing?
@@ -226,9 +262,11 @@ Date: Tue, 25 Apr 2006 22:17:35 -0700
 
   color codes: green=uptodate, yellow=not uptodate, black=not installed
 
+	DONE in rev. 732
+
 	* upgrade: new command that does nothing but
 	CPAN::Shell->install(CPAN::Shell->r)? Do not forget that we still may
-	have perl distros in the "r" list.
+	have perl distros in the "r" list. DONE in rev. 727
 
 	* DBM::Deep for a hash behind $CPAN::META. See 2005-12-28 for issues and
 	branches/1.80_56plus for a few lines that probably went in the wrong
@@ -242,15 +280,6 @@ Date: Tue, 25 Apr 2006 22:17:35 -0700
 
 	* Bug: installing scripts without modules? How does it work? How
 	should it work? getting the latest version ad-hoc?
-
-	* Jim Cromie suggests: tweak shell to allow cpan> o conf init @sections
-	tweak FirstTime::init() interface to accept optional @sections
-
-	put various interactive Qs into groups of conditionals: if ( !@sections
-	     or grep /$this_sect_name/, @sections)
-
-	candidate sections: progs - external prog selection make - all make
-	options
 
 	* hr ================ no todos below this line ================ /hr
 

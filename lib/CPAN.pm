@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.87_52';
+$VERSION = '1.87_53';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -70,6 +70,7 @@ use vars qw($VERSION @EXPORT $AUTOLOAD $DEBUG $META $HAS_USABLE $term
              recompile
              shell
              test
+             upgrade
 	    );
 
 sub soft_chdir_with_alternatives ($);
@@ -209,7 +210,7 @@ ReadLine support %s
 	    my $command = shift @line;
 	    eval { CPAN::Shell->$command(@line) };
 	    warn $@ if $@;
-            if ($command =~ /^(make|test|install|force|notest|clean)$/) {
+            if ($command =~ /^(make|test|install|force|notest|clean|upgrade)$/) {
                 CPAN::Shell->failed($CPAN::CurrentCommandId,1);
             }
             soft_chdir_with_alternatives(\@cwd);
@@ -294,6 +295,7 @@ use strict;
                                     recompile
                                     reload
                                     test
+                                    upgrade
 );
 
 package CPAN::Index;
@@ -925,7 +927,12 @@ sub has_inst {
 	    # No point in complaining unless the user can
 	    # reasonably install and use it.
 	    if (eval { require Crypt::OpenPGP; 1 } ||
-		defined $CPAN::Config->{'gpg'}) {
+		(
+                 defined $CPAN::Config->{'gpg'}
+                 &&
+                 $CPAN::Config->{'gpg'} =~ /\S/
+                )
+               ) {
 		$CPAN::Frontend->myprint(qq{
   CPAN: Module::Signature security checks disabled because Module::Signature
   not installed.  Please consider installing the Module::Signature module.
@@ -1216,7 +1223,6 @@ Display Information $filler (ver $CPAN::VERSION)
  command  argument          description
  a,b,d,m  WORD or /REGEXP/  about authors, bundles, distributions, modules
  i        WORD or /REGEXP/  about any of the above
- r        NONE              report updatable modules
  ls       AUTHOR or GLOB    about files in the author's directory
     (with WORD being a module, bundle or author name or a distribution
     name of the form AUTHOR/DISTRIBUTION)
@@ -1233,6 +1239,7 @@ Pragmas
 
 Other
  h,?           display this menu       ! perl-code   eval a perl command
+ r             report module updates   upgrade       upgrade all modules
  o conf [opt]  set and query options   q             quit the cpan shell
  reload cpan   load CPAN.pm again      reload index  load newer indices
  autobundle    Snapshot                recent        latest CPAN uploads});
@@ -1628,6 +1635,12 @@ sub recompile {
                            # stop a package from recompiling,
                            # e.g. IO-1.12 when we have perl5.003_10
     }
+}
+
+#-> sub CPAN::Shell::upgrade ;
+sub upgrade {
+    my($self) = shift @_;
+    $self->install($self->r);
 }
 
 #-> sub CPAN::Shell::_u_r_common ;
@@ -2359,31 +2372,78 @@ sub config {
 
 sub get_basic_credentials {
     my($self, $realm, $uri, $proxy) = @_;
-    return unless $proxy;
     if ($USER && $PASSWD) {
-    } elsif (defined $CPAN::Config->{proxy_user} &&
-             defined $CPAN::Config->{proxy_pass}) {
-        $USER = $CPAN::Config->{proxy_user};
-        $PASSWD = $CPAN::Config->{proxy_pass};
+        return ($USER, $PASSWD);
+    }
+    if ( $proxy ) {
+        ($USER,$PASSWD) = $self->get_proxy_credentials();
     } else {
-        ExtUtils::MakeMaker->import(qw(prompt));
-        $USER = prompt("Proxy authentication needed!
+        ($USER,$PASSWD) = $self->get_non_proxy_credentials();
+    }
+    return($USER,$PASSWD);
+}
+
+sub get_proxy_credentials {
+    my $self = shift;
+    my ($user, $password);
+    if ( defined $CPAN::Config->{proxy_user} &&
+         defined $CPAN::Config->{proxy_pass}) {
+        $user = $CPAN::Config->{proxy_user};
+        $password = $CPAN::Config->{proxy_pass};
+        return ($user, $password);
+    }
+    my $username_prompt = "\nProxy authentication needed!
  (Note: to permanently configure username and password run
    o conf proxy_user your_username
    o conf proxy_pass your_password
- )\nUsername:");
+     )\nUsername:";
+    ($user, $password) =
+        _get_username_and_password_from_user($username_prompt);
+    return ($user,$password);
+}
+
+sub get_non_proxy_credentials {
+    my $self = shift;
+    my ($user,$password);
+    if ( defined $CPAN::Config->{username} &&
+         defined $CPAN::Config->{password}) {
+        $user = $CPAN::Config->{username};
+        $password = $CPAN::Config->{password};
+        return ($user, $password);
+    }
+    my $username_prompt = "\nAuthentication needed!
+     (Note: to permanently configure username and password run
+       o conf username your_username
+       o conf password your_password
+     )\nUsername:";
+        
+    ($user, $password) =
+        _get_username_and_password_from_user($username_prompt);
+    return ($user,$password);
+}
+
+sub _get_username_and_password_from_user {
+    my $self = shift;
+    my $username_message = shift;
+    my ($username,$password);
+
+    ExtUtils::MakeMaker->import(qw(prompt));
+    $username = prompt($username_message);
         if ($CPAN::META->has_inst("Term::ReadKey")) {
             Term::ReadKey::ReadMode("noecho");
-        } else {
-            $CPAN::Frontend->mywarn("Warning: Term::ReadKey seems not to be available, your password will be echoed to the terminal!\n");
         }
-        $PASSWD = prompt("Password:");
+    else {
+        $CPAN::Frontend->mywarn(
+            "Warning: Term::ReadKey seems not to be available, your password will be echoed to the terminal!\n"
+        );
+    }
+    $password = prompt("Password:");
+
         if ($CPAN::META->has_inst("Term::ReadKey")) {
             Term::ReadKey::ReadMode("restore");
         }
         $CPAN::Frontend->myprint("\n\n");
-    }
-    return($USER,$PASSWD);
+    return ($username,$password);
 }
 
 # mirror(): Its purpose is to deal with proxy authentication. When we
@@ -4407,14 +4467,15 @@ EOF
 	$self->untar_me($ct);
     } elsif ( $local_file =~ /\.zip(?!\n)\Z/i ) {
 	$self->unzip_me($ct);
-    } elsif ( $local_file =~ /\.pm(\.(gz|Z))?(?!\n)\Z/) {
-        $self->{was_uncompressed}++ unless $ct->gtest();
-        $self->debug("calling pm2dir for local_file[$local_file]") if $CPAN::DEBUG;
-	$self->pm2dir_me($local_file);
     } else {
-	$self->{archived} = "NO";
-        $self->safe_chdir($sub_wd);
-        return;
+        $self->{was_uncompressed}++ unless $ct->gtest();
+        $self->debug("calling pm2dir for local_file[$local_file]")
+	  if $CPAN::DEBUG;
+	$local_file = $self->handle_singlefile($local_file);
+#    } else {
+#	$self->{archived} = "NO";
+#        $self->safe_chdir($sub_wd);
+#        return;
     }
 
     # we are still in the tmp directory!
@@ -4582,6 +4643,61 @@ We\'ll try to build it with that Makefile then.
 
             # Writing our own Makefile.PL
 
+	    my $script = "";
+	    if ($self->{archived} eq "maybe_pl"){
+		my $fh = FileHandle->new;
+		my $script_file = File::Spec->catfile($packagedir,$local_file);
+		$fh->open($script_file)
+		  or Carp::croak("Could not open $script_file: $!");
+		local $/ = "\n";
+		# name parsen und prereq
+		my($state) = "poddir";
+		my($name, $prereq) = ("", "");
+		while (<$fh>){
+		    if ($state eq "poddir" && /^=head\d\s+(\S+)/) {
+			if ($1 eq 'NAME') {
+			    $state = "name";
+			} elsif ($1 eq 'PREREQUISITES') {
+			    $state = "prereq";
+			}
+		    } elsif ($state =~ m{^(name|prereq)$}) {
+			if (/^=/) {
+			    $state = "poddir";
+			} elsif (/^\s*$/) {
+			    # nop
+			} elsif ($state eq "name") {
+			    if ($name eq "") {
+				($name) = /^(\S+)/;
+				$state = "poddir";
+			    }
+			} elsif ($state eq "prereq") {
+			    $prereq .= $_;
+			}
+		    } elsif (/^=cut\b/) {
+			last;
+		    }
+		}
+		$fh->close;
+
+		chomp $prereq;
+		my($PREREQ_PM) = join("\n", map {
+		    s{.*<}{}; # strip X<...>
+		    s{>.*}{};
+		    " "x28 . "'$_' => 0,";
+		} split /\s*,\s*/, $prereq);
+
+		$script = "
+              EXE_FILES => ['$name'],
+              PREREQ_PM => {
+$PREREQ_PM
+                           },
+";
+
+		my $to_file = File::Spec->catfile($packagedir, $name);
+		rename $script_file, $to_file
+		  or die "Can't rename $script_file to $to_file: $!";
+	    }
+
             my $fh = FileHandle->new;
             $fh->open(">$mpl")
                 or Carp::croak("Could not open >$mpl: $!");
@@ -4591,8 +4707,9 @@ qq{# This Makefile.PL has been autogenerated by the module CPAN.pm
 # Autogenerated on: }.scalar localtime().qq{
 
 use ExtUtils::MakeMaker;
-WriteMakefile(NAME => q[$cf]);
-
+WriteMakefile(
+              NAME => q[$cf],$script
+             );
 });
             $fh->close;
         }
@@ -4624,9 +4741,15 @@ sub unzip_me {
     return;
 }
 
-sub pm2dir_me {
+sub handle_singlefile {
     my($self,$local_file) = @_;
-    $self->{archived} = "pm";
+
+    if ( $local_file =~ /\.pm(\.(gz|Z))?(?!\n)\Z/ ){
+	$self->{archived} = "pm";
+    } else {
+	$self->{archived} = "maybe_pl";
+    }
+
     my $to = File::Basename::basename($local_file);
     if ($to =~ s/\.(gz|Z)(?!\n)\Z//) {
         if (CPAN::Tarzip->new($local_file)->gunzip($to)) {
@@ -4638,6 +4761,7 @@ sub pm2dir_me {
         File::Copy::cp($local_file,".");
         $self->{unwrapped} = "YES";
     }
+    return $to;
 }
 
 #-> sub CPAN::Distribution::new ;
@@ -5035,7 +5159,7 @@ sub isa_perl {
 		  (
                    \d{3}(_[0-4][0-9])?
                    |
-                   \d*[24680]\.\d+
+                   \d+\.\d+
                   )
 		  \.tar[._-]gz
 		  (?!\n)\Z
@@ -5088,7 +5212,9 @@ or
 			       $self->isa_perl,
 			       $self->called_for,
 			       $self->id);
-        sleep 5; return;
+        $self->{make} = CPAN::Distrostatus->new("NO isa perl");
+        sleep 2;
+        return;
       }
     }
     $self->get;
@@ -5135,8 +5261,14 @@ or
         if (exists $self->{later} and length($self->{later})) {
             if ($self->unsat_prereq) {
                 push @e, $self->{later};
-            } else {
-                delete $self->{later};
+# RT ticket 18438 raises doubts if the deletion of {later} is valid.
+# YAML-0.53 triggered the later hodge-podge here, but my margin notes
+# are not sufficient to be sure if we really must/may do the delete
+# here. SO I accept the suggested patch for now. If we trigger a bug
+# again, I must go into deep contemplation about the {later} flag.
+
+#            } else {
+#                delete $self->{later};
             }
         }
 
@@ -6378,8 +6510,16 @@ sub as_glimpse {
         $color_on = Term::ANSIColor::color("green");
         $color_off = Term::ANSIColor::color("reset");
     }
-    push @m, sprintf("%-8s %s%-22s%s (%s)\n",
+    my $uptodateness = " ";
+    if ($class eq "Bundle") {
+    } elsif ($self->uptodate) {
+        $uptodateness = "=";
+    } elsif ($self->inst_version) {
+        $uptodateness = "<";
+    }
+    push @m, sprintf("%-7s %1s %s%-22s%s (%s)\n",
                      $class,
+                     $uptodateness,
                      $color_on,
                      $self->id,
                      $color_off,
@@ -6809,6 +6949,7 @@ use strict;
 
 1;
 
+
 __END__
 
 =head1 NAME
@@ -7085,6 +7226,11 @@ Another popular use for C<recompile> is to act as a rescue in case your
 perl breaks binary compatibility. If one of the modules that CPAN uses
 is in turn depending on binary compatibility (so you cannot run CPAN
 commands), then you should try the CPAN::Nox module for recovery.
+
+=head2 upgrade
+
+The C<upgrade> command first runs an C<r> command and then installs
+the newest versions of all modules that were listed by that.
 
 =head2 mkmyconfig
 

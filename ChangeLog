@@ -1,3 +1,26 @@
+2006-07-22  k
+
+	* Changes, lib/CPAN.pm: bugfix on "b" command: it clashed with the 
+	  new format of the "m" command output
+	* README: prepare for 1.87_53 release
+	* Todo: prepare for 1.87_53 release
+	* Todo, lib/CPAN.pm: result of a train hackathon with Slaven 
+	  Rezic: basic support for direct installation of scripts from the 
+	  shell
+	* Todo, lib/CPAN.pm: CPAN::Module::as_glimpse now indicates if a 
+	  module is not installed,installed,uptodate
+	* lib/CPAN.pm: supposedly fix #18438; apply fix provided by 
+	  requestor; document which doubts I have about this area
+	* Todo, lib/CPAN.pm: a slightly different fix to rt.cpan.org 
+	  #20168 than the supplied patch by David Golden: turn off that 
+	  warning if the user has intentionally disabled gpg
+	* MANIFEST, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: applied a patch 
+	  by matisse enzer to improve handling of proxies which demand 
+	  login
+	* Todo, lib/CPAN.pm: upgrade command needs the "failed" mode at 
+	  the end
+	* Changes, README, Todo, lib/CPAN.pm: support the upgrade command
+
 2006-07-21  k
 
 	* Makefile.PL, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
