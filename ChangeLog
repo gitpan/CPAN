@@ -1,3 +1,14 @@
+2006-07-23  k
+
+	* lib/CPAN.pm: remove debug code
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm: brrrr, what an enourmous typo
+	* Changes, Todo, lib/CPAN.pm: prepare _54
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: 
+	  fix #18165: new config option term_ornaments
+	* lib/CPAN/FirstTime.pm: fix #20272: FirstTime::init did not 
+	  preserve the space that signifies "disabled program"
+	* Changes: typos
+
 2006-07-22  k
 
 	* Changes, lib/CPAN.pm: bugfix on "b" command: it clashed with the 

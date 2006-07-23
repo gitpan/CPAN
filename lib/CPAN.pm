@@ -1,6 +1,6 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN;
-$VERSION = '1.87_53';
+$VERSION = '1.87_54';
 $VERSION = eval $VERSION;
 use strict;
 
@@ -134,6 +134,9 @@ sub shell {
             close $fh;
         }}
 	# $term->OUT is autoflushed anyway
+        for ($CPAN::Config->{term_ornaments}) {
+            $term->ornaments($_) if defined;
+        }
 	my $odef = select STDERR;
 	$| = 1;
 	select STDOUT;

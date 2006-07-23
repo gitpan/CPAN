@@ -2,7 +2,7 @@
 package CPAN::Mirrored::By;
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf "%.6f", substr(q$Rev: 725 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 742 $,4)/1000000 + 5.4;
 
 sub new { 
     my($self,@arg) = @_;
@@ -21,7 +21,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec;
 use vars qw($VERSION);
-$VERSION = sprintf "%.6f", substr(q$Rev: 725 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 742 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -275,7 +275,7 @@ Shall we use it as the general CPAN build and cache directory?
       my $progcall = $progname;
       # we don't need ncftp if we have ncftpget
       next if $progname eq "ncftp" && $CPAN::Config->{ncftpget} gt " ";
-      my $path = $CPAN::Config->{$progname} 
+      my $path = $CPAN::Config->{$progname}
 	  || $Config::Config{$progname}
 	      || "";
       if (File::Spec->file_name_is_absolute($path)) {
@@ -284,6 +284,8 @@ Shall we use it as the general CPAN build and cache directory?
 
 	# warn "Warning: configured $path does not exist\n" unless -e $path;
 	# $path = "";
+      } elsif ($path =~ /^\s+$/) {
+          # preserve disabled programs
       } else {
 	$path = '';
       }
@@ -420,6 +422,7 @@ Shall we use it as the general CPAN build and cache directory?
     $CPAN::Config->{inhibit_startup_message} = 0;
     $CPAN::Config->{getcwd}                  = 'cwd';
     $CPAN::Config->{ftp_passive}             = 1;
+    $CPAN::Config->{term_ornaments}          = 1;
 
     $CPAN::Frontend->myprint("\n\n");
     CPAN::HandleConfig->commit($configpm);
