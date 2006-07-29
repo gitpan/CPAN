@@ -1,3 +1,14 @@
+2006-07-29  k
+
+	* Changes, lib/CPAN.pm, t/30shell.t, 
+	  t/CPAN/modules/03modlist.data: document CPAN::Module::as_glimpse 
+	  changes and fix the case where we
+	  have no author or no distro and added some tests for these cases
+	* Todo, lib/CPAN.pm: round off scripts support so I could install 
+	  a large random selection of scripts; I have no plans yet for the 
+	  scripts command, so I leave it as experimental for now
+	* Changes, Todo: docs only
+
 2006-07-23  k
 
 	* lib/CPAN.pm: remove debug code
