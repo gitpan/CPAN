@@ -1,3 +1,21 @@
+2006-08-24  k
+
+	* README, lib/CPAN.pm: prepare 1.87_56
+	* Changes, Todo: prepare 1.87_56
+
+2006-08-23  k
+
+	* lib/CPAN.pm: small pod tweaks
+
+2006-08-19  k
+
+	* README, Todo, bin/cp-to-perl.pl: blah
+
+2006-08-07  dagolden
+
+	* lib/CPAN.pm: suppress "no termcap" warnings from 
+	  Term::Readline::ornament()
+
 2006-07-29  k
 
 	* Changes, lib/CPAN.pm, t/30shell.t, 
