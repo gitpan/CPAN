@@ -1,3 +1,19 @@
+2006-08-26  k
+
+	* Changes, Todo, lib/CPAN.pm: prepare 1.87_57
+	* lib/CPAN.pm: what is mandated for CPAN::Reporter is cheap for 
+	  CPAN too: extend strictness to the very first line
+	* lib/CPAN.pm: add CPAN::Reporter to reloadable modules
+
+2006-08-25  dagolden
+
+	* ., lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: 
+	  merge CPAN::Reporter support from CPAN-dagolden branch
+
+2006-08-25  k
+
+	* lib/CPAN.pm: tiny pod fixes
+
 2006-08-24  k
 
 	* README, lib/CPAN.pm: prepare 1.87_56

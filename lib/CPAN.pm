@@ -1,8 +1,8 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
-package CPAN;
-$VERSION = '1.87_56';
-$VERSION = eval $VERSION;
 use strict;
+package CPAN;
+$CPAN::VERSION = '1.87_57';
+$CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
 use CPAN::Version;
@@ -1528,8 +1528,18 @@ sub reload {
         my $redef = 0;
         chdir $CPAN::iCwd if $CPAN::iCwd; # may fail
         my $failed;
-      MFILE: for my $f (qw(CPAN.pm CPAN/HandleConfig.pm CPAN/FirstTime.pm CPAN/Tarzip.pm
-                      CPAN/Debug.pm CPAN/Version.pm)) {
+        my @relo = (
+                    "CPAN.pm",
+                    "CPAN/HandleConfig.pm",
+                    "CPAN/FirstTime.pm",
+                    "CPAN/Tarzip.pm",
+                    "CPAN/Debug.pm",
+                    "CPAN/Version.pm",
+                   );
+        if ($CPAN::Config->{test_report}) {
+            push @relo, "CPAN/Reporter.pm";
+        }
+      MFILE: for my $f (@relo) {
             local($SIG{__WARN__}) = paintdots_onreload(\$redef);
             $self->reload_this($f) or $failed++;
         }
@@ -1659,7 +1669,7 @@ sub scripts {
     my @hrefs;
     my $qrarg;
     if ($arg =~ s|^/(.+)/$|$1|) {
-        $qrarg = qr/$arg/;
+        $qrarg = eval 'qr/$arg/'; # hide construct from 5.004
     }
     for my $l ($p->links) {
         my $tag = shift @$l;
@@ -5774,7 +5784,14 @@ sub test {
     } else {
         $system = join " ", $self->_make_command(), "test";
     }
-    if (system($system) == 0) {
+    my $tests_ok;
+    if ( $CPAN::Config->{test_report} && 
+         $CPAN::META->has_inst("CPAN::Reporter") ) {
+            $tests_ok = CPAN::Reporter::test($self, $system);
+    } else {
+            $tests_ok = system($system) == 0;
+    }
+    if ( $tests_ok ) {
 	 $CPAN::Frontend->myprint("  $system -- OK\n");
 	 $CPAN::META->is_tested($self->{'build_dir'});
 	 $self->{make_test} = CPAN::Distrostatus->new("YES");
@@ -8018,6 +8035,7 @@ defined:
   tar                location of external program tar
   term_is_latin      if true internal UTF-8 is translated to ISO-8859-1
                      (and nonsense for characters outside latin range)
+  test_report        email test reports (if CPAN::Reporter is installed)
   unzip              location of external program unzip
   urllist	     arrayref to nearby CPAN sites (or equivalent locations)
   wait_list          arrayref to a wait server to try (See CPAN::WAIT)
@@ -8054,7 +8072,7 @@ works like the corresponding perl commands.
 
 =back
 
-=head2 Not on config variable getcwd
+=head2 Note on config variable getcwd
 
 CPAN.pm changes the current working directory often and needs to
 determine its own current working directory. Per default it uses
@@ -8368,7 +8386,7 @@ not using the private area.
 
 How to get a package, unwrap it, and make a change before building it?
 
-  look Sybase::Sybperl
+Have a look at the C<look> (!) command.
 
 =item 7)
 
@@ -8464,11 +8482,14 @@ decent command.
 
 How do I install a "DEVELOPER RELEASE" of a module?
 
-By default, CPAN will install the latest non-developer release of a module.
-If you want to install a dev release, you have to specify a partial path to
-the tarball you wish to install, like so:
+By default, CPAN will install the latest non-developer release of a
+module. If you want to install a dev release, you have to specify the
+partial path starting with the author id to the tarball you wish to
+install, like so:
 
     cpan> install KWILLIAMS/Module-Build-0.27_07.tar.gz
+
+Note that you can use the C<ls> command to get this path listed.
 
 =item 13)
 

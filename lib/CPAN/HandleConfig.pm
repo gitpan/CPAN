@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 740 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 758 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -59,6 +59,7 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 740 $,4)/1000000 + 5.4;
                              "tar",
                              "term_is_latin",
                              "term_ornaments",
+                             "test_report",
                              "unzip",
                              "urllist",
                              "username",
@@ -552,7 +553,7 @@ package
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 740 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 758 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {
