@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.87_57';
+$CPAN::VERSION = '1.87_58';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -1411,8 +1411,9 @@ sub i {
 
 #-> sub CPAN::Shell::o ;
 
-# CPAN::Shell::o and CPAN::Config::edit are closely related. 'o conf'
-# should have been called set and 'o debug' maybe 'set debug'
+# CPAN::Shell::o and CPAN::HandleConfig::edit are closely related. 'o
+# conf' calls through to CPAN::HandleConfig::edit. 'o conf' should
+# have been called 'set' and 'o debug' maybe 'set debug' or 'debug'
 sub o {
     my($self,$o_type,@o_what) = @_;
     $DB::single = 1;
@@ -4446,7 +4447,11 @@ sub uptodate {
     my $c;
     foreach $c ($self->containsmods) {
         my $obj = CPAN::Shell->expandany($c);
-        return 0 unless $obj->uptodate;
+        unless ($obj->uptodate){
+            my $id = $self->pretty_id;
+            $self->debug("$id not uptodate due to $c") if $CPAN::DEBUG;
+            return 0;
+        }
     }
     return 1;
 }
@@ -6925,6 +6930,7 @@ sub test   {
 #-> sub CPAN::Module::uptodate ;
 sub uptodate {
     my($self) = @_;
+    local($_); # protect against a bug in MakeMaker 6.17
     my($latest) = $self->cpan_version;
     $latest ||= 0;
     my($inst_file) = $self->inst_file;
@@ -6977,6 +6983,9 @@ sub inst_file {
     my($dir,@packpath);
     @packpath = split /::/, $self->{ID};
     $packpath[-1] .= ".pm";
+    if (@packpath == 1 && $packpath[0] eq "readline.pm") {
+        unshift @packpath, "Term", "ReadLine"; # historical reasons
+    }
     foreach $dir (@INC) {
 	my $pmfile = File::Spec->catfile($dir,@packpath);
 	if (-f $pmfile){

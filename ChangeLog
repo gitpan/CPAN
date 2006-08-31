@@ -1,3 +1,34 @@
+2006-08-31  k
+
+	* Changes, Todo, lib/CPAN/FirstTime.pm: preparing 1.87_58
+
+2006-08-30  k
+
+	* Todo, lib/CPAN/FirstTime.pm: closer to a release? Need more 
+	  testing at home
+
+2006-08-29  k
+
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm, t/30shell.t: work in 
+	  progress to get "o conf init MATCH" working; all tests pass at 
+	  the moment but chances of breakage are high; the initial 
+	  question for manual/automatic configuration has now opposite 
+	  meaning and defaults with yes to an affirmation to autoconfig, 
+	  so only a tiny change to 30shell.t was needed
+
+2006-08-28  k
+
+	* lib/CPAN.pm: trying to special-case readline so it behaves like 
+	  a normal module
+
+2006-08-27  k
+
+	* Changes: note the "protect against a bug in MakeMaker 6.17" 
+	  repair
+	* lib/CPAN.pm: protect against a bug in MakeMaker 6.17
+	* README, t/12cpan.t: properly comment the tests so we do not have 
+	  to guess what exactly failed
+
 2006-08-26  k
 
 	* Changes, Todo, lib/CPAN.pm: prepare 1.87_57
