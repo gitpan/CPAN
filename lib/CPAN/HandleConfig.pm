@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 758 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 788 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -53,6 +53,8 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 758 $,4)/1000000 + 5.4;
                              "password",
                              "prefer_installer",
                              "prerequisites_policy",
+                             "proxy_pass",
+                             "proxy_user",
                              "scan_cache",
                              "shell",
                              "show_upload_date",
@@ -90,7 +92,7 @@ sub edit {
     $o = shift @args;
     $DB::single = 1;
     if($can{$o}) {
-	$self->$o(args => \@args);
+	$self->$o(args => \@args); # o conf init => sub init => sub load
 	return 1;
     } else {
         CPAN->debug("o[$o]") if $CPAN::DEBUG;
@@ -446,16 +448,18 @@ sub load {
 
     }
     local($") = ", ";
-    $CPAN::Frontend->myprint(<<END) if $redo && ! $theycalled;
+    if ($redo && ! $theycalled){
+        $CPAN::Frontend->myprint(<<END);
 Sorry, we have to rerun the configuration dialog for CPAN.pm due to
 the following indispensable but missing parameters:
 
 @miss
 END
+        $args{args} = ["\\b".join("|",@miss)."\\b"];
+    }
     $CPAN::Frontend->myprint(qq{
 $configpm initialized.
 });
-
     sleep 2;
     CPAN::FirstTime::init($configpm, %args);
 }
@@ -522,13 +526,25 @@ sub cpl {
     if (
 	defined($words[2])
 	and
+        $words[2] =~ /list$/
+        and
 	(
-	 $words[2] =~ /list$/ && @words == 3
+	 @words == 3
 	 ||
-	 $words[2] =~ /list$/ && @words == 4 && length($word)
+	 @words == 4 && length($word)
 	)
        ) {
 	return grep /^\Q$word\E/, qw(splice shift unshift pop push);
+    } elsif (defined($words[2])
+             and
+             $words[2] eq "init"
+             and
+            (
+             @words == 3
+             ||
+             @words == 4 && length($word)
+            )) {
+	return sort grep /^\Q$word\E/, keys %keys;
     } elsif (@words >= 4) {
 	return ();
     }
@@ -553,7 +569,7 @@ package
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 758 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 788 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {

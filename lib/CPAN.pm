@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.87_58';
+$CPAN::VERSION = '1.87_59';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -26,8 +26,17 @@ use Safe ();
 use Sys::Hostname qw(hostname);
 use Text::ParseWords ();
 use Text::Wrap ();
-no lib "."; # we need to run chdir all over and we would get at wrong
-            # libraries there
+
+# we need to run chdir all over and we would get at wrong libraries
+# there
+BEGIN {
+    if (File::Spec->can("rel2abs")) {
+        for my $inc (@INC) {
+            $inc = File::Spec->rel2abs($inc);
+        }
+    }
+}
+no lib ".";
 
 require Mac::BuildTools if $^O eq 'MacOS';
 
@@ -1414,6 +1423,7 @@ sub i {
 # CPAN::Shell::o and CPAN::HandleConfig::edit are closely related. 'o
 # conf' calls through to CPAN::HandleConfig::edit. 'o conf' should
 # have been called 'set' and 'o debug' maybe 'set debug' or 'debug'
+# 'o conf XXX' calls ->edit in CPAN/HandleConfig.pm
 sub o {
     my($self,$o_type,@o_what) = @_;
     $DB::single = 1;
@@ -7989,7 +7999,9 @@ added to the search path of the CPAN module before the use() or
 require() statements.
 
 The configuration dialog can be started any time later again by
-issuing the command C< o conf init > in the CPAN shell.
+issuing the command C< o conf init > in the CPAN shell. A subset of
+the configuration dialog can be run by issuing C<o conf init WORD>
+where WORD is any valid config variable or a regular expression.
 
 Currently the following keys in the hash reference $CPAN::Config are
 defined:

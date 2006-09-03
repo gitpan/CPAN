@@ -1,5 +1,53 @@
+2006-09-03  k
+
+	* Changes, README, lib/CPAN.pm: preparing 1.87_59
+	* Todo, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: fixed the 
+	  recently introduced bug that broke 30shell.t and really was a 
+	  bug introduced by sloppy refactoring
+	* Todo: broken since 784 or so,,, I have a look later
+	* Makefile.PL, lib/CPAN/HandleConfig.pm: 784 broke everything but 
+	  it was only a missing condition
+	* Todo, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: use 'o 
+	  conf init MATCH' when only a few mandatory variables are
+	  missing
+	* Todo, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm, 
+	  t/30shell.t: finished o conf init MATCH support and their tests
+
+2006-09-02  k
+
+	* Todo, lib/CPAN/FirstTime.pm, t/30shell.t: add another three 
+	  variables to the tests
+	* lib/CPAN/FirstTime.pm, t/30shell.t: add o-conf-init-getcwd
+	* lib/CPAN/FirstTime.pm, t/30shell.t:  and this version once again 
+	  passes all tests 
+	* lib/CPAN/FirstTime.pm, t/30shell.t: tune the ordering a little 
+	  and add more variables to the test
+	* lib/CPAN/FirstTime.pm, t/30shell.t: getting the last variables 
+	  into the dialog. One variable more. the yn prompt subroutine to 
+	  simplify yn handling
+	* Todo, lib/CPAN/FirstTime.pm: short circuit "o conf init NOVAR" 
+	  and support "o conf init VAR" by turing it in the REGEX that 
+	  makes sense
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm, t/30shell.t: small pod 
+	  for "o conf init VAR"
+	* lib/CPAN/HandleConfig.pm, t/30shell.t: support completion for "o 
+	  conf init variable"
+
+2006-09-01  k
+
+	* Todo, lib/CPAN/FirstTime.pm, t/30shell.t: many tests for o conf 
+	  init match; some minor cleanups; many questions
+	* Makefile.PL, Todo, lib/CPAN.pm: let compress ask again before 
+	  overwriting a dist
+	* Todo, lib/CPAN.pm: replace "no lib ." with rel2absing the INC if 
+	  rel2abs is available
+	  (suggested by Slaven Rezic)
+
 2006-08-31  k
 
+	* Todo: I nearly would have forgotten the most important todo item 
+	  related to o conf init MATCH
+	* Changes: improved wording for the release notes
 	* Changes, Todo, lib/CPAN/FirstTime.pm: preparing 1.87_58
 
 2006-08-30  k

@@ -2,7 +2,7 @@
 package CPAN::Mirrored::By;
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf "%.6f", substr(q$Rev: 769 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 788 $,4)/1000000 + 5.4;
 
 sub new { 
     my($self,@arg) = @_;
@@ -21,7 +21,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec;
 use vars qw($VERSION);
-$VERSION = sprintf "%.6f", substr(q$Rev: 769 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 788 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -46,6 +46,16 @@ sub init {
     use Config;
     # extra arg in 'o conf init make' selects only $item =~ /make/
     my $matcher = $args{args} && @{$args{args}} ? $args{args}[0] : '';
+    if ($matcher =~ /^\w+$/) {
+        if (
+            exists $CPAN::HandleConfig::keys{$matcher}
+           ) {
+            $matcher = "\\b$matcher\\b";
+        } else {
+            $CPAN::Frontend->myprint("'$matcher' is not a valid configuration variable");
+            return;
+        }
+    }
     CPAN->debug("matcher[$matcher]") if $CPAN::DEBUG;
 
     unless ($CPAN::VERSION) {
@@ -61,7 +71,7 @@ sub init {
     my($ans,$default);
 
     #
-    # Files, directories
+    #= Files, directories
     #
 
     unless ($matcher) {
@@ -150,20 +160,22 @@ Shall we use it as the general CPAN build and cache directory?
         }
 
         if (!$matcher or 'keep_source_where' =~ /$matcher/) {
-            $CPAN::Frontend->myprint($prompts{keep_source_where});
-
-            $CPAN::Config->{keep_source_where}
-                = File::Spec->catdir($CPAN::Config->{cpan_home},"sources");
+            my_dflt_prompt("keep_source_where",
+                           File::Spec->catdir($CPAN::Config->{cpan_home},"sources"),
+                           $matcher,
+                          );
         }
 
         if (!$matcher or 'build_dir' =~ /$matcher/) {
-            $CPAN::Config->{build_dir}
-                = File::Spec->catdir($CPAN::Config->{cpan_home},"build");
+            my_dflt_prompt("build_dir",
+                           File::Spec->catdir($CPAN::Config->{cpan_home},"build"),
+                           $matcher
+                          );
         }
     }
 
     #
-    # Cache size, Index expire
+    #= Cache size, Index expire
     #
 
     if (!$matcher or 'build_cache' =~ /$matcher/){
@@ -173,8 +185,11 @@ Shall we use it as the general CPAN build and cache directory?
         my_dflt_prompt(build_cache => 100, $matcher);
     }
 
-    # XXX This the time when we refetch the index files (in days)
-    $CPAN::Config->{'index_expire'} = 1;
+    if (!$matcher or 'index_expire' =~ /$matcher/) {
+        $CPAN::Frontend->myprint($prompts{index_expire_intro});
+
+        my_dflt_prompt(index_expire => 1, $matcher);
+    }
 
     if (!$matcher or 'scan_cache' =~ /$matcher/){
         $CPAN::Frontend->myprint($prompts{scan_cache_intro});
@@ -183,71 +198,13 @@ Shall we use it as the general CPAN build and cache directory?
     }
 
     #
-    # cache_metadata
+    #= cache_metadata
     #
 
-    if (!$matcher or 'cache_metadata' =~ /$matcher/) {
-
-	$CPAN::Frontend->myprint($prompts{cache_metadata});
-
-	defined($default = $CPAN::Config->{cache_metadata}) or $default = 1;
-	do {
-	    $ans = prompt("Cache metadata (yes/no)?", ($default ? 'yes' : 'no'));
-	} while ($ans !~ /^[yn]/i);
-	$CPAN::Config->{cache_metadata} = ($ans =~ /^y/i ? 1 : 0);
-    }
-    #
-    # term_is_latin
-    #
-
-    if (!$matcher or 'term_is_latin' =~ /$matcher/){
-        $CPAN::Frontend->myprint($prompts{term_is_latin});
-
-        defined($default = $CPAN::Config->{term_is_latin}) or $default = 1;
-        do {
-            $ans = prompt("Your terminal expects ISO-8859-1 (yes/no)?",
-                          ($default ? 'yes' : 'no'));
-        } while ($ans !~ /^[yn]/i);
-        $CPAN::Config->{term_is_latin} = ($ans =~ /^y/i ? 1 : 0);
-    }
+    my_yn_prompt(cache_metadata => 1, $matcher);
 
     #
-    # save history in file 'histfile'
-    #
-
-    if (!$matcher or 'histfile histsize' =~ /$matcher/) {
-        $CPAN::Frontend->myprint($prompts{histfile_intro});
-        defined($default = $CPAN::Config->{histfile}) or
-            $default = File::Spec->catfile($CPAN::Config->{cpan_home},"histfile");
-        $ans = prompt("File to save your history?", $default);
-        $CPAN::Config->{histfile} = $ans;
-
-        if ($CPAN::Config->{histfile}) {
-            defined($default = $CPAN::Config->{histsize}) or $default = 100;
-            $ans = prompt("Number of lines to save?", $default);
-            $CPAN::Config->{histsize} = $ans;
-        }
-    }
-
-    #
-    # do an ls on the m or the d command
-    #
-    if (!$matcher or 'show_upload_date' =~ /$matcher/) {
-        $CPAN::Frontend->myprint($prompts{show_upload_date_intro});
-
-        defined($default = $CPAN::Config->{show_upload_date}) or
-            $default = 'n';
-        $ans = prompt("Always try to show upload date with 'd' and 'm' command (yes/no)?",
-                      ($default ? 'yes' : 'no'));
-        $CPAN::Config->{show_upload_date} = ($ans =~ /^[y1]/i ? 1 : 0);
-    }
-
-    #my_prompt_loop(show_upload_date => 'n', $matcher,
-		   #'follow|ask|ignore');
-
-    #
-    # prerequisites_policy
-    # Do we follow PREREQ_PM?
+    #= Do we follow PREREQ_PM?
     #
 
     if (!$matcher or 'prerequisites_policy' =~ /$matcher/){
@@ -258,7 +215,7 @@ Shall we use it as the general CPAN build and cache directory?
     }
 
     #
-    # Module::Signature
+    #= Module::Signature
     #
     if (!$matcher or 'check_sigs' =~ /$matcher/) {
         $CPAN::Frontend->myprint($prompts{check_sigs_intro});
@@ -271,7 +228,7 @@ Shall we use it as the general CPAN build and cache directory?
     }
 
     #
-    # CPAN::Reporter
+    #= CPAN::Reporter
     #
     if (!$matcher or 'test_report' =~ /$matcher/) {
         $CPAN::Frontend->myprint($prompts{test_report_intro});
@@ -284,7 +241,7 @@ Shall we use it as the general CPAN build and cache directory?
     }
 
     #
-    # External programs
+    #= External programs
     #
 
     my @external_progs = qw/bzip2 gzip tar unzip make
@@ -362,7 +319,7 @@ Shall we use it as the general CPAN build and cache directory?
     }
 
     #
-    # Installer, arguments to make etc.
+    #= Installer, arguments to make etc.
     #
 
     if (!$matcher or 'prefer_installer' =~ /$matcher/){
@@ -406,7 +363,7 @@ Shall we use it as the general CPAN build and cache directory?
     my_dflt_prompt(mbuild_install_arg => "", $matcher);
 
     #
-    # Alarm period
+    #= Alarm period
     #
 
     if (!$matcher or 'inactivity_timeout' =~ /$matcher/) {
@@ -416,15 +373,18 @@ Shall we use it as the general CPAN build and cache directory?
             prompt("Timeout for inactivity during {Makefile,Build}.PL?",$default);
     }
 
-    # Proxies
+    #
+    #= Proxies
+    #
 
     my @proxy_vars = qw/ftp_proxy http_proxy no_proxy/;
-    if (!$matcher or "@proxy_vars" =~ /$matcher/){
+    my @proxy_user_vars = qw/proxy_user proxy_pass/;
+    if (!$matcher or "@proxy_vars @proxy_user_vars" =~ /$matcher/){
         $CPAN::Frontend->myprint($prompts{proxy_intro});
 
         for (@proxy_vars) {
             if (!$matcher or /$matcher/){
-                $default = $CPAN::Config->{$_} || $ENV{$_};
+                $default = $CPAN::Config->{$_} || $ENV{$_} || "";
                 $CPAN::Config->{$_} = prompt("Your $_?",$default);
             }
         }
@@ -432,7 +392,7 @@ Shall we use it as the general CPAN build and cache directory?
         if ($CPAN::Config->{ftp_proxy} ||
             $CPAN::Config->{http_proxy}) {
 
-            $default = $CPAN::Config->{proxy_user} || $CPAN::LWP::UserAgent::USER;
+            $default = $CPAN::Config->{proxy_user} || $CPAN::LWP::UserAgent::USER || "";
 
             $CPAN::Frontend->myprint($prompts{proxy_user});
 
@@ -454,7 +414,77 @@ Shall we use it as the general CPAN build and cache directory?
     }
 
     #
-    # MIRRORED.BY and conf_sites()
+    #= how FTP works
+    #
+
+    my_yn_prompt(ftp_passive => 1, $matcher);
+
+    #
+    #= how cwd works
+    #
+
+    if (!$matcher or 'getcwd' =~ /$matcher/){
+        $CPAN::Frontend->myprint($prompts{getcwd_intro});
+
+        my_prompt_loop(getcwd => 'cwd', $matcher,
+                       'cwd|getcwd|fastcwd|backtickcwd');
+    }
+
+    #
+    #= the CPAN shell itself
+    #
+
+    my_yn_prompt(commandnumber_in_prompt => 1, $matcher);
+    my_yn_prompt(term_ornaments => 1, $matcher);
+
+    #
+    #== term_is_latin
+    #
+
+    if (!$matcher or 'term_is_latin' =~ /$matcher/){
+        $CPAN::Frontend->myprint($prompts{term_is_latin});
+
+        defined($default = $CPAN::Config->{term_is_latin}) or $default = 1;
+        do {
+            $ans = prompt("Your terminal expects ISO-8859-1 (yes/no)?",
+                          ($default ? 'yes' : 'no'));
+        } while ($ans !~ /^[yn]/i);
+        $CPAN::Config->{term_is_latin} = ($ans =~ /^y/i ? 1 : 0);
+    }
+
+    #
+    #== save history in file 'histfile'
+    #
+
+    if (!$matcher or 'histfile histsize' =~ /$matcher/) {
+        $CPAN::Frontend->myprint($prompts{histfile_intro});
+        defined($default = $CPAN::Config->{histfile}) or
+            $default = File::Spec->catfile($CPAN::Config->{cpan_home},"histfile");
+        $ans = prompt("File to save your history?", $default);
+        $CPAN::Config->{histfile} = $ans;
+
+        if ($CPAN::Config->{histfile}) {
+            defined($default = $CPAN::Config->{histsize}) or $default = 100;
+            $ans = prompt("Number of lines to save?", $default);
+            $CPAN::Config->{histsize} = $ans;
+        }
+    }
+
+    #
+    #== do an ls on the m or the d command
+    #
+    if (!$matcher or 'show_upload_date' =~ /$matcher/) {
+        $CPAN::Frontend->myprint($prompts{show_upload_date_intro});
+
+        defined($default = $CPAN::Config->{show_upload_date}) or
+            $default = 'n';
+        $ans = prompt("Always try to show upload date with 'd' and 'm' command (yes/no)?",
+                      ($default ? 'yes' : 'no'));
+        $CPAN::Config->{show_upload_date} = ($ans =~ /^[y1]/i ? 1 : 0);
+    }
+
+    #
+    #= MIRRORED.BY and conf_sites()
     #
 
     if ($matcher){
@@ -472,14 +502,17 @@ Shall we use it as the general CPAN build and cache directory?
         conf_sites();
     }
 
-    # We don't ask these now, the defaults are very likely OK.
+    # We don't ask this one now, it's plain silly and maybe is not
+    # even used correctly everywhere.
     $CPAN::Config->{inhibit_startup_message} = 0;
-    $CPAN::Config->{getcwd}                  = 'cwd';
-    $CPAN::Config->{ftp_passive}             = 1;
-    $CPAN::Config->{term_ornaments}          = 1;
 
     $CPAN::Frontend->myprint("\n\n");
-    CPAN::HandleConfig->commit($configpm);
+    if ($matcher) {
+        $CPAN::Frontend->myprint("Please remember to call 'o conf commit' to ".
+                                 "make the config permanent!\n\n");
+    } else {
+        CPAN::HandleConfig->commit($configpm);
+    }
 }
 
 sub my_dflt_prompt {
@@ -489,6 +522,23 @@ sub my_dflt_prompt {
     $DB::single = 1;
     if (!$m || $item =~ /$m/) {
 	$CPAN::Config->{$item} = prompt($prompts{$item}, $default);
+    } else {
+	$CPAN::Config->{$item} = $default;
+    }
+}
+
+sub my_yn_prompt {
+    my ($item, $dflt, $m) = @_;
+    my $default;
+    defined($default = $CPAN::Config->{$item}) or $default = $dflt;
+
+    $DB::single = 1;
+    if (!$m || $item =~ /$m/) {
+        if (my $intro = $prompts{$item . "_intro"}) {
+            print $intro;
+        }
+	my $ans = prompt($prompts{$item}, $default ? 'yes' : 'no');
+        $CPAN::Config->{$item} = ($ans =~ /^[y1]/i ? 1 : 0);
     } else {
 	$CPAN::Config->{$item} = $default;
     }
@@ -794,13 +844,9 @@ First of all, I\'d like to create this directory. Where?
 
 keep_source_where => qq{
 
-If you like, I can cache the source files after I build them.  Doing
-so means that, if you ever rebuild that module in the future, the
-files will be taken from the cache. The tradeoff is that it takes up
-space.  How much space would you like to allocate to this cache?  (If
-you don\'t want me to keep a cache, answer 0.)
-
-},
+Unless you are accessing the CPAN via the filesystem directly CPAN.pm
+needs to keep the source files it downloads somewhere. Please supply a
+directory where the downloaded files are to be kept.},
 
 build_cache_intro => qq{
 
@@ -812,6 +858,9 @@ with all the intermediate files\?
 build_cache =>
 "Cache size for build directory (in MB)?",
 
+build_dir =>
+
+"Directory where the build process takes place?",
 
 scan_cache_intro => qq{
 
@@ -823,13 +872,15 @@ performed to keep the cache size in sync. To prevent this, answer
 
 scan_cache => "Perform cache scanning (atstart or never)?",
 
-cache_metadata => qq{
+cache_metadata_intro => qq{
 
 To considerably speed up the initial CPAN shell startup, it is
 possible to use Storable to create a cache of metadata. If Storable
 is not available, the normal index mechanism will be used.
 
 },
+
+cache_metadata => qq{Cache metadata (yes/no)?},
 
 term_is_latin => qq{
 
@@ -1051,9 +1102,10 @@ Your choice: },
 inactivity_timeout_intro => qq{
 
 Sometimes you may wish to leave the processes run by CPAN alone
-without caring about them. Because the Makefile.PL sometimes contains
-question you\'re expected to answer, you can set a timer that will
-kill a 'perl Makefile.PL' process after the specified time in seconds.
+without caring about them. Because the Makefile.PL or the Build.PL
+sometimes contains question you\'re expected to answer, you can set a
+timer that will kill a 'perl Makefile.PL' process after the specified
+time in seconds.
 
 If you set this value to 0, these processes will wait forever. This is
 the default and recommended setting.
@@ -1112,6 +1164,53 @@ Warning: Term::ReadKey seems not to be available, your password will
 be echoed to the terminal!
 
 },
+
+commandnumber_in_prompt => qq{
+
+The prompt of the cpan shell can contain the current command number
+for easier tracking of the session or be a plain string. Do you want
+the command number in the prompt (yes/no)?},
+
+ftp_passive => qq{
+
+Shall we always set FTP_PASSIVE envariable when dealing with ftp
+download (yes/no)?},
+
+# taken from the manpage:
+getcwd_intro => qq{
+
+CPAN.pm changes the current working directory often and needs to
+determine its own current working directory. Per default it uses
+Cwd::cwd but if this doesn't work on your system for some reason,
+alternatives can be configured according to the following table:
+
+    cwd         Cwd::cwd
+    getcwd      Cwd::getcwd
+    fastcwd     Cwd::fastcwd
+    backtickcwd external command cwd
+
+},
+
+getcwd => qq{Preferred method for determining the current working directory?},
+
+index_expire_intro => qq{
+
+The CPAN indexes are usually rebuilt once or twice per hour, but the
+typical CPAN mirror mirrors only once or twice per day. Depending on
+the quality of your mirror and your desire to be on the bleeding edge,
+you may want to set the following value to more or less than one day
+(which is the default). It determines after how many days CPAN.pm
+downloads new indexes.
+
+},
+
+index_expire => qq{Let the index expire after how many days?},
+
+term_ornaments => qq{
+
+When using Term::ReadLine, you can turn ornaments on so that your
+input stands out against the output from CPAN.pm. Do you want to turn
+ornaments on?},
 
 );
 

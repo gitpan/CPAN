@@ -79,6 +79,7 @@ plan tests => (
                scalar @prgs
                + 2                     # 2 histsize tests
                + 1                     # 1 RUN_EXPECT feedback
+               + 1                     # 1 count keys for 'o conf init variable'
                # + scalar @modules
               );
 
@@ -97,6 +98,33 @@ $HAVE->{"Term::ReadLine::Perl||Term::ReadLine::Gnu"}
     || $HAVE->{"Term::ReadLine::Gnu"};
 read_myconfig;
 is($CPAN::Config->{histsize},100,"histsize is 100");
+
+{
+    require CPAN::HandleConfig;
+    my @ociv_tests = map { /P:o conf init (\w+)/ && $1 } @prgs;
+    my %ociv;
+    @ociv{@ociv_tests} = ();
+    my $keys = %CPAN::HandleConfig::keys; # to keep warnings silent
+    my @kwnt = sort grep { not exists $ociv{$_} }
+        grep { ! m/
+                   ^(?:
+                   urllist
+                   |inhibit_startup_message
+                   |username
+                   |password
+                   |proxy_(?:user|pass)
+                   |.*_list
+                   |.*_hash
+                  )$/x }
+            keys %CPAN::HandleConfig::keys;
+    my $test_tuning = 0;
+    if ($test_tuning) {
+        ok(@kwnt==0,"key words not tested[@kwnt]");
+        die if @kwnt;
+    } else {
+        ok(1,"Another dummy test");
+    }
+}
 
 my $prompt = "cpan>";
 my $prompt_re = "cpan[^>]*?>"; # note: replicated in DATA!
@@ -208,6 +236,7 @@ expected[$expected]\ngot[$got]\n\n";
                      );
         my $got = $expo->clear_accum;
         mydiag "GOT: $got\n";
+        $prog =~ s/^(\d)/...$1/;
         ok(1, $prog||"\"\\n\"");
     } else {
         $expected = "" if $prog =~ /\t/;
@@ -267,6 +296,305 @@ E:histsize.+?101
 ########
 P:o conf urllist
 E:file:///.*?CPAN
+########
+P:o conf init build_cache
+E:(\])
+########
+P:100
+E:
+########
+P:o conf init build_dir
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init bzip2
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init cache_metadata
+E:(\])
+########
+P:y
+E:
+########
+P:o conf init check_sigs
+E:(\])
+########
+P:y
+E:
+########
+P:o conf init cpan_home
+E:(\])
+########
+P:/tmp/must_be_a_createable_absolute_path/../
+E:
+########
+P:o conf init curl
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init gpg
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init gzip
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init lynx
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init make_arg
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init make_install_arg
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init make_install_make_command
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init makepl_arg
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init mbuild_arg
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init mbuild_install_arg
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init mbuild_install_build_command
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init mbuildpl_arg
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init ncftp
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init ncftpget
+E:(\])
+########
+P:foo
+E:
+########
+P:foo
+E:
+########
+P:o conf init pager
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init prefer_installer
+E:(\])
+########
+P:EUMM
+E:
+########
+P:o conf init prerequisites_policy
+E:(\])
+########
+P:ask
+E:
+########
+P:o conf init scan_cache
+E:(\])
+########
+P:atstart
+E:
+########
+P:o conf init shell
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init show_upload_date
+E:(\])
+########
+P:y
+E:
+########
+P:o conf init tar
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init term_is_latin
+E:(\])
+########
+P:n
+E:
+########
+P:o conf init test_report
+E:(\])
+########
+P:n
+E:
+########
+P:o conf init unzip
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init wget
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init commandnumber_in_prompt
+E:(\])
+########
+P:y
+E:
+########
+P:o conf init ftp
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init make
+E:(\])
+########
+P:foo
+E:
+########
+P:o conf init ftp_passive
+E:(\])
+########
+P:y
+E:
+########
+P:o conf init ftp_proxy
+E:(\])
+########
+P:y
+E:(\?)
+########
+P:u
+E:(\?)
+########
+P:p
+E:
+########
+P:o conf init http_proxy
+E:(\])
+########
+P:y
+E:(\?)
+########
+P:u
+E:(\?)
+########
+P:p
+E:
+########
+P:o conf init no_proxy
+E:(\])
+########
+P:y
+E:(\?)
+########
+P:u
+E:(\?)
+########
+P:p
+E:
+########
+P:o conf init getcwd
+E:(\])
+########
+P:cwd
+E:
+########
+P:o conf init histfile
+E:(hist)
+########
+P:/tmp/foo
+E:(save)
+########
+P:100
+E:
+########
+P:o conf init histsize
+E:(hist)
+########
+P:/tmp/foo
+E:(save)
+########
+P:100
+E:
+########
+P:o conf init inactivity_timeout
+E:(\])
+########
+P:10000
+E:
+########
+P:o conf init index_expire
+E:(\])
+########
+P:y
+E:
+########
+P:o conf init keep_source_where
+E:(\])
+########
+P:/tmp
+E:
+########
+P:o conf init term_ornaments
+E:(\])
+########
+P:y
+E:
+########
+P:o conf defaults
 ########
 P:!print$ENV{HARNESS_PERL_SWITCHES}||"",$/
 E:
