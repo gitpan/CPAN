@@ -53,3 +53,8 @@ sub set_up {
     undef $CPAN::LWP::UserAgent::USER;
     undef $CPAN::LWP::UserAgent::PASSWD;
 }
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 4
+# End:

@@ -1,3 +1,49 @@
+=pod
+
+Documentation about this test script is scattered around, sorry.
+
+C<30shell.pod> only talks about results from Devel::Cover
+
+C<README.shell.txt> describes how to add new pseudo distributions
+
+In the following I want to provide an overview about how this
+testscript works.
+
+After the __END__ token you find small groups of lines like the
+following:
+
+    ########
+    P:make CPAN::Test::Dummy::Perl5::BuildOrMake
+    E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
+    R:Module::Build
+    T:15
+    C:comment
+    ########
+
+P stands for program or print
+
+E for expect
+
+T for timeout
+
+R for requires or relies on
+
+C for comment
+
+
+The script starts a CPAN shell and feed it the chunks such that the P
+line is injected, the output of the shell is parsed and compared to
+the expression in the E line. With T the timeout can be changed (the
+default is rather low, maybe 10 seconds, see the code for details).
+The expression in R is used to filter tests.
+
+To get reliable and debuggable results, Expect.pm should be installed.
+Without Expect.pm, a fallback mode is started that should in principle
+also succeed but is pretty hard to debug because there is no mechanism
+to sync state between reader and writer.
+
+=cut
+
 use strict;
 
 use vars qw($HAVE_EXPECT $RUN_EXPECT $HAVE);
@@ -72,6 +118,7 @@ my @modules = qw(
                  Module::Build
                  Archive::Zip
                  Data::Dumper
+                 Term::ANSIColor
                 );
 
 use Test::More;
@@ -129,7 +176,7 @@ is($CPAN::Config->{histsize},100,"histsize is 100");
 my $prompt = "cpan>";
 my $prompt_re = "cpan[^>]*?>"; # note: replicated in DATA!
 my $t = File::Spec->catfile($cwd,"t");
-my $timeout = 60;
+my $timeout = 20;
 
 my @system = (
               $^X,
@@ -158,7 +205,19 @@ sub mydiag {
 $|=1;
 my $expo;
 my @PAIRS;
-$RUN_EXPECT = $HAVE_EXPECT || 0;
+if ($HAVE_EXPECT) {
+    if ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
+        $RUN_EXPECT = 0;
+    } else {
+        $RUN_EXPECT = 1;
+    }
+} else {
+    if ($ENV{CPAN_RUN_SHELL_TEST}) {
+        $RUN_EXPECT = 1;
+    } else {
+        $RUN_EXPECT = 0;
+    }
+}
 ok(1,"RUN_EXPECT[$RUN_EXPECT]");
 if ($RUN_EXPECT) {
     $expo = Expect->new;
@@ -184,7 +243,7 @@ sub splitchunk ($) {
 TUPL: for my $i (0..$#prgs){
     my $chunk = $prgs[$i];
     my %h = splitchunk $chunk;
-    my($prog,$expected,$req) = @h{qw(P E R)};
+    my($prog,$expected,$req,$test_timeout,$comment) = @h{qw(P E R T C)};
     unless (defined $expected or defined $prog) {
         ok(1,"empty test");
         next TUPL;
@@ -219,7 +278,7 @@ TUPL: for my $i (0..$#prgs){
     if ($RUN_EXPECT) {
         mydiag "EXPECT: $expected";
         $expo->expect(
-                      $timeout,
+                      $test_timeout || $timeout,
                       [ eof => sub {
                             my $got = $expo->clear_accum;
                             diag "EOF on i[$i]prog[$prog]
@@ -230,6 +289,12 @@ expected[$expected]\ngot[$got]\n\n";
                             my $got = $expo->clear_accum;
                             diag "timed out on i[$i]prog[$prog]
 expected[$expected]\ngot[$got]\n\n";
+                            diag sprintf(
+                                         "and perl says that [[[%s]]] %s match [[[%s]]]!",
+                                         $got,
+                                         $got=~/$expected/ ? "DOES" : "doesN'T",
+                                         $expected
+                                        );
                             exit;
                         } ],
                       '-re', $expected
@@ -237,7 +302,8 @@ expected[$expected]\ngot[$got]\n\n";
         my $got = $expo->clear_accum;
         mydiag "GOT: $got\n";
         $prog =~ s/^(\d)/...$1/;
-        ok(1, $prog||"\"\\n\"");
+        $comment ||= "";
+        ok(1, "$comment" . ($prog ? " (testing command '$prog')" : "[empty RET]"));
     } else {
         $expected = "" if $prog =~ /\t/;
         push @PAIRS, [$prog,$expected];
@@ -265,6 +331,7 @@ read_myconfig;
 is($CPAN::Config->{histsize},101);
 rmtree _d"t/dot-cpan";
 
+# note: E=expect; P=program(=print); T=timeout; R=requires(=relies_on)
 __END__
 ########
 E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*?>)
@@ -277,6 +344,7 @@ E:initialized(?s:.*?configure.as.much.as.possible.automatically.*?\])
 ########
 P:yesplease
 E:wrote
+T:60
 ########
 P:# o debug all
 ########
@@ -298,7 +366,7 @@ P:o conf urllist
 E:file:///.*?CPAN
 ########
 P:o conf init build_cache
-E:(\])
+E:(size.*?\])
 ########
 P:100
 E:
@@ -605,6 +673,12 @@ E:NoCpAnCoNfIg
 P:!print $INC{"CPAN/MyConfig.pm"},$/
 E:CPAN/MyConfig.pm
 ########
+P:!print "\@INC: ", map { "    $_\n" } @INC
+E:
+########
+P:!print "%INC: ", map { "    $_\n" } sort values %INC
+E:
+########
 P:rtlprnft
 E:Unknown
 ########
@@ -646,14 +720,14 @@ P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
 E:CPAN_USERID.*?ANDK.*?Andreas
 ########
 P:ls ANDK
-E:(?s:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy.*?\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump)
+E:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy[\d\D]*?\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump
 ########
 P:ls ANDK/CPAN*
-E:(?s:Text::Glob\s+loaded\s+ok.*?CPAN-Test-Dummy)
+E:Text::Glob\s+loaded\s+ok[\d\D]*?CPAN-Test-Dummy
 R:Text::Glob
 ########
 P:force ls ANDK/CPAN*
-E:(?s:CPAN-Test-Dummy)
+E:CPAN-Test-Dummy
 R:Text::Glob
 ########
 P:test CPAN::Test::Dummy::Perl5::Make
@@ -675,11 +749,11 @@ E:test\s+--\s+NOT OK
 R:Module::Build
 ########
 P:dump CPAN::Test::Dummy::Perl5::Make
-E:(?s:bless.+?('(ID|CPAN_FILE|CPAN_USERID|CPAN_VERSION)'.+?){4})
+E:\}.+?CPAN::Module.+?;
 R:Data::Dumper
 ########
 P:install CPAN::Test::Dummy::Perl5::Make::Failearly
-E:(?s:Failed during this command.+?writemakefile NO)
+E:Failed during this command[\d\D]+?writemakefile NO
 ########
 P:test CPAN::Test::Dummy::Perl5::NotExists
 E:Warning:
@@ -703,21 +777,29 @@ P:reload index
 E:staleness
 ########
 P:m /l/
-E:(?s:Perl5.*?Fcntl)
+E:(?s:Perl5.*?Fcntl.*?items)
 ########
 P:i /l/
-E:(?s:Dummies.*?Dummy.*?Perl5.*?Fcntl)
+E:(?s:Dummies.*?Dummy.*?Perl5.*?Fcntl.*?items)
 ########
 P:h
 E:(?s:make.*?test.*?install.*?force.*?notest.*?reload)
 ########
 P:o conf
-E:(?s:commit.*?build_cache.*?cpan_home.*?inhibit_startup_message.*?urllist)
+E:commit[\d\D]*?build_cache[\d\D]*?cpan_home[\d\D]*?inhibit_startup_message[\d\D]*?urllist[\d\D]*?wget
 ########
 P:o conf prefer_installer EUMM
+E:EUMM\]
+########
+P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
+E:\}.+?CPAN::Module
+########
+P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
+E:\}.+?CPAN::Distribution
 ########
 P:make CPAN::Test::Dummy::Perl5::BuildOrMake
 E:(?s:Running make.*?Writing Makefile.*?make["']?\s+-- OK)
+C:first try
 ########
 P:o conf prefer_installer MB
 R:Module::Build
@@ -726,16 +808,39 @@ P:force get CPAN::Test::Dummy::Perl5::BuildOrMake
 E:Removing previously used
 R:Module::Build
 ########
+P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
+E:\}.+?CPAN::Module
+########
+P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
+E:\}.+?CPAN::Distributio.
+########
 P:make CPAN::Test::Dummy::Perl5::BuildOrMake
 E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
 R:Module::Build
+C:second try
+########
+P:dump Bundle::CpanTestDummies
+E:\}
+R:Module::Build
+########
+P:dump CPAN::Test::Dummy::Perl5::Build::Fails
+E:\}
+R:Module::Build
+########
+P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
+E:\}
+R:Module::Build
 ########
 P:test Bundle::CpanTestDummies
-E:Test-Dummy-Perl5-Build-Fails-\S+\s+make_test\s+NO
+E:Test-Dummy-Perl5-Build-Fails-.+?make_test\s+NO
 R:Module::Build
+T:30
 ########
 P:get Bundle::CpanTestDummies
 E:Is already unwrapped
+########
+P:dump ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz
+E:\}.*?CPAN::Distribution
 ########
 P:notest make Bundle::CpanTestDummies
 E:Has already been processed

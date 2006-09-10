@@ -156,10 +156,12 @@ sub macro {
     q{
 LC_ALL_noexport=en_GB.utf8
 
-ALL_PERLS = /usr/bin/perl /usr/local/bin/perl \
+ALL_PERLS = /usr/bin/perl \
+	    /usr/local/bin/perl \
 	    /usr/local/perl-5.8.0/bin/perl \
             /usr/local/perl-5.004_05/bin/perl \
-            /usr/local/perl-5.005_04/bin/perl
+            /usr/local/perl-5.005_04/bin/perl \
+            /usr/local/perl-5.6.2/bin/perl
 }
 }
 
@@ -232,8 +234,9 @@ howto-release:
 META.yml:
 	$(ECHO) -n "" >> META.yml
 
-testcover:
+testcover: testdistros
 	:>SIGNATURE
+	$(PERL) -MDevel::Cover -e 0
 	`dirname $(PERL)`/cover -delete
 	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
 	`dirname $(PERL)`/cover
@@ -248,10 +251,21 @@ testdistros: t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz 
         t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz
 
 # sorry, unix centric
-testshell-with-protocol:
+testshell-with-protocol: testdistros
 	$(PERL) -e 'for ("protocols"){-d $$_ or mkdir $$_, 0755}'
 	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | \
 		tee protocols/make-test-`date +%Y%m%dT%H%M%S`
+	ls -ltr protocols | tail
+
+testshell-with-protocol-twice: testdistros
+	$(PERL) -e 'for ("protocols"){-d $$_ or mkdir $$_, 0755}'
+	$(PERL) -p -i~ -e 's/colorize_output\D+\d/colorize_output=>0/' t/CPAN/TestConfig.pm
+	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | \
+		tee protocols/make-test-`date +%Y%m%dT%H%M%S`
+	$(PERL) -p -i~ -e 's/colorize_output\D+\d/colorize_output=>1/' t/CPAN/TestConfig.pm
+	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | \
+		tee protocols/make-test-`date +%Y%m%dT%H%M%S`
+	$(PERL) -p -i~ -e 's/colorize_output\D+\d/colorize_output=>0/' t/CPAN/TestConfig.pm
 	ls -ltr protocols | tail
 
 t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz :
@@ -331,7 +345,7 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz: \
 
 testallperls :
 	:>SIGNATURE
-	for p in $(ALL_PERLS); do $$p Makefile.PL && $(MAKE) test; done
+	for p in $(ALL_PERLS); do $$p -v && $$p Makefile.PL && $(MAKE) test; done
 
 clean ::
 	$(RM) t/CPAN/authors/id/A/AN/ANDK/*/Build \

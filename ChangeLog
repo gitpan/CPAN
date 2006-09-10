@@ -1,3 +1,97 @@
+2006-09-10  k
+
+	* Changes: prepare 1.87_61
+	* lib/CPAN.pm, t/30shell.t: playing aroung with the bugs I have in 
+	  the two alternative colorize implementations; no code changes
+	* lib/CPAN.pm: lost a finishing newline in the demobug code
+	* lib/CPAN.pm: bring some ortogonality into the myprint/mywarn 
+	  world
+	* lib/CPAN/FirstTime.pm: prevent accidents with negative numbers
+
+2006-09-09  k
+
+	* Todo: notes
+	* Makefile.PL, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm, t/30shell.t, t/CPAN/TestConfig.pm: New 
+	  test target testshell-with-protocol-twice to test the difference
+	  between colorize_output true and false
+	  
+	  Support for colorize_* Firsttime inclusive.
+	  
+	  30_shell.t now has C (comment) as a new attribute per test
+	  
+	  Lots of new tests in 30_shell
+	  
+	  Switching (hopefully) all "raw" prints and warns to Frontend->my*
+	  
+	  Simplifying a few Firsttime chunks
+	  
+	  conf_sites now has a mode that takes only RET to do nothing. 
+	  Onl;y
+	  works when a urllist is already there from a previous run.
+	  
+	  A few new alerts when things go wrong just to help the user 
+	  figure out
+	  early that something is wrong
+
+2006-09-08  k
+
+	* Todo, lib/CPAN.pm: document PRINT_ORNAMENTING and mention it in 
+	  the next Todo
+	* lib/CPAN/FirstTime.pm: uniquify the picks to prevent listing 
+	  picks twice on the next level
+	* lib/CPAN/FirstTime.pm: conf_sites(): if there are previous 
+	  picks, off the as default
+	* lib/CPAN/FirstTime.pm: let conf_sites use a local urllist 
+	  instead of the global configured one: prevents that ^C kills the 
+	  currently configured urllist
+	* Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm: revert 803 and replace 
+	  only print with myprint and warn with mywarn; reindenting; 
+	  convert some places to my style
+
+2006-09-07  k
+
+	* Todo, lib/CPAN/FirstTime.pm: some magic ate the output of warn 
+	  completely; needs more investigation
+	* t/30shell.pod, t/30shell.t, t/README.shell.txt: add 
+	  documentation about various aspects of 30shell.t
+
+2006-09-06  k
+
+	* lib/CPAN/FirstTime.pm: oops
+	* lib/CPAN/FirstTime.pm, t/30shell.t: consolidate two dialogs with 
+	  the help of my_yn_prompt()
+
+2006-09-06  dagolden
+
+	* lib/CPAN/FirstTime.pm: added support for CPAN::Reporter 
+	  configuration, if available
+
+2006-09-06  k
+
+	* Makefile.PL, t/30shell.t: failing tests on some boxes! adjusting 
+	  for debugging
+
+2006-09-05  k
+
+	* t/CPAN/TestConfig.pm: turn off ornaments during testing, it 
+	  helps bug analysis
+
+2006-09-04  k
+
+	* Makefile.PL, lib/CPAN.pm, t/30shell.t: test did not succeed on 
+	  5.8.0 and 5.8.1, maybe because the bold prompt was produced 
+	  differently then? This simple tiny change makes it succeed; the 
+	  rest is debugging aid for the next time around
+	* t/60credentials.t: the matisse test was not checked in at that 
+	  time
+	* Todo: just notes
+	* lib/CPAN/FirstTime.pm: dialog buglet: it is not only about 
+	  download programs
+	* t/30shell.pod: notes about Devel::Cover
+	* Makefile.PL, README, t/30shell.pod: check for Devel::Cover 
+	  before using the cover script
+
 2006-09-03  k
 
 	* Changes, README, lib/CPAN.pm: preparing 1.87_59
