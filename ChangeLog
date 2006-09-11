@@ -1,3 +1,29 @@
+2006-09-11  k
+
+	* Changes: prepare 1.87_62
+	* Changes: prepare 1.87_62
+	* Changes, Makefile.PL, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm: 
+	  Addressing Debian bug #380551: Manual testing with emulated 
+	  offline
+	  mode revealed several weaknesses in the URL selection process.
+	  
+	  Do not display the $empty_warning after the user has picked a
+	  continent or country.
+	  
+	  Do not suggest "SPACE RETURN" when there is no previous pick 
+	  anyway to
+	  default to and "RETURN" alone will do just the same.
+	  
+	  Tell the user to enter numbers (prevents the error in 380551
+	  alltogether).
+	  
+	  Change the help text if there is no urllist at all to say so.
+	* lib/CPAN.pm: make term_ornaments switchable while running; we 
+	  only used it once before entering the shell loop
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm: prevent accidents when they 
+	  set the colors wrong: both in Firsttime and when we use it in 
+	  print_ornamented
+
 2006-09-10  k
 
 	* Changes: prepare 1.87_61

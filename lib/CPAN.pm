@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.87_61';
+$CPAN::VERSION = '1.87_62';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -142,11 +142,11 @@ sub shell {
             }
             close $fh;
         }}
-	# $term->OUT is autoflushed anyway
-        for ($CPAN::Config->{term_ornaments}) {
+        for ($CPAN::Config->{term_ornaments}) { # alias
             local $Term::ReadLine::termcap_nowarn = 1;
             $term->ornaments($_) if defined;
         }
+	# $term->OUT is autoflushed anyway
 	my $odef = select STDERR;
 	$| = 1;
 	select STDOUT;
@@ -167,17 +167,19 @@ sub shell {
 	($term->ReadLine ne "Term::ReadLine::Stub") ? "enabled" :
 	    "available (try 'install Bundle::CPAN')";
 
-    $CPAN::Frontend->myprint(
-			     sprintf qq{
+    unless ($CPAN::Config->{'inhibit_startup_message'}){
+        $CPAN::Frontend->myprint(
+                                 sprintf qq{
 cpan shell -- CPAN exploration and modules installation (v%s)
 ReadLine support %s
 
 },
-                             $CPAN::VERSION,
-                             $rl_avail
-                            )
-        unless $CPAN::Config->{'inhibit_startup_message'} ;
+                                 $CPAN::VERSION,
+                                 $rl_avail
+                                )
+    }
     my($continuation) = "";
+    my $last_term_ornaments;
   SHELLCOMMAND: while () {
 	if ($Suppress_readline) {
 	    print $prompt;
@@ -252,6 +254,19 @@ ReadLine support %s
             @_ = ($oprompt,"");
 	    goto &shell;
 	}
+      }
+      for ($CPAN::Config->{term_ornaments}) { # alias
+          if (defined $_) {
+              if (not defined $last_term_ornaments
+                  or $_ != $last_term_ornaments
+                 ) {
+                  local $Term::ReadLine::termcap_nowarn = 1;
+                  $term->ornaments($_);
+                  $last_term_ornaments = $_;
+              }
+          } else {
+              undef $last_term_ornaments;
+          }
       }
     }
     soft_chdir_with_alternatives(\@cwd);
@@ -2217,6 +2232,11 @@ sub print_ornamented {
     }
     $longest = 78 if $longest > 78; # yes, arbitrary, who wants it set-able?
     if ($self->colorize_output) {
+        my $color_on = eval { Term::ANSIColor::color($ornament) } || "";
+        if ($@) {
+            print "Term::ANSIColor rejects color[$ornament]: $@\n
+Please choose a different color (Hint: try 'o conf init color.*')\n";
+        }
         my $demobug = 0; # (=0) works, (=1) has some obscure bugs and
                          # breaks 30shell.t, (=2) has some obvious
                          # bugs but passes 30shell.t
@@ -2242,7 +2262,7 @@ sub print_ornamented {
                 # my($nl) = chomp $line ? "\n" : "";
                 # ->debug verboten within print_ornamented ==> recursion!
                 # warn("line[$line]ornament[$ornament]sprintf[$sprintf]\n") if $CPAN::DEBUG;
-                print Term::ANSIColor::color($ornament),
+                print $color_on,
                     sprintf("%-*s",$longest,$line),
                         Term::ANSIColor::color("reset"),
                               $line =~ /\n/ ? "" : $nl;
@@ -2251,7 +2271,7 @@ sub print_ornamented {
             my $block = join "\n",
                 map {
                     sprintf("%s%-*s%s",
-                            Term::ANSIColor::color($ornament),
+                            $color_on,
                             $longest,
                             $_,
                             Term::ANSIColor::color("reset"),
@@ -2260,7 +2280,7 @@ sub print_ornamented {
                     split /[\r ]*\n/, $swhat;
             print $block;
         } else {
-            print Term::ANSIColor::color($ornament),
+            print $color_on,
                 $swhat,
                     Term::ANSIColor::color("reset");
         }
@@ -2308,7 +2328,8 @@ sub colorable_makemaker_prompt {
     my($foo,$bar) = @_;
     if (CPAN::Shell->colorize_output) {
         my $ornament = $CPAN::Config->{colorize_print}||'bold blue';
-        print Term::ANSIColor::color($ornament);
+        my $color_on = eval { Term::ANSIColor::color($ornament); } || "";
+        print $color_on;
     }
     my $ans = ExtUtils::MakeMaker::prompt($foo,$bar);
     if (CPAN::Shell->colorize_output) {
@@ -2863,12 +2884,18 @@ sub localize {
     }
     unless ($CPAN::Signal) {
         my(@mess);
-        push @mess,
-            qq{Please check, if the URLs I found in your configuration file \(}.
-                join(", ", @{$CPAN::Config->{urllist}}).
-                    qq{\) are valid. The urllist can be edited.},
-                        qq{E.g. with 'o conf urllist push ftp://myurl/'};
-        $CPAN::Frontend->mywarn(Text::Wrap::wrap("","",@mess). "\n\n");
+        local $" = " ";
+        if (@{$CPAN::Config->{urllist}}) {
+            push @mess,
+                qq{Please check, if the URLs I found in your configuration file \(}.
+                    join(", ", @{$CPAN::Config->{urllist}}).
+                        qq{\) are valid.};
+        } else {
+            push @mess, qq{Your urllist is empty!};
+        }
+        push @mess, qq{The urllist can be edited.},
+            qq{E.g. with 'o conf urllist push ftp://myurl/'};
+        $CPAN::Frontend->mywarn(Text::Wrap::wrap("","","@mess"). "\n\n");
         $CPAN::Frontend->mywarn("Could not fetch $file\n");
         $CPAN::Frontend->mysleep(2);
     }
@@ -3171,8 +3198,7 @@ sub hosthardest {
 As a last ressort we now switch to the external ftp command '$ftpbin'
 to get '$aslocal'.
 
-Doing so often leads to problems that are hard to diagnose, even endless
-loops may be encountered.
+Doing so often leads to problems that are hard to diagnose.
 
 If you're victim of such problems, please consider unsetting the ftp
 config variable with
@@ -3181,7 +3207,7 @@ config variable with
     o conf commit
 
 });
-    $CPAN::Frontend->mysleep(4);
+    $CPAN::Frontend->mysleep(2);
   HOSTHARDEST: for $ro_url (@$host_seq) {
 	my $url = "$ro_url$file";
 	$self->debug("localizing ftpwise[$url]") if $CPAN::DEBUG;
