@@ -1,3 +1,20 @@
+2006-09-13  k
+
+	* Changes: prepare 1.87_63
+	* lib/CPAN/HandleConfig.pm, t/30shell.t: get rid of the 
+	  "initialized" sentence we now see it too often
+	* Todo, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm, 
+	  t/30shell.t: work around some weird bug in 5.8.0 (see Todo); 
+	  make sure _real_prompt is guaranteed to be defined; give some 
+	  humble feedback to "o conf defaults"
+
+2006-09-12  k
+
+	* Todo: borked state documented in Todo...
+	* Changes, Makefile.PL, Todo, lib/CPAN.pm: address #17973: default 
+	  URLs should not try to override user-defined URLs just because 
+	  LWP is not available
+
 2006-09-11  k
 
 	* Changes: prepare 1.87_62
