@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.87_63';
+$CPAN::VERSION = '1.87_64';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -260,17 +260,19 @@ ReadLine support %s
 	    goto &shell;
 	}
       }
-      for ($CPAN::Config->{term_ornaments}) { # alias
-          if (defined $_) {
-              if (not defined $last_term_ornaments
-                  or $_ != $last_term_ornaments
-                 ) {
-                  local $Term::ReadLine::termcap_nowarn = 1;
-                  $term->ornaments($_);
-                  $last_term_ornaments = $_;
+      if ($term and $term->can("ornaments")) {
+          for ($CPAN::Config->{term_ornaments}) { # alias
+              if (defined $_) {
+                  if (not defined $last_term_ornaments
+                      or $_ != $last_term_ornaments
+                     ) {
+                      local $Term::ReadLine::termcap_nowarn = 1;
+                      $term->ornaments($_);
+                      $last_term_ornaments = $_;
+                  }
+              } else {
+                  undef $last_term_ornaments;
               }
-          } else {
-              undef $last_term_ornaments;
           }
       }
     }
@@ -772,7 +774,7 @@ this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
       # no blocks!!!
       &cleanup if $Signal;
       $CPAN::Frontend->mydie("Got another SIGINT") if $Signal;
-      print "Caught SIGINT\n";
+      $CPAN::Frontend->myprint("Caught SIGINT\n");
       $Signal++;
     };
 
@@ -1608,9 +1610,12 @@ index    re-reads the index files\n});
     }
 }
 
+# reload means only load again what we have loaded before
+#-> sub CPAN::Shell::reload_this ;
 sub reload_this {
     my($self,$f) = @_;
-    return 1 unless $INC{$f};
+    return 1 unless $INC{$f}; # we never loaded this, so we do not
+                              # reload but say OK
     my $pwd = CPAN::anycwd();
     CPAN->debug("reloading the whole '$f' from '$INC{$f}' while pwd='$pwd'")
         if $CPAN::DEBUG;
@@ -2251,59 +2256,38 @@ sub print_ornamented {
         $swhat
             =~ s{([\xC0-\xDF])([\x80-\xBF])}{chr(ord($1)<<6&0xC0|ord($2)&0x3F)}eg; #};
     }
-    my $line;
-    my $longest = 0; # Does list::util work on 5.004?
-    for $line (split /\n/, $swhat) {
-        $longest = length($line) if length($line) > $longest;
-    }
-    $longest = 78 if $longest > 78; # yes, arbitrary, who wants it set-able?
     if ($self->colorize_output) {
         my $color_on = eval { Term::ANSIColor::color($ornament) } || "";
         if ($@) {
             print "Term::ANSIColor rejects color[$ornament]: $@\n
 Please choose a different color (Hint: try 'o conf init color.*')\n";
         }
-        my $demobug = 0; # (=0) works, (=1) has some obscure bugs and
-                         # breaks 30shell.t, (=2) has some obvious
-                         # bugs but passes 30shell.t
-        if ($demobug == 1) {
-            my $nl = chomp $swhat ? "\n" : "";
-            while (length $swhat) {
-                $line = "";
-                if (0) {
-                    $swhat =~ s/(.*\n?)//m;
-                    $line = $1;
-                    last unless $line;
-                } else {
-                    while (length $swhat) {
-                        my $c = substr($swhat,0,1);
-                        $swhat = substr($swhat,1);
-                        $line .= $c;
-                        if ($c eq "\n") {
-                            last;
-                        }
-                    }
-                }
-
-                # my($nl) = chomp $line ? "\n" : "";
-                # ->debug verboten within print_ornamented ==> recursion!
-                # warn("line[$line]ornament[$ornament]sprintf[$sprintf]\n") if $CPAN::DEBUG;
-                print $color_on,
-                    sprintf("%-*s",$longest,$line),
-                        Term::ANSIColor::color("reset"),
-                              $line =~ /\n/ ? "" : $nl;
+        my $colorstyle = 0; # (=0) works, (=1) tries to make
+                            # background colors more attractive by
+                            # appending whitespace to short lines, it
+                            # seems also to work but is less tested;
+                            # for testing use the make target
+                            # testshell-with-protocol-twice; overall
+                            # seems not worth any effort
+        if ($colorstyle == 1) {
+            my $line;
+            my $longest = 0; # Does list::util work on 5.004?
+            for $line (split /\n/, $swhat) {
+                $longest = length($line) if length($line) > $longest;
             }
-        } elsif ($demobug == 2) {
-            my $block = join "\n",
+            $longest = 78 if $longest > 78; # yes, arbitrary, who wants it set-able?
+            my $nl = chomp $swhat ? "\n" : "";
+            my $block = join "",
                 map {
-                    sprintf("%s%-*s%s",
+                    sprintf("%s%-*s%s%s",
                             $color_on,
                             $longest,
                             $_,
                             Term::ANSIColor::color("reset"),
+                            $nl,
                            )
                 }
-                    split /[\r ]*\n/, $swhat;
+                    split /[\r\t ]*\n/, $swhat, -1;
             print $block;
         } else {
             print $color_on,
@@ -5541,35 +5525,55 @@ or
 	local($SIG{ALRM}) = sub { die "inactivity_timeout reached\n" };
 	my($ret,$pid);
 	$@ = "";
+        my $go_via_alarm;
 	if ($CPAN::Config->{inactivity_timeout}) {
-	    eval {
-		alarm $CPAN::Config->{inactivity_timeout};
-		local $SIG{CHLD}; # = sub { wait };
-		if (defined($pid = fork)) {
-		    if ($pid) { #parent
-			# wait;
-			waitpid $pid, 0;
-		    } else {    #child
+            require Config;
+            if ($Config::Config{d_alarm}
+                &&
+                $Config::Config{d_alarm} eq "define"
+               ) {
+                $go_via_alarm++
+            } else {
+                $CPAN::Frontend->mywarn("Warning: you have configured the config ".
+                                        "variable 'inactivity_timeout' to ".
+                                        "'$CPAN::Config->{inactivity_timeout}'. But ".
+                                        "on this machine the system call 'alarm' ".
+                                        "isn't available. This means that we cannot ".
+                                        "provide the feature of intercepting long ".
+                                        "waiting code and will turn this feature off.\n"
+                                       );
+                $CPAN::Config->{inactivity_timeout} = 0;
+            }
+        }
+        if ($go_via_alarm) {
+            eval {
+                alarm $CPAN::Config->{inactivity_timeout};
+                local $SIG{CHLD}; # = sub { wait };
+                if (defined($pid = fork)) {
+                    if ($pid) { #parent
+                        # wait;
+                        waitpid $pid, 0;
+                    } else {    #child
                         # note, this exec isn't necessary if
                         # inactivity_timeout is 0. On the Mac I'd
                         # suggest, we set it always to 0.
                         exec $system;
-		    }
-		} else {
-		    $CPAN::Frontend->myprint("Cannot fork: $!");
-		    return;
-		}
-	    };
-	    alarm 0;
-	    if ($@){
-		kill 9, $pid;
-		waitpid $pid, 0;
+                    }
+                } else {
+                    $CPAN::Frontend->myprint("Cannot fork: $!");
+                    return;
+                }
+            };
+            alarm 0;
+            if ($@){
+                kill 9, $pid;
+                waitpid $pid, 0;
                 my $err = "$@";
-		$CPAN::Frontend->myprint($err);
-		$self->{writemakefile} = CPAN::Distrostatus->new("NO $err");
-		$@ = "";
-		return;
-	    }
+                $CPAN::Frontend->myprint($err);
+                $self->{writemakefile} = CPAN::Distrostatus->new("NO $err");
+                $@ = "";
+                return;
+            }
 	} else {
 	  $ret = system($system);
 	  if ($ret != 0) {
@@ -8152,19 +8156,32 @@ defined:
 
   build_cache        size of cache for directories to build modules
   build_dir          locally accessible directory to build modules
+  bzip2              path to external prg
   cache_metadata     use serializer to cache metadata
   commands_quote     prefered character to use for quoting external
                      commands when running them. Defaults to double
                      quote on Windows, single tick everywhere else;
                      can be set to space to disable quoting
   check_sigs         if signatures should be verified
+  colorize_output    boolean if Term::ANSIColor should colorize output
+  colorize_print     Term::ANSIColor attributes for normal output
+  colorize_warn      Term::ANSIColor attributes for warnings
+  commandnumber_in_prompt
+                     boolean if you want to see current command number
   cpan_home          local directory reserved for this package
+  curl               path to external prg
+  dontload_hash      DEPRECATED
   dontload_list      arrayref: modules in the list will not be
                      loaded by the CPAN::has_inst() routine
+  ftp                path to external prg
+  ftp_passive        if set, the envariable FTP_PASSIVE is set for downloads
+  ftp_proxy          proxy host for ftp requests
   getcwd             see below
+  gpg                path to external prg
   gzip		     location of external program gzip
   histfile           file to maintain history between sessions
   histsize           maximum number of lines to keep in histfile
+  http_proxy         proxy host for http requests
   inactivity_timeout breaks interactive Makefile.PLs or Build.PLs
                      after this many seconds inactivity. Set to 0 to
                      never break.
@@ -8172,6 +8189,7 @@ defined:
   inhibit_startup_message
                      if true, does not print the startup message
   keep_source_where  directory in which to keep the source (if we do)
+  lynx               path to external prg
   make               location of external make program
   make_arg	     arguments that should always be passed to 'make'
   make_install_make_command
@@ -8185,7 +8203,11 @@ defined:
                      command to use instead of './Build' when we are
                      in the install stage, for example 'sudo ./Build'
   mbuildpl_arg       arguments passed to 'perl Build.PL'
+  ncftp              path to external prg
+  ncftpget           path to external prg
+  no_proxy           don't proxy to these hosts/domains (comma separated list)
   pager              location of external program more (or any pager)
+  password           your password if you CPAN server wants one
   prefer_installer   legal values are MB and EUMM: if a module comes
                      with both a Makefile.PL and a Build.PL, use the
                      former (EUMM) or the latter (MB); if the module
@@ -8197,17 +8219,18 @@ defined:
   proxy_user         username for accessing an authenticating proxy
   proxy_pass         password for accessing an authenticating proxy
   scan_cache	     controls scanning of cache ('atstart' or 'never')
+  shell              your favorite shell
+  show_upload_date   boolean if commands should try to determine upload date
   tar                location of external program tar
   term_is_latin      if true internal UTF-8 is translated to ISO-8859-1
                      (and nonsense for characters outside latin range)
+  term_ornaments     boolean to turn ReadLine ornamenting on/off
   test_report        email test reports (if CPAN::Reporter is installed)
   unzip              location of external program unzip
   urllist	     arrayref to nearby CPAN sites (or equivalent locations)
+  username           your username if you CPAN server wants one
   wait_list          arrayref to a wait server to try (See CPAN::WAIT)
-  ftp_passive        if set, the envariable FTP_PASSIVE is set for downloads
-  ftp_proxy,      }  the three usual variables for configuring
-    http_proxy,   }  proxy requests. Both as CPAN::Config variables
-    no_proxy      }  and as environment variables configurable.
+  wget               path to external prg
 
 You can set and query each of these options interactively in the cpan
 shell with the command set defined within the C<o conf> command:
@@ -8700,6 +8723,13 @@ unusable. Please consider backing up your data before every upgrade.
 =head1 AUTHOR
 
 Andreas Koenig C<< <andk@cpan.org> >>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
 
 =head1 TRANSLATIONS
 

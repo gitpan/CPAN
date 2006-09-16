@@ -24,8 +24,9 @@ if ($HAVE_FILE_SPEC) {
     die "Your perl is a bit dated[$]].\nDo not make a release with it\n" if $] < 5.008;
     {
       local $^W;
+      $ExtUtils::MakeMaker::VERSION = eval $ExtUtils::MakeMaker::VERSION;
       die "Your MakeMaker is a bit dated[$ExtUtils::MakeMaker::VERSION].\nDo not make a release with it\n"
-          if $ExtUtils::MakeMaker::VERSION+0 < 6.30;
+          if $ExtUtils::MakeMaker::VERSION < 6.3004;
     }
     die "Your MakeMaker doesn't do the sign woodoo" unless
         MM->can("signature_target");
@@ -128,6 +129,7 @@ WriteMakefile(
               VERSION_FROM => $version_from,
               EXE_FILES    => [qw(scripts/cpan)],
               PREREQ_PM    => $prereq_pm,
+              LICENSE      => "perl",
               clean        => { FILES => "lib/CPAN/Config.pm" },
               @sign,
               ($] >= 5.005 ?
@@ -242,8 +244,8 @@ diff::
 howto-release:
 	@$(ECHO) make ci dist \&\& make release
 
-META.yml:
-	$(ECHO) -n "" >> META.yml
+META.yml: metafile
+	$(CP) $(DISTVNAME)/META.yml  ./META.yml
 
 testcover: testdistros
 	:>SIGNATURE

@@ -23,6 +23,7 @@ lib/CPAN/Version.pm
 scripts/cpan
 t/CPAN/CpanTestDummies-1.55.pm
 t/CPAN/TestConfig.pm
+t/CPAN/TestMirroredBy
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz
@@ -49,5 +50,7 @@ t/12cpan.t
 t/30shell.pod
 t/30shell.t
 t/50pod.t
+t/51pod.t
+t/52podcover.t
 t/60credentials.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,5 +1,63 @@
+2006-09-16  k
+
+	* Makefile.PL: prepare 1.87_64
+	* Changes, Todo: prepare 1.87_64
+	* Todo: reshuffle todos; no attractive pick found
+	* MANIFEST, t/30shell.t, t/CPAN/TestMirroredBy: test the urllist 
+	  dialog
+	* t/30shell.t: allow skipping of single tests and bailing out of 
+	  from within the loop
+	* Makefile.PL, Todo: META.yml was not produced for quite a while; 
+	  now make sure it is always produced by makemaker and make sure 
+	  MM is recent
+	* lib/CPAN/FirstTime.pm: allow ranges in urllist dialog, as 
+	  inspired by Andrew Strebkov
+	* lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: simplify "o 
+	  conf init" argument passing and handling and allow "o conf init 
+	  WORD WORD2...", document inline
+	* lib/CPAN/FirstTime.pm: simplify a if/else construct
+	* lib/CPAN/FirstTime.pm: oops, broke "o conf init" without 
+	  argument yesterday
+	* Makefile.PL, lib/CPAN.pm, lib/CPAN/Admin.pm, lib/CPAN/Debug.pm, 
+	  lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm, 
+	  lib/CPAN/Nox.pm, lib/CPAN/Tarzip.pm, lib/CPAN/Version.pm: add 
+	  boilerplate license
+	* MANIFEST, t/52podcover.t, t/podcover.t: add pod coverage
+	* t/podcover.t: add pod coverage
+
+2006-09-15  k
+
+	* lib/CPAN.pm: untested version that disables inactivity_timeout 
+	  when d_alarm os not "define";
+	* lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: rethunk the 
+	  question if the regex in "o conf init MATCH" shall be enclosed 
+	  in slashes with Slaven and he siad yes to the slash; so be it
+	* lib/CPAN.pm: found one of the last direct print commands
+	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: o conf defaults 
+	  revisited
+	* Todo, lib/CPAN.pm: finished the investigation of the $demobug 
+	  bug and renamed the variable to $colorstyle and commented in the 
+	  code; conclusion: not worth any further effort
+	* t/51pod.t: used only once warning fixed
+
+2006-09-14  k
+
+	* t/30shell.t: weird behaviour on 5.8.0 with LANG=en_US.UTF-8 on a 
+	  RedHat 7 or 8 box fixed by forcing LANG=C before spawning the 
+	  shell
+	* t/30shell.t: weird behaviour on 5.8.0 with LANG=en_US.UTF-8 on a 
+	  RedHat 7 or 8 box fixed by makeing the expect strings more 
+	  precise (which is never wrong)
+	* MANIFEST: ... and test completeness
+	* Todo: document all known config variables and test completeness
+	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm, t/51pod.t: document 
+	  all known config variables and test completeness
+
 2006-09-13  k
 
+	* Changes, Todo, lib/CPAN.pm: documenting todos and reviewing 
+	  release notes
+	* Todo, lib/CPAN.pm, t/30shell.t: revistited Todo items
 	* Changes: prepare 1.87_63
 	* lib/CPAN/HandleConfig.pm, t/30shell.t: get rid of the 
 	  "initialized" sentence we now see it too often

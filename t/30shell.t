@@ -30,12 +30,16 @@ R for requires or relies on
 
 C for comment
 
+S for status
+
 
 The script starts a CPAN shell and feed it the chunks such that the P
 line is injected, the output of the shell is parsed and compared to
 the expression in the E line. With T the timeout can be changed (the
 default is rather low, maybe 10 seconds, see the code for details).
-The expression in R is used to filter tests.
+The expression in R is used to filter tests. The keyword in S may be
+one of C<run> to run this test, C<skip> to skip it, and C<quit> to
+stop testing immediately when this test is reached.
 
 To get reliable and debuggable results, Expect.pm should be installed.
 Without Expect.pm, a fallback mode is started that should in principle
@@ -58,8 +62,8 @@ BEGIN {
     }
     eval { require Expect };
     if ($@) {
-        unless ($ENV{CPAN_RUN_SHELL_TEST}) {
-            print "1..0 # Skip: no Expect, maybe try env CPAN_RUN_SHELL_TEST=1\n";
+        unless ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
+            print "1..0 # Skip: no Expect, maybe try env CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT=1\n";
             eval "require POSIX; 1" and POSIX::_exit(0);
         }
     } else {
@@ -88,6 +92,8 @@ END {
 }
 cp _f"t/CPAN/TestConfig.pm", _f"t/CPAN/MyConfig.pm"
     or die "Could not cp t/CPAN/TestConfig.pm over t/CPAN/MyConfig.pm: $!";
+cp _f"t/CPAN/TestMirroredBy", _f"t/dot-cpan/sources/MIRRORED.BY"
+    or die "Could not cp t/CPAN/TestMirroredBy over t/dor-cpan/sources/MIRRORED.BY: $!";
 mkpath _d"t/dot-cpan/Bundle";
 cp _f"t/CPAN/CpanTestDummies-1.55.pm",
     _f"t/dot-cpan/Bundle/CpanTestDummies.pm" or die
@@ -221,6 +227,7 @@ if ($HAVE_EXPECT) {
 ok(1,"RUN_EXPECT[$RUN_EXPECT]");
 if ($RUN_EXPECT) {
     $expo = Expect->new;
+    $ENV{LANG} = "C";
     $expo->spawn(@system);
     $expo->log_stdout(0);
     $expo->notransfer(1);
@@ -240,10 +247,29 @@ sub splitchunk ($) {
     @s;
 }
 
+my $skip_the_rest;
 TUPL: for my $i (0..$#prgs){
     my $chunk = $prgs[$i];
     my %h = splitchunk $chunk;
-    my($prog,$expected,$req,$test_timeout,$comment) = @h{qw(P E R T C)};
+    my($status,$prog,$expected,$req,$test_timeout,$comment) = @h{qw(S P E R T C)};
+    if ($skip_the_rest) {
+        ok(1,"skipping");
+        next TUPL;
+    }
+    if ($status) {
+        chomp $status;
+        if ($status eq "skip") {
+            ok(1,"skipping");
+            next TUPL;
+        } elsif ($status eq "run") {
+        } elsif ($status eq "quit") {
+            ok(1,"skipping");
+            $skip_the_rest++;
+            next TUPL;
+        } else {
+            die "Alert: illegal status [$status]";
+        }
+    }
     unless (defined $expected or defined $prog) {
         ok(1,"empty test");
         next TUPL;
@@ -273,6 +299,14 @@ TUPL: for my $i (0..$#prgs){
             print SYSTEM "# NEXT: $sendprog\n";
             print SYSTEM "$sendprog\n";
         }
+    } else {
+        if ($RUN_EXPECT) {
+            mydiag "PRESSING RETURN";
+            $expo->send("\n");
+        } else {
+            print SYSTEM "# PRESSING RETURN\n";
+            print SYSTEM "\n";
+        }
     }
     $expected .= "(?s:.*?$prompt_re)" unless $expected =~ /\(/;
     if ($RUN_EXPECT) {
@@ -301,7 +335,7 @@ expected[$expected]\ngot[$got]\n\n";
                      );
         my $got = $expo->clear_accum;
         mydiag "GOT: $got\n";
-        $prog =~ s/^(\d)/...$1/;
+        $prog =~ s/^(\d)/$1/;
         $comment ||= "";
         ok(1, "$comment" . ($prog ? " (testing command '$prog')" : "[empty RET]"));
     } else {
@@ -328,7 +362,7 @@ if ($RUN_EXPECT) {
 }
 
 read_myconfig;
-is($CPAN::Config->{histsize},101);
+is($CPAN::Config->{histsize},100);
 rmtree _d"t/dot-cpan";
 
 # note: E=expect; P=program(=print); T=timeout; R=requires(=relies_on)
@@ -336,8 +370,46 @@ __END__
 ########
 E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*?>)
 ########
+P:o conf init urllist
+E:(MIRR).+?y\]
+########
+P:y
+E:continent.+?(\])
+########
+P:
+E:previous.+?(\])
+########
+P:
+E:another URL.+?(\])
+########
+P:
+E:(?s:New set.+?commit.+?(!).+?\])
+########
+P:o conf init urllist
+E:MIRR.+?(\])
+########
+P:y
+E:continent.+?(\])
+########
+P:1-8
+E:(\])
+########
+P:1-8
+E:(\])
+########
+P:1-8
+E:(\])
+########
+P:
+E:(?s:New set.+?commit.+?(!).+?\])
+########
+P:o conf urllist
+########
+P:o conf defaults
+########
 P:o conf build_cache
 E:build_cache
+S:run
 ########
 P:o conf init
 E:(?s:.*?configure.as.much.as.possible.automatically.*?\])
@@ -363,6 +435,12 @@ E:reread
 P:o conf histsize
 E:histsize.+?101
 ########
+P:o conf histsize 100
+E:histsize.+?100
+########
+P:o conf commit
+E:commit: wrote.+?MyConfig
+########
 P:o conf urllist
 E:file:///.*?CPAN
 ########
@@ -385,7 +463,7 @@ P:foo
 E:
 ########
 P:o conf init bzip2
-E:bzip2.+?(\])
+E:Where.+?bzip2.+?(\])
 ########
 P:foo
 E:
@@ -397,37 +475,37 @@ P:y
 E:
 ########
 P:o conf init check_sigs
-E:............(\])
+E:Module::Signature is installed.+?(\])
 ########
 P:y
 E:
 ########
 P:o conf init cpan_home
-E:............(\])
+E:directory.+?(\])
 ########
 P:/tmp/must_be_a_createable_absolute_path/../
 E:
 ########
 P:o conf init curl
-E:............(\])
+E:Where.+?(\])
 ########
 P:foo
 E:
 ########
 P:o conf init gpg
-E:............(\])
+E:Where.+?(\])
 ########
 P:foo
 E:
 ########
 P:o conf init gzip
-E:............(\])
+E:Where.+?(\])
 ########
 P:foo
 E:
 ########
 P:o conf init lynx
-E:............(\])
+E:Where.+?(\])
 ########
 P:foo
 E:
