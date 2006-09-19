@@ -1,5 +1,26 @@
+2006-09-19  k
+
+	* t/51pod.t: prepare 1.87_65
+	* README, t/52podcover.t: prepare 1.87_65
+	* README, lib/CPAN.pm: prepare 1.87_65
+	* lib/CPAN.pm: prepare 1.87_65
+	* t/52podcover.t: prepare 1.87_65
+	* README: prepare 1.87_65
+	* Changes, Todo, lib/CPAN.pm, t/52podcover.t: Hunting missing 
+	  documentation with Test::Pod::Coverage because my
+	  first try to use it started with a wrong copy&paste.
+
+2006-09-17  k
+
+	* Todo, lib/CPAN/Tarzip.pm: Archive::Tar now supports bz2, so one 
+	  mydie needs to go; make BUGHUNTING survive reloads; add an 
+	  assertion that Archive::Tar must be there
+	* Makefile.PL: protect users of older MakeMakers from the recently 
+	  added LICENSE attribute
+
 2006-09-16  k
 
+	* Changes, README, lib/CPAN.pm: prepare 1.88
 	* Makefile.PL: prepare 1.87_64
 	* Changes, Todo: prepare 1.87_64
 	* Todo: reshuffle todos; no attractive pick found
