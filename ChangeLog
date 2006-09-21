@@ -1,5 +1,28 @@
+2006-09-21  k
+
+	* Changes: finish release 1.88
+	* Changes: finish the release notes
+	* Todo: finish Todo file for release
+	* lib/CPAN.pm: preparing 1.88
+	* README: result from the last make dist
+	* Makefile.PL: add a warning for very old MakeMakers because -- I 
+	  do not know for which -- some old MakeMakers are not able to 
+	  make everything;
+	* lib/CPAN.pm: better keep that comparizon as short as pozzible
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm: choose defaults with 
+	  background and be consistent in default colors
+	* Changes, Todo: more release notes for 1.88; notes about 
+	  investigations on MailTools
+
+2006-09-20  k
+
+	* Changes, Makefile.PL, Todo, lib/CPAN.pm: clarify the MakeMaker 
+	  VERSION always, not only when releasing, it influences the 
+	  LICENSE field as I just discovered with Devel::Symdump
+
 2006-09-19  k
 
+	* Todo: notes about failing mail
 	* t/51pod.t: prepare 1.87_65
 	* README, t/52podcover.t: prepare 1.87_65
 	* README, lib/CPAN.pm: prepare 1.87_65

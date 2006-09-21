@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.87_65';
+$CPAN::VERSION = '1.88';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -2307,7 +2307,7 @@ Please choose a different color (Hint: try 'o conf init color.*')\n";
 sub myprint {
     my($self,$what) = @_;
 
-    $self->print_ornamented($what, $CPAN::Config->{colorize_print}||'bold blue');
+    $self->print_ornamented($what, $CPAN::Config->{colorize_print}||'bold blue on_white');
 }
 
 sub myexit {
@@ -2318,13 +2318,13 @@ sub myexit {
 
 sub mywarn {
     my($self,$what) = @_;
-    $self->print_ornamented($what, $CPAN::Config->{colorize_warn}||'bold red');
+    $self->print_ornamented($what, $CPAN::Config->{colorize_warn}||'bold red on_white');
 }
 
 # only to be used for shell commands
 sub mydie {
     my($self,$what) = @_;
-    $self->print_ornamented($what, $CPAN::Config->{colorize_warn}||'bold red');
+    $self->print_ornamented($what, $CPAN::Config->{colorize_warn}||'bold red on_white');
 
     # If it is the shell, we want that the following die to be silent,
     # but if it is not the shell, we would need a 'die $what'. We need
@@ -2338,7 +2338,7 @@ sub mydie {
 sub colorable_makemaker_prompt {
     my($foo,$bar) = @_;
     if (CPAN::Shell->colorize_output) {
-        my $ornament = $CPAN::Config->{colorize_print}||'bold blue';
+        my $ornament = $CPAN::Config->{colorize_print}||'bold blue on_white';
         my $color_on = eval { Term::ANSIColor::color($ornament); } || "";
         print $color_on;
     }
@@ -7249,14 +7249,8 @@ Batch mode:
 
 =head1 STATUS
 
-This module will eventually be replaced by CPANPLUS. CPANPLUS is kind
-of a modern rewrite from ground up with greater extensibility and more
-features but no full compatibility. If you're new to CPAN.pm, you
-probably should investigate if CPANPLUS is the better choice for you.
-
-If you're already used to CPAN.pm you're welcome to continue using it.
-I intend to support it until somebody convinces me that there is a
-both superior and sufficiently compatible drop-in replacement.
+This module and its competitor, the CPANPLUS module, are both much
+cooler than the other.
 
 =head1 COMPATIBILITY
 

@@ -1,31 +1,37 @@
 2006-09-xx  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* release 1.88 (still on hold)
+	* release 1.88
 
-	* This release is identical to the 1.87_XX developer release. For
-	detailed changes see the entries in the Changes file of the release
-	itself. For finer grained change log see the ChangeLog.svn file in the
-	release. The highlights of this release are:
+	* For detailed changes since 1.87 see the entries in the Changes file.
+	For finer grained change log see the ChangeLog.svn file. The highlights
+	of this release are:
 
 	* convenient configuration: dialogs for individual items or groups of
 	items can be accessed with a single command (Courtesy Jim Cromie)
 
-	* support for CPAN::Reporter by David Golden: try 'o conf init /test/'
+	* experimental support for CPAN::Reporter: try
+	    o conf init /test/
 	(Courtesy David Golden)
 
-	* make installation of scripts easier: try 'install
-	SREZIC/pingomatic-1.012' (Courtesy Slaven Rezic)
+	* make installation of scripts easier: try something like
+	    install	SREZIC/pingomatic-1.012
+	(Courtesy Slaven Rezic)
 
 	* colored output for better separation of process output, messages from
-	CPAN and warnings from CPAN: try 'o conf init /color/' to turn
-	colorization on/off
+	CPAN and warnings from CPAN: to turn colorization on/off try
+	    o conf init /color/
 
 	* formatting of lists of modules now features a column to indicate
 	installed and updateable modules
 
-	* Minor Incompatibility: the init dialog now has reversed semantics: it
-	suggests automatic configuration that can be confirmed with 'yes'
-	instead of suggesting manual configuration that can be denied with 'no'.
+	* signature checking can now be turned on and off with 'o conf check_sigs'
+
+	* new command 'upgrade' installs newest version of all installed modules
+
+	* Please note a minor incompatibility: the init dialog now has reversed
+	semantics: it suggests automatic configuration that can be confirmed
+	with 'yes' instead of suggesting manual configuration that can be denied
+	with 'no'.
 
 2006-09-18  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 

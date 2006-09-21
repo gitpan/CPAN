@@ -2,7 +2,7 @@
 package CPAN::Mirrored::By;
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf "%.6f", substr(q$Rev: 848 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 870 $,4)/1000000 + 5.4;
 
 sub new { 
     my($self,@arg) = @_;
@@ -21,7 +21,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec;
 use vars qw($VERSION $urllist);
-$VERSION = sprintf "%.6f", substr(q$Rev: 848 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 870 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -473,8 +473,8 @@ Shall we use it as the general CPAN build and cache directory?
         my_yn_prompt(colorize_output => 0, $matcher);
         if ($CPAN::Config->{colorize_output}) {
             for my $tuple (
-                           ["colorize_print", "bold blue"],
-                           ["colorize_warn", "bold red"],
+                           ["colorize_print", "bold blue on_white"],
+                           ["colorize_warn", "bold red on_white"],
                           ) {
                 my_dflt_prompt($tuple->[0] => $tuple->[1], $matcher);
                 if ($CPAN::META->has_inst("Term::ANSIColor")) {

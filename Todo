@@ -1,20 +1,23 @@
-2006-09-18  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+2006-09-21  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* verify that the CPAN.pm-using modules continue to work
+	* automatic testing? Is it anywhere documented what the impacts of
+	$ENV{AUTOMATED_TESTING} are?
+
+	* new keyword capture? CPAN::Reporter does not know the output of the
+	commands before "test" and cannot report about compilation failures.
+	This looks like a major flaw to me:-(
+
+	* E5: (again and again) verify that the CPAN.pm-using modules continue
+	to work
 
   AltaVista-BabelFish DMUEY CPAN-Unwind MSCHILLI CPAN-WAIT ULPFR
 	Devel-Modlist RJRAY PAR-Dist-FromCPAN SMUELLER Perl-Dist DAGOLDEN
 	Test-CPANpm CRAKRJACK
 
-	Dubious CPAN::Unwind (something to do with Log4perl)
-	Dubious Test-CPANpm (did this ever work?)
+	* E5 watch RT for open tickets. This todo can never be closed.
 
 	* E1 Todo: continue to close the Pod::Coverage gap. Currently only
 	CPAN.pm is covered
-
-2006-09-17  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* E5 watch RT for open tickets. This todo can never be closed.
 
 	* E3 Todo: write a test for dot-cpan/Metadata usage. Hmmm. Important for
 	the future of locking, the future of DBM::Deep, protocol changes. Not
@@ -35,8 +38,6 @@
 	Schulze. This has nothing to do with -I. but only with the shell and
 	$ENV{PATH} and as we do not know which shell it was it seems we cannot
 	test for the problem.
-
-2006-09-16  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* H1 These days developer TELS posted to perl5-porters that his newest
 	release is available at
@@ -85,8 +86,6 @@ oh, very interesting, especially if I already have the file:
 This makes CPAN::Mini::Inject a bit less useful because I no longer
 need the middle man.
 
-
-2006-09-15  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* Make the "new -> ." symlink in scripts/ as outlined in a mail to kurt
 	and jarkko
@@ -143,7 +142,7 @@ need the middle man.
 	andreas
 
 
-	* M3 feature request by Juergen Christoffel: have time stamps on the
+	* M2 feature request by Juergen Christoffel: have time stamps on the
 	history and a history command to see them
 
 	* E3 prerequisites: require perl version xxx: we should not delete that
@@ -171,6 +170,167 @@ need the middle man.
 	And I promise to try out a more granular locking mechanism.
 
 	* hr ================ no todos below this line ================ /hr
+
+	* I have seen this bug with 5.6.2, 5.8.3, 5.8.4, 5.8.5; it seems not to
+	effect bleadperl and 5.8.8, 5.8.6-RC1
+
+	Once you have installed both Module::Signature AND CPAN::Reporter, you
+	cannot test both of them in the same session. E.g. with 5.8.4 I do
+
+	test Module::Signature
+	--> tests ok, do you want to report? no,no,no
+	test CPAN::Reporter
+	--> tests ok, debug says "main: distribution\nmain:\
+	comments\nCPAN::Reporter defines neither package nor VERSION--version\
+	check failed at (eval 70) line 405."
+	test Module::Signature
+	--> tests ok, debug says "main: distribution\nmain:\
+	comments\nCPAN::Reporter defines neither package nor VERSION--version\
+	check failed at (eval 70) line 405."
+
+	"version check failed" is in
+	/usr/local/perl-redhat-5.8.5/lib/5.8.5/pod/perldiag.pod:
+
+=item %s defines neither package nor VERSION--version check failed
+
+(F) You said something like "use Module 42" but in the Module file
+there are neither package declarations nor a C<$VERSION>.
+
+	So I spot this line in CPAN::Reporter:
+
+    $tr->via( 'CPAN::Reporter ' . CPAN::Reporter->VERSION );
+
+	and I change it to
+
+    $tr->via( 'CPAN::Reporter ' . $CPAN::Reporter::VERSION );
+
+	and the bug is worked around.
+
+
+2006-09-20  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* #  FAIL  DBIx-Timeout  1.01 350359 5.8.8 on Netbsd 3.0 (i386-netbsd-thread-multi-64int)
+# PASS Net-SDP 0.07 350354 5.8.8 on Netbsd 3.0 (i386-netbsd-thread-multi-64int)
+# PASS GIS-Distance 0.01000 350352 5.8.8 on Netbsd 3.0 (i386-netbsd-thread-multi-64int)
+# PASS Class-Measure 0.02 350351 5.8.8 on Netbsd 3.0 (i386-netbsd-thread-multi-64int)
+# PASS WWW-Pagination 0.35 350350 5.8.8 on Netbsd 3.0 (i386-netbsd-thread-multi-64int)
+# PASS Socket-Multicast6 0.01 350348 5.8.8 on Netbsd 3.0 (i386-netbsd-thread-multi-64int)
+# PASS IO-Socket-INET6 2.51 350347 5.8.8 on Netbsd 3.0 (i386-netbsd-thread-multi-64int)
+
+	Repeating experiments with CPAN::Reporter and Net::SMTP and AUTOMATED_TESTING
+
+	I just started with a fresh blead@28875 and the command
+
+	    install CPAN::Reporter Bundle::CPAN Module::Signature Devel::Symdump
+
+	and all reports that CPAN::Reporter offered were accepted by me. So
+	tomorrow morning I expect reports on testers.cpan.org above the FAIL for
+	DBIx-Timeout. Then I can install Mail::Send again and send a few reports
+	and then I can set AUTOMATIC_TESTING and on the next perl I can do that
+	in opposite order.
+
+	7 hours later nothing shows up on http://testers.cpan.org/recent.html
+
+	I'd better go subscribe to cpan-testers. Now I am subscribed and I
+	re-tested with blead@28876 and while Mail::Send does send out messages
+	since I added the MASQUERADE_AS line, they do not come back to me. I
+	need to change the email_to to me on the next try.... And yes, the mail
+	arrives. Apparently it is not accepted at testers, only Net::SMTP gets
+	through. Maybe some MX thingie going on.
+
+2006-09-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* repeating the exercise of testing CPAN::Reporter
+
+	blead@28868: install CPAN::Reporter and its dependencies (no MailTools
+	but Net::SMTP ist there). Testing TAPx::Parser fails miserably, the
+	report seems to be sent. Testing CGI::Session succeeds with lots of
+	SKIPs. The report seems to have been sent. Testing Module::Signature
+	succeeds with just a single test, report seems to have been sent.
+	Installing CPANPLUS::Dist::Build installs among many other dependencies
+	CPANPLUS itself, the latter succeeds and I let CPAN::Reporter send a
+	mail which seems to work.
+
+	Now I install Mail::Mailer and succeed. The Mail is still sent by
+	Net::SMTP and apparently succeeds.
+
+	Now let's try IO::Tty. Tests succeed but it's a test.pl based distro, so
+	CPAN::Reporter cannot send mail. To get to a quick end, I now test
+	CPAN::Reporter itself. It pretends to send mail, from the debug output I
+	recognize Mail::Mailer. And now I have two mails in the mqueue with
+	"Could not resolve k75.linux.bogus". QED.
+
+	MASQUERADE_AS(`franz.ak.mind.de')dnl in the sendmail.mc seems to have
+	done the trick.
+
+	* find out why CPAN::Reporter cannot send mail on my home machine
+
+	Somebody seems to try to send mail and using the local address
+	(k75.linux.bogus) in a HELO or something. I'm testing with
+	Devel::Symdump.
+
+	Installed modules? Mail::Send from MailTools? Net::SMTP from libnet?
+
+	MailTools no, N:S yes.
+
+	Ah, Test::Reporter says "If you have MailTools installed". Hmmm. This
+	test succeeded today with blead@28866. Will have to wait again to see a
+	fail.
+
+	So now I have MailTools installed and now I see again the message
+
+% mailq
+MSP Queue status...
+/var/spool/mqueue-client is empty
+                Total requests: 0
+MTA Queue status...
+                /var/spool/mqueue (1 request)
+-----Q-ID----- --Size-- -----Q-Time----- ------------Sender/Recipient-----------
+k8J6VCVD013108     3070 Tue Sep 19 08:31 <k@k75.linux.bogus>
+                 (Deferred: 450 Could not resolve k75.linux.bogus)
+                                         <cpan-testers@perl.org>
+                Total requests: 1
+
+	This is the debugging output of {CPAN,Test}::Reporter:
+
+Sending test report with 'pass' to cpan-testers@perl.org
+Test::Reporter: debug
+Test::Reporter: send
+Test::Reporter: debug
+Test::Reporter: from
+Test::Reporter: debug
+Test::Reporter::Mail::Util: _mailaddress
+Test::Reporter: debug
+Test::Reporter: report
+Test::Reporter: debug
+Test::Reporter: subject
+Test::Reporter: debug
+Test::Reporter: _verify
+Test::Reporter: errstr
+Test::Reporter: debug
+Test::Reporter: _have_mail_send
+Test::Reporter: debug
+Test::Reporter: _mail_send
+Test::Reporter: via
+Test::Reporter: address
+Test::Reporter: debug
+Test::Reporter: from
+Test::Reporter: debug
+Test::Reporter::Mail::Util: _mailaddress
+Test::Reporter: debug
+Test::Reporter: subject
+Test::Reporter: debug
+Test::Reporter: mail_send_args
+Test::Reporter: debug
+Test::Reporter: _have_mail_send
+Test::Reporter: debug
+Test::Reporter: report
+
+	Need to repeat the process and then report as a bug.
+
+2006-09-18  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+2006-09-17  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* Test the urllist dialog. Requires a fake mirrored.by file. DONE in rev. 851
 
