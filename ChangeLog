@@ -1,3 +1,10 @@
+2006-09-22  k
+
+	* Changes: prepare 1.8801
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm: cpan-testers found an 
+	  environment where the init dialog didn't proceed as my tests 
+	  expected. Should now be fixed
+
 2006-09-21  k
 
 	* Changes: finish release 1.88
