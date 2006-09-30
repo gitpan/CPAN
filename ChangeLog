@@ -1,3 +1,195 @@
+2006-09-30  k
+
+	* MANIFEST.SKIP, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.01.zip:
+	   prepare 1.88_51
+	* Changes: prepare 1.88_51
+	* README: readme automatically generated
+	* lib/CPAN.pm: document build_requires_install_policy
+	* Todo, lib/CPAN.pm, t/30shell.t: fixd bug where an object starts 
+	  first as a "build_requires" and later becomes a "requires". We 
+	  are not promoting the object and forget the previous attempt to 
+	  install if necessary
+	* lib/CPAN.pm, t/30shell.t: add debugging aids and a few tests and 
+	  fix a variable shadowing bug introduced very recently
+	* README, t/30shell.t, t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS, 
+	  t/CPAN/modules/02packages.details.txt: everything adjusted to 
+	  the new dummy distros; 30shell.t still passes
+	* MANIFEST, bin/no_CR.pl, t/30shell.t: fix mae dist
+	* t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/META.yml,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.03.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.02.zip:
+	   add the three new versions of test distros; they are not yet 
+	  tested!
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/lib/CPAN/Test/Dummy/Perl5/Make/Zip.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/t/00_load.t:
+	   new versions of CPAN-Test-Dummy distros for dependency testing
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/CPAN/Test/Dummy/Perl5/Make.pm:
+	   new versions of CPAN-Test-Dummy distros for dependency testing
+	* Makefile.PL: new versions of CPAN-Test-Dummy distros for 
+	  dependency testing
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/META.yml:
+	   new versions of CPAN-Test-Dummy distros for dependency testing
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Makefile.PL:
+	   new versions of CPAN-Test-Dummy distros for dependency testing
+	* Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Makefile.PL:
+	   new versions of CPAN-Test-Dummy distros for dependency testing
+	* Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL:
+	   new versions of CPAN-Test-Dummy distros for dependency testing
+	* Makefile.PL: new versions of CPAN-Test-Dummy distros for 
+	  dependency testing
+	* Makefile.PL, Todo, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/Changes, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/MANIFEST,
+	   t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/README, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/lib/CPAN/Test/Dummy/Perl5/Build.pm:
+	   new versions of CPAN-Test-Dummy distros for dependency testing
+	* Makefile.PL, Todo, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/README,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/lib/CPAN/Test/Dummy/Perl5/Make/Zip.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/MANIFEST: 
+	  new versions of CPAN-Test-Dummy distros for dependency testing
+	* Makefile.PL, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL,
+	   t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/README, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/CPAN/Test/Dummy/Perl5/Make.pm:
+	   prepare a new CPAN-Test-Dummy-Perl5-Make distro with better 
+	  kwalitee
+	* t/30shell.coverage, t/30shell.pod, t/30shell.t, 
+	  t/README.shell.txt: cleanup scattered documentation on 30shell.t 
+	  (just shuffling around/renaming, no new text)
+	* lib/CPAN.pm, lib/CPAN/Debug.pm, lib/CPAN/FirstTime.pm: again 
+	  improve transparence during reload command by simplifying code
+	* lib/CPAN/FirstTime.pm: discovering that FirstTime has no VERSION
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/Queue.pm, 
+	  related/Bundle-CPAN/Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL:
+	   improve transparence during reload command by displaying 
+	  filenames and versions; remove execute bits from various 
+	  Makefile.PLs (kwalitee)
+
+2006-09-29  k
+
+	* lib/CPAN.pm: Removing unneeded SIG handler: and David Golden 
+	  does not even have that signal!
+	* Todo: prepare 1.88_51
+	* Changes: prepare 1.88_51
+	* Changes: forgot attribution
+	* Changes, Todo: prepare 1.88_51
+	* Changes, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm: first preliminary finish of 
+	  build_requires_install_policy for public viewing
+	* Todo, lib/CPAN.pm: fixed bug with repeated successful tests of 
+	  thing that were not installed
+
+2006-09-28  k
+
+	* Todo, lib/CPAN.pm: WIP: test bundles with reqtype
+	* Todo, lib/CPAN.pm, lib/CPAN/Queue.pm: inheritance of 
+	  build_requires now seems to work
+	* lib/CPAN/Queue.pm: blah
+
+2006-09-27  k
+
+	* Todo: a note to remember myself style
+	* Todo, lib/CPAN.pm, lib/CPAN/Queue.pm: work in progress; 30shell 
+	  passes but the inheritance of requirements is not correct yet
+	* lib/CPAN.pm: comment what is_installed is being used for
+	* Todo: testing cpan commit emails
+	* Todo: testing cpan commit emails
+	* Todo: testing cpan commit emails
+
+2006-09-26  k
+
+	* lib/CPAN.pm: ducument that r takes arguments; support the same 
+	  arguments for the upgrade command; document this (feature 
+	  suggested by Adam Kennedy in #21724)
+	* Todo: again notes about build_requires
+	* Todo: again notes about build_requires
+	* Todo, lib/CPAN.pm: bringing build_requires one step further, out 
+	  of unsat_prereq into follow_prereqs
+	* Todo: again notes about build_requires
+	* lib/CPAN.pm: do not merge requires and build_requires in 
+	  prereq_pm: currently we merge unsat_prereq which is also wrong 
+	  but better; passes 30shell.t
+	* Todo: notes about testing the upgrade command
+	* Makefile.PL: apparently I was wrong about the MakeMAker version 
+	  that introduced LICENSE
+	* lib/CPAN.pm: typo
+	* lib/CPAN.pm: Bugfix patch by Phil Pennock (see #21716)
+
+2006-09-25  k
+
+	* lib/CPAN.pm: consolidate the two AUTOLOADS; a few notes about a 
+	  few XXX spots
+	* Todo, lib/CPAN.pm: a few simple ideas how to defend against deep 
+	  recursion via autoload
+
+2006-09-24  k
+
+	* Makefile.PL: alphabetize the prereqs
+	* related/Bundle-CPAN/CPAN.pm: Address #18987 -- eliminate libnet 
+	  to save a few downloads; address
+	  #18985 -- put Module::Build highjer up to reduce recursion; add 
+	  all
+	  prerequisites to help people who ignored the prereqs; replace the
+	  distro of ReadLine with the module name again
+	* t/CPAN/modules/02packages.details.txt: triviality
+	* Todo, lib/CPAN.pm: notes about build_requires
+	* Todo, lib/CPAN.pm, lib/CPAN/Queue.pm, 
+	  t/CPAN/modules/02packages.details.txt: trivial changes to the 
+	  handling of queue objects
+
+2006-09-23  k
+
+	* Makefile.PL, Todo, lib/CPAN.pm, related/Bundle-CPAN/CPAN.pm, 
+	  t/30shell.t: make Test::Harness 2.62 a PREREQ_PM
+	* Todo: PS: 886 was about Put CPAN::Queue in its own file.
+	* MANIFEST, Todo, bin/cp-to-perl.pl, lib/CPAN.pm, 
+	  lib/CPAN/Queue.pm, t/03pkgs.t: broken work in progress!
+	* Todo, lib/CPAN.pm: implement a smart dumper (undocumnted) that 
+	  helps debugging via the dump command
+	* lib/CPAN.pm: catch errors in user-provided regular expressions
+	* Todo: notes about build_dependencies
+	* lib/CPAN.pm: defend against the case where the private @cwd of 
+	  the shell loses the last alternative for some reason: then we 
+	  add root again; CPAN::Distribution::as_glimpse now uses 
+	  pretty_id instead of id
+
 2006-09-22  k
 
 	* Changes: prepare 1.8801
