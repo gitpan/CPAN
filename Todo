@@ -1,12 +1,55 @@
-2006-09-29  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+2006-10-03  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* Todo: investigate if we want a different amount of newlines depending
-	on readline availability
+	* Bug: cpan[15]> install File::Copy::Recursive                   
+Running install for module File::Copy::Recursive
+Running make for D/DM/DMUEY/File-Copy-Recursive-0.28.tar.gz
+  Is already unwrapped into directory /home/k/.cpan/build/File-Copy-Recursive-0.28
+  Has already been processed within this session
+Running make test
+Prepending /home/k/.cpan/build/File-Copy-Recursive-0.28/blib/arch /home/k/.cpan/build/File-Copy-Recursive-0.28/blib/lib to PERL5LIB.
+Sorry, test with a regular expression is not supported
+Running test for module File::Copy::Recursive
+Running make for D/DM/DMUEY/File-Copy-Recursive-0.28.tar.gz
+  Is already unwrapped into directory /home/k/.cpan/build/File-Copy-Recursive-0.28
+  Has already been processed within this session
+Running make test
+Prepending /home/k/.cpan/build/File-Copy-Recursive-0.28/blib/arch /home/k/.cpan/build/File-Copy-Recursive-0.28/blib/lib to PERL5LIB.
+Refusing to autoload 'test' 'CPAN::Distribution=HASH(0x9b6ff30)' '/usr/bin/make test' in recursion
+  /usr/bin/make test -- NOT OK
+Running make for D/DM/DMUEY/File-Copy-Recursive-0.28.tar.gz
+  Is already unwrapped into directory /home/k/.cpan/build/File-Copy-Recursive-0.28
+  Has already been processed within this session
+Running make test
+  Won't repeat unsuccessful test during this command
+  /usr/bin/make test -- OK
+Running make install
+Installing /usr/local/perl-5.8.8/lib/site_perl/5.8.8/File/Copy/Recursive.pm
+Installing /usr/local/perl-5.8.8/man/man3/File::Copy::Recursive.3
+Writing /usr/local/perl-5.8.8/lib/site_perl/5.8.8/i686-linux-64int/auto/File/Copy/Recursive/.packlist
+Appending installation info to /usr/local/perl-5.8.8/lib/5.8.8/i686-linux-64int/perllocal.pod
 
-	* Todo: send a patch to P5P that adds Queue.pm to the MANIFEST.
+	What I had done was to install CPAN::Reporter but forgot the sudo for
+	make. Then I added the sudo to make_install_make_command and did a
+	'force get' and then the above. The install was successful in the end
+	but the "Sorry" message was written in red and completely bogus and
+	together with the 'Refusing to autoload' message was frightening.
 
-	* Todo: do the right thing with prereq "perl". Find modules suited for
-	testing.
+	Showstopper!
+
+	Trying to reproduce by setting both m*_install_*_command variables to
+	"false", then install CPAN::Reporter. This gives a long list of failed
+	installs at the end. Then 'install File::Copy::Recursive' works as
+	expected: already tried without success. Then 'force get F:C:R' works as
+	expected. And then again 'install File::Copy::Recursive' works as
+	expected: tests again and tries to install.
+
+	Shhhhhhh, so I cannot reproduce this, something must have been different.
+
+	* Todo: revisit rev 158:159, the introduction of recent and perldoc.
+	#21791 has its bugreport. I don't like that most of the subroutines are
+	thrown into CPAN::Distribution either. OTOH, we have commands that have
+	no central role within CPAN. One can always refuse to use them. Hrm.
+	HTML::Display!
 
 	* Gabor reports #21692: how to reproduce? Just get a 5.8.7 and call
 	upgrade on it. No, take a 5.8.8 and silently replace B::Concise with the
@@ -142,9 +185,6 @@ need the middle man.
 	* M2 feature request by Juergen Christoffel: have time stamps on the
 	history and a history command to see them
 
-	* E3 prerequisites: require perl version xxx: we should not delete that
-	information but honour it.
-
 	* M3 RT 17353: Flag outdated CPAN sites and move them to the end of the
 	list when they have reached 291 hours. (Note: $CPAN/authors/02STAMP)
 
@@ -167,6 +207,116 @@ need the middle man.
 	And I promise to try out a more granular locking mechanism.
 
 	* hr ================ no todos below this line ================ /hr
+
+	* hr ================ no todos below this line ================ /hr
+
+	* hr ================ no todos below this line ================ /hr
+
+	* Bug: during 'o conf defaults' I get
+
+Debug(HandleConfig,HandleConfig.pm,95,[Shell,CPAN.pm,1401,edit]): self[CPAN::HandleConfig]args[defaults]
+Can't locate CPAN/MyConfig.pm in @INC (@INC contains: _build/lib _build/lib _build/lib _build/lib /home/k/sources/CPAN/SVN/lib /home/src/perl/repoperls/installed-perls/perl/pGHVCgA/perl-5.8.0@28914/lib/5.9.4/i686-linux-64int /home/src/perl/repoperls/installed-perls/perl/pGHVCgA/perl-5.8.0@28914/lib/5.9.4 /home/src/perl/repoperls/installed-perls/perl/pGHVCgA/perl-5.8.0@28914/lib/site_perl/5.9.4/i686-linux-64int /home/src/perl/repoperls/installed-perls/perl/pGHVCgA/perl-5.8.0@28914/lib/site_perl/5.9.4 /home/k/sources/CPAN/SVN) at (eval 512) line 1, <GEN331> chunk 1.
+Use of uninitialized value within %INC in concatenation (.) or string at /home/k/sources/CPAN/SVN/lib/CPAN/HandleConfig.pm line 285.
+'' reread
+
+	Fixed in rev. 958
+
+	* Bug: cpan[4]> install CPAN::Reporter
+Running install for module CPAN::Reporter
+Running Build for D/DA/DAGOLDEN/CPAN-Reporter-0.24.tar.gz
+  Is already unwrapped into directory /home/k/.cpan/build/CPAN-Reporter-0.24
+
+  CPAN.pm: Going to build D/DA/DAGOLDEN/CPAN-Reporter-0.24.tar.gz
+
+Creating custom builder _build/lib/Module/Build/WikiDoc.pm in _build/lib/Module/Build
+Checking whether your kit is complete...
+Looks good
+
+Checking prerequisites...
+Package 'CPAN' already declared with version '1.87_64'
+ignoring new version ''.
+ - ERROR: IO::CaptureOutput is not installed
+ - ERROR: File::Copy::Recursive is not installed
+ - ERROR: CPAN (1.87_64) is installed, but we need version >= 1.88
+
+ERRORS/WARNINGS FOUND IN PREREQUISITES.  You may wish to install the versions
+of the modules indicated above before proceeding with this installation
+
+Creating new 'Build' script for 'CPAN-Reporter' version '0.24'
+lib/CPAN/Reporter.pm -> blib/lib/CPAN/Reporter.pm
+lib/CPAN/Reporter.pod -> blib/lib/CPAN/Reporter.pod
+Manifying blib/lib/CPAN/Reporter.pod -> blib/libdoc/CPAN::Reporter.3
+  ./Build  -- OK
+Running Build test
+  The version of your Test::Harness is only
+  '2.56', you need at least '2.62'. Please upgrade your Test::Harness.
+Running Build install
+Installing /usr/local/perl-5.8.7/lib/site_perl/5.8.7/CPAN/Reporter.pm
+Installing /usr/local/perl-5.8.7/lib/site_perl/5.8.7/CPAN/Reporter.pod
+Installing /usr/local/perl-5.8.7/man/man3/CPAN::Reporter.3
+Writing /usr/local/perl-5.8.7/lib/site_perl/5.8.7/i686-linux-64int/auto/CPAN/Reporter/.packlist
+  sudo ./Build install --uninst 1 -- OK
+
+	Showstopper II! The test refused to run with the reference to
+	Test::Harness but the install succeeded nonetheless:(((
+
+	Fixed in rev. 954.
+
+	* Finish the debugging aid of reload. Current code (rev. 953)
+	allows
+
+% perl -Ilib -MCPAN -e '
+my $ix = bless {}, CPAN::Index;
+$ix->reload(shift)' /home/ftp/pub/PAUSE/modules/02packages.details.txt 
+CPAN: File::HomeDir loaded ok
+CPAN: Term::ANSIColor loaded ok
+CPAN: LWP::UserAgent loaded ok
+CPAN: URI::URL loaded ok
+Going to read /home/ftp/pub/CPAN/authors/01mailrc.txt.gz
+CPAN: Compress::Zlib loaded ok
+............................................................................DONE
+Going to read /home/ftp/pub/CPAN/modules/02packages.details.txt.gz
+  Database was generated on Sun, 01 Oct 2006 18:39:54 GMT
+............................................................................DONE
+Going to read /home/ftp/pub/CPAN/modules/03modlist.data.gz
+............................................................................DONE
+
+	But it reveals unacceptable timing when run via 'reload index'. Timing
+	is much better when called as above. Quite confusing is the fact that
+	03modlist does not print dots during reload but does so on first time.
+	So more debugging called for. FIXED in rev. 956
+
+	* Bug: the line number in the Debug messages is very often wrong. FIXED
+	in rev. 955
+
+	* E3 prerequisites: require perl version xxx: we should not delete that
+	information but honour it. DONE in rev. 952
+
+	* Todo: do the right thing with prereq "perl". Find modules suited for
+	testing.
+
+	"5.8.3" : File-BOM-0.12, XML-DOM-Lite-0.08, Business-ReportWriter-0.09
+
+	">= 5.8.0" : Devel-FIXME-0.01
+
+	">= 5.008" : Data-Visitor-0.05
+
+	"0" : Net-Address-IPv4-Local-0.12
+
+	"" : Net-IRC2-0.27
+
+	The full list of found requires to "perl" today is:
+
+	5.002|5.000|>= 5|>= 5.6|5.6|5.8|5.8.4|>= 5.8.0|5.8.2|5.8.7|5.5.3|5.8.3|>= 5.6.0|5.004|>= 5.008|5.005_03|0|5.5.0|5.4.5|5.00307|5.00503|5.8.0|5.005|5.008|5.7.1|>= 5.005_04|5.007|5.8.1|5.005003|5.6.0|5.006|5.6.1|5.7.3|5
+
+	DONE in rev. 952
+
+	* Todo: investigate if we want a different amount of newlines depending
+	on readline availability. Who is it who displays the extra newline as
+	soon as readline is active? It is apparently coming from readline and I
+	see no reason to interfere. REJECT
+
+	* Todo: send a patch to P5P that adds Queue.pm to the MANIFEST.
 
 	* Todo: add to 30shell the case of repeated testing that was fixed in
 	rev 915

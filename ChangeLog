@@ -1,5 +1,42 @@
+2006-10-03  k
+
+	* README: prepare 1.88_52
+	* Changes, Todo: prepare 1.88_52
+	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: fix bug in "o conf 
+	  defaults" introduced by the revised reload code in rev. 955; 
+	  tune the dump command to not fire too often unintended; turn 
+	  prettyprint off when the thing is neither legal nor defined
+	* Todo: shuffle Todos down that are DONE
+	* Todo, lib/CPAN.pm, lib/CPAN/Tarzip.pm, 
+	  t/CPAN/modules/02packages.details.txt: major speddup in parsing 
+	  indexes by switching to slurp mode; passes 30shell.t
+	* lib/CPAN.pm, lib/CPAN/Debug.pm: repair debugging aid to display 
+	  the correct line number and some info on the calling frames; 
+	  reload now uses "require" to retain the file info in the debug 
+	  output; document most of this dark chamber
+
+2006-10-02  k
+
+	* Todo, lib/CPAN.pm: fix a bug discovered and documented in the 
+	  Todo file as showstopper II today by moving the Test::Harness 
+	  version verification further down
+
+2006-10-01  k
+
+	* Todo, lib/CPAN.pm: making the loading of the indexes more 
+	  transparent with the help of the usual dots; needs more 
+	  debugging aid as described in Todo
+	* Todo, lib/CPAN.pm: do the right thing with prereq "perl"
+	* t/CPAN/modules/02packages.details.txt: repair a test mistake
+	* lib/CPAN/Version.pm, t/10version.t: be prepared for multiple 
+	  underscores as well: better save than sorry
+	* lib/CPAN/Version.pm, t/10version.t: bug in VERSION: forgets to 
+	  remove the underscores
+	* Todo: notes about #21791
+
 2006-09-30  k
 
+	* Changes, bin/cp-to-perl.pl: post-release depression
 	* MANIFEST.SKIP, 
 	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz,
 	   
