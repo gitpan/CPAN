@@ -1,3 +1,19 @@
+2006-10-09  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 1.88_53
+
+	* wrapping Module::Build calls into an eval to catch external errors
+	with the right consequences.
+
+	* 'reload cpan' now based on timestamps and always jumps into a fresh
+	shell when needed
+
+	* display the version during loading of our own modules
+
+	* address #21692: make the "isa perl" case less noisy (Gabor Szabo)
+
+	* new tests
+
 2006-10-03  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* release 1.88_52

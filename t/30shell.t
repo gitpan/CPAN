@@ -536,7 +536,7 @@ __END__
 #E:
 ########
 #P:o conf init prerequisites_policy
-#E:............(\])
+#E:follow[\S\s]+?ask[\S\s]+?ignore[\S\s]+?............(\])
 ########
 #P:ask
 #E:
@@ -554,7 +554,7 @@ __END__
 #E:
 ########
 #P:o conf init show_upload_date
-#E:............(\])
+#E:upload[\S\s]+?date[\S\s]+?............(\])
 ########
 #P:y
 #E:
@@ -590,7 +590,7 @@ __END__
 #E:
 ########
 #P:o conf init commandnumber_in_prompt
-#E:............(\])
+#E:command[\S\s]+?number[\S\s]+?............(\])
 ########
 #P:y
 #E:
@@ -742,10 +742,10 @@ __END__
 #P:n
 #R:Digest::SHA
 ########
-#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.03.tar.gz
+#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.04.tar.gz
 #E:CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
 ########
-#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.03.tar.gz
+#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.04.tar.gz
 #E:CPAN_USERID.*?ANDK.*?Andreas
 ########
 #P:ls ANDK
@@ -869,7 +869,7 @@ __END__
 #P:get Bundle::CpanTestDummies
 #E:Is already unwrapped
 ########
-#P:dump ANDK/CPAN-Test-Dummy-Perl5-Build-1.02.tar.gz
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz
 #E:\}.*?CPAN::Distribution
 ########
 #P:notest make Bundle::CpanTestDummies
@@ -900,7 +900,12 @@ __END__
 #E:build_requires_install_policy
 ########
 #P:install CPAN::Test::Dummy::Perl5::Build
-#E:is up to date|SAW MAKE[\s\S]+SAW MAKE[\s\S]+SAW MBUILD
+#E:is up to date|SAW MAKE[\s\S]+?SAW MAKE[\s\S]+?SAW MBUILD
+#C: "is up to date" is for when they have it installed in INC
+#R:Module::Build
+########
+#P:install CPAN::Test::Dummy::Perl5::Build::DepeFails
+#E:is up to date|Failed during[\S\s]+?Build-DepeFails.+?dependenc\S+ not OK.+?Build::Fails
 #C: "is up to date" is for when they have it installed in INC
 #R:Module::Build
 ########
@@ -938,7 +943,7 @@ __END__
 
   make test TEST_FILES=t/30shell.t # traditional on file invocation
 
-  make testshell-with-protocol     # collects output for later reference
+  make testshell-with-protocol     # collects output in ../protocols
 
 =head1 DESCRIPTION
 
@@ -1059,7 +1064,15 @@ To add a new distro, the following steps must be taken:
 
 - verify that 'make dist' on CPAN.pm still works
 
-- add the distro(s) to CPAN/modules/02packages.details.txt
+- add the distro(s) to CPAN/modules/02packages.details.txt: this step
+  needs special care: pay attention to both the module version and the
+  distro name; if there is more than one module or bundle inside the
+  distro, write two lines; watch the line count;
+
+- if this distro replaces another, svn rm the other one
+
+- if this distro replaces another, fix the tests that rely on the
+  other one
 
 - add the test to shell.t that triggered the demand for a new distro
 

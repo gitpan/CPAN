@@ -1,5 +1,109 @@
+2006-10-09  k
+
+	* Changes, Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: make the 
+	  reloading of modules forcable, otherwise "o conf defaults" breaks
+	* Changes, Todo, lib/CPAN.pm: fix irritating warning that we 
+	  cannot do GetHistory when we are just reloading; prepare 1.88_53
+	* lib/CPAN.pm: repair crappy formatting
+	* Todo, lib/CPAN.pm: fixing any potential Module::Build failure by 
+	  wrapping it into an eval; prompted for by HTML::Mason
+	* Changes, Todo, lib/CPAN.pm: hopefully this was all that was 
+	  needed to reset the incommandcolor for prerequisites
+	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm, lib/CPAN/Queue.pm: 
+	  reload cpan now based on timestamps
+	* Todo, lib/CPAN.pm, lib/CPAN/Queue.pm: reload cpan now does a 
+	  goto shell not only if ReadLine has changed but also when shell 
+	  has changed; removed a code branch dependent on perl 5.00322:); 
+	  modified the temporary incommandcolor bug chasing helper to 
+	  reset itself
+
+2006-10-08  k
+
+	* Changes, Todo, lib/CPAN.pm: more todos and a debugging aid 
+	  against incommandcolor brokenness
+
+2006-10-07  k
+
+	* Todo, t/30shell.t: only notes about the world as such
+
+2006-10-05  k
+
+	* Todo, lib/CPAN.pm, t/30shell.t: one very high level test more 
+	  and a fix for the particular failure mode: if a prerequisite 
+	  fails, do not count a passing test as success; might need 
+	  further pondering
+	* t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS: cpan has indexed
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails/t/00_load.t,
+	   t/CPAN/modules/02packages.details.txt: new dummy distro for 
+	  DepeFails
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails:
+	   new dummy distro for DepeFails
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, Todo, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails/README,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails/lib/CPAN/Test/Dummy/Perl5/Build/Fails.pm,
+	   t/CPAN/modules/02packages.details.txt: new dummy distro for 
+	  Fails
+	* Makefile.PL, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.03.tar.gz,
+	   t/CPAN/modules/02packages.details.txt: we pass 30shell again 
+	  after upgrading the dummy distros
+	* MANIFEST, lib/CPAN.pm, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS: new dummy distros next 
+	  step
+	* Todo, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.04.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL:
+	   plans for a new dummy distro and a new test
+	* MANIFEST, Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/lib/CPAN/Test/Dummy/Perl5/Build.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/Bundle/CpanTestDummies.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/CPAN/Test/Dummy/Perl5/Make.pm:
+	   again improve kwalitee on existing dummy modules
+	* t/30shell.t: new sync points in the test to catch future FAIL 
+	  tests. There is one I cannot decipher; improve docu about dummy 
+	  modules
+	* Todo: notes
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build/Build.PL:
+	   was svn:executable
+
 2006-10-03  k
 
+	* lib/CPAN.pm: address #21692: make the "isa perl" case less noisy 
+	  (Gabor Szabo)
+	* lib/CPAN.pm: when has_inst loads a module, let the user know the 
+	  version he has
 	* README: prepare 1.88_52
 	* Changes, Todo: prepare 1.88_52
 	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: fix bug in "o conf 
