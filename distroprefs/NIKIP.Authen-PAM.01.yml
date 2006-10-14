@@ -1,0 +1,33 @@
+--- 
+match:
+  distribution: "^NIKIP/Authen-PAM-"
+pl: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+make: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+test: 
+  args: []
+
+  env: {}
+
+  expect: 
+   -  Password
+   -  "Password\n"
+
+install: 
+  args: []
+
+  env: {}
+
+  expect: []
+

@@ -33,9 +33,9 @@ unlink _f"t/dot-cpan/.lock";
 mkpath _d"t/dot-cpan/sources/authors/id/A/AN/ANDK";
 
 use File::Copy qw(cp);
-cp _f"t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS\@588",
+cp _f"t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd",
     _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS"
-    or die "Could not cp t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS\@588 ".
+    or die "Could not cp t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd ".
     "over t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS: $!";
 END {
     unlink _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS";
@@ -742,10 +742,10 @@ __END__
 #P:n
 #R:Digest::SHA
 ########
-#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.04.tar.gz
+#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.05.tar.gz
 #E:CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
 ########
-#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.04.tar.gz
+#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.05.tar.gz
 #E:CPAN_USERID.*?ANDK.*?Andreas
 ########
 #P:ls ANDK
@@ -824,7 +824,7 @@ __END__
 #P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
 #E:\}.+?CPAN::Module
 ########
-#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
 #E:\}.+?CPAN::Distribution
 ########
 #P:make CPAN::Test::Dummy::Perl5::BuildOrMake
@@ -841,7 +841,7 @@ __END__
 #P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
 #E:\}.+?CPAN::Module
 ########
-#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
 #E:\}.+?CPAN::Distributio.
 ########
 #P:make CPAN::Test::Dummy::Perl5::BuildOrMake
@@ -857,7 +857,7 @@ __END__
 #E:\}
 #R:Module::Build
 ########
-#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
 #E:\}
 #R:Module::Build
 ########
@@ -908,6 +908,11 @@ __END__
 #E:is up to date|Failed during[\S\s]+?Build-DepeFails.+?dependenc\S+ not OK.+?Build::Fails
 #C: "is up to date" is for when they have it installed in INC
 #R:Module::Build
+#T:60
+########
+#P:install CPAN::Test::Dummy::Perl5::Make::CircDepeOne
+#E:is up to date|Recursive dependency detected[\s\S]+?Cannot continue.[\s\S]+?Failed during this command
+#T:60
 ########
 #P:u /--/
 #E:No modules found for
@@ -1030,11 +1035,11 @@ To add a new distro, the following steps must be taken:
 
 - svn add (or svn cp) the whole source code under the author's homedir
 
-- add the source code directory with a trailing slash to MANIFEST.SKIP
+- add the source code directory with a trailing slash to ../MANIFEST.SKIP
 
 - finish now the distro until it does what you intended
 
-(2) Create the distro zipfile
+(2) Create the distro tarball
 
 - add a stanza to CPAN.pm's Makefile.PL that produces the distro with
   the whole dependency on all files within the distro and moves it up
@@ -1042,12 +1047,12 @@ To add a new distro, the following steps must be taken:
 
 - *svn add* the new testdistro (first we did that, then we stopped
   doing it for "it makes no sense"; then I realized we need to do it
-  because with a newer MakeMaker or Moule::Build we cannot regenerate
+  because with a newer MakeMaker or Module::Build we cannot regenerate
   them byte-by-byte and lose the signature war)
 
-- add it to the MANIFEST
+- add it to the ../MANIFEST
 
-(3) Upload and embed into our minicpan
+(3) Upload and embed into our "./CPAN" minicpan
 
 - verify that 'make dist' on CPAN.pm still works
 

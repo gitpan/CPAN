@@ -1,0 +1,25 @@
+--- 
+match:
+  distribution: "^ABW/Template-Toolkit-"
+pl: 
+  expect:
+    - "Do you want to build the XS Stash module"
+    - "n\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"
+    - "."
+    - "\n"

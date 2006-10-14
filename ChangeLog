@@ -1,5 +1,304 @@
+2006-10-14  k
+
+	* MANIFEST, Todo, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd, 
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS@588: during this manifest 
+	  business I accidentally destroyed a test. Recreating
+	* t/30shell.t: mark two tests as slow
+	* MANIFEST, MANIFEST.SKIP: MANIFEST buglet
+	* Todo: update todo list
+	* Todo, lib/CPAN.pm, t/30shell.t, 
+	  t/CPAN/modules/02packages.details.txt: finish test writing for 
+	  circular dependencies
+	* t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS: PAUSE has checksummed
+	* MANIFEST, MANIFEST.SKIP: the usual manifest keeping doties
+	* MANIFEST, MANIFEST.SKIP: the usual manifest keeping doties
+	* MANIFEST.SKIP, README: prepare new dummy distros
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree-1.00.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/lib/CPAN/Test/Dummy/Perl5/Make/CircDepeOne.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/lib/CPAN/Test/Dummy/Perl5/Make/CircDepeThree.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/t/00_load.t,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo-1.00.tar.gz:
+	   prepare new dummy distros
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/lib/CPAN/Test/Dummy/Perl5/Make/CircDepeOne.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree/t/00_load.t,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/Makefile.PL:
+	   prepare new dummy distros
+	* MANIFEST, MANIFEST.SKIP, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo-1.00.tar.gz:
+	   prepare new dummy distros
+	* t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne-1.00.tar.gz:
+	   prepare new dummy distros
+	* Makefile.PL, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/t/00_load.t,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/lib/CPAN/Test/Dummy/Perl5/Make/CircDepeOne.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/lib/CPAN/Test/Dummy/Perl5/Make/CircDepeTwo.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/t/00_load.t:
+	   prepare new dummy distros
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne-1.00.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/lib/CPAN/Test/Dummy/Perl5/Make/CircDepeOne.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/lib/CPAN/Test/Dummy/Perl5/Make.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo/lib/CPAN/Test/Dummy/Perl5/Make/CircDepeOne.pm:
+	   prepare new dummy distros
+	* Todo, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/lib/Bundle,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne/lib/CPAN/Test/Dummy/Perl5/Make:
+	   prepare a new dummy distro
+	* Changes: prepare release notes;
+	* Todo, lib/CPAN.pm: reading the "install" descriptions in the 
+	  manpage again
+
+2006-10-13  k
+
+	* Todo, distroprefs/README, lib/CPAN.pm: address 21144: document 
+	  the difference between $obj->install and CPAN::Shell->install
+	* Todo: update the Todo list
+	* Todo, lib/CPAN.pm: support the two cpanconfig variables make and 
+	  make_install_make_command being set from distroprefs
+	* distroprefs/BTROTT.Crypt-DSA.01.yml, 
+	  distroprefs/BTROTT.URI-Fetch-0.01.yml, 
+	  distroprefs/BYRNE.SOAP-Lite.01.yml, 
+	  distroprefs/DBROBINS.Net-SSH-Perl.01.yml, 
+	  distroprefs/FDALY.Test-Deep.01.yml, 
+	  distroprefs/GBARR.Authen-SASL.01.yml, 
+	  distroprefs/GEOFF.Apache-Test.01.yml, 
+	  distroprefs/ILYAZ.Term-ReadLine-Perl.01.yml, 
+	  distroprefs/JJORE.Carp-Clan.01.yml: use more "module" related 
+	  keys in the example directory
+	* Todo, distroprefs/ABW.Template-Toolkit.01.yml, 
+	  distroprefs/AUDREYT.Module-Signature.01.yml, 
+	  distroprefs/BTROTT.Convert-PEM.01.yml, 
+	  distroprefs/BTROTT.Crypt-DSA.01.yml, 
+	  distroprefs/BTROTT.Feed-Find.01.yml, 
+	  distroprefs/BTROTT.URI-Fetch-0.01.yml, 
+	  distroprefs/BTROTT.XML-Feed.01.yml, 
+	  distroprefs/BYRNE.SOAP-Lite.01.yml, 
+	  distroprefs/CHAMAS.Crypt-SSLeay.01.yml, 
+	  distroprefs/DBROBINS.Net-SSH-Perl.01.yml, 
+	  distroprefs/EESTABROO.IMAP-Admin.01.yml, 
+	  distroprefs/FDALY.Test-Deep.01.yml, 
+	  distroprefs/GAAS.libwww.01.yml, 
+	  distroprefs/GBARR.Authen-SASL.01.yml, 
+	  distroprefs/GBARR.perl-ldap.01.yml, 
+	  distroprefs/GEOFF.Apache-Test.01.yml, 
+	  distroprefs/ILYAZ.Math-Pari.01.yml, 
+	  distroprefs/ILYAZ.Term-ReadLine-Perl.01.yml, 
+	  distroprefs/INGY.Inline.01.yml, distroprefs/INGY.YAML.01.yml, 
+	  distroprefs/JJORE.Carp-Clan.01.yml, 
+	  distroprefs/KWILLIAMS.AI-Categorizer.01.yml, 
+	  distroprefs/MIYAGAWA.Plagger.yml, 
+	  distroprefs/MIYAGAWA.XML-Atom.yml, 
+	  distroprefs/NIKIP.Authen-PAM.01.yml, 
+	  distroprefs/OLAF.Net-DNS.01.yml, 
+	  distroprefs/PCIMPRICH.XML-SAX-ExpatXS.01.yml, 
+	  distroprefs/PETDANCE.WWW-Mechanize.01.yml, 
+	  distroprefs/RCAPUTO.POE.01.yml, distroprefs/README, 
+	  distroprefs/SREZIC.Tk-Autoscroll.01.yml, lib/CPAN.pm: switch 
+	  from "qr" to "match/module" and "match/distribution" in the 
+	  distroprefs YAML files
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm: move _find_prefs into 
+	  CPAN::Distribution; say a word about YAML::Tiny
+	* lib/CPAN.pm: off by one error?
+	* Todo: todo item gnumake for pdl
+	* Todo: restructure prefs hash again
+	* Todo: coming closer to 1.88_54
+	* Changes, Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm: coming closer 
+	  to 1.88_54
+	* Todo: notes
+	* Todo: notes about C:S:L
+	* Todo, distroprefs/PCIMPRICH.XML-SAX-ExpatXS.01.yml, lib/CPAN.pm: 
+	  yet another distropreffy
+	* Todo, distroprefs/KWILLIAMS.AI-Categorizer.01.yml, lib/CPAN.pm: 
+	  about to finish distroprefs stuff
+	* distroprefs/ttt.nodbi.yml: Oops
+	* Todo, distroprefs/AUDREYT.Module-Signature.01.yml, 
+	  distroprefs/BTROTT.Convert-PEM.01.yml, 
+	  distroprefs/BTROTT.Feed-Find.01.yml, 
+	  distroprefs/BTROTT.URI-Fetch-0.01.yml, 
+	  distroprefs/BTROTT.XML-Feed.01.yml, 
+	  distroprefs/EESTABROO.IMAP-Admin.01.yml, 
+	  distroprefs/FDALY.Test-Deep.01.yml, 
+	  distroprefs/GAAS.libwww.01.yml, 
+	  distroprefs/ILYAZ.Term-ReadLine-Perl.01.yml, 
+	  distroprefs/MIYAGAWA.Plagger.yml, 
+	  distroprefs/MIYAGAWA.XML-Atom.yml, distroprefs/README, 
+	  distroprefs/SREZIC.Tk-Autoscroll.01.yml, 
+	  distroprefs/ttt.nodbi.yml, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  t/30shell.t: lots of distroprefs stuff
+
+2006-10-12  k
+
+	* Todo, distroprefs/ABW.Template-Toolkit.01.yml, 
+	  distroprefs/BTROTT.Crypt-DSA.01.yml, 
+	  distroprefs/BTROTT.URI-Fetch-0.01.yml, 
+	  distroprefs/BTROTT.XML-Feed.01.yml, 
+	  distroprefs/BYRNE.SOAP-Lite.01.yml, 
+	  distroprefs/CHAMAS.Crypt-SSLeay.01.yml, 
+	  distroprefs/DBROBINS.Net-SSH-Perl.01.yml, 
+	  distroprefs/EESTABROO.IMAP-Admin.01.yml, 
+	  distroprefs/FDALY.Test-Deep.01.yml, 
+	  distroprefs/GBARR.Authen-SASL.01.yml, 
+	  distroprefs/GBARR.perl-ldap.01.yml, 
+	  distroprefs/GEOFF.Apache-Test.01.yml, 
+	  distroprefs/ILYAZ.Math-Pari.01.yml, 
+	  distroprefs/INGY.Inline.01.yml, distroprefs/INGY.YAML.01.yml, 
+	  distroprefs/JJORE.Carp-Clan.01.yml, 
+	  distroprefs/MIYAGAWA.Plagger.yml, 
+	  distroprefs/MIYAGAWA.XML-Atom.yml, 
+	  distroprefs/NIKIP.Authen-PAM.01.yml, 
+	  distroprefs/OLAF.Net-DNS.01.yml, 
+	  distroprefs/PETDANCE.WWW-Mechanize.01.yml, 
+	  distroprefs/RCAPUTO.POE.01.yml, distroprefs/README, lib/CPAN.pm: 
+	  quite extensive distroprefs support incl documentation; 
+	  insufficiently tested, some Todos still in the Todo file; could 
+	  build Bundle::Phalanx100 without a single question asked
+
+2006-10-11  k
+
+	* lib/CPAN.pm: make sure this is not simply an empty array because 
+	  then we would disable more than just CPAN::Reporter
+	* Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm: notes about **all** 
+	  remaining Phalanx100 modules that need a distroprefs recipe
+	* Todo, distroprefs/SREZIC.Tk-Autoscroll.01.yml, lib/CPAN.pm: 
+	  Tk-AutoScroll now free of interactiveness
+	* Todo, distroprefs/GAAS.libwww.01.yml, 
+	  distroprefs/ILYAZ.Term-ReadLine-Perl.01.yml, lib/CPAN.pm: 
+	  Term-ReadLine-Perl now free of interactiveness
+	* Todo: memo Tk-Getopt
+	* Todo: notes
+	* MANIFEST, Todo, distroprefs/CHAMAS.Crypt-SSLeay.01.yml: 
+	  distropref for Crypt-SSLeay; current distroproefs added to 
+	  MANIFEST; reminder for CPANTS modules in Todo
+
+2006-10-10  k
+
+	* lib/CPAN.pm: oops
+	* Todo, distroprefs/INGY.YAML.01.yml, 
+	  distroprefs/OLAF.Net-DNS.01.yml, 
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS: again passes all tests; 
+	  added two new distroprefs files
+	* README, t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.04.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.02.zip,
+	   t/CPAN/modules/02packages.details.txt: kwalitee
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, Todo, lib/CPAN.pm, 
+	  t/30shell.t, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.03.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails/lib/CPAN/Test/Dummy/Perl5/Build/Fails.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/Build.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/README,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake/lib/CPAN/Test/Dummy/Perl5/BuildOrMake.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1.05.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.01,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.02.tar.gz,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly/Changes,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly/MANIFEST,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly/README,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly/lib/CPAN/Test/Dummy/Perl5/Make/Failearly.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.03.zip,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip/lib/CPAN/Test/Dummy/Perl5/Make/Zip.pm,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/Makefile.PL,
+	   
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make/lib/CPAN/Test/Dummy/Perl5/Make.pm:
+	   raise kwalitee once again; why is it so hard to get it right?
+	* Todo, distroprefs/JJORE.Carp-Clan.01.yml, lib/CPAN.pm: this 
+	  revision actually DID install Carp-Clan-5.8 without asking a 
+	  question; because Expect DID answer the question for me
+	* Changes, Todo, distroprefs, distroprefs/GAAS.libwww.01.yml, 
+	  distroprefs/GEOFF.Apache-Test.01.yml, lib/CPAN.pm, 
+	  lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: first stab at 
+	  DistroPrefs
+
 2006-10-09  k
 
+	* Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm: introduce new option yaml_module
 	* Changes, Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: make the 
 	  reloading of modules forcable, otherwise "o conf defaults" breaks
 	* Changes, Todo, lib/CPAN.pm: fix irritating warning that we 

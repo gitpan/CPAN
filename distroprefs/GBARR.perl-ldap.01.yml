@@ -1,0 +1,31 @@
+--- 
+match:
+  distribution: "^GBARR/perl-ldap-"
+pl: 
+  args: ["--defaultdeps"]
+
+  env: {}
+
+  expect: []
+
+make: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+test: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+install: 
+  args: []
+
+  env: {}
+
+  expect: []
+

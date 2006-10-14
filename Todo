@@ -1,54 +1,91 @@
-2006-10-09  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+2006-10-14  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* write a test with new dummy modules PrerecqurseI and II
+	* Add support for all other CPAN::Config variables. Maybe by turning
+	them all into methods in CPAN::Distribution, maybe via autoload, maybe
+	with clever use of local(). Currently only "make",
+	"make_install_make_command", and "build_requires_install_policy" are
+	supported. The first two for PDL on freebsd, the last one was just for
+	quick testing of the mechanism.
 
-	* Schwern reopened 21144. Go resolve, I have promised before the next release.
+	* Randy's CPAN-Search-Lite lives at
+	http://sourceforge.net/cvs/?group_id=101571 and on my local disk at
+	/home/src/perl/cpan-search-lite/CPAN-Search-Lite. As it needs DBI, it
+	cannot use bleadperl. Latest maint-perl is 28854.
 
-2006-10-08  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+	AI::Categorizer needed by t/basic.t, not listed as prereq. Needs in turn
+	(unlisted?) Algorithm::NaiveBayes:-(
 
-	* Nice to have: CPAN::MyDistroPrefs to store arguments and expect
-	scripts to Makefile.PL/make/test/install based on regexes being matched
-	against the distroname. (think libwww, ReadLine, perl-ldap, Apache-Test,
-	and always questions from Module::AutoInstall, Carp::Clan asks if I want
-	a prereq for testing from Makefile.PL, Net::DNS ask if I want to run
-	tests over the internet, mod_perl or Apache::Test asks me for the apache
-	executable, Authen-PAM asks me for a password, Module::Signature asks
-	for importing the key)
+	Warning: prerequisite Config::IniFiles 0 not found.
+	Warning: prerequisite DBD::SQLite 0 not found.
+	Warning: prerequisite File::Listing 0 not found.
+
+	DBD::SQLite did not compile on the first try. But it did on the second.
+	I think in between I installed libsqlite0-dev.
+
+	No again I have no Lingua::StopWords:=(
+
+	No SOAP::Lite
+
+	No Perl::Tidy
+
+	No HTML::TextToHTML
+
+	No Pod::Xhtml
+
+	No XML::SAX::ExpatXS
+
+	Finished installing prereqs, all tests except Mysql pass.
+
+	make install is OK.
+
+	First invocation of the indexer with
+
+	/home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/bin/csl_index --config /home/src/perl/cpan-search-lite/cpan.conf --setup
+Using config file "/home/src/perl/cpan-search-lite/cpan.conf"
+Cannot retrieve /home/src/perl/cpan-search-lite/indices/ls-lR.gz from file:///home/ftp/pub/PAUSE/indices/ls-lR.gz at /home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/lib/site_perl/5.8.8/CPAN/Search/Lite/Index.pm line 198.
+
+	Ouch, ls-lR.gz is used for what exactly? That's pure funet. I fetch it
+	from there. It's huge (2.4M)! How often do they update it?
+
+	/home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/bin/csl_index --config /home/src/perl/cpan-search-lite/cpan.conf --setup
+Using config file "/home/src/perl/cpan-search-lite/cpan.conf"
+Cannot retrieve /home/src/perl/cpan-search-lite/MIRRORED.BY from file:///home/ftp/pub/PAUSE/./MIRRORED.BY at /home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/lib/site_perl/5.8.8/CPAN/Search/Lite/Index.pm line 198.
+
+
+	Gotta get this mirroredby file as well...
+
+	% /home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/bin/csl_index --config /home/src/perl/cpan-search-lite/cpan.conf --setup
+Using config file "/home/src/perl/cpan-search-lite/cpan.conf"
+Argument "0.20a" isn't numeric in numeric comparison (<=>) at /home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/lib/site_perl/5.8.8/CPAN/Search/Lite/Util.pm line 274.
+	[...]
+
+	Ah, it's quite fast.
+	
+
+	* write a dummy distro that reads arguments to Makefile.PL and another
+	one that reads something from STDIN (or maybe both in one) DELAYED until
+	the distroprefs stuff leaves the alpha stage.
+
+	* Measure kwalitee with Module::CPANTS::Analyse before uploading. That
+	way we can catch bugs in M:C:A itself or in its dependencies. DELAYED
+	because currently M:C:A doesn't pass its own tests.
+
+	* just a memo what I usually install:
+
+	    o debug CPAN Distribution
+	    install Bundle::CPAN YAML::Syck Module::Signature CPAN::Reporter Devel::Symdump
+	    force install Expect
+
+	* replace 03 index file with YAML.
 
 	* Todo/buglet: turn on debug "CPAN" and find the reason why
-	incommandcolor is quite often not reset.
+	incommandcolor is quite often not reset. We had that further down but I
+	fear it is not yet fixed.
 
-	First example is "Net::Stomp" with a prereq of Class::Accessor::Fast.
-	After it and its prereq are installed, the module Class::Accessor::Fast
-	and the distro K/KA/KASEI/Class-Accessor-0.25.tar.gz are both still in
-	command state.
+	* Todo: clean up "XXX" in the code
 
-	So it's something with follow_prereqs.
-
-	Seems to be fixed with rev. 980 but needs to stay on the watchlist
-
-	No, I just tried Bundle::Phalanx100 and the majority of modules was in
-	commandcolor and many were neither installed nor reported as failed, so
-	the rev. 908 may be buggier than we ever were?? Maybe its just the "run
-	it twice" problem due to late dependency resolving. Oh and watch the
-	ugly bug that shows up when makeing Mason!
-
-	AHHHH, that is fixable with eval! FIXED in rev. 981.
-
-2006-10-07  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* Todo: clean up XXX
-
-	* automatic testing? Is it anywhere documented what the impacts of
-	$ENV{AUTOMATED_TESTING} are?
-
-	* new keyword capture? CPAN::Reporter does not know the output of the
-	commands before "test" and cannot report about compilation failures.
-	This looks like a major flaw to me:-(
-
-	* E1: Nice to have: make YAML vs. YAML::Syck switchable. Another
-	advantage would be that we could remove YAML from the Bundle.
-	Beforethought: replace 03 index file with YAML!
+	* "I hate Module::AutoInstall". See down under the hr if you have much
+	time.
 
 	* M2 (Wishlist) separate the TTLs for 01,02,03. If somebody asks 'a
 	FOO', we should only check for the authors database, etc.
@@ -183,6 +220,261 @@ need the middle man.
 	* hr ================ no todos below this line ================ /hr
 
 	* hr ================ no todos below this line ================ /hr
+
+	* write a test with new dummy modules PrerecqurseI and II (or CircDep?)
+	Take t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make as the
+	source and
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne as
+	target. DONE in rev. 1031
+
+	* Schwern reopened 21144. Go resolve, I have promised before the next
+	release. FIXED in rev. 1016 and 1018
+
+2006-10-13  Andreas J Koenig  <akoenig@*c*nm*b*l*.com>
+
+	* Slaven want direct support for $Config->{make} and
+	make_install_make_command so that it can be set to gnumake for PDL on
+	freebsd. DONE in rev 1015
+
+	* Slaven says that no user knows the distroname as well as the module
+	name. ==> Change the prefs hash structure. "qr" shall be replaced by
+	"match" and contain "module" and/or "distro" which are ANDed conditions
+	and each may contain a regex. We probably will rename all distroprefs
+	files too. DONE in rev. 1013/14
+
+2006-10-13  Andreas J Koenig  <akoenig@*c*nm*b*l*.com>
+
+	* always check if *c*nm*b*l* has crept into the Todo file!
+
+2006-10-13  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* check the version numbers since we rolled over rev. 1000. DONE, is OK
+
+	* Fix what podcover found: prefs and yaml_loadfile DONE.
+
+	* See if YAML::Tiny works and if so, mention it in FirstTime and maybe
+	make it the default?? Doesn't seem to work out of the box. DONE and
+	documented in FirstTime.
+
+	* I hate Module::AutoInstall. Watching installation of Plagger:
+
+  CPAN.pm: Going to build M/MI/MIYAGAWA/Plagger-0.7.13.tar.gz
+
+make[1]: Entering directory `/home/k/.cpan/build/Plagger-0.7.13'
+/home/src/perl/repoperls/installed-perls/perl/p4tTru3/perl-5.8.0@29004/bin/perl "-Iinc" Makefile.PL --config= --installdeps=File::Find::Rule,0,UNIVERSAL::require,0.1,Template,2.13,Template::Provider::Encoding,0.04,Text::Tags,0,DateTime::Format::Strptime,0,URI::Fetch,0.071,Cache::Cache,1.04,Module::Pluggable::Fast,0,HTML::ResolveLink,0,Date::Parse,0,MIME::Types,1.16,Net::DNS,0,XML::Feed,0.12,XML::Atom,0.23,Term::Encoding,0,XML::Liberal,0.14,XML::RSS::Liberal,0,HTML::Scrubber,0,XML::Feed,0.09,XML::Atom,0.20,HTML::Scrubber,0,Time::Duration::Parse,0,WebService::Bloglines,0.11
+CPAN: File::HomeDir loaded ok (v0.58)
+*** Installing dependencies...
+
+	Holy crap! Recursive installation where we are just eager to maintain a
+	clean and efficient queue of installation objects and could do it
+	ourselves so easily? And besides that, the INC path is not our INC path,
+	so I always get a different CPAN version. While the latter is only
+	disturbing a minority, it's a BUUUUUUG to go recursive.
+
+	Not only does it cost memory, this child is also uninformed about failed
+	installations!
+
+	This needs to be fixed.
+
+	The manpage of M:AI says it checks if it is running under CPAN.pm. Maybe
+	this check is wrong? Apparently yes.
+
+2006-10-12  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* restructure the prefs YAML files to have cpanconfig as key and all
+	CPAN.pm configs inside that. That gives room to cpanplus. DONE
+
+	* why did MIYAGAWA/XML-Atom not work? -- Because it asked us twice but
+	our yaml file only answered once FIXED.
+
+	* improve feedback when you pick a file for prefs settings, maybe store
+	the picked yaml file in the distro object. DONE.
+
+	* test if you can get around single modules by specifying
+	prefs->{make}{nosuchtarget}. Interesting for MailTools or DBI in current
+	bleadperl. EXACTLY! (and tested)
+
+	* test if the Test-Deep setting of brip works. DONE
+
+2006-10-11  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* F/FD/FDALY/Test-Deep-0.096.tar.gz is just needed temporarily during building or testing. Do you want to install it permanently? (Y/n) [no] 
+
+	* BTROTT/Crypt-DSA-0.14.tar.gz
+
+==> Auto-install the 1 optional module(s) from CPAN? [n] 
+==> Auto-install the 1 optional module(s) from CPAN? [n] 
+
+	* PETDANCE/WWW-Mechanize-1.20.tar.gz
+
+Do you want to install the mech-dump utility? [y] 
+
+	* ABW/Template-Toolkit-2.15.tar.gz
+
+Do you want to build the XS Stash module? [y] 
+
++ about 9 questions
+
+	* BYRNE/SOAP-Lite-0.69.tar.gz
+
+Press <enter> to see the detailed list.  
+
+Do you want to proceed with this configuration? [yes] 
+
+Do you want to perform these tests in addition to core tests? [no] 
+
+	* RCAPUTO/POE-0.38.tar.gz
+
+Would you like to skip the network tests?
+
+(Any text other than Y or y will be taken as a no) [n] 
+
+	* DBROBINS/Net-SSH-Perl-1.30.tar.gz asks
+
+Which protocol(s) do you plan to use? [3] 
+Enter your choices, separated by spaces: [1] 
+Would you like to install it? (y/n) [y] 
+Would you like to install it? (y/n) [y] 
+
+	* ILYAZ/modules/Math-Pari-2.010706.tar.gz asks
+
+Make sure you have a large scrollback buffer to see the messages.
+Fetch? (y/n, press Enter) 
+
+	* INGY/Inline-0.44.tar.gz asks for
+
+Do you want to install Inline::C? [y] 
+
+	* EESTABROO/IMAP-Admin-1.6.4.tar.gz asks me for...
+
+Enter server: 
+Enter login: 
+Enter password: 
+Test using SSL(y/n)? 
+Test using CRAM(y/n)? 
+Enter Port#: 
+
+	* NIKIP/Authen-PAM: asks me for a password during testing and I enter
+	"testing". Maybe I should enter exactly what he demands?
+
+	* GBARR/perl-ldap-0.33 and ExtUtils::AutoInstall. Read source code. Same
+	for GBARR/Authen-SASL-2.10 DONE
+
+	* CHAMAS/SSLeay: the first distro that shows us that Expect needs a
+	debugging aid. Maybe fixed in rev. 998 or so
+
+	* Interesting bug occurred with current maint when I tried to upgrade
+	everything. PathTools failed and I see this:
+
+	cpan[3]> d  KWILLIAMS/PathTools-3.22.tar.gz 
+Use of uninitialized value in sprintf at lib/CPAN.pm line 4258.
+Distribution id = K/KW/KWILLIAMS/PathTools-3.22.tar.gz
+    CPAN_USERID  P5P (The Perl5 Porters Mailing List <perl5-porters@perl.org>)
+    CALLED_FOR   File::Spec
+    CHECKSUM_STATUS OK
+    CONTAINSMODS Cwd File::Spec File::Spec::Cygwin File::Spec::Epoc File::Spec::Functions File::Spec::Mac File::Spec::OS2 File::Spec::Unix File::Spec::VMS File::Spec::Win32
+    UPLOAD_DATE  2006-10-10
+    archived     tar
+    build_dir    /home/k/.cpan/build/PathTools-3.22
+    incommandcolor 0
+    localfile    /home/ftp/pub/CPAN/authors/id/K/KW/KWILLIAMS/PathTools-3.22.tar.gz
+    make         NO
+    modulebuild  1
+    prereq_pm    build_requires requires
+	  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    prereq_pm_detected 1
+	  ^^^^^^^^^^^^^^^^^^^^
+    reqtype      c
+    unwrapped    YES
+    writemakefile YES
+    yaml_content 
+
+	But I cannot reproduce it. So I must have upgraded something that caused
+	the bug.
+
+	* Since when fails a YAML test? 0.62 with blead @28990 fails today on
+	rt-bugs.t or so. Reported to P5P. RESOLVED in blead @28997.
+
+2006-10-10  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* put the distroprefs directory into MANIFEST. DONE in rev. 993
+
+	* DistroPrefs:
+
+	Variable           Comment                      Done in file
+
+  pl env                                          DBROBINS.Net-SSH-Perl.01.yml
+     args                                         GAAS.libwww.01.yml
+     expect                                       JJORE.Carp-Clan.01.yml
+  make env
+       args
+       expect
+  test env           Tk-Getopt(BATCH=1)           SREZIC.Tk-Autoscroll.01.yml
+       args
+       expect        ReadLine                     ILYAZ.Term-ReadLine-Perl.01.yml
+  install env
+          args
+          expect
+	cpanconfig:
+    build_requires_install_policy                 FDALY.Test-Deep.01.yml
+
+
+2006-10-09  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+2006-10-08  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Nice to have: CPAN::MyDistroPrefs to store arguments and expect
+	scripts to Makefile.PL/make/test/install based on regexes being matched
+	against the distroname. (think libwww, ReadLine, perl-ldap, Apache-Test,
+	and always questions from Module::AutoInstall, Carp::Clan asks if I want
+	a prereq for testing from Makefile.PL, Net::DNS ask if I want to run
+	tests over the internet, mod_perl or Apache::Test asks me for the apache
+	executable, Authen-PAM asks me for a password, Module::Signature asks
+	for importing the key)
+
+	Name? DistroPrefs is good. Customize is not so good because one would
+	expect that it is related to 'o conf'. Distro must be in the name.
+	DistroCustomize is too long so DistroBuildEnv seems completely out of
+	band. Only Prefs is tempting but again too easily confusable with 'o
+	conf' stuff. Something completely different? Its about Env, Args, Stdin.
+	BuildInput? Distrinput? Distrin? No. DistroPrefs the long word, prefs
+	the short one. 'reload prefs' might be a command if we need it at all.
+
+	ALL DONE in rev. 1015; well, left in alpha state
+
+	* Todo/buglet: turn on debug "CPAN" and find the reason why
+	incommandcolor is quite often not reset.
+
+	First example is "Net::Stomp" with a prereq of Class::Accessor::Fast.
+	After it and its prereq are installed, the module Class::Accessor::Fast
+	and the distro K/KA/KASEI/Class-Accessor-0.25.tar.gz are both still in
+	command state.
+
+	So it's something with follow_prereqs.
+
+	Seems to be fixed with rev. 980 but needs to stay on the watchlist
+
+	No, I just tried Bundle::Phalanx100 and the majority of modules was in
+	commandcolor and many were neither installed nor reported as failed, so
+	the rev. 908 may be buggier than we ever were?? Maybe its just the "run
+	it twice" problem due to late dependency resolving. Oh and watch the
+	ugly bug that shows up when makeing Mason!
+
+	AHHHH, that is fixable with eval! FIXED in rev. 981.
+
+2006-10-07  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Todo: clean up XXX
+
+	* automatic testing? Is it anywhere documented what the impacts of
+	$ENV{AUTOMATED_TESTING} are?
+
+	* new keyword capture? CPAN::Reporter does not know the output of the
+	commands before "test" and cannot report about compilation failures.
+	This looks like a major flaw to me:-(
+
+	* E1: Nice to have: make YAML vs. YAML::Syck switchable. Another
+	advantage would be that we could remove YAML from the Bundle. DONE rev. 986
 
 	* reload cpan should be based on timestamps. Fixed in rev. 979
 
@@ -534,7 +826,7 @@ Going to read /home/ftp/pub/CPAN/modules/03modlist.data.gz
 	more than once within a single command. Maybe the same bug as described
 	below under "Very stupid is CPAN.pm..." FIXED in rev. 915
 
-2006-09-27  Andreas J Koenig  <akoenig@iconmobile.com>
+2006-09-27  Andreas J Koenig  <akoenig@*c*nm*b*l*.com>
 
 	* Todo: canonify usage of req/reqtype/etc. into "reqtype" and shorten
 	the known reqtype to one letter: r,b,c and comment on them in
@@ -564,7 +856,7 @@ Use of uninitialized value $id in delete at lib/CPAN.pm line 794, <FH> line 4106
 	* build_requires: fortunately the things on the Queue are objects with
 	currently only one attribute "qmod", the string.
 
-	    install Bundle::CPAN CPAN::Reporter Module::Signature Devel::Symdump Expect
+	    install Bundle::CPAN CPAN::Reporter Expect Module::Signature Devel::Symdump
 
 	First step is to change the constructor to accept more arguments DONE in rev 889
 
@@ -1343,7 +1635,9 @@ Proceed? [yes]
 	CHECKSUMS file is 3 months old and its timestamp is 1 month old.
 
 	Fixed in 638 with the new argument $sloppy for CHECKSUM_check_file, but
-	test still missing. ... Test added by addng CHCKSUMS@588 in rev. 643
+	test still missing. ... Test added by adding CHECKSUMS@588 in rev. 643
+
+	Later renamed to CHECKSUMS.2nd (around rev. 1033)
 
 2006-02-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 

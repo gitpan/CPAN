@@ -1,0 +1,33 @@
+--- 
+match:
+  distribution: "^ILYAZ/modules/Math-Pari-"
+pl: 
+  args: []
+
+  env: {}
+
+  expect:
+    - "Fetch\?"
+    - "n\n"
+
+make: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+test: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+install: 
+  args: []
+
+  env: {}
+
+  expect: []
+
