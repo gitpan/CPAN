@@ -1,4 +1,38 @@
+2006-10-16  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* new maint-5.8:
+drwxr-xr-x  34 k k     8192 Oct 15 21:38 perl-m-5.8.0@29022/
+drwxr-xr-x  35 k k     8192 Oct 15 21:19 perl-p-5.8.0@29023/
+
+2006-10-15  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* just a memo what I usually install:
+
+	    o debug CPAN Distribution
+	    force install Expect
+	    install YAML::Syck Bundle::CPAN Module::Signature CPAN::Reporter Devel::Symdump Plagger Bundle::Phalanx100
+
+	YAML::Syck after Bundle::CPAN did not turn off interactivity.
+
+	YAML::Syck before Bundle::CPAN!
+
+	* Investigate what's going on with Crypt::DH and Net::SSH::Perl. Both
+	seem to hang during the tests.
+
+	* Feature request by Slaven: build a patched thing. Reminds me of Ilyas
+	words about something involving patches. Maybe (1) if the argument ends
+	with a dot, it is a local directory: go there and build. Maybe (2)
+	keyword patch in distroprefs.
+
+	* new maint-5.8:
+	drwxr-xr-x  34 k k     8192 Oct 14 23:48 perl-m-5.8.0@29014/
+	drwxr-xr-x  35 k k     8192 Oct 14 23:30 perl-p-5.8.0@29015/
+
 2006-10-14  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Test installing Plagger with saying yes to all dependcy questions.
+	Needs 63 times "Y\n" :-) => say --defaultdeps instead of --installdeps=y
+	DONE in rev. 1038
 
 	* Add support for all other CPAN::Config variables. Maybe by turning
 	them all into methods in CPAN::Distribution, maybe via autoload, maybe
@@ -13,7 +47,7 @@
 	cannot use bleadperl. Latest maint-perl is 28854.
 
 	AI::Categorizer needed by t/basic.t, not listed as prereq. Needs in turn
-	(unlisted?) Algorithm::NaiveBayes:-(
+	(unlisted?) Algorithm::NaiveBayes. Bug report to Ken sent.
 
 	Warning: prerequisite Config::IniFiles 0 not found.
 	Warning: prerequisite DBD::SQLite 0 not found.
@@ -22,19 +56,16 @@
 	DBD::SQLite did not compile on the first try. But it did on the second.
 	I think in between I installed libsqlite0-dev.
 
-	No again I have no Lingua::StopWords:=(
+	Trying make test.
 
+	No again: I have no Lingua::StopWords:=(
 	No SOAP::Lite
-
 	No Perl::Tidy
-
 	No HTML::TextToHTML
-
 	No Pod::Xhtml
-
 	No XML::SAX::ExpatXS
 
-	Finished installing prereqs, all tests except Mysql pass.
+	Finished installing prereqs, all tests except Mysql pass which is OK.
 
 	make install is OK.
 
@@ -50,7 +81,6 @@ Cannot retrieve /home/src/perl/cpan-search-lite/indices/ls-lR.gz from file:///ho
 	/home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/bin/csl_index --config /home/src/perl/cpan-search-lite/cpan.conf --setup
 Using config file "/home/src/perl/cpan-search-lite/cpan.conf"
 Cannot retrieve /home/src/perl/cpan-search-lite/MIRRORED.BY from file:///home/ftp/pub/PAUSE/./MIRRORED.BY at /home/src/perl/repoperls/installed-perls/maint-5.8/pjTSIuN/perl-5.8.0@28854/lib/site_perl/5.8.8/CPAN/Search/Lite/Index.pm line 198.
-
 
 	Gotta get this mirroredby file as well...
 
@@ -69,12 +99,6 @@ Argument "0.20a" isn't numeric in numeric comparison (<=>) at /home/src/perl/rep
 	* Measure kwalitee with Module::CPANTS::Analyse before uploading. That
 	way we can catch bugs in M:C:A itself or in its dependencies. DELAYED
 	because currently M:C:A doesn't pass its own tests.
-
-	* just a memo what I usually install:
-
-	    o debug CPAN Distribution
-	    install Bundle::CPAN YAML::Syck Module::Signature CPAN::Reporter Devel::Symdump
-	    force install Expect
 
 	* replace 03 index file with YAML.
 
@@ -390,7 +414,7 @@ Distribution id = K/KW/KWILLIAMS/PathTools-3.22.tar.gz
     yaml_content 
 
 	But I cannot reproduce it. So I must have upgraded something that caused
-	the bug.
+	the bug. REVISITED after 1.88_54 and FIXED in 1043.
 
 	* Since when fails a YAML test? 0.62 with blead @28990 fails today on
 	rt-bugs.t or so. Reported to P5P. RESOLVED in blead @28997.

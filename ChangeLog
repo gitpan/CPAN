@@ -1,5 +1,35 @@
+2006-10-16  k
+
+	* MANIFEST.SKIP: prepare 1.88_55
+	* MANIFEST, README: prepare 1.88_55
+	* Changes, distroprefs/MIYAGAWA.Plagger.yml, lib/CPAN.pm: 
+	  autoinstall does not like it that way
+	* lib/CPAN.pm: address #22118: add new command "report"
+	* distroprefs/MIYAGAWA.Plagger.yml, 
+	  distroprefs/ZEV.Test-Dependencies.01.yml: lost the --; 
+	  Autoinstall bug again with failing dependencies visible in 
+	  Test::Dependencies
+	* lib/CPAN.pm: tiny change that gives us "cpan ."
+	* Todo: rewrite a German note in Emglish
+	* Todo: note about YAML::Syck
+
+2006-10-15  k
+
+	* Todo, t/30shell.t: add a test for the fix in patch 1043
+	* lib/CPAN.pm: fix the "d" command to display the prereq_pm 
+	  correctly, to not delete undef stuff (and delete it immediately)
+	* Todo: new todos
+	* t/30shell.t: typo
+	* lib/CPAN.pm: make authors alive even without email or fullname
+	* Makefile.PL, lib/CPAN.pm, lib/CPAN/FirstTime.pm, t/30shell.t: 
+	  cleaning 30shell.t until it succeeds without Expect; opening the 
+	  test for other platforms
+	* Todo, distroprefs/MIYAGAWA.Plagger.yml: new ideas from Slaven
+
 2006-10-14  k
 
+	* Todo, lib/CPAN.pm: do not complain THAT often about uninstalled 
+	  YAML::Syck; once is per distro enough
 	* MANIFEST, Todo, t/30shell.t, 
 	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd, 
 	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS@588: during this manifest 
