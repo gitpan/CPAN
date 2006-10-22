@@ -16,13 +16,16 @@ BEGIN {
     }
 }
 
-use File::Spec;
+use Config;
+use CPAN::FirstTime ();
+use File::Spec ();
 
 sub _f ($) {File::Spec->catfile(split /\//, shift);}
 sub _d ($) {File::Spec->catdir(split /\//, shift);}
 use File::Path qw(rmtree mkpath);
 rmtree _d"t/dot-cpan/sources";
 rmtree _d"t/dot-cpan/build";
+rmtree _d"t/dot-cpan/prefs";
 unlink _f"t/dot-cpan/Metadata";
 unlink _f"t/dot-cpan/.lock";
 mkpath _d"t/dot-cpan/sources/authors/id/A/AN/ANDK";
@@ -44,9 +47,26 @@ cp _f"t/CPAN/CpanTestDummies-1.55.pm",
     _f"t/dot-cpan/Bundle/CpanTestDummies.pm" or die
     "Could not cp t/CPAN/CpanTestDummies-1.55.pm over ".
     "t/dot-cpan/Bundle/CpanTestDummies.pm: $!";
+mkpath _d"t/dot-cpan/prefs";
 
 use Cwd;
 my $cwd = Cwd::cwd;
+
+open FH, (">" . _f"t/dot-cpan/prefs/TestDistroPrefsFile.yml") or die "Could not open: $!";
+print FH <<EOF;
+---
+comment: "Having more than one yaml variable per file is OK?"
+match:
+  distribution: "matches never^"
+---
+match:
+  module: "CPAN::Test::Dummy::Perl5::Build::Fails"
+patches:
+  - "$cwd/t/CPAN/TestPatch.txt"
+EOF
+END {
+    unlink _f"t/dot-cpan/prefs/TestDistroPrefsFile.yml";
+}
 
 sub read_myconfig () {
     local *FH;
@@ -72,7 +92,11 @@ my @modules = qw(
                  Archive::Zip
                  Data::Dumper
                  Term::ANSIColor
+                 YAML
                 );
+my @programs = qw(
+                  patch
+                 );
 
 use Test::More;
 plan tests => (
@@ -88,14 +112,27 @@ sub mreq ($) {
     eval "require $m; 1";
 }
 
-my $m;
-for $m (@modules) {
-    $HAVE->{$m}++ if mreq $m;
+{
+    my $m;
+    for $m (@modules) {
+        $HAVE->{$m}++ if mreq $m;
+    }
+}
+{
+    my $p;
+    my(@path) = split /$Config{path_sep}/, $ENV{PATH};
+    for my $p (@programs) {
+        $HAVE->{$p}++ if CPAN::FirstTime::find_exe($p,\@path);
+    }
 }
 $HAVE->{"Term::ReadLine::Perl||Term::ReadLine::Gnu"}
     =
     $HAVE->{"Term::ReadLine::Perl"}
     || $HAVE->{"Term::ReadLine::Gnu"};
+$HAVE->{"YAML&&patch"}
+    =
+    $HAVE->{"YAML"}
+    || $HAVE->{"patch"};
 read_myconfig;
 is($CPAN::Config->{histsize},100,"histsize is 100 before testing");
 
@@ -413,7 +450,7 @@ __END__
 #E:
 ########
 #P:o conf init bzip2
-#E:Where.+?bzip2.+?(\])
+#E:Where.+?bzip2.+?(\?)
 ########
 #P:foo
 #E:
@@ -437,25 +474,25 @@ __END__
 #E:
 ########
 #P:o conf init curl
-#E:Where.+?(\])
+#E:Where.+?(\?)
 ########
 #P:foo
 #E:
 ########
 #P:o conf init gpg
-#E:Where.+?(\])
+#E:Where.+?(\?)
 ########
 #P:foo
 #E:
 ########
 #P:o conf init gzip
-#E:Where.+?(\])
+#E:Where.+?(\?)
 ########
 #P:foo
 #E:
 ########
 #P:o conf init lynx
-#E:Where.+?(\])
+#E:Where.+?(\?)
 ########
 #P:foo
 #E:
@@ -545,7 +582,7 @@ __END__
 #E:
 ########
 #P:o conf init shell
-#E:............(\])
+#E:shell.*?(\?)
 ########
 #P:foo
 #E:
@@ -557,7 +594,7 @@ __END__
 #E:
 ########
 #P:o conf init tar
-#E:............(\])
+#E:Where.+?(\?)
 ########
 #P:foo
 #E:
@@ -770,6 +807,12 @@ __END__
 #P:failed
 #E:Nothing
 ########
+#P:o conf prefs_dir ""
+#N:to hide the YAML file
+########
+#P:o conf prefs_dir
+#E:prefs_dir
+########
 #P:test CPAN::Test::Dummy::Perl5::Build::Fails
 #E:test\s+--\s+NOT OK
 #R:Module::Build
@@ -913,6 +956,16 @@ __END__
 #P:install CPAN::Test::Dummy::Perl5::Make::CircDepeOne
 #E:is up to date|Recursive dependency detected[\s\S]+?Cannot continue.[\s\S]+?Failed during this command
 #T:60
+########
+#P:o conf defaults
+########
+#P:force get CPAN::Test::Dummy::Perl5::Build::Fails
+#E:D i s t r o[\s\S]+?TestDistroPrefsFile.yml\[1[\s\S]+?patch
+#R:YAML&&patch
+########
+#P:test CPAN::Test::Dummy::Perl5::Build::Fails
+#E:test -- OK
+#R:YAML&&patch
 ########
 #P:u /--/
 #E:No modules found for

@@ -1,5 +1,134 @@
+2006-10-22  k
+
+	* lib/CPAN.pm: prepare 1.88_56
+	* lib/CPAN.pm: prepare 1.88_56
+	* Changes: prepare 1.88_56
+	* MANIFEST, MANIFEST.SKIP, Todo: prepare 1.88_56
+	* Todo: prepare 1.88_56
+	* Todo, distroprefs/ABW.Template-Toolkit.01.yml: forbit 
+	  Template-Toolkit to install extras because I cannot write into 
+	  the default directory
+	* Todo, distroprefs/ABW.Template-Toolkit.01.yml: Template-Toolkit 
+	  patch referenced that removes a buggy test
+	* Changes, README, distroprefs/GBARR.perl-ldap.01.yml, 
+	  distroprefs/Jifty.yml, distroprefs/README, 
+	  distroprefs/SCHWERN.Exporter-Lite.yml, 
+	  distroprefs/URI.File-Slurp.yml, lib/CPAN.pm: allow for gzipped 
+	  patches; add a distroprefs file for File::Slurp and 
+	  Exporter::Lite; document the patch creating process in the 
+	  distroprefs/README; forbid Jifty to recursively install via 
+	  AutoInstall
+	* Todo, lib/CPAN.pm: prepare 1.88_56
+	* Changes: prepare 1.88_56
+	* t/30shell.t: prepare 1.88_56
+	* README, t/30shell.t: prepare 1.88_56
+	* MANIFEST: prepare 1.88_56
+	* Changes, Todo, distroprefs/ABW.Template-Toolkit.01.yml, 
+	  distroprefs/MIYAGAWA.Template-P-E.yml, distroprefs/README, 
+	  distroprefs/RGIERSIG.Expect.yml, lib/CPAN.pm, t/30shell.t: 
+	  prepare 1.88_56
+	* Changes, Todo, distroprefs/AUDREYT.Module-Signature.01.yml, 
+	  lib/CPAN.pm, t/30shell.t: two things: workaround the not yet 
+	  finally decided Module::Build thingie with subclasses in 
+	  Build.PL; and now we allow for YAML files that contain many YAML 
+	  sections
+
+2006-10-21  k
+
+	* Todo, lib/CPAN.pm: the most precious gems out of Ilya's patch
+	* lib/CPAN.pm: typos
+	* Todo, lib/CPAN.pm: document the trailing dot
+	* Todo: reshuffle Todo list
+	* lib/CPAN.pm: we need zero risk here after a reload cpan the 
+	  unwrapped attribute is not yet an object for all distros
+	* distroprefs/SCHWERN.UNIVERSAL-require.yml: a patch to 
+	  UNIVERSAL-require-0.10 has been uploaded to CPAN and this is the 
+	  YAML file to apply it
+	* Todo, distroprefs/ILYAZ.Math-Pari.01.yml, lib/CPAN.pm: extend 
+	  patch ability to files from CPAN
+	* Todo, lib/CPAN.pm: disable reporting through CPAN::Reporter when 
+	  source is patched
+	* Todo, distroprefs/README, distroprefs/Test-CTDPBF.yml, 
+	  lib/CPAN.pm: add "perl" to the matches stuff of distroprefs; 
+	  update the documentation
+	* Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, t/30shell.t: patch 
+	  implemented with test succeeding; minor cosmetics to FirstTime
+
+2006-10-20  k
+
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: 
+	  introducing the patch config variable but not yet much of the 
+	  patch support proper
+	* lib/CPAN.pm, t/30shell.t: tiny anti-spaghetti-refactoring and a 
+	  stub where patch shall happen; passes tests
+	* Todo: Todo item from Tina
+	* MANIFEST, Todo, t/30shell.t, t/CPAN/TestPatch.txt: prepare a 
+	  distroprefs test with patch that now already tests some basics
+	* Todo, distroprefs/LOCAL.trailing_dot_distros.yml: demo file for 
+	  local distros
+	* Todo, lib/CPAN.pm: make it more obvious what is happening when a 
+	  bundle goes to a distro directly
+	* lib/CPAN.pm: improve guessing of usernames for unknown objects
+	* Todo: notes about the patch from Ilya
+	* distroprefs/DBROBINS.Net-SSH-Perl.01.yml: do not build 
+	  Net::SSH::Perl for now, comment on the reason; choose the 
+	  "nosuchtarget" trick to keep it on the radar
+
+2006-10-19  k
+
+	* lib/CPAN/HandleConfig.pm: applied a patch by smpeters to silence 
+	  an unini warning (RT #22277)
+	* Todo: notes
+	* patches/diff_CPAN-1.76: old patch from ilya that he digged out 
+	  on request
+	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm, t/12cpan.t: address 
+	  #20979: trailing slashes in MyConfig variables with test (Lars 
+	  XXX via David Golden)
+	* Todo, distroprefs/README, lib/CPAN.pm: change determination of 
+	  \$ready_to_report and the accompanying error message (suggested 
+	  by Slaven)
+
+2006-10-18  k
+
+	* Todo: memo ThirdParty
+	* distroprefs/Jifty.yml: still Jifty
+	* MANIFEST, distroprefs/Jifty.yml, distroprefs/Module-Install.yml: 
+	  start testing with Jifty
+	* Todo, distroprefs/README: documentation
+	* Todo, t/30shell.t: at least revealed the empty ENV something
+	* lib/CPAN.pm: oh what a crap I wrote; just wiping %ENV does no 
+	  good
+	* ., distroprefs, related/Bundle-CPAN, t/CPAN, 
+	  t/CPAN/authors/id/A/AN/ANDK, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails:
+	   set a bunch of svn:ignore properties
+	* Todo, lib/CPAN/FirstTime.pm, t/30shell.t: if a program is not 
+	  found in the path, display the path for better diagnostics; also 
+	  adjust the test to not expect a pracket
+	* Todo, distroprefs/ILYAZ.Math-Pari.01.yml, lib/CPAN.pm: two in 
+	  one: support setting timeout in expect (undocumented);  and 
+	  disable CPAN::Reporter for user LOCAL
+
+2006-10-17  k
+
+	* Todo: plans for the evening
+	* Todo, distroprefs/ILYAZ.Math-Pari.01.yml, lib/CPAN.pm: silence 
+	  an unini warning due to undefined ENV variables; "unsatisfied" 
+	  message prettier
+
 2006-10-16  k
 
+	* distroprefs/DBROBINS.Net-SSH-Perl.01.yml: oops
+	* Todo, distroprefs/DBROBINS.Net-SSH-Perl.01.yml, 
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails/lib/CPAN/Test/Dummy/Perl5/Build/DepeFails.pm:
+	   another missed checkin
+	* lib/CPAN.pm: need to mock up an author:  this is what LOCAL is 
+	  for, is it not?
+	* Todo: memo about the missing checkin
+	* distroprefs/PDF-FromHTML.yml, distroprefs/XML-Twig.yml: these 
+	  were in 1.88_55 but not in SVN:-( must write some code that 
+	  prevents this bug from happening again
 	* MANIFEST.SKIP: prepare 1.88_55
 	* MANIFEST, README: prepare 1.88_55
 	* Changes, distroprefs/MIYAGAWA.Plagger.yml, lib/CPAN.pm: 
