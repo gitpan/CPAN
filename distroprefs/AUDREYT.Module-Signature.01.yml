@@ -1,7 +1,0 @@
---- 
-match:
-  module: "^Module::Signature$"
-pl: 
-  expect:
-    - "Import PAUSE"
-    - "y\n"

@@ -1,5 +1,0 @@
---- 
-match:
-  module: "^Authen::SASL$"
-pl: 
-  args: ["--defaultdeps"]

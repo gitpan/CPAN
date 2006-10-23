@@ -1,9 +1,8 @@
-# -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 package CPAN::Debug;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 955 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 844 $,4)/1000000 + 5.4;
 # module is internal to CPAN.pm
 
 %CPAN::DEBUG = qw[
@@ -31,24 +30,15 @@ $CPAN::DEBUG ||= 0;
 #-> sub CPAN::Debug::debug ;
 sub debug {
     my($self,$arg) = @_;
-
-    my @caller;
-    my $i = 0;
-    while () {
-        my(@c) = (caller($i))[0 .. ($i ? 3 : 2)];
-        last unless defined $c[0];
-        push @caller, \@c;
-        for (0,3) {
-            last if $_ > $#c;
-            $c[$_] =~ s/.*:://;
-        }
-        for (1) {
-            $c[$_] =~ s|.*/||;
-        }
-        last if ++$i>=3;
-    }
-    pop @caller;
-    if ($CPAN::DEBUG{$caller[0][0]} & $CPAN::DEBUG){
+    my($caller,$func,$line,@rest) = caller(1); # caller(0) eg
+                                               # Complete, caller(1)
+                                               # eg readline
+    ($caller) = caller(0);
+    $caller =~ s/.*:://;
+    $arg = "" unless defined $arg;
+    pop @rest while @rest > 5;
+    my $rest = join ",", map { defined $_ ? $_ : "UNDEF" } @rest;
+    if ($CPAN::DEBUG{$caller} & $CPAN::DEBUG){
         if ($arg and ref $arg) {
             eval { require Data::Dumper };
             if ($@) {
@@ -57,12 +47,7 @@ sub debug {
                 $CPAN::Frontend->myprint(Data::Dumper::Dumper($arg));
             }
         } else {
-            my $outer = "";
-            local $" = ",";
-            if (@caller>1) {
-                $outer = ",[@{$caller[1]}]";
-            }
-            $CPAN::Frontend->myprint("Debug(@{$caller[0]}$outer): $arg\n");
+            $CPAN::Frontend->myprint("Debug($caller:$func,$line,[$rest]): $arg\n");
         }
     }
 }
@@ -70,7 +55,6 @@ sub debug {
 1;
 
 __END__
-
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or

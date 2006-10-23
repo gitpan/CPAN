@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 1085 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 847 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -11,14 +11,10 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 1085 $,4)/1000000 + 5.4;
         init     => "Interactive setting of all options",
 );
 
-# Q: where is the "How do I add a new config option" HOWTO?
-# A1: svn diff -r 757:758 # where dagolden added test_report
-# A2: svn diff -r 985:986 # where andk added yaml_module
 %keys = map { $_ => undef } (
                              #  allow_unauthenticated ?? some day...
                              "build_cache",
                              "build_dir",
-                             "build_requires_install_policy",
                              "bzip2",
                              "cache_metadata",
                              "check_sigs",
@@ -59,10 +55,8 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 1085 $,4)/1000000 + 5.4;
                              "no_proxy",
                              "pager",
                              "password",
-                             "patch",
                              "prefer_installer",
                              "prerequisites_policy",
-                             "prefs_dir",
                              "proxy_pass",
                              "proxy_user",
                              "scan_cache",
@@ -77,7 +71,6 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 1085 $,4)/1000000 + 5.4;
                              "username",
                              "wait_list",
                              "wget",
-                             "yaml_module",
                             );
 if ($^O eq "MSWin32") {
     for my $k (qw(
@@ -154,8 +147,7 @@ sub edit {
             $CPAN::Config->{$o} = { @args };
         } else {
 	    $CPAN::Config->{$o} = $args[0] if defined $args[0];
-	    $self->prettyprint($o)
-                if exists $keys{$o} or defined $CPAN::Config->{$o};
+	    $self->prettyprint($o);
             return 1;
 	}
     }
@@ -193,7 +185,6 @@ sub prettyprint {
 
 sub commit {
     my($self,@args) = @_;
-    CPAN->debug("args[@args]") if $CPAN::DEBUG;
     my $configpm;
     if (@args) {
       if ($args[0] eq "args") {
@@ -264,10 +255,7 @@ sub neatvalue {
     my($self, $v) = @_;
     return "undef" unless defined $v;
     my($t) = ref $v;
-    unless ($t){
-        $v =~ s/\\/\\\\/g;
-        return "q[$v]";
-    }
+    return "q[$v]" unless $t;
     if ($t eq 'ARRAY') {
         my(@m, @neat);
         push @m, "[";
@@ -292,8 +280,7 @@ sub defaults {
     my $done;
     for my $config (qw(CPAN/MyConfig.pm CPAN/Config.pm)) {
         if ($INC{$config}) {
-            CPAN->debug("INC{'$config'}[$INC{$config}]") if $CPAN::DEBUG;
-            CPAN::Shell->reload_this($config,{force => 1});
+            CPAN::Shell->reload_this($config);
             $CPAN::Frontend->myprint("'$INC{$config}' reread\n");
             last;
         }
@@ -346,7 +333,6 @@ else: quote it with the correct quote type for the box we're on
         my $quote = $CPAN::Config->{commands_quote} || $quotes;
 
         if ($quote ne ' '
-            and defined($command )
             and $command =~ /\s/
             and $command !~ /[$quote]/) {
             return qq<$use_quote$command$use_quote>
@@ -593,12 +579,12 @@ package
 
 use strict;
 use vars qw($AUTOLOAD $VERSION);
-$VERSION = sprintf "%.2f", substr(q$Rev: 1085 $,4)/100;
+$VERSION = sprintf "%.2f", substr(q$Rev: 847 $,4)/100;
 
 # formerly CPAN::HandleConfig was known as CPAN::Config
 sub AUTOLOAD {
   my($l) = $AUTOLOAD;
-  $CPAN::Frontend->mywarn("Dispatching deprecated method '$l' to CPAN::HandleConfig\n");
+  $CPAN::Frontend->mywarn("Dispatching deprecated method '$l' to CPAN::HandleConfig");
   $l =~ s/.*:://;
   CPAN::HandleConfig->$l(@_);
 }

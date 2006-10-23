@@ -1,9 +1,0 @@
---- 
-match:
-  module: "^Module::Install$"
-pl:
-  env:
-    PERL_AUTOINSTALL: --skip
-make:
-  env:
-    PERL_AUTOINSTALL: --skip    

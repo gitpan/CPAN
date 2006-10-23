@@ -1,9 +1,0 @@
---- 
-match:
-  module: "^URI::Fetch$"
-pl: 
-  expect: 
-    - "Auto-install"
-    - "y\n"
-    - "Auto-install"
-    - "y\n"

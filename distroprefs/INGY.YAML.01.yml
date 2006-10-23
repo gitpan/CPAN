@@ -1,8 +1,0 @@
---- 
-match:
-  distribution: "^INGY/YAML-0.62"
-pl: 
-  expect:
-    - "Continue installing"
-    - "y\n"
-

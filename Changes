@@ -1,118 +1,16 @@
-2006-10-22  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+2006-10-23  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* release 1.88_56
+	* release 1.8802
 
-	* add the ability to patch random distros both with local patches and
-	with patches from CPAN. Demo patches to UNIVERSAL::require, Expect,
-	Math::Pari, etc. are uploaded to my CPAN directory, corresponding YAML
-	files are in the distroprefs directory. Heavily inspired by an old patch
-	from Ilya Zakharevich.
+	* backported from the 1.88_56 developer release the code that protects
+	the user from using a broken version of Test::Harness.
 
-	* fixes from Ilya Zakharevich to the PERL5LIB environment handling for
-	not yet installed modules from a 3 year old patch.
+	* backported from the 1.88_56 developer release a bugfix that deals with
+	modules that subclass Module::Build in the Build.PL like Error.pm and
+	HTML::Mason
 
-	* work around a Module::Build issue with Build.PL files that are
-	subclassing Module::Build like Error.pm and HTML::Mason. For now we fall
-	back to the META.yml file. Needs further discussion with Module::Build
-	people.
-
-	* in the distroprefs system allow for YAML files with an arbitrary
-	number of sections.
-
-	* document how to integrate local distribution directories into the CPAN
-	shell. See section 'Integrating local directories' in the manpage.
-
-	* reporting of errors during unpacking is now integrated into the
-	report section at the end of each command and the 'failed' command.
-
-	* applied a patch by smpeters to silence an unini warning (RT #22277).
-
-	* address #20979: trailing backslashes in MyConfig variables with test
-	(Lars XXX via David Golden)
-
-2006-10-16  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* release 1.88_55
-
-	* new command 'report' as requested by Schwern in #22118.
-
-	* extend the Distribution object to local directories. Gives a meaning
-	to the 'cpan .' command. Suggested by Slaven Rezic.
-
-	* removes the linux centric behaviour of t/30shell.t.
-
-	* do not complain THAT often about uninstalled YAML or YAML::Syck; once
-	is per distro enough.
-
-2006-10-13  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* release 1.88_54
-
-	* New option 'yaml_module' to switch between YAML.pm and YAML::Syck
-	Try 'o conf init /yaml/' to use it.
-
-	* New distroprefs system that lets the user store arguments, environment
-	variables, individual answers to questions asked by Distributions when
-	being built, and config overrides. Try 'o conf init /prefs/' for more
-	information.
-
-	* address #21144 major documentation bug: $obj->install is NOT the same
-	as CPAN::Shell->install($obj) as soon as a queue of dependencies comes
-	into play.
-
-	* fix "o conf defaults" which was broken in 1.88_53.
-
-	* protect us against Module::Build errors with an eval around the
-	requires() and build_requires() calls.
-
-2006-10-09  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* release 1.88_53
-
-	* wrapping Module::Build calls into an eval to catch external errors
-	with the right consequences.
-
-	* 'reload cpan' now based on timestamps and always jumps into a fresh
-	shell when needed.
-
-	* display the version during loading of our own modules.
-
-	* address #21692: make the "isa perl" case less noisy (Gabor Szabo)
-
-	* new tests
-
-2006-10-03  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* release 1.88_52
-
-	* now does the right thing with prereq "perl"
-
-	* major speedup in parsing of index files
-
-	* repair debugging aid to display the correct line number
-
-	* fix bug introduced in _51 regarding Test::Harness version verification
-
-	* fix old bug in CPAN::Version wrt installed developer versions
-
-2006-09-29  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* release 1.88_51
-
-	* dependencies declared as 'build_requires' are now treated according to
-	a new policy option: try 'o conf init build_requires_install_policy' for
-	more info. (Suggested/Requested by Johan Vromans)
-
-	* fixed a bug where successful tests were repeated if things were not
-	being installed like during the 'test' command itself.
-
-	* address #21724: document that the 'r' command takes arguments; support
-	the same arguments for the 'upgrade' command (Adam Kennedy)
-
-	* address #21716: fix the broken 'recent' command (Phil Pennock)
-
-	* fixed a rare but extremely unpleasant bug with deep recursion in
-	AUTOLOAD during the 'reload cpan' command.
+	* backported from the 1.88_56 developer release another few very trivial
+	zero risk things
 
 2006-09-22  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 

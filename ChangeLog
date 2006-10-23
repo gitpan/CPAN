@@ -1,5 +1,16 @@
+2006-10-23  k
+
+	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: pure cosmetics, 
+	  noreal change
+
 2006-10-22  k
 
+	* lib/CPAN.pm, lib/CPAN/HandleConfig.pm: address #22396: have a 
+	  global COFNIG_DIRTY flag when something on config is assigning a 
+	  value that is cleared on save and reset
+	* MANIFEST, Todo, distroprefs/MIYAGAWA.Template-P-E.yml: miyagawa 
+	  fixed his package; Randy sent CPAN::SQLite
+	* Todo, lib/CPAN.pm: silence an unini warning due to %ENV
 	* lib/CPAN.pm: prepare 1.88_56
 	* lib/CPAN.pm: prepare 1.88_56
 	* Changes: prepare 1.88_56

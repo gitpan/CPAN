@@ -1,7 +1,0 @@
---- 
-match:
-  distribution: "^RCAPUTO/POE-"
-pl: 
-  expect:
-    - "Any text other than Y or y will be taken as a no"
-    - "y\n"

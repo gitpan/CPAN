@@ -1,5 +1,0 @@
---- 
-match:
-  module: "^Test::Deep$"
-cpanconfig:
-  build_requires_install_policy: "yes"
