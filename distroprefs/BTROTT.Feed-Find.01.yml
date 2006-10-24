@@ -1,0 +1,9 @@
+--- 
+match:
+  distribution: "^BTROTT/Feed-Find-"
+pl: 
+  expect: 
+    - "Auto-install"
+    - "y\n"
+    - "Auto-install"
+    - "y\n"

@@ -1,0 +1,31 @@
+--- 
+match:
+  distribution: "^OLAF/Net-DNS-"
+pl: 
+  args: 
+    - --no-online-tests
+  env: {}
+
+  expect: []
+
+make: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+test: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+install: 
+  args: []
+
+  env: {}
+
+  expect: []
+

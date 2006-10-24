@@ -1,0 +1,33 @@
+--- 
+match:
+  distribution: "^CHAMAS/Crypt-SSLeay-"
+pl: 
+  args: []
+
+  env: {}
+
+  expect:
+    - "Which OpenSSL build path"
+    - "\n"
+
+make: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+test: 
+  args: []
+
+  env: {}
+
+  expect: []
+
+install: 
+  args: []
+
+  env: {}
+
+  expect: []
+

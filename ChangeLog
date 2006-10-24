@@ -1,5 +1,24 @@
+2006-10-24  k
+
+	* MANIFEST: prepare 1.88_57
+	* Changes: prepare 1.88_57
+	* Todo, distroprefs/README, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: 
+	  new method CPAN::HandleConfig->prefs_lookup
+	* lib/CPAN/HandleConfig.pm: whitespace
+	* lib/CPAN/HandleConfig.pm: whitespace
+	* distroprefs/DBD-mysql.yml, distroprefs/MLEHMANN.Coro.yml: new 
+	  prefs files
+	* lib/CPAN.pm: make prefer_installer configurable in distroprefs
+	* Todo, lib/CPAN.pm: end of a long debugging session for ->VERSION 
+	  bug: cluck after a die instead of just warn; add the "for" 
+	  explanation to set_perl5env;  reset incommandcolor because ^C 
+	  also needs it
+
 2006-10-23  k
 
+	* distroprefs/TIMB.DBI.yml: pointer to the patch by Steve Peters 
+	  for the DBI under bleadperl
+	* Todo: notes
 	* Todo, lib/CPAN.pm, lib/CPAN/HandleConfig.pm: pure cosmetics, 
 	  noreal change
 

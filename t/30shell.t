@@ -1,53 +1,3 @@
-=pod
-
-Documentation about this test script is scattered around, sorry.
-
-C<30shell.pod> only talks about results from Devel::Cover
-
-C<README.shell.txt> describes how to add new pseudo distributions
-
-In the following I want to provide an overview about how this
-testscript works.
-
-After the __END__ token you find small groups of lines like the
-following:
-
-    ########
-    P:make CPAN::Test::Dummy::Perl5::BuildOrMake
-    E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
-    R:Module::Build
-    T:15
-    C:comment
-    ########
-
-P stands for program or print
-
-E for expect
-
-T for timeout
-
-R for requires or relies on
-
-C for comment
-
-S for status
-
-
-The script starts a CPAN shell and feed it the chunks such that the P
-line is injected, the output of the shell is parsed and compared to
-the expression in the E line. With T the timeout can be changed (the
-default is rather low, maybe 10 seconds, see the code for details).
-The expression in R is used to filter tests. The keyword in S may be
-one of C<run> to run this test, C<skip> to skip it, and C<quit> to
-stop testing immediately when this test is reached.
-
-To get reliable and debuggable results, Expect.pm should be installed.
-Without Expect.pm, a fallback mode is started that should in principle
-also succeed but is pretty hard to debug because there is no mechanism
-to sync state between reader and writer.
-
-=cut
-
 use strict;
 
 use vars qw($HAVE_EXPECT $RUN_EXPECT $HAVE);
@@ -55,11 +5,6 @@ BEGIN {
     $|++;
     #chdir 't' if -d 't';
     unshift @INC, './lib';
-    require Config;
-    unless ($Config::Config{osname} eq "linux" or $ENV{CPAN_RUN_SHELL_TEST}) {
-	print "1..0 # Skip: only validated on linux; maybe try env CPAN_RUN_SHELL_TEST=1\n";
-	eval "require POSIX; 1" and POSIX::_exit(0);
-    }
     eval { require Expect };
     if ($@) {
         unless ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
@@ -71,21 +16,24 @@ BEGIN {
     }
 }
 
-use File::Spec;
+use Config;
+use CPAN::FirstTime ();
+use File::Spec ();
 
 sub _f ($) {File::Spec->catfile(split /\//, shift);}
 sub _d ($) {File::Spec->catdir(split /\//, shift);}
 use File::Path qw(rmtree mkpath);
 rmtree _d"t/dot-cpan/sources";
 rmtree _d"t/dot-cpan/build";
+rmtree _d"t/dot-cpan/prefs";
 unlink _f"t/dot-cpan/Metadata";
 unlink _f"t/dot-cpan/.lock";
 mkpath _d"t/dot-cpan/sources/authors/id/A/AN/ANDK";
 
 use File::Copy qw(cp);
-cp _f"t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS\@588",
+cp _f"t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd",
     _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS"
-    or die "Could not cp t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS\@588 ".
+    or die "Could not cp t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd ".
     "over t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS: $!";
 END {
     unlink _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS";
@@ -99,9 +47,26 @@ cp _f"t/CPAN/CpanTestDummies-1.55.pm",
     _f"t/dot-cpan/Bundle/CpanTestDummies.pm" or die
     "Could not cp t/CPAN/CpanTestDummies-1.55.pm over ".
     "t/dot-cpan/Bundle/CpanTestDummies.pm: $!";
+mkpath _d"t/dot-cpan/prefs";
 
 use Cwd;
 my $cwd = Cwd::cwd;
+
+open FH, (">" . _f"t/dot-cpan/prefs/TestDistroPrefsFile.yml") or die "Could not open: $!";
+print FH <<EOF;
+---
+comment: "Having more than one yaml variable per file is OK?"
+match:
+  distribution: "matches never^"
+---
+match:
+  module: "CPAN::Test::Dummy::Perl5::Build::Fails"
+patches:
+  - "$cwd/t/CPAN/TestPatch.txt"
+EOF
+END {
+    unlink _f"t/dot-cpan/prefs/TestDistroPrefsFile.yml";
+}
 
 sub read_myconfig () {
     local *FH;
@@ -113,8 +78,10 @@ sub read_myconfig () {
 my @prgs;
 {
     local $/;
-    @prgs = split /########.*/, <DATA>;
+    my $data = <DATA>;
     close DATA;
+    $data =~ s/^=head.*//ms;
+    @prgs = split /########.*/, $data;
 }
 my @modules = qw(
                  Digest::SHA
@@ -125,7 +92,11 @@ my @modules = qw(
                  Archive::Zip
                  Data::Dumper
                  Term::ANSIColor
+                 YAML
                 );
+my @programs = qw(
+                  patch
+                 );
 
 use Test::More;
 plan tests => (
@@ -141,16 +112,29 @@ sub mreq ($) {
     eval "require $m; 1";
 }
 
-my $m;
-for $m (@modules) {
-    $HAVE->{$m}++ if mreq $m;
+{
+    my $m;
+    for $m (@modules) {
+        $HAVE->{$m}++ if mreq $m;
+    }
+}
+{
+    my $p;
+    my(@path) = split /$Config{path_sep}/, $ENV{PATH};
+    for my $p (@programs) {
+        $HAVE->{$p}++ if CPAN::FirstTime::find_exe($p,\@path);
+    }
 }
 $HAVE->{"Term::ReadLine::Perl||Term::ReadLine::Gnu"}
     =
     $HAVE->{"Term::ReadLine::Perl"}
     || $HAVE->{"Term::ReadLine::Gnu"};
+$HAVE->{"YAML&&patch"}
+    =
+    $HAVE->{"YAML"}
+    || $HAVE->{"patch"};
 read_myconfig;
-is($CPAN::Config->{histsize},100,"histsize is 100");
+is($CPAN::Config->{histsize},100,"histsize is 100 before testing");
 
 {
     require CPAN::HandleConfig;
@@ -209,22 +193,13 @@ sub mydiag {
 }
 
 $|=1;
-my $expo;
-my @PAIRS;
-if ($HAVE_EXPECT) {
-    if ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
-        $RUN_EXPECT = 0;
-    } else {
-        $RUN_EXPECT = 1;
-    }
+if ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
+    $RUN_EXPECT = 0;
 } else {
-    if ($ENV{CPAN_RUN_SHELL_TEST}) {
-        $RUN_EXPECT = 1;
-    } else {
-        $RUN_EXPECT = 0;
-    }
+    $RUN_EXPECT = 1;
 }
 ok(1,"RUN_EXPECT[$RUN_EXPECT]");
+my $expo;
 if ($RUN_EXPECT) {
     $expo = Expect->new;
     $ENV{LANG} = "C";
@@ -239,19 +214,26 @@ if ($RUN_EXPECT) {
 
 sub splitchunk ($) {
     my $ch = shift;
-    my @s = split /(^[A-Z]:)/m, $ch;
+    my @s = split /(^\#[A-Z]:)/m, $ch;
     shift @s; # leading empty string
     for (my $i = 0; $i < @s; $i+=2) {
+        $s[$i] =~ s/\#//;
         $s[$i] =~ s/://;
     }
     @s;
 }
 
+sub test_name {
+    my($prog,$comment) = @_;
+    ($comment||"") . ($prog ? " (testing command '$prog')" : "[empty RET]")
+}
+
 my $skip_the_rest;
+my @PAIRS;
 TUPL: for my $i (0..$#prgs){
     my $chunk = $prgs[$i];
     my %h = splitchunk $chunk;
-    my($status,$prog,$expected,$req,$test_timeout,$comment) = @h{qw(S P E R T C)};
+    my($status,$prog,$expected,$req,$test_timeout,$comment) = @h{qw(S P E R T C N)};
     if ($skip_the_rest) {
         ok(1,"skipping");
         next TUPL;
@@ -270,8 +252,9 @@ TUPL: for my $i (0..$#prgs){
             die "Alert: illegal status [$status]";
         }
     }
+
     unless (defined $expected or defined $prog) {
-        ok(1,"empty test");
+        ok(1,"empty test %h=(".join(" ",%h).")");
         next TUPL;
     }
     if ($req) {
@@ -296,7 +279,6 @@ TUPL: for my $i (0..$#prgs){
             mydiag "NEXT: $prog";
             $expo->send("$sendprog\n");
         } else {
-            print SYSTEM "# NEXT: $sendprog\n";
             print SYSTEM "$sendprog\n";
         }
     } else {
@@ -304,7 +286,6 @@ TUPL: for my $i (0..$#prgs){
             mydiag "PRESSING RETURN";
             $expo->send("\n");
         } else {
-            print SYSTEM "# PRESSING RETURN\n";
             print SYSTEM "\n";
         }
     }
@@ -337,10 +318,10 @@ expected[$expected]\ngot[$got]\n\n";
         mydiag "GOT: $got\n";
         $prog =~ s/^(\d)/$1/;
         $comment ||= "";
-        ok(1, "$comment" . ($prog ? " (testing command '$prog')" : "[empty RET]"));
+        ok(1, test_name($prog,$comment));
     } else {
         $expected = "" if $prog =~ /\t/;
-        push @PAIRS, [$prog,$expected];
+        push @PAIRS, [$prog,$expected,$comment];
     }
 }
 if ($RUN_EXPECT) {
@@ -352,606 +333,812 @@ if ($RUN_EXPECT) {
     my $got = <SYSTEM>;
     close SYSTEM;
     my $pair;
+    my $pos = 0;
     for $pair (@PAIRS) {
-        my($prog,$expected) = @$pair;
+        my($prog,$expected,$comment) = @$pair;
+        mydiag "NEXT: $prog";
         mydiag "EXPECT: $expected";
-        $got =~ /(\G.*?$expected)/sgc or die "Failed on prog[$prog]expected[$expected]";
-        mydiag "GOT: $1\n";
-        ok(1, $prog||"\"\\n\"");
+        if ($got =~ /(\G.*?$expected)/sgc) {
+            mydiag "GOT: $1\n";
+            $pos = pos $got;
+        } else {
+            mydiag "FAILED at pos[$pos] in test.out";
+        }
+        ok(1, test_name($prog,$comment));
     }
 }
 
 read_myconfig;
-is($CPAN::Config->{histsize},100);
+is($CPAN::Config->{histsize},100,"histsize is 100 after testing");
 rmtree _d"t/dot-cpan";
 
-# note: E=expect; P=program(=print); T=timeout; R=requires(=relies_on)
+# note: E=expect; P=program(=print); T=timeout; R=requires(=relies_on); N=Notes(internal); C=Comment(visible during testing)
 __END__
 ########
-E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*?>)
+#E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*?>)
 ########
-P:o conf init urllist
-E:(MIRR).+?y\]
+#P:o conf init urllist
+#E:(MIRR).+?y\]
 ########
-P:y
-E:continent.+?(\])
+#P:y
+#E:continent.+?(\])
 ########
-P:
-E:previous.+?(\])
+#P:
+#E:previous.+?(\])
 ########
-P:
-E:another URL.+?(\])
+#P:
+#E:another URL.+?(\])
 ########
-P:
-E:(?s:New set.+?commit.+?(!).+?\])
+#P:
+#E:(?s:New set.+?commit.+?(!).+?\])
 ########
-P:o conf init urllist
-E:MIRR.+?(\])
+#P:o conf init urllist
+#E:MIRR.+?(\])
 ########
-P:y
-E:continent.+?(\])
+#P:y
+#E:continent.+?(\])
 ########
-P:1-8
-E:(\])
+#P:1-8
+#E:(\])
 ########
-P:1-8
-E:(\])
+#P:1-8
+#E:(\])
 ########
-P:1-8
-E:(\])
+#P:1-8
+#E:(\])
 ########
-P:
-E:(?s:New set.+?commit.+?(!).+?\])
+#P:
+#E:(?s:New set.+?commit.+?(!).+?\])
 ########
-P:o conf urllist
+#P:o conf urllist
 ########
-P:o conf defaults
+#P:o conf defaults
 ########
-P:o conf build_cache
-E:build_cache
-S:run
+#P:o conf build_cache
+#E:build_cache
+#S:run
 ########
-P:o conf init
-E:(?s:.*?configure.as.much.as.possible.automatically.*?\])
+#P:o conf init
+#E:(?s:.*?configure.as.much.as.possible.automatically.*?\])
 ########
-P:yesplease
-E:commit: wrote.+?MyConfig
-T:60
+#P:yesplease
+#E:commit: wrote.+?MyConfig
+#T:60
 ########
-P:# o debug all
+#P:# o debug all
 ########
-P:o conf histsize 101
-E:.  histsize.+?101
+#P:o conf histsize 101
+#E:.  histsize.+?101
 ########
-P:o conf commit
-E:commit: wrote.+?MyConfig
+#P:o conf commit
+#E:commit: wrote.+?MyConfig
 ########
-P:o conf histsize 102
-E:.  histsize.+?102
+#P:o conf histsize 102
+#E:.  histsize.+?102
 ########
-P:o conf defaults
-E:reread
+#P:o conf defaults
+#E:reread
 ########
-P:o conf histsize
-E:histsize.+?101
+#P:o conf histsize
+#E:histsize.+?101
 ########
-P:o conf histsize 100
-E:histsize.+?100
+#P:o conf histsize 100
+#E:histsize.+?100
 ########
-P:o conf commit
-E:commit: wrote.+?MyConfig
+#P:o conf commit
+#E:commit: wrote.+?MyConfig
 ########
-P:o conf urllist
-E:file:///.*?CPAN
+#P:o conf urllist
+#E:file:///.*?CPAN
 ########
-P:o conf init keep_source_where
-E:kept.+?(\])
+#P:o conf init keep_source_where
+#E:kept.+?(\])
 ########
-P:/tmp
-E:
+#P:/tmp
+#E:
 ########
-P:o conf init build_cache
-E:(size.*?\])
+#P:o conf init build_cache
+#E:(size.*?\])
 ########
-P:100
-E:
+#P:100
+#E:
 ########
-P:o conf init build_dir
-E:Directory.+?(\])
+#P:o conf init build_dir
+#E:Directory.+?(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init bzip2
-E:Where.+?bzip2.+?(\])
+#P:o conf init bzip2
+#E:Where.+?bzip2.+?(\?)
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init cache_metadata
-E:Cache.+?(\])
+#P:o conf init cache_metadata
+#E:Cache.+?(\])
 ########
-P:y
-E:
+#P:y
+#E:
 ########
-P:o conf init check_sigs
-E:Module::Signature is installed.+?(\])
+#P:o conf init check_sigs
+#E:Module::Signature is installed.+?(\])
 ########
-P:y
-E:
+#P:y
+#E:
 ########
-P:o conf init cpan_home
-E:directory.+?(\])
+#P:o conf init cpan_home
+#E:directory.+?(\])
 ########
-P:/tmp/must_be_a_createable_absolute_path/../
-E:
+#P:/tmp/must_be_a_createable_absolute_path/../
+#E:
 ########
-P:o conf init curl
-E:Where.+?(\])
+#P:o conf init curl
+#E:Where.+?(\?)
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init gpg
-E:Where.+?(\])
+#P:o conf init gpg
+#E:Where.+?(\?)
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init gzip
-E:Where.+?(\])
+#P:o conf init gzip
+#E:Where.+?(\?)
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init lynx
-E:Where.+?(\])
+#P:o conf init lynx
+#E:Where.+?(\?)
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init make_arg
-E:............(\])
+#P:o conf init make_arg
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init make_install_arg
-E:............(\])
+#P:o conf init make_install_arg
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init make_install_make_command
-E:............(\])
+#P:o conf init make_install_make_command
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init makepl_arg
-E:............(\])
+#P:o conf init makepl_arg
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init mbuild_arg
-E:............(\])
+#P:o conf init mbuild_arg
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init mbuild_install_arg
-E:............(\])
+#P:o conf init mbuild_install_arg
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init mbuild_install_build_command
-E:............(\])
+#P:o conf init mbuild_install_build_command
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init mbuildpl_arg
-E:............(\])
+#P:o conf init mbuildpl_arg
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init ncftp
-E:............(\])
+#P:o conf init ncftp
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init ncftpget
-E:............(\])
+#P:o conf init ncftpget
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init pager
-E:............(\])
+#P:o conf init pager
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init prefer_installer
-E:............(\])
+#P:o conf init prefer_installer
+#E:............(\])
 ########
-P:EUMM
-E:
+#P:EUMM
+#E:
 ########
-P:o conf init prerequisites_policy
-E:............(\])
+#P:o conf init prerequisites_policy
+#E:follow[\S\s]+?ask[\S\s]+?ignore[\S\s]+?............(\])
 ########
-P:ask
-E:
+#P:ask
+#E:
 ########
-P:o conf init scan_cache
-E:............(\])
+#P:o conf init scan_cache
+#E:............(\])
 ########
-P:atstart
-E:
+#P:atstart
+#E:
 ########
-P:o conf init shell
-E:............(\])
+#P:o conf init shell
+#E:shell.*?(\?)
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init show_upload_date
-E:............(\])
+#P:o conf init show_upload_date
+#E:upload[\S\s]+?date[\S\s]+?............(\])
 ########
-P:y
-E:
+#P:y
+#E:
 ########
-P:o conf init tar
-E:............(\])
+#P:o conf init tar
+#E:Where.+?(\?)
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init term_is_latin
-E:............(\])
+#P:o conf init term_is_latin
+#E:............(\])
 ########
-P:n
-E:
+#P:n
+#E:
 ########
-P:o conf init test_report
-E:............(\])
+#P:o conf init test_report
+#E:............(\])
 ########
-P:n
-E:
+#P:n
+#E:
 ########
-P:o conf init unzip
-E:............(\])
+#P:o conf init unzip
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init wget
-E:............(\])
+#P:o conf init wget
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init commandnumber_in_prompt
-E:............(\])
+#P:o conf init commandnumber_in_prompt
+#E:command[\S\s]+?number[\S\s]+?............(\])
 ########
-P:y
-E:
+#P:y
+#E:
 ########
-P:o conf init ftp
-E:............(\])
+#P:o conf init ftp
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init make
-E:............(\])
+#P:o conf init make
+#E:............(\])
 ########
-P:foo
-E:
+#P:foo
+#E:
 ########
-P:o conf init ftp_passive
-E:............(\])
+#P:o conf init ftp_passive
+#E:............(\])
 ########
-P:y
-E:
+#P:y
+#E:
 ########
-P:o conf init ftp_proxy
-E:............(\])
+#P:o conf init ftp_proxy
+#E:............(\])
 ########
-P:y
-E:(\?)
+#P:y
+#E:(\?)
 ########
-P:u
-E:(\?)
+#P:u
+#E:(\?)
 ########
-P:p
-E:
+#P:p
+#E:
 ########
-P:o conf init http_proxy
-E:............(\])
+#P:o conf init http_proxy
+#E:............(\])
 ########
-P:y
-E:(\?)
+#P:y
+#E:(\?)
 ########
-P:u
-E:(\?)
+#P:u
+#E:(\?)
 ########
-P:p
-E:
+#P:p
+#E:
 ########
-P:o conf init no_proxy
-E:............(\])
+#P:o conf init no_proxy
+#E:............(\])
 ########
-P:y
-E:(\?)
+#P:y
+#E:(\?)
 ########
-P:u
-E:(\?)
+#P:u
+#E:(\?)
 ########
-P:p
-E:
+#P:p
+#E:
 ########
-P:o conf init getcwd
-E:............(\])
+#P:o conf init getcwd
+#E:............(\])
 ########
-P:cwd
-E:
+#P:cwd
+#E:
 ########
-P:o conf init histfile
-E:(hist)
+#P:o conf init histfile
+#E:(hist)
 ########
-P:/tmp/foo
-E:(save)
+#P:/tmp/foo
+#E:(save)
 ########
-P:100
-E:
+#P:100
+#E:
 ########
-P:o conf init histsize
-E:(hist)
+#P:o conf init histsize
+#E:(hist)
 ########
-P:/tmp/foo
-E:(save)
+#P:/tmp/foo
+#E:(save)
 ########
-P:100
-E:
+#P:100
+#E:
 ########
-P:o conf init inactivity_timeout
-E:............(\])
+#P:o conf init inactivity_timeout
+#E:............(\])
 ########
-P:10000
-E:
+#P:10000
+#E:
 ########
-P:o conf init index_expire
-E:............(\])
+#P:o conf init index_expire
+#E:............(\])
 ########
-P:y
-E:
+#P:y
+#E:
 ########
-P:o conf init term_ornaments
-E:............(\])
+#P:o conf init term_ornaments
+#E:............(\])
 ########
-P:y
-E:
+#P:y
+#E:
 ########
-P:o conf defaults
+#P:o conf defaults
 ########
-P:!print$ENV{HARNESS_PERL_SWITCHES}||"",$/
-E:
+#P:!print$ENV{HARNESS_PERL_SWITCHES}||"",$/
+#E:
 ########
-P:!print $INC{"CPAN/Config.pm"} || "NoCpAnCoNfIg",$/
-E:NoCpAnCoNfIg
+#P:!print $INC{"CPAN/Config.pm"} || "NoCpAnCoNfIg",$/
+#E:NoCpAnCoNfIg
 ########
-P:!print $INC{"CPAN/MyConfig.pm"},$/
-E:CPAN/MyConfig.pm
+#P:!print $INC{"CPAN/MyConfig.pm"},$/
+#E:CPAN/MyConfig.pm
 ########
-P:!print "\@INC: ", map { "    $_\n" } @INC
-E:
+#P:!print "\@INC: ", map { "    $_\n" } @INC
+#E:
 ########
-P:!print "%INC: ", map { "    $_\n" } sort values %INC
-E:
+#P:!print "%INC: ", map { "    $_\n" } sort values %INC
+#E:
 ########
-P:rtlprnft
-E:Unknown
+#P:rtlprnft
+#E:Unknown
 ########
-P:o conf ftp ""
+#P:o conf ftp ""
 ########
-P:m Fcntl
-E:Defines fcntl
+#P:m Fcntl
+#E:Defines fcntl
 ########
-P:a JHI
-E:Hietaniemi
+#P:a JHI
+#E:Hietaniemi
 ########
-P:a ANDK JHI
-E:(?s:Andreas.*?Hietaniemi.*?items found)
+#P:a ANDK JHI
+#E:(?s:Andreas.*?Hietaniemi.*?items found)
 ########
-P:autobundle
-E:Wrote bundle file
+#P:autobundle
+#E:Wrote bundle file
 ########
-P:b
-E:(?s:Bundle::CpanTestDummies.*?items found)
+#P:b
+#E:(?s:Bundle::CpanTestDummies.*?items found)
 ########
-P:b
-E:(?s:Bundle::Snapshot\S+\s+\(N/A\))
+#P:b
+#E:(?s:Bundle::Snapshot\S+\s+\(N/A\))
 ########
-P:b Bundle::CpanTestDummies
-E:\sCONTAINS.+?CPAN::Test::Dummy::Perl5::Make.+?CPAN::Test::Dummy::Perl5::Make::Zip
-R:Archive::Zip
+#P:b Bundle::CpanTestDummies
+#E:\sCONTAINS.+?CPAN::Test::Dummy::Perl5::Make.+?CPAN::Test::Dummy::Perl5::Make::Zip
+#R:Archive::Zip
 ########
-P:install ANDK/NotInChecksums-0.000.tar.gz
-E:(?s:awry.*?yes)
-R:Digest::SHA
+#P:install ANDK/NotInChecksums-0.000.tar.gz
+#E:(?s:awry.*?yes)
+#R:Digest::SHA
 ########
-P:n
-R:Digest::SHA
+#P:n
+#R:Digest::SHA
 ########
-P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
-E:CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
+#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.05.tar.gz
+#E:CONTAINSMODS\s+CPAN::Test::Dummy::Perl5::Make
 ########
-P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.02.tar.gz
-E:CPAN_USERID.*?ANDK.*?Andreas
+#P:d ANDK/CPAN-Test-Dummy-Perl5-Make-1.05.tar.gz
+#E:CPAN_USERID.*?ANDK.*?Andreas
 ########
-P:ls ANDK
-E:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy[\d\D]*?\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump
+#P:ls ANDK
+#E:\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/CPAN-Test-Dummy[\d\D]*?\d+\s+\d\d\d\d-\d\d-\d\d\sANDK/Devel-Symdump
 ########
-P:ls ANDK/CPAN*
-E:Text::Glob\s+loaded\s+ok[\d\D]*?CPAN-Test-Dummy
-R:Text::Glob
+#P:ls ANDK/CPAN*
+#E:Text::Glob\s+loaded\s+ok[\d\D]*?CPAN-Test-Dummy
+#R:Text::Glob
 ########
-P:force ls ANDK/CPAN*
-E:CPAN-Test-Dummy
-R:Text::Glob
+#P:force ls ANDK/CPAN*
+#E:CPAN-Test-Dummy
+#R:Text::Glob
 ########
-P:test CPAN::Test::Dummy::Perl5::Make
-E:test\s+--\s+OK
+#P:test CPAN::Test::Dummy::Perl5::Make
+#E:test\s+--\s+OK
 ########
-P:test CPAN::Test::Dummy::Perl5::Build
-E:test\s+--\s+OK
-R:Module::Build
+#P:test CPAN::Test::Dummy::Perl5::Build
+#E:test\s+--\s+OK
+#R:Module::Build
 ########
-P:test CPAN::Test::Dummy::Perl5::Make::Zip
-E:test\s+--\s+OK
-R:Archive::Zip
+#P:test CPAN::Test::Dummy::Perl5::Make::Zip
+#E:test\s+--\s+OK
+#R:Archive::Zip
 ########
-P:failed
-E:Nothing
+#P:failed
+#E:Nothing
 ########
-P:test CPAN::Test::Dummy::Perl5::Build::Fails
-E:test\s+--\s+NOT OK
-R:Module::Build
+#P:o conf prefs_dir ""
+#N:to hide the YAML file
 ########
-P:dump CPAN::Test::Dummy::Perl5::Make
-E:\}.+?CPAN::Module.+?;
-R:Data::Dumper
+#P:o conf prefs_dir
+#E:prefs_dir
 ########
-P:install CPAN::Test::Dummy::Perl5::Make::Failearly
-E:Failed during this command[\d\D]+?writemakefile NO
+#P:test CPAN::Test::Dummy::Perl5::Build::Fails
+#E:test\s+--\s+NOT OK
+#R:Module::Build
+#C:If this test fails, it's probably due to Test::Harness being < 2.62
 ########
-P:test CPAN::Test::Dummy::Perl5::NotExists
-E:Warning:
+#P:dump CPAN::Test::Dummy::Perl5::Make
+#E:\}.+?CPAN::Module.+?;
+#R:Data::Dumper
 ########
-P:clean NOTEXISTS/Notxists-0.000.tar.gz
-E:nothing done
+#P:install CPAN::Test::Dummy::Perl5::Make::Failearly
+#E:Failed during this command[\d\D]+?writemakefile NO
 ########
-P:failed
-E:Test-Dummy-Perl5-Build-Fails.*?make_test NO
-R:Module::Build
+#P:test CPAN::Test::Dummy::Perl5::NotExists
+#E:Warning:
 ########
-P:failed
-E:Test-Dummy-Perl5-Make-Failearly.*?writemakefile NO
+#P:clean NOTEXISTS/Notxists-0.000.tar.gz
+#E:nothing done
 ########
-P:o conf commandnumber_in_prompt 1
+#P:failed
+#E:Test-Dummy-Perl5-Build-Fails.*?make_test NO
+#R:Module::Build
 ########
-P:o conf build_cache 0.1
-E:build_cache
+#P:failed
+#E:Test-Dummy-Perl5-Make-Failearly.*?writemakefile NO
 ########
-P:reload index
-E:staleness
+#P:o conf commandnumber_in_prompt 1
 ########
-P:m /l/
-E:(?s:Perl5.*?Fcntl.*?items)
+#P:o conf build_cache 0.1
+#E:build_cache
 ########
-P:i /l/
-E:(?s:Dummies.*?Dummy.*?Perl5.*?Fcntl.*?items)
+#P:reload index
+#E:staleness
 ########
-P:h
-E:(?s:make.*?test.*?install.*?force.*?notest.*?reload)
+#P:m /l/
+#E:(?s:Perl5.*?Fcntl.*?items)
 ########
-P:o conf
-E:commit[\d\D]*?build_cache[\d\D]*?cpan_home[\d\D]*?inhibit_startup_message[\d\D]*?urllist[\d\D]*?wget
+#P:i /l/
+#E:(?s:Dummies.*?Dummy.*?Perl5.*?Fcntl.*?items)
 ########
-P:o conf prefer_installer EUMM
-E:EUMM\]
+#P:h
+#E:(?s:make.*?test.*?install.*?force.*?notest.*?reload)
 ########
-P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
-E:\}.+?CPAN::Module
+#P:o conf
+#E:commit[\d\D]*?build_cache[\d\D]*?cpan_home[\d\D]*?inhibit_startup_message[\d\D]*?urllist[\d\D]*?wget
 ########
-P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
-E:\}.+?CPAN::Distribution
+#P:o conf prefer_installer EUMM
+#E:EUMM\]
 ########
-P:make CPAN::Test::Dummy::Perl5::BuildOrMake
-E:(?s:Running make.*?Writing Makefile.*?make["']?\s+-- OK)
-C:first try
+#P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
+#E:\}.+?CPAN::Module
 ########
-P:o conf prefer_installer MB
-R:Module::Build
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
+#E:\}.+?CPAN::Distribution
 ########
-P:force get CPAN::Test::Dummy::Perl5::BuildOrMake
-E:Removing previously used
-R:Module::Build
+#P:make CPAN::Test::Dummy::Perl5::BuildOrMake
+#E:(?s:Running make.*?Writing Makefile.*?make["']?\s+-- OK)
+#C:first try
 ########
-P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
-E:\}.+?CPAN::Module
+#P:o conf prefer_installer MB
+#R:Module::Build
 ########
-P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
-E:\}.+?CPAN::Distributio.
+#P:force get CPAN::Test::Dummy::Perl5::BuildOrMake
+#E:Removing previously used
+#R:Module::Build
 ########
-P:make CPAN::Test::Dummy::Perl5::BuildOrMake
-E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
-R:Module::Build
-C:second try
+#P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
+#E:\}.+?CPAN::Module
 ########
-P:dump Bundle::CpanTestDummies
-E:\}
-R:Module::Build
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
+#E:\}.+?CPAN::Distributio.
 ########
-P:dump CPAN::Test::Dummy::Perl5::Build::Fails
-E:\}
-R:Module::Build
+#P:make CPAN::Test::Dummy::Perl5::BuildOrMake
+#E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
+#R:Module::Build
+#C:second try
 ########
-P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.01.tar.gz
-E:\}
-R:Module::Build
+#P:dump Bundle::CpanTestDummies
+#E:\}
+#R:Module::Build
 ########
-P:test Bundle::CpanTestDummies
-E:Test-Dummy-Perl5-Build-Fails-.+?make_test\s+NO
-R:Module::Build
-T:30
+#P:dump CPAN::Test::Dummy::Perl5::Build::Fails
+#E:\}
+#R:Module::Build
 ########
-P:get Bundle::CpanTestDummies
-E:Is already unwrapped
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
+#E:\}
+#R:Module::Build
 ########
-P:dump ANDK/CPAN-Test-Dummy-Perl5-Build-1.01.tar.gz
-E:\}.*?CPAN::Distribution
+#P:test Bundle::CpanTestDummies
+#E:Test-Dummy-Perl5-Build-Fails-.+?make_test\s+NO
+#R:Module::Build
+#T:30
 ########
-P:notest make Bundle::CpanTestDummies
-E:Has already been processed
+#P:get Bundle::CpanTestDummies
+#E:Is already unwrapped
 ########
-P:clean Bundle::CpanTestDummies
-E:Failed during this command
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz
+#E:\}.*?CPAN::Distribution
 ########
-P:clean Bundle::CpanTestDummies
-E:make clean already called once
+#P:d ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz
+#E:prereq_pm\s+build_requires:\S+requires:\S+
 ########
-P:r
-E:(All modules are up to date|installed modules|Fcntl)
+#P:notest make Bundle::CpanTestDummies
+#E:Has already been processed
 ########
-P:u /--/
-E:No modules found for
+#P:clean Bundle::CpanTestDummies
+#E:Failed during this command
 ########
-P:m _NEXISTE_::_NEXISTE_
-E:Defines nothing
+#P:clean Bundle::CpanTestDummies
+#E:make clean already called once
 ########
-P:m /_NEXISTE_/
-E:Contact Author J. Cpantest Hietaniemi
+#P:r
+#E:(All modules are up to date|installed modules|Fcntl)
 ########
-P:notest
-E:Pragma.*?method
+#P:r /cnt/
+#E:(All modules are up to date|installed modules|Fcntl)
 ########
-P:o conf help
-E:(?s:commit.*?defaults.*?help.*?init.*?urllist)
+#P:upgrade /cnt/
+#E:(All modules are up to date|installed modules|Fcntl)
 ########
-P:o conf inhibit_\t
-E:inhibit_startup_message
-R:Term::ReadLine::Perl||Term::ReadLine::Gnu
+#P:! $CPAN::Config->{make_install_make_command} = "'$^X' -le 'print q{SAW MAKE}'"
+#E:SAW MAKE
 ########
-P:quit
-E:(removed\.)
+#P:! $CPAN::Config->{mbuild_install_build_command} = "'$^X' -le 'print q{SAW MBUILD}'"
+#E:SAW MBUILD
 ########
+#P:o conf build_requires_install_policy no
+#E:build_requires_install_policy
+########
+#P:install CPAN::Test::Dummy::Perl5::Build
+#E:is up to date|SAW MAKE[\s\S]+?SAW MAKE[\s\S]+?SAW MBUILD
+#N: "is up to date" is for when they have it installed in INC
+#R:Module::Build
+########
+#P:install CPAN::Test::Dummy::Perl5::Build::DepeFails
+#E:is up to date|Failed during[\S\s]+?Build-DepeFails.+?dependenc\S+ not OK.+?Build::Fails
+#N: "is up to date" is for when they have it installed in INC
+#R:Module::Build
+#T:60
+########
+#P:install CPAN::Test::Dummy::Perl5::Make::CircDepeOne
+#E:is up to date|Recursive dependency detected[\s\S]+?Cannot continue.[\s\S]+?Failed during this command
+#T:60
+########
+#P:o conf defaults
+########
+#P:force get CPAN::Test::Dummy::Perl5::Build::Fails
+#E:D i s t r o[\s\S]+?TestDistroPrefsFile.yml\[1[\s\S]+?patch
+#R:YAML&&patch
+########
+#P:test CPAN::Test::Dummy::Perl5::Build::Fails
+#E:test -- OK
+#R:YAML&&patch
+########
+#P:u /--/
+#E:No modules found for
+########
+#P:m _NEXISTE_::_NEXISTE_
+#E:Defines nothing
+########
+#P:m /_NEXISTE_/
+#E:Contact Author J. Cpantest Hietaniemi
+########
+#P:notest
+#E:Pragma.*?method
+########
+#P:o conf help
+#E:(?s:commit.*?defaults.*?help.*?init.*?urllist)
+########
+#P:o conf inhibit_\t
+#E:inhibit_startup_message
+#R:Term::ReadLine::Perl||Term::ReadLine::Gnu
+########
+#P:quit
+#E:(removed\.)
+########
+
+
+=head1 NAME
+
+30shell - The main test script for CPAN.pm
+
+=head1 SYNOPSIS
+
+  make test                        # standard
+
+  make test TEST_FILES=t/30shell.t # traditional on file invocation
+
+  make testshell-with-protocol     # collects output in ../protocols
+
+=head1 DESCRIPTION
+
+
+=head2 Coverage
+
+C<30shell.coverage> collects results from Devel::Cover
+
+=head2 How this script works
+
+In the following I want to provide an overview about how this
+testscript works.
+
+After the __END__ token you find small groups of lines like the
+following:
+
+    ########
+    #P:make CPAN::Test::Dummy::Perl5::BuildOrMake
+    #E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
+    #R:Module::Build
+    #T:15
+    #C:comment
+    #N:internal note
+    ########
+
+P stands for program or print
+
+E for expect
+
+T for timeout
+
+R for requires or relies on
+
+C for comment (should be visible during testing)
+
+S for status
+
+N for notes (just for the test writer, otherwise invisible)
+
+
+The script starts a CPAN shell and feed it the chunks such that the P
+line is injected, the output of the shell is parsed and compared to
+the expression in the E line. With T the timeout can be changed (the
+default is rather low, maybe 10 seconds, see the code for details).
+The expression in R is used to filter tests. The keyword in S may be
+one of C<run> to run this test, C<skip> to skip it, and C<quit> to
+stop testing immediately when this test is reached.
+
+To get reliable and debuggable results, Expect.pm should be installed.
+Without Expect.pm, a fallback mode is started that should in principle
+also succeed but is pretty hard to debug because there is no mechanism
+to sync state between reader and writer.
+
+=head2 How to add new pseudo distributions
+
+The heart of the testing mechanism is shell.t which is based on Expect
+and as such is able to test a shell session. To make reproducable
+tests we need a shell session that is based on a clone of a
+miniaturized CPAN site. This site lives under t/CPAN/{authors,modules}.
+
+The first distribution in the fake CPAN site was
+CPAN-Test-Dummy-Perl5-Make-1.01.tar.gz in the
+./CPAN/authors/id/A/AN/ANDK/ directory which was a clone of
+PITA::Test::Dummy::Perl5::Make.
+
+This document describes which distros we need and how they can be
+added.
+
+We need distros based on the following (and more) criteria:
+
+ Testing:        success/failure
+ Installer:      EU:MM/M:B/M:I
+ YAML:           with/without
+ SIGNATURE:      with/without
+ Zipping:        tar.gz/tar.bz2/zip
+ Requires:       requires/build_requires
+
+Any new distro must be separately available on CPAN so that our
+CHECKSUMS files can be the real (signed) ones and we need not
+introduce a backdoor into the shell to ignore signatures.
+
+To add a new distro, the following steps must be taken:
+
+(1) Collect the source
+
+- svn mkdir the author's directory if it doesn't exist yet
+
+- svn add (or svn cp) the whole source code under the author's homedir
+
+- add the source code directory with a trailing slash to ../MANIFEST.SKIP
+
+- finish now the distro until it does what you intended
+
+(2) Create the distro tarball
+
+- add a stanza to CPAN.pm's Makefile.PL that produces the distro with
+  the whole dependency on all files within the distro and moves it up
+  into the author's homedir. Run this with 'make testdistros'.
+
+- *svn add* the new testdistro (first we did that, then we stopped
+  doing it for "it makes no sense"; then I realized we need to do it
+  because with a newer MakeMaker or Module::Build we cannot regenerate
+  them byte-by-byte and lose the signature war)
+
+- add it to the ../MANIFEST
+
+(3) Upload and embed into our "./CPAN" minicpan
+
+- verify that 'make dist' on CPAN.pm still works
+
+- if you want more distros, repeat (1) and (2) now
+
+- upload the distro(s) to the CPAN and wait until the indexer has
+  produced a CHECKSUMS file
+
+- svn add/ci the relevant CHECKSUMS files
+
+- add the CHECKSUMS files to the MANIFEST
+
+(4) Work with the results
+
+- verify that 'make dist' on CPAN.pm still works
+
+- add the distro(s) to CPAN/modules/02packages.details.txt: this step
+  needs special care: pay attention to both the module version and the
+  distro name; if there is more than one module or bundle inside the
+  distro, write two lines; watch the line count;
+
+- if this distro replaces another, svn rm the other one
+
+- if this distro replaces another, fix the tests that rely on the
+  other one
+
+- add the test to shell.t that triggered the demand for a new distro
+
+=cut
+
 
 # Local Variables:
 # mode: cperl

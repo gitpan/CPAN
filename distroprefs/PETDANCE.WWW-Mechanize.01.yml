@@ -1,0 +1,7 @@
+--- 
+match:
+  distribution: "^PETDANCE/WWW-Mechanize-"
+pl: 
+  expect:
+    - "Do you want to install the mech-dump utility"
+    - "\n"

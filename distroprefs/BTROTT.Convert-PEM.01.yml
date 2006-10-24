@@ -1,0 +1,10 @@
+--- 
+match:
+  distribution: "^BTROTT"
+  module: "^Convert::PEM$"
+pl: 
+  expect: 
+    - "Auto-install"
+    - "y\n"
+    - "Auto-install"
+    - "y\n"
