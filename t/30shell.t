@@ -25,6 +25,62 @@ sub _d ($) {File::Spec->catdir(split /\//, shift);}
 use File::Path qw(rmtree mkpath);
 rmtree _d"t/dot-cpan/sources";
 rmtree _d"t/dot-cpan/build";
+mkpath _d"t/dot-cpan/build";
+{
+    local *FH;
+    open *FH, (">"._f"t/dot-cpan/build/Something-From-Builddir-0.00.yml") or die;
+    my @stat = stat $^X;
+    my $dll = eval {OS2::DLLname()};
+    my $mtime_dll = 0;
+    if (defined $dll) {
+        $mtime_dll = (-f $dll ? (stat(_))[9] : '-1');
+    }
+    print FH <<EOF;
+---
+distribution: !!perl/hash:CPAN::Distribution
+  ID: A/AN/ANDK/Something-From-Builddir-0.00.tar.gz
+  RO:
+    CPAN_COMMENT: ~
+    CPAN_USERID: ANDK
+  archived: tar
+  make: !!perl/hash:CPAN::Distrostatus
+    COMMANDID: 78
+    FAILED: ''
+    TEXT: YES
+  make_test: !!perl/hash:CPAN::Distrostatus
+    COMMANDID: 78
+    FAILED: ''
+    TEXT: YES
+  prereq_pm_detected: 1
+  unwrapped: !!perl/hash:CPAN::Distrostatus
+    COMMANDID: 78
+    FAILED: ''
+    TEXT: YES
+  writemakefile: !!perl/hash:CPAN::Distrostatus
+    COMMANDID: 78
+    FAILED: ''
+    TEXT: YES
+perl:
+  \$^X: "$^X"
+  mtime_dll: "$mtime_dll"
+  sitearchexp: "$Config::Config{sitearchexp}"
+  stat(\$^X):
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - $stat[9]
+    - 0
+    - 0
+    - 0
+time: 1
+EOF
+}
 rmtree _d"t/dot-cpan/prefs";
 unlink _f"t/dot-cpan/Metadata";
 unlink _f"t/dot-cpan/.lock";
@@ -214,7 +270,7 @@ if ($RUN_EXPECT) {
 
 sub splitchunk ($) {
     my $ch = shift;
-    my @s = split /(^\#[A-Z]:)/m, $ch;
+    my @s = split /(^\#[A-Za-z]:)/m, $ch;
     shift @s; # leading empty string
     for (my $i = 0; $i < @s; $i+=2) {
         $s[$i] =~ s/\#//;
@@ -233,7 +289,8 @@ my @PAIRS;
 TUPL: for my $i (0..$#prgs){
     my $chunk = $prgs[$i];
     my %h = splitchunk $chunk;
-    my($status,$prog,$expected,$req,$test_timeout,$comment) = @h{qw(S P E R T C N)};
+    my($status,$prog,$expected,$notexpected,
+       $req,$test_timeout,$comment) = @h{qw(S P E e R T C N)};
     if ($skip_the_rest) {
         ok(1,"skipping");
         next TUPL;
@@ -253,7 +310,7 @@ TUPL: for my $i (0..$#prgs){
         }
     }
 
-    unless (defined $expected or defined $prog) {
+    unless (defined $expected or defined $notexpected or defined $prog) {
         ok(1,"empty test %h=(".join(" ",%h).")");
         next TUPL;
     }
@@ -267,7 +324,7 @@ TUPL: for my $i (0..$#prgs){
             }
         }
     }
-    for ($prog,$expected) {
+    for ($prog,$expected,$notexpected) {
         $_ = "" unless defined $_;
         s/^\s+//;
         s/\s+\z//;
@@ -292,6 +349,9 @@ TUPL: for my $i (0..$#prgs){
     $expected .= "(?s:.*?$prompt_re)" unless $expected =~ /\(/;
     if ($RUN_EXPECT) {
         mydiag "EXPECT: $expected";
+        if ($notexpected) {
+            mydiag "NOTEXPECT: $notexpected";
+        }
         $expo->expect(
                       $test_timeout || $timeout,
                       [ eof => sub {
@@ -316,12 +376,19 @@ expected[$expected]\ngot[$got]\n\n";
                      );
         my $got = $expo->clear_accum;
         mydiag "GOT: $got\n";
+        my $ok = 1;
+        if ($notexpected) {
+            if ($got =~ /$notexpected/) {
+                diag sprintf "found offending [[[%s]]] in [[[%s]]]", $notexpected, $got;
+                $ok = 0;
+            }
+        }
         $prog =~ s/^(\d)/$1/;
         $comment ||= "";
-        ok(1, test_name($prog,$comment));
+        ok($ok, test_name($prog,$comment));
     } else {
         $expected = "" if $prog =~ /\t/;
-        push @PAIRS, [$prog,$expected,$comment];
+        push @PAIRS, [$prog,$expected,$notexpected,$comment];
     }
 }
 if ($RUN_EXPECT) {
@@ -330,21 +397,33 @@ if ($RUN_EXPECT) {
     close SYSTEM or die "Could not close SYSTEM filehandle: $!";
     open SYSTEM, "test.out" or die "Could not open test.out for reading: $!";
     local $/;
-    my $got = <SYSTEM>;
+    my $biggot = <SYSTEM>;
     close SYSTEM;
     my $pair;
     my $pos = 0;
     for $pair (@PAIRS) {
-        my($prog,$expected,$comment) = @$pair;
+        my($prog,$expected,$notexpected,$comment) = @$pair;
         mydiag "NEXT: $prog";
         mydiag "EXPECT: $expected";
-        if ($got =~ /(\G.*?$expected)/sgc) {
-            mydiag "GOT: $1\n";
-            $pos = pos $got;
+        if ($notexpected) {
+            mydiag "NOTEXPECT: $notexpected";
+        }
+        my $ok = 1;
+        if ($biggot =~ /(\G.*?$expected)/sgc) {
+            my $got = $1;
+            mydiag "GOT: $got\n";
+            $pos = pos $biggot;
+            if ($notexpected) {
+                if ($got =~ /$notexpected/) {
+                    mydiag sprintf "found offending [[[%s]]] in [[[%s]]]", $notexpected, $got;
+                    $ok = 0;
+                }
+            }
         } else {
             mydiag "FAILED at pos[$pos] in test.out";
+            $ok = 0;
         }
-        ok(1, test_name($prog,$comment));
+        ok($ok, test_name($prog,$comment));
     }
 }
 
@@ -748,7 +827,7 @@ __END__
 #P:o conf ftp ""
 ########
 #P:m Fcntl
-#E:Defines fcntl
+#E:Found \d old builds, restored state of \d[\s\S]+?Defines fcntl
 ########
 #P:a JHI
 #E:Hietaniemi
@@ -889,6 +968,20 @@ __END__
 #R:Module::Build
 #C:second try
 ########
+#P:force get ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
+#E:Removing previously used
+#R:Module::Build
+########
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
+#E:\}.+?CPAN::Distributio.
+########
+#P:notest test ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
+#E:Running Build[\s\S]*?Creating new[\s\S]*?Build\s+-- OK[\s\S]+?Skipping test
+#R:Module::Build
+########
+#P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
+#e:'notest' => 1,
+########
 #P:dump Bundle::CpanTestDummies
 #E:\}
 #R:Module::Build
@@ -934,10 +1027,8 @@ __END__
 #E:(All modules are up to date|installed modules|Fcntl)
 ########
 #P:! $CPAN::Config->{make_install_make_command} = "'$^X' -le 'print q{SAW MAKE}'"
-#E:SAW MAKE
 ########
 #P:! $CPAN::Config->{mbuild_install_build_command} = "'$^X' -le 'print q{SAW MBUILD}'"
-#E:SAW MBUILD
 ########
 #P:o conf build_requires_install_policy no
 #E:build_requires_install_policy

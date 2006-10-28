@@ -1,3 +1,51 @@
+2006-10-28  k
+
+	* Changes: prepare 1.88_58
+	* MANIFEST, README: add Data::UUID
+	* Todo: notes
+	* lib/CPAN.pm, t/30shell.t: discount the COMMANDID for commands 
+	  taken from the build_dir; add a test for the basic functionality 
+	  of reuse
+	* lib/CPAN.pm: report some reuse stats
+	* lib/CPAN/FirstTime.pm, t/30shell.t: tried the 30shell test once 
+	  again without Expect and got it working with this patch
+	* Todo, lib/CPAN.pm: fix reuse without metadata bug, described in 
+	  Todo
+
+2006-10-27  k
+
+	* Todo, lib/CPAN.pm: forward defend against future .bz2 releases
+	* distroprefs/RJBS.Data-UUID.yml: typo
+	* distroprefs/GAAS.libwww.01.yml, 
+	  distroprefs/PETDANCE.WWW-Mechanize.01.yml: explicitness
+	* Todo: notes
+	* Todo: notes
+	* Todo: notes
+	* lib/CPAN.pm: count from 1, otherwise you end up with divide by 0
+	* Todo: notes
+	* Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm, 
+	  lib/CPAN/HandleConfig.pm: new config option build_dir_reuse for 
+	  persistent distro state in build_dir inspired by Ilya Zakharevich
+
+2006-10-26  k
+
+	* Todo: found an archive of that thread
+	* Todo, distroprefs/ILYAZ.Math-Pari.01.yml: new version of 
+	  Math::Pari needs no patch
+
+2006-10-25  k
+
+	* distroprefs/RJBS.Data-UUID.yml: a new dialog
+	* Todo, lib/CPAN.pm: add the distribution name above every OK/NOT 
+	  OK; remove one redundant setenv during testing
+	* Todo: notes
+	* Todo: notes about some breakages
+	* Todo, t/30shell.t: add ability to test for non-existence of 
+	  strings and testing the notest pragma bug that was fixed by the 
+	  previous checkin
+	* lib/CPAN.pm: unpragma was missing in the Distribution leading to 
+	  sticky notest pragma
+
 2006-10-24  k
 
 	* MANIFEST: prepare 1.88_57

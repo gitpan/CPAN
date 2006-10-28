@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_57';
+$CPAN::VERSION = '1.88_58';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -372,6 +372,25 @@ sub _yaml_loadfile {
     return +[];
 }
 
+# CPAN::_yaml_dumpfile
+sub _yaml_dumpfile {
+    my($self,$to_local_file,@what) = @_;
+    my $yaml_module = $CPAN::Config->{yaml_module} || "YAML";
+    if ($CPAN::META->has_inst($yaml_module)) {
+        my $code = UNIVERSAL::can($yaml_module, "DumpFile");
+        eval { $code->($to_local_file,@what); };
+        if ($@) {
+            $CPAN::Frontend->mydie("Alert: While trying to sump YAML file\n".
+                                   "  $to_local_file\n".
+                                   "with $yaml_module the following error was encountered:\n".
+                                   "  $@\n"
+                                  );
+        }
+    } else {
+        $CPAN::Frontend->mywarn("'$yaml_module' not installed, cannot dump to '$to_local_file'\n");
+    }
+}
+
 package CPAN::CacheMgr;
 use strict;
 @CPAN::CacheMgr::ISA = qw(CPAN::InfoObj CPAN);
@@ -416,7 +435,7 @@ use strict;
 
 package CPAN::Index;
 use strict;
-use vars qw($LAST_TIME $DATE_OF_02 $DATE_OF_03);
+use vars qw($LAST_TIME $DATE_OF_02 $DATE_OF_03 $HAVE_REANIMATED);
 @CPAN::Index::ISA = qw(CPAN::Debug);
 $LAST_TIME ||= 0;
 $DATE_OF_03 ||= 0;
@@ -1222,6 +1241,7 @@ sub force_clean_cache {
     $self->debug("have to rmtree $dir, will free $self->{SIZE}{$dir}")
 	if $CPAN::DEBUG;
     File::Path::rmtree($dir);
+    unlink "$dir.yml"; # may fail
     $self->{DU} -= $self->{SIZE}{$dir};
     delete $self->{SIZE}{$dir};
 }
@@ -1391,9 +1411,9 @@ sub globls {
                                                        # more than one
                                                        # author
         for my $pragma (@$pragmas) {
-            my $meth = "un$pragma";
-            if ($author->can($meth)) {
-                $author->$meth();
+            my $unpragma = "un$pragma";
+            if ($author->can($unpragma)) {
+                $author->$unpragma();
             }
         }
     }
@@ -2544,14 +2564,11 @@ to find objects with matching identifiers.
 	for my $pragma (@pragma) {
 	    if ($pragma
 		&&
-		($] < 5.00303 || $obj->can($pragma))){
-		### compatibility with 5.003
-		$obj->$pragma($meth); # the pragma "force" in
-                                      # "CPAN::Distribution" must know
-                                      # what we are intending
+		$obj->can($pragma)){
+		$obj->$pragma($meth);
 	    }
         }
-        if ($]>=5.00303 && $obj->can('called_for')) {
+        if ($obj->can('called_for')) {
             $obj->called_for($s);
         }
         CPAN->debug(qq{pragma[@pragma]meth[$meth]}.
@@ -2565,6 +2582,12 @@ to find objects with matching identifiers.
         }
 
         $obj->undelay;
+	for my $pragma (@pragma) {
+            my $unpragma = "un$pragma";
+	    if ($obj->can($unpragma)) {
+		$obj->$unpragma();
+	    }
+        }
 	CPAN::Queue->delete_first($s);
     }
     for my $obj (@qcopy) {
@@ -3677,7 +3700,7 @@ sub force_reload {
 
 #-> sub CPAN::Index::reload ;
 sub reload {
-    my($cl,$force) = @_;
+    my($self,$force) = @_;
     my $time = time;
 
     # XXX check if a newer one is available. (We currently read it
@@ -3691,29 +3714,30 @@ sub reload {
         Carp::cluck("META-PROTOCOL[$CPAN::META->{PROTOCOL}]");
     }
     unless ($CPAN::META->{PROTOCOL}) {
-        $cl->read_metadata_cache;
+        $self->read_metadata_cache;
         $CPAN::META->{PROTOCOL} ||= "1.0";
     }
     if ( $CPAN::META->{PROTOCOL} < PROTOCOL  ) {
         # warn "Setting last_time to 0";
         $LAST_TIME = 0; # No warning necessary
     }
-    return if $LAST_TIME + $CPAN::Config->{index_expire}*86400 > $time
-	and ! $force;
-    if (0) {
+    if ($LAST_TIME + $CPAN::Config->{index_expire}*86400 > $time
+	and ! $force){
+        # called too often
+        # CPAN->debug("LAST_TIME[$LAST_TIME]index_expire[$CPAN::Config->{index_expire}]time[$time]");
+    } elsif (0) {
         # IFF we are developing, it helps to wipe out the memory
         # between reloads, otherwise it is not what a user expects.
         undef $CPAN::META; # Neue Gruendlichkeit since v1.52(r1.274)
         $CPAN::META = CPAN->new;
-    }
-    {
+    } else {
         my($debug,$t2);
         local $LAST_TIME = $time;
         local $CPAN::META->{PROTOCOL} = PROTOCOL;
 
         my $needshort = $^O eq "dos";
 
-        $cl->rd_authindex($cl
+        $self->rd_authindex($self
                           ->reload_x(
                                      "authors/01mailrc.txt.gz",
                                      $needshort ?
@@ -3724,7 +3748,7 @@ sub reload {
         $debug = "timing reading 01[".($t2 - $time)."]";
         $time = $t2;
         return if $CPAN::Signal; # this is sometimes lengthy
-        $cl->rd_modpacks($cl
+        $self->rd_modpacks($self
                          ->reload_x(
                                     "modules/02packages.details.txt.gz",
                                     $needshort ?
@@ -3735,22 +3759,89 @@ sub reload {
         $debug .= "02[".($t2 - $time)."]";
         $time = $t2;
         return if $CPAN::Signal; # this is sometimes lengthy
-        $cl->rd_modlist($cl
+        $self->rd_modlist($self
                         ->reload_x(
                                    "modules/03modlist.data.gz",
                                    $needshort ?
                                    File::Spec->catfile('modules', '03mlist.gz') :
                                    File::Spec->catfile('modules', '03modlist.data.gz'),
                                    $force));
-        $cl->write_metadata_cache;
+        $self->write_metadata_cache;
         $t2 = time;
         $debug .= "03[".($t2 - $time)."]";
         $time = $t2;
         CPAN->debug($debug) if $CPAN::DEBUG;
     }
+    if ($CPAN::Config->{build_dir_reuse}) {
+        $self->reanimate_build_dir;
+    }
     $LAST_TIME = $time;
     $CPAN::META->{PROTOCOL} = PROTOCOL;
 }
+
+#-> sub CPAN::Index::reanimate_build_dir ;
+sub reanimate_build_dir {
+    my($self) = @_;
+    unless ($CPAN::META->has_inst($CPAN::Config->{yaml_module}||"YAML")) {
+        return;
+    }
+    return if $HAVE_REANIMATED++;
+    my $d = $CPAN::Config->{build_dir};
+    my $dh = DirHandle->new;
+    opendir $dh, $d or return; # does not exist
+    my $dirent;
+    my $i = 0;
+    my $painted = 0;
+    my $restored = 0;
+    $CPAN::Frontend->myprint("Going to read $CPAN::Config->{build_dir}/\n");
+    my @candidates = grep {/\.yml$/} readdir $dh;
+  DISTRO: for $dirent (@candidates) {
+        my $c = CPAN->_yaml_loadfile(File::Spec->catfile($d,$dirent))->[0];
+        if ($c && $^X eq $c->{perl}{'$^X'}) {
+            my @stat = stat $^X;
+            my $dll = eval {OS2::DLLname()};
+            my $mtime_dll = 0;
+            if (defined $dll) {
+                $mtime_dll = (-f $dll ? (stat(_))[9] : '-1');
+            }
+            if ($c->{perl}{'stat($^X)'}[9]) {
+                if ($stat[9] == $c->{perl}{'stat($^X)'}[9]
+                    && $mtime_dll == $c->{perl}{mtime_dll}
+                    && $Config::Config{sitearchexp} eq $c->{perl}{sitearchexp}
+                   ) {
+                    my $key = $c->{distribution}{ID};
+                    for my $k (keys %{$c->{distribution}}) {
+                        if ($c->{distribution}{$k}
+                            && ref $c->{distribution}{$k}
+                            && UNIVERSAL::isa($c->{distribution}{$k},"CPAN::Distrostatus")) {
+                            # the correct algorithm would be a
+                            # two-pass and we would subtract the
+                            # maximum of all old commands minus 2
+                            $c->{distribution}{$k}{COMMANDID} -= scalar @candidates - 2 ;
+                        }
+                    }
+
+                    #we tried to restore only if element already
+                    #exists; but then we do not work with metadata
+                    #turned off.
+                    $CPAN::META->{readwrite}{'CPAN::Distribution'}{$key} = $c->{distribution};
+                    $restored++;
+                }
+            }
+        }
+        $i++;
+        while (($painted/76) < ($i/@candidates)) {
+            $CPAN::Frontend->myprint(".");
+            $painted++;
+        }
+    }
+    $CPAN::Frontend->myprint(sprintf(
+                                     "DONE\nFound %s old builds, restored state of %s\n",
+                                     @candidates ? sprintf("%d",scalar @candidates) : "no",
+                                     $restored || "none",
+                                    ));
+}
+
 
 #-> sub CPAN::Index::reload_x ;
 sub reload_x {
@@ -4310,7 +4401,7 @@ sub as_string {
                     for my $y (sort keys %{$v->{$x}}) {
                         push @svalue, "$y=>$v->{$x}{$y}";
                     }
-                    push @value, "$x\:" . join ",", @svalue;
+                    push @value, "$x\:" . join ",", @svalue if @svalue;
                 }
                 $value = join ";", @value;
             } else {
@@ -4946,8 +5037,38 @@ EOF
     } elsif (! $mpl_exists) {
         $self->_edge_cases($mpl,$packagedir,$local_file);
     }
+    if ($self->{build_dir}
+        &&
+        $CPAN::Config->{build_dir_reuse}
+       ) {
+        $self->store_persistent_state;
+    }
 
     return $self;
+}
+
+#-> CPAN::Distribution::store_persistent_state
+sub store_persistent_state {
+    my($self) = @_;
+    my $file = sprintf "%s.yml", $self->{build_dir};
+    my $dll = eval {OS2::DLLname()};
+    my $mtime_dll = 0;
+    if (defined $dll) {
+        $mtime_dll = (-f $dll ? (stat(_))[9] : '-1');
+    }
+    CPAN->_yaml_dumpfile(
+                         $file,
+                         {
+                          time => time,
+                          perl => {
+                                   '$^X' => $^X,
+                                   sitearchexp => $Config::Config{sitearchexp},
+                                   'stat($^X)' => [stat $^X],
+                                   'mtime_dll' => $mtime_dll,
+                                  },
+                          distribution => $self,
+                         }
+                        );
 }
 
 #-> CPAN::Distribution::patch
@@ -5617,12 +5738,14 @@ sub force {
   }
 }
 
+#-> sub CPAN::Distribution::notest ;
 sub notest {
   my($self, $method) = @_;
   # warn "XDEBUG: set notest for $self $method";
   $self->{"notest"}++; # name should probably have been force_install
 }
 
+#-> sub CPAN::Distribution::unnotest ;
 sub unnotest {
   my($self) = @_;
   # warn "XDEBUG: deleting notest";
@@ -5648,7 +5771,7 @@ sub isa_perl {
                    |
                    \d+\.\d+
                   )
-		  \.tar[._-]gz
+		  \.tar[._-](?:gz|bz2)
 		  (?!\n)\Z
 		}xs){
     return "$1.$3";
@@ -5939,13 +6062,18 @@ is part of the perl-%s distribution. To install that, you need to run
             $ENV{$e} = $env->{$e};
         }
     }
-    if (system($system) == 0) {
+    my $system_ok = system($system) == 0;
+    $self->introduce_myself;
+    if ( $system_ok ) {
 	 $CPAN::Frontend->myprint("  $system -- OK\n");
 	 $self->{make} = CPAN::Distrostatus->new("YES");
     } else {
 	 $self->{writemakefile} ||= CPAN::Distrostatus->new("YES");
 	 $self->{make} = CPAN::Distrostatus->new("NO");
 	 $CPAN::Frontend->mywarn("  $system -- NOT OK\n");
+    }
+    if ( $CPAN::Config->{build_dir_reuse} ) {
+        $self->store_persistent_state;
     }
 }
 
@@ -6522,13 +6650,6 @@ sub test {
         }
     }
 
-    local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
-                           ? $ENV{PERL5LIB}
-                           : ($ENV{PERLLIB} || "");
-
-    $CPAN::META->set_perl5lib;
-    local $ENV{MAKEFLAGS}; # protect us from outer make calls
-
     my $system;
     if ($self->{modulebuild}) {
         $system = sprintf "%s test", $self->_build_command();
@@ -6598,6 +6719,7 @@ sub test {
     } else {
         $tests_ok = system($system) == 0;
     }
+    $self->introduce_myself;
     if ( $tests_ok ) {
         {
             my @prereq;
@@ -6631,6 +6753,9 @@ sub test {
         $self->{make_test} = CPAN::Distrostatus->new("NO");
         $self->{badtestcnt}++;
         $CPAN::Frontend->mywarn("  $system -- NOT OK\n");
+    }
+    if ( $CPAN::Config->{build_dir_reuse} ) {
+        $self->store_persistent_state;
     }
 }
 
@@ -6675,7 +6800,9 @@ sub clean {
     } else {
         $system  = join " ", $self->_make_command(), "clean";
     }
-    if (system($system) == 0) {
+    my $system_ok = system($system) == 0;
+    $self->introduce_myself;
+    if ( $system_ok ) {
       $CPAN::Frontend->myprint("  $system -- OK\n");
 
       # $self->force;
@@ -6705,6 +6832,9 @@ sub clean {
       # 2006-02-27: seems silly to me to force a make now
       # $self->force("make"); # so that this directory won't be used again
 
+    }
+    if ( $CPAN::Config->{build_dir_reuse} ) {
+        $self->store_persistent_state;
     }
 }
 
@@ -6837,7 +6967,9 @@ sub install {
 	$makeout .= $_;
     }
     $pipe->close;
-    if ($?==0) {
+    my $close_ok = $? == 0;
+    $self->introduce_myself;
+    if ( $close_ok ) {
         $CPAN::Frontend->myprint("  $system -- OK\n");
         $CPAN::META->is_installed($self->{build_dir});
         return $self->{install} = CPAN::Distrostatus->new("YES");
@@ -6867,6 +6999,14 @@ sub install {
         }
     }
     delete $self->{force_update};
+    if ( $CPAN::Config->{build_dir_reuse} ) {
+        $self->store_persistent_state;
+    }
+}
+
+sub introduce_myself {
+    my($self) = @_;
+    $CPAN::Frontend->myprint(sprintf("  %s\n",$self->pretty_id));
 }
 
 #-> sub CPAN::Distribution::dir ;
@@ -8999,6 +9139,7 @@ defined:
 
   build_cache        size of cache for directories to build modules
   build_dir          locally accessible directory to build modules
+  build_dir_reuse    boolean if distros in build_dir are persistent
   build_requires_install_policy
                      to install or not to install: when a module is
                      only needed for building. yes|no|ask/yes|ask/no
