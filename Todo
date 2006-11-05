@@ -1,211 +1,191 @@
-2006-10-27  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+2006-11-04  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* Test if "reuse" works without metadata (timing issues because the
-	entries do not exist yet?) No, it doesn't! FIXED in rev 1149
+	* https://rt.cpan.org/Ticket/Attachment/250710/107655/ is a bug in YAML
+	combined with long strings. Would like to see if bleadperl also fails.
 
-	* Investigate what happens if a user has CPAN 1.8802 and Module::Build
-	0.2611 and tries to upgrade to 0.2805. Gabor says, it fails. If it
-	fails, I'll have to coin a new phrase for the bug: install suicide? No
-	need to worry, ATM it works more or less well, but it doesn't fail
-	rightaway. CHECKED after rev. 1149 or so.
+	Its parent is https://rt.cpan.org/Ticket/Display.html?id=22134
+	
+	I've put my findings in there. FIXED.
 
-	* Rethink if Ilya's expire_old_builds is better the build_dir_reuse in
-	that it sets an expiration date. His -1 is my 1. His 0 is my 0. I have
-	nothing like his 30. The name of his variable is not good in that one
-	could believe that setting expire_old_builds==0 might mean to do NOT
-	expire them at all. Hmm.
+	* ALERT! A test in YAML turned red with blead??? It turns out that my
+	YAML crashes bugs-rt when the URI module is installed and passes all
+	tests when the URI module is not installed. The second test in bugs-rt.t
+	has "skip_unless_modules: URI". So it's an older bug that I just did not
+	see upto now. Bugreport to P5P written.
 
-	* Todo: invent a test for build_dir_reuse. It should construct a YAML
-	file before test start that will then be picked up and lead to some
-	"already in..." which we test for. And then we use force to actually get
-	that distro. Or we do that for an inexistent distro so that we do not
-	have to rewrite the test after each new release? DONE in rev. 1152
+	* Bug that has to do with install_tested or build_dir_reuse or degraded
+	shell mode or some use of ^C at the wrong moment:
 
-2006-10-25  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+  PEREINAR/File-Which-0.05.tar.gz              : install NO
 
-	* The first thing that I encounter when I start testing instead of
-	installing things is that test doesn't stop when the installed version
-	is higher than or equal to the CPAN version. Ilya invented for that
-	test_uptodate
+	But File::Which is installed. Maybe in a concurrent shell. When I ask
+	for 'install File::Which' I get 'is up to date' and nothing gets
+	repaired. When I ask for 'install PEREINAR/File-Which-0.05.tar.gz' then
+	the thing gets tested but not installed because 'Already tried without
+	success'.
 
-	* Todo: if the user does not want to install a module (say a
-	build_requires), give him options to use the already tested module even
-	after he has left the shell.
+	Are we in trouble?
 
-	Ilya seems to say, people do NOT want to install a number of modules
-	because they are not yet sure if they really need them. But they have
-	tested them and have them still lying around in their ~/.cpan/build
-	directory. So we should give them a chance to use them next time they
-	come around with the same perl.
+	Maybe we must rethink how 'force test' works. I should not 'force get',
+	and 'force make', it should just test and not refuse to do it.
 
-	DONE in rev. 1140 with build_dir_reuse
+	Or we must compute the COMMANDID better than we do during reanimate and
+	treat negative COMAMNDIDs with more rigor in some constellations?
 
-	* Todo: put the distro ID close to the OK or NOT OK line DONE in rev.
-	1136 or so.
+	The thing is that the module object for File::Which knows about the
+	correct distro object but it gets the installed version from @INC and
+	does not know who put it there and so should not be able to discard the
+	distro object. Hmmm.
 
-	* What was the deal with
+	Remember, we hat the notest pragma! Maybe we can let install_tested
+	support both the force and the notest pragma and are through?
 
-Package 'CPAN' already declared with version '1.88_57'
-ignoring new version ''.
-Looks good
+	But no, even 'notest install ...' does not succeed because we need
+	force, not notest, but notest propagates down until we restart with get.
+	This is, of course a last resort, but it's no fun:-(
 
-	again?
+	SHOWSTOPPER ALERT!
 
-	http://www.mail-archive.com/module-build@perl.org/msg00340.html
+	At least I get the impression this extreme case happens only on ^C, but
+	some other methods of dieing will certainly exist as well.
 
-	* just a memo what I usually install:
+	* Da fällt mir ein, ich habs kürzlich anders gelöst, wenn du das nächste
+  > mal testest, probier mal diese Lösung (mit AnyEvent, sinngemäß gehts
+  > auch mit Coro):
 
-	    install YAML::Syck Expect YAML Bundle::CPAN Module::Signature CPAN::Reporter Math::BigInt::GMP Plagger Bundle::Phalanx100 Jifty Coro Getopt::Euclid DBIx::Class IPC::PubSub Bundle::Pause PadWalker
+  >    BEGIN { $ENV{PERL_RL} = "gnu" } use Term::ReadLine;
 
-	YAML::Syck after Bundle::CPAN did not turn off interactivity.
+  >    my $rl = new Term::ReadLine "cfshell";
 
-	YAML::Syck before Bundle::CPAN worked well.
+  >    my $w = AnyEvent->io (fh => $rl->IN, poll => 'r', cb => sub { $rl->callback_read_char });
 
-	CPAN::Reporter before YAML worked well but we want to catch the early
-	YAML interactivity (which in turn can be avoided with YAML::Syck).
+  >    $rl->callback_handler_install ("$ARGV[0]> ", sub {
+  >       $rl->add_history ($_[0]);
+  >    }
 
-	* Since DBI is fixed I see other intersting breakages: Class::DBI,
-	RPC::PlServer, GD.
+  > Allein das $ENV...= läßt mich grausen, aber irgendjemand hat halt
+  > entschieden, daß zwei völlig API-inkompatible module nicht getrennt
+  > ladbar sein dürfen.
 
-	GD fails with 5.8.8 and 5.8.3
+  > Ach ja, zum zwischendurch was ausgeben mache ich:
 
-	Class::DBI fails with 5.8.8
+  >    $rl->crlf;
+  >    print ...
+  >    $rl->forced_update_display;
 
-	RPC::PlServer fails with 5.8.8 and 5.8.3 but only if Crypt::DES is
+  > und beim exit muss man:
+
+  >    $rl->crlf;
+  >    $rl->deprep_terminal;
+
+  > machen.
+
+  > -- 
+  >                 The choice of a
+  >       -----==-     _GNU_
+  >       ----==-- _       generation     Marc Lehmann
+  >       ---==---(_)__  __ ____  __      pcg@goof.com
+  >       --==---/ / _ \/ // /\ \/ /      http://schmorp.de/
+  >       -=====/_/_//_/\_,_/ /_/\_\      XX11-RIPE
+
+
+	* Observing in a shell in degraded mode: it wrote a new Metadata file.
+
+	* Observing how install_tested behaves: within the same session it
+	installs without retesting. In a new session it does retest. What
+	*should* it do?
+	
+	Noting that the DH test runs forever again because GMP comes too late.
+
+2006-11-03  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* "shall I try to run in degraded mode" should not come a second time
+	within the same session. Currently it can happen.
+
+2006-11-02  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* imacat writes in #22749:
+
+	> I found that CPAN is NOT downloading CHECKSUMS alone with the
+  > package file (*.tar.gz) from the SAME source.  This morning when I was
+  > updating the newly-updated DBI-1.53, it cannot match CHECKSUMS with
+  > DBI-1.53.tar.gz since they came from 2 different sources, and each has
+  > its own mirror schedule.  The package file DBI-1.53.tar.gz came from a
+  > mirror that has it, but CHECKSUMS came from another that doesn't have it
+  > yet.  Shouldn't they be downloaded from the same mirror source?
+
+	[the protocol shows how the fourth host succeeds for
+	TIMB/DBI-1.53.tar.gz but CPAN.pm then fetches the CHECKSUMS file from
+	the first]
+
+	For young files there is often a short timespan within which there is no
+	entry in the checksums file yet, even if they come from the same host.
+	As you are always working with very young files, I'm surprised it
+	doesn't happen more often to you.
+
+	But in principle you are right, CPAN.pm should try to get checksums file
+	from the same host because the likelihood is higher to get an uptpdate
+	checksums file.
+
+	* Watch the Module::Build space for updates to the question of calling
+	M:B methods or parsing _build/*. Ken seemed to argue for the file (?)
+
+	* write a patch for Test::Reporter so you can choose the mail sending
+	module? Reported 2005-07:
+	http://rt.cpan.org/Ticket/Display.html?id=13836
+
+	* distroprefs with artificial intelligence: find out how to write a
+	distropref with so much AI that it handles several different dialogues.
+	I just realized that YAML::Syck talked me into a different dialogue on
+	some older bleadperl that had YAML 0.60 installed:
+
+*** WARNING ***
+
+This release breaks compatibility with versions earlier than version 0.60 of
+YAML::Syck and YAML.pm when serializing blessed references.
+
+See the COMPATIBILITY file for more information.
+
+*** Pre-0.60 version of YAML.pm (0.53) detected.
+Continue installing YAML::Syck? [y]
+
+	We would like to answer to this question yes if it comes. Or we would
+	like to upgrade YAML first.
+
+	One would think that Expect collects data and compares them to a pool of
+	regular expressions each of which has an associated answer. As soon as
+	one expression matches, its answer is given and it is taken out of the
+	pool. On EOF do not even complain. Very similar to what we do now. Is it
+	even worth to keep the current interface? Yes, because it has the
+	potential to break. Because Expect itself does not provide it. We must
+	write some code in between:
+
+	Variant 1: match on /./, look at the whole collected string, do the
+	match loop. On success do as we do now, on failure continue as we do
+	now. On timeout do like we do now. On EOF exit the loop silently. As
+	test write a distro that asks 12 questions in random order and dies if
+	the wrong answer is given.
+
+	Variant 2: match on /./ until timeout is reached. Now do your own
+	matching. On success do as we do now, on failure give up. One question
+	that we cannot answer is too much. There is no timeout error, just a "no
+	prepared regex matches the question". On EOF exit the loop silently.
+
+	Variant 2 is much better.
+
+	* Randy Kobes needs an API to find out where the index files are
+	located. And the whole SQLite needs to be integrated. First question is
+	what do we use from it. Only the readonly stuff, I suppose.
+
+	* Investigate if I want Math::Bigint::GMP in the core. Think of
+	Crypt::DH and the horrible test timings when Math::Bigint::GMP is not
 	installed
 
-2006-10-24  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+	* find out why upgrade always upgrades
+	Apache::Session::Generate::ModUniqueId and ...::ModUserTrack.
 
-	* Coro 2.0 works with bleadperl Yay! YAML for Coro with default answers
-	written.
-
-	* bug with notest pragma: it seems to remain in the distro object. I did
-	a report DAGOLDEN/CPAN-Reporter-0.28_51.tar.gz, then I did a "notest
-	install" on it. Then I reloaded and tried a "report" on it again and
-	CPAN refused to run the test because of the notest pragma.
-
-	FIXED in rev. 1132 but what is a good test for it? test WRITTEN in 1133.
-
-2006-10-23  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* The ->VERSION bug was back for a short while. It happens when
-	version.pm is not installed and Module::Build loads its own version.pm
-	from <data>. There it finds 0.661 and this does something that isn't
-	fool proof, very hard to diagnose and to reproduce. Easy workaround: do
-	not check for Module::Signature->VERSION anymore. The test was on 0.26
-	and we now have 0.55, so I guess, I can remove the version test.
-
-	As soon as I have means to not call into Module::Build, this bug will
-	diappear for sure, so no need to hunt it down from here. FINISHED in
-	rev. 1123
-
-	So recall: one can turn off sig_check, then install version, then leave
-	and enter CPAN.pm and the bug should disappear. Or we release 1.88_57
-	now. Update: I released 1.88_57 immediately after that.
-
-	* SMPETERS fixed DBI-1.52. Thank you! YAML for DBI with patch address
-	written
-
-2006-10-23  Andreas J Koenig  <akoenig@iconmobile.com>
-
-	* make a list of cpanconfig variables that can be changed via
-	distroprefs. Extend the list and document it, so that people can look it
-	up and do not have to read the source and can file bug reports against
-	it.
-
-	I fear for example that the preferred builder is not configurable(?)
-	latter half FIXED in rev. 1124
-
-	First half done with rev. 1125
-
-	* Write an executive summary of the state of affairs wrt. distroprefs so
-	we can decide about future directions. Update the README file to better
-	outline the executive summary. Update the examples to better reflect our
-	powers and weaknesses.
-
-	What we have:
-
-	- Give the user a simple system to store per-distro preferences related
-	to environment variables, commandline args and stdin for the four
-	commands of our traditional mantra: perl Makefile.PL, make, make test,
-	make install (and symmetrically for M:B modules)
-
-	- Give the user the option to patch distros with arbitrary patches from
-	local disk or CPAN
-
-	What we aim at:
-
-	- Give the users a simple means to exchange their preferences to reduce
-	the overhead of maintaining them. As it currently stands, those YAML
-	files devaluate quickly as new distros arrive.
-
-2006-10-23  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* release a 1.8802 with the HTML::Mason workaround? Because it may take
-	a while until 1.89 is ready to go. DONE in rev. 1120
-
-	* write a patch for Test::Reporter so you can choose the mail sending module?
-
-2006-10-22  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* Randy needs an API to find out where the index files are located.
-
-	* Investigate if I want Math::Bigint::GMP in the core
-
-	* Todo: gzipped patches; DONE in rev. 1103
-
-	* patches that are not separate files but live in the YAML file?
-
-2006-10-21  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
-
-	* add CPAN::Reporter to Bundle::CPAN (which version of CPAN.pm needs
-	CPAN::Reporter currently? -- 1.88)
-
-	* think about the locking from a different angle: currently it is
-	possible but unsafe to have concurrent access to the .cpan/build
-	directory
-
-	* go after the Module::Build errors in Error.pm and Mason: I suspect
-	that's the set_perl5lib bug mentioned by Ilya. NO, it was not the
-	set_perl5lib bug. The bug is that the two distros use subclassing in
-	their Build.PL and so Module::Build's own methods are unable to provide
-	the prerequisites. My workaround for now is to fall back to the content
-	of META.yml, the bug persists and needs to be discussed with M:B people.
-
-	* Tina suggests: if the user has changed some config variable via 'o
-	conf' mechanism and has not yet saved the new config via 'o conf commit'
-	and is leaving the shell without saving, we could trigger a dialog.
-	#22396 talks about this.
-
-	After some thinking: maybe I prefer just a loud warning instead of a
-	hanging terminal. Hmmm.
-
-	This is a critical/showstopper thing because people perceive it as a
-	bug. rev. 1114 FIXES
-
-	* Todo: find out the remaining relevant pieces of Ilya's patch:
-
-	(1) better logging (maybe with the help of CPAN::Reporter?) I said below
-	that we have colors now, but fact is that you have to scroll back and if
-	you install 100 modules, you cannot investigate without disturbing the
-	process. One would like to study STDOUT and STDERR in a separate window.
-
-	(2) "cpantok#" keep some test OK state between sessions. I see no strong
-	need for this ATM.
-
-	* just a memo what I usually install:
-
-	    o debug CPAN Distribution
-	    install YAML::Syck Expect YAML Bundle::CPAN Module::Signature CPAN::Reporter Math::BigInt::GMP Plagger Bundle::Phalanx100 Jifty
-
-	YAML::Syck after Bundle::CPAN did not turn off interactivity.
-
-	YAML::Syck before Bundle::CPAN worked well.
-
-	CPAN::Reporter before YAML worked well but we want to catch the early
-	YAML interactivity (which in turn can be avoided with YAML::Syck).
-
-	* See what we can do for Module::ThirdParty
+	Seems to be Apache-Session-1.81/Session/Generate/ModUniqueId.pm and
+	Apache-Session-1.81/Session/Generate/ModUsertrack.pm
 
 	* The Net::SSH::Perl test 03-packet still runs forever even with
 	Math::Bigint::GMP. Maybe this is completely unrelated? Yes! No load!
@@ -217,28 +197,51 @@ Looks good
 	really quick with Math::Bigint::GMP installed. Note that Math::GMP is
 	not enough. But can we patch it?
 
-	* as long as HTML::Mason/Module::Build are broken, we should use
-	Bundle::HTML::Mason? Alas, it doesn't list HTML::Entities. And after
-	that it still fails on 07-interp.t. Ah, ok. Report sent. But can we
-	patch it? DONE
+	* The first thing that I encounter when I start testing instead of
+	installing things is that test doesn't stop when the installed version
+	is higher than or equal to the CPAN version. Ilya invented for that
+	test_uptodate
 
-	* Maybe add support for more CPAN::Config variables in distroprefs
-
-	* Evaluate Randy's CPAN-SQLite stuff
+	* CPAN::Checksums -> Data::Compare -> File::Find::Rule ->
+	Number::Compare
 	
+	* I wanted to watch some scenarios with persistent data. Especially with
+	modules that work and that are being tested again and again with prereqs
+	and without or within bundles and if they are retested or not, installed
+	or not with persistence and within the same session.
+
+	Write a megatest?
+
+	* Study "pip" by Adam K (in Module-Plan-Base) and CPAN::Mini::Tested and
+	CPAN::Mini::Phalanx100 and also see what we can do for
+	Module::ThirdParty
+
 	* write a dummy distro that reads arguments to Makefile.PL and another
 	one that reads something from STDIN (or maybe both in one) DELAYED until
 	the distroprefs stuff leaves the alpha stage.
 
 	* replace 03 index file with YAML.
 
-	* Todo/buglet: turn on debug "CPAN" and find the reason why
-	incommandcolor is quite often not reset. We had that further down but I
-	fear it is not yet fixed.
+	* Provide an API or documentation how to find out the CPAN::Config
+	variables.
+
+	* The bug in Strptime is in the "ga" locale. Installing the ga locale on
+	my box doesn't solve it. Manana.
+
+	* Looks like a bug to me what I find in Bundle-SZABGAB-0.01.yml:
+	CONTAINSMODS is empty because Gabor has a distro in the bundle.
+
+	* Faszinating: Coro/eg/readline
+
+	* Now I know the first bug in install_tested: it re-tests already
+	installed modules.
+
+	* One thing we do not support yet in distroprefs is adding dependencies
+	without patching. Shall we?
 
 	* Todo: clean up "XXX" in the code
 
-	* "I hate Module::AutoInstall". See down under the hr if you have much
+	* "I hate Module::AutoInstall". See down under the hr when you ever have
 	time.
 
 	* M2 (Wishlist) separate the TTLs for 01,02,03. If somebody asks 'a
@@ -355,6 +358,265 @@ need the middle man.
 	* M2 feature request by Juergen Christoffel: have time stamps on the
 	history and a history command to see them
 
+	* hr ================ no todos below this line ================ /hr
+
+	* hr ================ no todos below this line ================ /hr
+
+	* hr ================ no todos below this line ================ /hr
+
+2006-11-02  Andreas J Koenig  <akoenig@*c*nm*b*l*.com>
+
+	* Oops! Something changed my
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails-1.02.tar.gz
+
+	!!! Ahh, that explains something! The copy I had here believed to be
+	newer and "M", I should have reverted, I suppose.
+
+	* 30shell fails because of missing checksum data after a force get.
+	FIXED
+
+	New ideas from Slaven: patch -p0/1/etc might be autodetected
+
+	More match variables like all config variables or $^O ("os"?) and
+	perlver.
+
+	Finally: leaving back the .orig files (which I called -g0, why?) only
+	when debugging turned on?? I think I'll remove -b and -g0 and use
+	$ENV{PATCH_GET}=0 instead. Honorable mention: Text::Patch, unfortunately
+	stalled.
+
+2006-11-01  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Locking needs to be resolved soonish to enable safe concurrent
+	megainstalls and concurrent running shells.
+
+	I want to share the build_dir first because this is currently the most
+	dangerous spot. I suppose we can have it by using File::Temp for the
+	individual build_dir. We would have to turn off build_dir_reuse for the
+	second process. Nobody would ever overwrite a build_dir. Some guys would
+	remove old directories and this would do no harm. Should be done in rev.
+	1183.
+
+	Even if the second uses the same perl as the first one, we could coexist
+	because many commands scan the INC repeatedly. Things we do not scan
+	again and again are ???
+
+	historyfile: We would have to set histfile to nil for the second. DONE
+	1181
+
+	metadata: we would turn it off for the second. We could
+	neither read nor write it safely without locking protocol. DONE 1181
+
+	reading traditional index files: make writing atomic, let the second
+	only read them (by setting expiration time to inf). DONE 1181 Actually,
+	this was nonsense. the expiration time must not be changed. The user
+	wants to read index files from time to time... REVERTED in 1188
+
+	ability to reload index: turn off for the second DONE 1181
+
+	storing/listing local bundles: risk REVISIT LATER
+
+	local directories with the dot: risk REVISIT LATER
+
+	shared source: make it atomic to download (if it isn't yet) DONE 1180
+
+	Different perspective: batch jobs have not had a lock ever since CPAN.pm
+	exists. They could break each other on any occasion. Did they write the
+	histfile? Seems not so. Timestamp does not change with my tests and it
+	does not say "Lockfile removed". Yes, checklock is only called from the
+	shell (and from mkmyconfig but this is negligible). REVISIT mkmyconfig
+
+	But they read metadata and shouldn't. Disable! DONE 1181
+
+	And they reuse build_dir. Disable! DONE 1181
+
+	But they MUST read the index files: make writing atomic! DONE 1180
+
+	Is CPAN::FTP::localize doing its storage management atomicly? YES, since 1180
+
+	Todo: consider setting scan_cache to "never" or maybe not.
+
+	* Todo: compare the output of the 'failed' command within megainstall
+	and after reentering the shell. DONE and found one bug and fixed it in
+	rev. 1178
+
+	* I wanted to watch some scenarios with persistent data. Especially with
+	modules that work and that are being tested again and again with prereqs
+	and without or within bundles and if they are retested or not, installed
+	or not with persistence and within the same session.
+
+	Write a megatest?
+
+	* Wondering why I find this in the build directory in Crypt-CBC-2.22.yml:
+
+  writemakefile: !!perl/hash:CPAN::Distrostatus 
+    COMMANDID: 0
+    FAILED: ''
+    TEXT: YES
+
+	Note the 0 in COMMANDID.
+
+	A: The reason is that we only issued one command with 'make
+	megainstall', so this is correct.
+
+	* Does the shell still do locking? Under which circumstances is locking
+	turned off? Console/terminal I suppose.
+
+	A: yes.
+
+2006-10-31  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* just a memo what I usually install:
+
+	    install Bundle::CPANxxl Math::BigInt::GMP Plagger Bundle::Phalanx100 Jifty Coro Getopt::Euclid DBIx::Class IPC::PubSub Bundle::Pause PadWalker Graph::Easy
+
+	YAML::Syck after Bundle::CPAN did not turn off interactivity.
+
+	YAML::Syck before Bundle::CPAN worked well.
+
+	CPAN::Reporter before YAML worked well but we want to catch the early
+	YAML interactivity (which in turn can be avoided with YAML::Syck).
+
+	Now all in "make megainstall" including logging.
+
+	* Todo: some capture stuff maybe collected into the YAML files in
+	build_dir that contains all relevant output of that distro so we can
+	study the nonsense that currently goes on when I do my mega install on
+	maint-5.8.
+
+	For some reason some modules failed early in the cycle and then never
+	got re-tested. And they broke others which also didn't get re-tested. In
+	the end we had a lot of modules uninstalled that would test individually
+	well but all refused to re-test without force.
+	
+	One simple solution was to 'force test Bundle::CPANxxl' but that took
+	many minutes again.
+
+	[What's the deal with PathTools? Ahh, the dependency on
+	ExtUtils::CBuilder again. I have reported the bug but it is not yet
+	fixed. FIXED in Bundle::CPAN by pulling CBuilder to the front,]
+
+	For example the chain broke: CPAN::Checksums -> Data::Compare ->
+	File::Find::Rule -> Number::Compare. I could install Number::Compare now
+	when I asked for it (without force!), and then the chain could be
+	resolved step after step.
+
+	Something's fishy.
+
+2006-10-30  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Q: Why is this: during install Bundle::Phalanx100 I get for
+	DBD::Oracle a writemakefile NO
+	'/home/src/perl/repoperls/installed-perls/perl/pIOeQkH/perl-5.8.0@29165/bin/perl
+	Makefile.PL' returned status 65280
+
+	When I leave the shell and start it again and call 'failed' it is gone.
+
+	A: because we did not care for the state safe
+
+	Fixed in rev. 1172
+
+2006-10-30  Andreas J Koenig  <akoenig@*c*nm*b*l*.com>
+
+	* From: "David Golden" <xdaveg@gmail.com>
+Subject: CPAN::Reporter and Bundle::CPAN
+To: "Andreas J. Koenig" <andreas.koenig.gmwojprw@franz.ak.mind.de>
+Date: Mon, 30 Oct 2006 10:04:05 -0500                                           
+
+With CPAN::Reporter 0.29, all the config items are switched over.  The
+Todo backlog is still non-trivial, but I don't think any of the items
+will cause back-compatibilty problems down the line.  Given that,
+please feel free to add CPAN::Reporter to Bundle::CPAN whenever you
+have a chance.
+
+David
+
+	* disable PerlMagick
+
+2006-10-30  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* File::Slurp vs Pod::Coverage. Ticket opened:
+	http://rt.cpan.org/Ticket/Display.html?id=22693
+	
+2006-10-29  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Need to write build_dir/*.yml files also if reuse is turned off. And
+	also when we fail.
+
+	* Need a 'disabled' keyword on distroprefs. The hack to use
+	cpanconfig/make=false is both Unix centric and not obvious. ADDED in
+	rev. 1159
+
+	* distroprefs is harder to use with build_dir_reuse than before. We now
+	need "force get" more often because the old prefs value is in the distro
+	object. Force get can mean a network connection, so there's a need to
+	decide how we want to deal with that.
+
+	First idea is to remove the prefs from the serialized object but this is
+	much worse in case a patch has been applied.
+
+	* new method perl_fingerprint and _is_deeply or so to compare previous
+	and current fingerprint. DONE in rev. 1158
+
+	* Math::Pari was definitely broken by blead. Make it a bug report(?)
+----Program----
+eval {require Math::Pari};
+print $@ ? "N/A" : Math::Pari->VERSION;
+print "\n";
+
+----Output of .../pAEBdqj/perl-5.8.0@24541/bin/perl----
+2.010709
+
+----EOF ($?='0')----
+----Output of .../pIwwDvK/perl-5.8.0@24542/bin/perl----
+N/A
+
+----EOF ($?='0')----
+Need a perl between 24541 and 24542
+
+	This between Ilya and me:
+
+> But bleadperl@29045 doesn't compile with:
+> 
+> cc -c  -I pari-2.1.7/src -Ipari-2.1.7/src/headers -Ipari-2.1.7/src -I./libPARI -DDEBUGGING -fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g   -DVERSION=\"2.010708\" -DXS_VERSION=\"2.010708\" -fPIC "-I/home/src/perl/repoperls/installed-perls/perl/pqbZHKu/perl-5.8.0@29045/lib/5.9.5/i686-linux-64int/CORE"  -DPARI_VERSION_EXP=2001007 -DDEBUG_PARI -DLSB_in_U32=0 -DLONG_SHORTER_THAN_IV -Derr=pari_err Pari.c
+> Pari.xs:1219: error: 'XPVCV' has no member named 'xof_off'
+> Pari.xs: In function 'XS_Math__Pari_DESTROY':
+
+	xray searching for "Ilya CV attach" finds
+	http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-02/msg00633.html
+
+	Reading 24542.... Posting to P5P WRITTEN
+
+	Answer received with a pointer to a previous discussion where Nicholas said
+
+	|Assuming it is, in blead upgrading the PVCV to a PVFM and using
+	| IV		xfm_lines;
+	|instead should work. The structures are equivalent, except that PVFM
+	|has that one extra IV at the end.
+
+2006-10-28  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* think about the locking from a different angle: currently it is
+	possible but unsafe to have concurrent access to the .cpan/build
+	directory
+
+	* go after the Module::Build errors in Error.pm and Mason: I suspect
+	that's the set_perl5lib bug mentioned by Ilya. NO, it was not the
+	set_perl5lib bug. The bug is that the two distros use subclassing in
+	their Build.PL and so Module::Build's own methods are unable to provide
+	the prerequisites. My workaround for now is to fall back to the content
+	of META.yml, the bug persists and needs to be discussed with M:B people.
+
+	* write a dummy distro that reads arguments to Makefile.PL and another
+	one that reads something from STDIN (or maybe both in one) DELAYED until
+	the distroprefs stuff leaves the alpha stage.
+
+	* replace 03 index file with YAML.
+
+	* Todo/buglet: turn on debug "CPAN" and find the reason why
+	incommandcolor is quite often not reset. We had that further down but I
+	fear it is not yet fixed.
+
 	* H3 Locking: Linda W writes
 
 	>I'm not sure I understand the reason for the lock file
@@ -375,11 +637,189 @@ need the middle man.
 	between 2006-01-26 and 2006-02-01 (and I wrote a paragraph into the
 	manpage how multiple ~/.cpan* directories could work)
 
-	* hr ================ no todos below this line ================ /hr
+2006-10-27  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* hr ================ no todos below this line ================ /hr
+	* Test if "reuse" works without metadata (timing issues because the
+	entries do not exist yet?) No, it doesn't! FIXED in rev 1149
 
-	* hr ================ no todos below this line ================ /hr
+	* Investigate what happens if a user has CPAN 1.8802 and Module::Build
+	0.2611 and tries to upgrade to 0.2805. Gabor says, it fails. If it
+	fails, I'll have to coin a new phrase for the bug: install suicide? No
+	need to worry, ATM it works more or less well, but it doesn't fail
+	rightaway. CHECKED after rev. 1149 or so.
+
+	* Rethink if Ilya's expire_old_builds is better the build_dir_reuse in
+	that it sets an expiration date. His -1 is my 1. His 0 is my 0. I have
+	nothing like his 30. The name of his variable is not good in that one
+	could believe that setting expire_old_builds==0 might mean to do NOT
+	expire them at all. Hmm. I think my build_dir_reuse is good enough.
+
+	* Todo: invent a test for build_dir_reuse. It should construct a YAML
+	file before test start that will then be picked up and lead to some
+	"already in..." which we test for. And then we use force to actually get
+	that distro. Or we do that for an inexistent distro so that we do not
+	have to rewrite the test after each new release? DONE in rev. 1152
+
+2006-10-25  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Todo: if the user does not want to install a module (say a
+	build_requires), give him options to use the already tested module even
+	after he has left the shell.
+
+	Ilya seems to say, people do NOT want to install a number of modules
+	because they are not yet sure if they really need them. But they have
+	tested them and have them still lying around in their ~/.cpan/build
+	directory. So we should give them a chance to use them next time they
+	come around with the same perl.
+
+	DONE in rev. 1140 with build_dir_reuse
+
+	* Todo: put the distro ID close to the OK or NOT OK line DONE in rev.
+	1136 or so.
+
+	* What was the deal with
+
+Package 'CPAN' already declared with version '1.88_57'
+ignoring new version ''.
+Looks good
+
+	again?
+
+	http://www.mail-archive.com/module-build@perl.org/msg00340.html
+
+	* Since DBI is fixed I see other interesting breakages: Class::DBI,
+	RPC::PlServer, GD.
+
+	GD fails with 5.8.8 and 5.8.3
+
+	Class::DBI fails with 5.8.8
+
+	RPC::PlServer fails with 5.8.8 and 5.8.3 but only if Crypt::DES is
+	installed
+
+	OK, so nothing new.
+
+2006-10-24  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Coro 2.0 works with bleadperl Yay! YAML for Coro with default answers
+	written.
+
+	* bug with notest pragma: it seems to remain in the distro object. I did
+	a report DAGOLDEN/CPAN-Reporter-0.28_51.tar.gz, then I did a "notest
+	install" on it. Then I reloaded and tried a "report" on it again and
+	CPAN refused to run the test because of the notest pragma.
+
+	FIXED in rev. 1132 but what is a good test for it? test WRITTEN in 1133.
+
+2006-10-23  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* The ->VERSION bug was back for a short while. It happens when
+	version.pm is not installed and Module::Build loads its own version.pm
+	from <data>. There it finds 0.661 and this does something that isn't
+	fool proof, very hard to diagnose and to reproduce. Easy workaround: do
+	not check for Module::Signature->VERSION anymore. The test was on 0.26
+	and we now have 0.55, so I guess, I can remove the version test.
+
+	As soon as I have means to not call into Module::Build, this bug will
+	diappear for sure, so no need to hunt it down from here. FINISHED in
+	rev. 1123
+
+	So recall: one can turn off sig_check, then install version, then leave
+	and enter CPAN.pm and the bug should disappear. Or we release 1.88_57
+	now. Update: I released 1.88_57 immediately after that.
+
+	* SMPETERS fixed DBI-1.52. Thank you! YAML for DBI with patch address
+	written
+
+2006-10-23  Andreas J Koenig  <akoenig@iconmobile.com>
+
+	* make a list of cpanconfig variables that can be changed via
+	distroprefs. Extend the list and document it, so that people can look it
+	up and do not have to read the source and can file bug reports against
+	it.
+
+	I fear for example that the preferred builder is not configurable(?)
+	latter half FIXED in rev. 1124
+
+	First half done with rev. 1125
+
+	* Write an executive summary of the state of affairs wrt. distroprefs so
+	we can decide about future directions. Update the README file to better
+	outline the executive summary. Update the examples to better reflect our
+	powers and weaknesses.
+
+	What we have:
+
+	- Give the user a simple system to store per-distro preferences related
+	to environment variables, commandline args and stdin for the four
+	commands of our traditional mantra: perl Makefile.PL, make, make test,
+	make install (and symmetrically for M:B modules)
+
+	- Give the user the option to patch distros with arbitrary patches from
+	local disk or CPAN
+
+	What we aim at:
+
+	- Give the users a simple means to exchange their preferences to reduce
+	the overhead of maintaining them. As it currently stands, those YAML
+	files devaluate quickly as new distros arrive.
+
+2006-10-23  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release a 1.8802 with the HTML::Mason workaround? Because it may take
+	a while until 1.89 is ready to go. DONE in rev. 1120
+
+2006-10-22  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Todo: gzipped patches; DONE in rev. 1103
+
+	* patches that are not separate files but live in the YAML file? REJECT
+	unless somebody requests it.
+
+2006-10-21  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* add CPAN::Reporter to Bundle::CPAN (which version of CPAN.pm needs
+	CPAN::Reporter currently? -- 1.88) WAITING for OK from David Golden
+
+	* Tina suggests: if the user has changed some config variable via 'o
+	conf' mechanism and has not yet saved the new config via 'o conf commit'
+	and is leaving the shell without saving, we could trigger a dialog.
+	#22396 talks about this.
+
+	After some thinking: maybe I prefer just a loud warning instead of a
+	hanging terminal. Hmmm.
+
+	This is a critical/showstopper thing because people perceive it as a
+	bug. rev. 1114 FIXES
+
+	* Todo: find out the remaining relevant pieces of Ilya's patch:
+
+	(1) better logging (maybe with the help of CPAN::Reporter?) I said below
+	that we have colors now, but fact is that you have to scroll back and if
+	you install 100 modules, you cannot investigate without disturbing the
+	process. One would like to study STDOUT and STDERR in a separate window.
+
+	(2) "cpantok#" keep some test OK state between sessions. I see no strong
+	need for this ATM.
+
+	* just a memo what I usually install:
+
+	    o debug CPAN Distribution
+	    install YAML::Syck Expect YAML Bundle::CPAN Module::Signature CPAN::Reporter Math::BigInt::GMP Plagger Bundle::Phalanx100 Jifty
+
+	YAML::Syck after Bundle::CPAN did not turn off interactivity.
+
+	YAML::Syck before Bundle::CPAN worked well.
+
+	CPAN::Reporter before YAML worked well but we want to catch the early
+	YAML interactivity (which in turn can be avoided with YAML::Syck).
+
+	* as long as HTML::Mason/Module::Build are broken, we should use
+	Bundle::HTML::Mason? Alas, it doesn't list HTML::Entities. And after
+	that it still fails on 07-interp.t. Ah, ok. Report sent. But can we
+	patch it? DONE
+
+	* Maybe add support for more CPAN::Config variables in distroprefs
 
 	* Todo: document the trailing dot and that it is useful in a Bundle file
 	and that there is a LOCAL.trailing_dot_distros.yml in the distroprefs
@@ -558,7 +998,7 @@ drwxr-xr-x  35 k k     8192 Oct 15 21:19 perl-p-5.8.0@29023/
 	supported. The first two for PDL on freebsd, the last one was just for
 	quick testing of the mechanism. Added test_report around rev. 1061
 
-	* Randy's CPAN-Search-Lite lives at
+	* Randy Kobes' CPAN-Search-Lite lives at
 	http://sourceforge.net/cvs/?group_id=101571 and on my local disk at
 	/home/src/perl/cpan-search-lite/CPAN-Search-Lite. As it needs DBI, it
 	cannot use bleadperl. Latest maint-perl is 28854.

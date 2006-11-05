@@ -6,6 +6,7 @@
 ^CPAN-.+/.+
 ^CPAN-.+gz$
 ^CPAN/MakeMaker
+^ChangeLog.*\.svk
 ^DIST
 ^DIST
 ^MANIFEST.bak
@@ -25,6 +26,7 @@
 ^lib/CPAN/Config\.pm
 ^lib/CPAN\.pm@
 ^lib/CPAN\.pm\.wrong_idea_for_cleanup
+^logs/
 ^mail
 ^make-test-
 ^memo

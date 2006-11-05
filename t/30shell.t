@@ -64,20 +64,7 @@ perl:
   \$^X: "$^X"
   mtime_dll: "$mtime_dll"
   sitearchexp: "$Config::Config{sitearchexp}"
-  stat(\$^X):
-    - 0
-    - 1
-    - 2
-    - 3
-    - 4
-    - 5
-    - 6
-    - 7
-    - 8
-    - $stat[9]
-    - 0
-    - 0
-    - 0
+  mtime_\$^X: $stat[9]
 time: 1
 EOF
 }
@@ -188,7 +175,7 @@ $HAVE->{"Term::ReadLine::Perl||Term::ReadLine::Gnu"}
 $HAVE->{"YAML&&patch"}
     =
     $HAVE->{"YAML"}
-    || $HAVE->{"patch"};
+    && $HAVE->{"patch"};
 read_myconfig;
 is($CPAN::Config->{histsize},100,"histsize is 100 before testing");
 
@@ -470,6 +457,34 @@ __END__
 #E:(?s:New set.+?commit.+?(!).+?\])
 ########
 #P:o conf urllist
+#E:linuxforum
+########
+#P:o conf urllist pop
+########
+#P:o conf urllist pop
+########
+#P:o conf urllist pop
+########
+#P:o conf urllist splice 1 3
+########
+#P:o conf urllist
+#E:programming.+\n.+linuxforum
+########
+#P:o conf urllist push PUSH
+########
+#P:o conf urllist unshift UNSHIFT
+########
+#P:o conf urllist
+#E:UNSHIFT.+\n.+programming.+\n.+linuxforum.+\n.+PUSH
+########
+#P:o conf urllist ONE TWO
+########
+#P:o conf urllist push PUSH
+########
+#P:o conf urllist unshift UNSHIFT
+########
+#P:o conf urllist
+#E:UNSHIFT.+\n.+ONE.+\n.+TWO.+\n.+PUSH
 ########
 #P:o conf defaults
 ########
@@ -827,7 +842,8 @@ __END__
 #P:o conf ftp ""
 ########
 #P:m Fcntl
-#E:Found \d old builds, restored state of \d[\s\S]+?Defines fcntl
+#E:Found \d old builds, restored the state of \d[\s\S]+?Defines fcntl
+#R:YAML
 ########
 #P:a JHI
 #E:Hietaniemi
@@ -954,7 +970,7 @@ __END__
 #R:Module::Build
 ########
 #P:force get CPAN::Test::Dummy::Perl5::BuildOrMake
-#E:Removing previously used
+#E:CPAN-Test-Dummy-Perl5-BuildOrMake-1.02/Build.PL
 #R:Module::Build
 ########
 #P:dump CPAN::Test::Dummy::Perl5::BuildOrMake
@@ -969,7 +985,7 @@ __END__
 #C:second try
 ########
 #P:force get ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
-#E:Removing previously used
+#E:CPAN-Test-Dummy-Perl5-BuildOrMake-1.02/Build.PL
 #R:Module::Build
 ########
 #P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
@@ -1227,6 +1243,15 @@ To add a new distro, the following steps must be taken:
   other one
 
 - add the test to shell.t that triggered the demand for a new distro
+
+=head2 Problems
+
+When you set up a new working copy of the SVN repository, you first
+have to run 'make testdistros' to get the pseudo distros that are not
+in the repository. This makes too many testdistros, so you must run
+'svk st' and see which are marked with 'M'. You must revert those and
+then the 30shell test should succeed. I'm sure this can be fixed but
+haven't yet found out how.
 
 =cut
 

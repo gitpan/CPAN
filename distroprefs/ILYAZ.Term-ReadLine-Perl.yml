@@ -1,0 +1,5 @@
+--- 
+match:
+  module: "^Term::ReadLine::Perl$"
+test: 
+  expect: ["Enter arithmetic or Perl expression", "\n"]

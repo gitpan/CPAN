@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 1140 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 1201 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -124,7 +124,7 @@ sub edit {
 	if ($o =~ /list$/) {
 	    $func = shift @args;
 	    $func ||= "";
-            CPAN->debug("func[$func]") if $CPAN::DEBUG;
+            CPAN->debug("func[$func]args[@args]") if $CPAN::DEBUG;
             my $changed;
 	    # Let's avoid eval, it's easier to comprehend without.
 	    if ($func eq "push") {
@@ -140,10 +140,12 @@ sub edit {
 		unshift @{$CPAN::Config->{$o}}, @args;
                 $changed = 1;
 	    } elsif ($func eq "splice") {
-		splice @{$CPAN::Config->{$o}}, @args;
+                my $offset = shift @args || 0;
+                my $length = shift @args || 0;
+		splice @{$CPAN::Config->{$o}}, $offset, $length, @args; # may warn
                 $changed = 1;
-	    } elsif (@args) {
-		$CPAN::Config->{$o} = [@args];
+	    } elsif ($func) {
+		$CPAN::Config->{$o} = [$func, @args];
                 $changed = 1;
 	    } else {
                 $self->prettyprint($o);
@@ -625,7 +627,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 1140 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 1201 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {

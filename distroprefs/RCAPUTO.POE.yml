@@ -1,0 +1,14 @@
+--- 
+match:
+  distribution: "^RCAPUTO/POE-"
+pl: 
+  expect:
+    - "Would you like to skip the network tests"
+    - "y\n"
+--- 
+comment: "Or if you prefer to follow the defaults..."
+match:
+  distribution: "^RCAPUTO/POE-"
+pl: 
+  args:
+    - --default
