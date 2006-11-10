@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_59';
+$CPAN::VERSION = '1.88_61';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -352,10 +352,24 @@ Trying to chdir to "$cwd->[1]" instead.
     }
 }
 
+sub _yaml_module {
+    my $yaml_module = $CPAN::Config->{yaml_module} || "YAML";
+    if (
+        $yaml_module ne "YAML"
+        &&
+        !$CPAN::META->has_inst($yaml_module)
+       ) {
+        # $CPAN::Frontend->mywarn("'$yaml_module' not installed, falling back to 'YAML'\n");
+        $yaml_module = "YAML";
+    }
+    return $yaml_module;
+}
+
 # CPAN::_yaml_loadfile
 sub _yaml_loadfile {
     my($self,$local_file) = @_;
-    my $yaml_module = $CPAN::Config->{yaml_module} || "YAML";
+    return +[] unless -s $local_file;
+    my $yaml_module = $self->_yaml_module;
     if ($CPAN::META->has_inst($yaml_module)) {
         my $code = UNIVERSAL::can($yaml_module, "LoadFile");
         my @yaml;
@@ -377,19 +391,24 @@ sub _yaml_loadfile {
 # CPAN::_yaml_dumpfile
 sub _yaml_dumpfile {
     my($self,$to_local_file,@what) = @_;
-    my $yaml_module = $CPAN::Config->{yaml_module} || "YAML";
+    my $yaml_module = $self->_yaml_module;
     if ($CPAN::META->has_inst($yaml_module)) {
-        my $code = UNIVERSAL::can($yaml_module, "DumpFile");
-        eval { $code->($to_local_file,@what); };
+        if (UNIVERSAL::isa($to_local_file, "FileHandle")) {
+            my $code = UNIVERSAL::can($yaml_module, "Dump");
+            eval { print $to_local_file $code->(@what) };
+        } else {
+            my $code = UNIVERSAL::can($yaml_module, "DumpFile");
+            eval { $code->($to_local_file,@what); };
+        }
         if ($@) {
-            $CPAN::Frontend->mydie("Alert: While trying to sump YAML file\n".
+            $CPAN::Frontend->mydie("Alert: While trying to dump YAML file\n".
                                    "  $to_local_file\n".
                                    "with $yaml_module the following error was encountered:\n".
                                    "  $@\n"
                                   );
         }
     } else {
-        $CPAN::Frontend->mywarn("'$yaml_module' not installed, cannot dump to '$to_local_file'\n");
+        $CPAN::Frontend->myprint("Note (usually harmless): '$yaml_module' not installed, not dumping to '$to_local_file'\n");
     }
 }
 
@@ -400,6 +419,7 @@ use File::Find;
 
 package CPAN::FTP;
 use strict;
+use Fcntl qw(:flock);
 use vars qw($Ua $Thesite $ThesiteURL $Themethod);
 @CPAN::FTP::ISA = qw(CPAN::Debug);
 
@@ -420,6 +440,7 @@ use strict;
                                     cvs_import
                                     dump
                                     force
+                                    hosts
                                     install
                                     install_tested
                                     look
@@ -715,7 +736,7 @@ There seems to be running another CPAN process (pid $otherpid).  Contacting...
 			(qq{Shall I try to run in degraded }.
 			 qq{mode? (Y/n)},"y");
                 if ($ans =~ /^y/i) {
-                    $CPAN::Frontend->mywarn("Running in degraded more is experimental.
+                    $CPAN::Frontend->mywarn("Running in degraded mode (experimental).
 Please report if something unexpected happens\n");
                     $run_degraded = 1;
                     for ($CPAN::Config) {
@@ -793,7 +814,7 @@ Please make sure the directory exists and is writable.
             sleep 1;
         }
     }
-    unless ($run_degraded) {
+    if (!$run_degraded && !$self->{LOCKFH}) {
         my $fh;
         unless ($fh = FileHandle->new("+>>$lockfile")) {
             if ($! =~ /Permission/) {
@@ -1592,8 +1613,10 @@ sub o {
 	    $CPAN::Frontend->myprint("\n");
 	} else {
             if (CPAN::HandleConfig->edit(@o_what)) {
-                $CPAN::Frontend->myprint("Please use 'o conf commit' to ".
-                                         "make the config permanent!\n\n");
+                unless ($o_what[0] eq "init") {
+                    $CPAN::Frontend->myprint("Please use 'o conf commit' to ".
+                                             "make the config permanent!\n\n");
+                }
             } else {
                 $CPAN::Frontend->myprint(qq{Type 'o conf' to view all configuration }.
                                          qq{items\n\n});
@@ -1682,6 +1705,70 @@ sub paintdots_onreload {
 	}
 	warn @_;
     };
+}
+
+#-> sub CPAN::Shell::hosts ;
+sub hosts {
+    my($self) = @_;
+    my $fullstats = CPAN::FTP->_ftp_statistics();
+    my $history = $fullstats->{history} || [];
+    my %S; # statistics
+    while (my $last = pop @$history) {
+        my $attempts = $last->{attempts} or next;
+        my $start;
+        if (@$attempts) {
+            $start = $attempts->[-1]{start};
+            if ($#$attempts > 0) {
+                for my $i (0..$#$attempts-1) {
+                    my $url = $attempts->[$i]{url} or next;
+                    $S{no}{$url}++;
+                }
+            }
+        } else {
+            $start = $last->{start};
+        }
+        $S{start} = $start;
+        $S{end} ||= $last->{end};
+        my $dltime = $last->{end} - $start;
+        my $dlsize = $last->{filesize};
+        my $url = $last->{thesiteurl}->text;
+        my $s = $S{ok}{$url} ||= {};
+        $s->{n}++;
+        $s->{dlsize} ||= 0;
+        $s->{dlsize} += $dlsize/1024;
+        $s->{dltime} ||= 0;
+        $s->{dltime} += $dltime;
+    }
+    my $res;
+    for my $url (keys %{$S{ok}}) {
+        next if $S{ok}{$url}{dltime} == 0; # div by zero
+        push @{$res->{ok}}, [@{$S{ok}{$url}}{qw(n dlsize dltime)},
+                             $S{ok}{$url}{dlsize}/$S{ok}{$url}{dltime},
+                             $url,
+                            ];
+    }
+    for my $url (keys %{$S{no}}) {
+        push @{$res->{no}}, [$S{no}{$url},
+                             $url,
+                            ];
+    }
+    my $R = ""; # report
+    $R .= sprintf "Log starts: %s\n", scalar(localtime $S{start}) || "unknown";
+    $R .= sprintf "Log ends  : %s\n", scalar(localtime $S{end}) || "unknown";
+    if ($res->{ok} && @{$res->{ok}}) {
+        $R .= sprintf "\nSuccessful downloads:
+   N        kB  secs       kB/s url\n";
+        for (sort { $b->[3] <=> $a->[3] } @{$res->{ok}}) {
+            $R .= sprintf "%4d %9d %5d %10.1f %s\n", @$_;
+        }
+    }
+    if ($res->{no} && @{$res->{no}}) {
+        $R .= sprintf "\nUnsuccessful downloads:\n";
+        for (sort { $b->[0] <=> $a->[0] } @{$res->{no}}) {
+            $R .= sprintf "%4d %s\n", @$_;
+        }
+    }
+    $CPAN::Frontend->myprint($R);
 }
 
 #-> sub CPAN::Shell::reload ;
@@ -2868,6 +2955,111 @@ sub mirror {
 package CPAN::FTP;
 use strict;
 
+#-> sub CPAN::FTP::ftp_statistics
+# if they want to rewrite, they need to pass in a filehandle
+sub _ftp_statistics {
+    my($self,$fh) = @_;
+    my $locktype = $fh ? LOCK_EX : LOCK_SH;
+    $fh ||= FileHandle->new;
+    my $file = File::Spec->catfile($CPAN::Config->{cpan_home},"FTPstats.yml");
+    open $fh, "+>>$file" or $CPAN::Frontend->mydie("Could not open '$file': $!");
+    my $sleep = 1;
+    while (!flock $fh, $locktype|LOCK_NB) {
+        if ($sleep>3) {
+            die;
+        }
+        $CPAN::Frontend->mysleep($sleep++);
+    }
+    my $stats = CPAN->_yaml_loadfile($file);
+    if ($locktype == LOCK_SH) {
+    } else {
+        seek $fh, 0, 0;
+        if (@$stats){ # no yaml no write
+            truncate $fh, 0;
+        }
+    }
+    return $stats->[0];
+}
+
+sub _mytime () {
+    if (CPAN->has_inst("Time::HiRes")) {
+        return Time::HiRes::time();
+    } else {
+        return time;
+    }
+}
+
+sub _new_stats {
+    my($self,$file) = @_;
+    my $ret = {
+               file => $file,
+               attempts => [],
+               start => _mytime,
+              };
+    $ret;
+}
+
+sub _add_to_statistics {
+    my($self,$stats) = @_;
+    $stats->{thesiteurl} = $ThesiteURL;
+    if (CPAN->has_inst("Time::HiRes")) {
+        $stats->{end} = Time::HiRes::time();
+    } else {
+        $stats->{end} = time;
+    }
+    my $fh = FileHandle->new;
+    my $fullstats = $self->_ftp_statistics($fh);
+    push @{$fullstats->{history}}, $stats;
+    my $time = time;
+    shift @{$fullstats->{history}}
+        while $time - $fullstats->{history}[0]{start} > 30*86400; # one month too much?
+    CPAN->_yaml_dumpfile($fh,$fullstats);
+}
+
+# if file is CHECKSUMS, suggest the place where we got the file to be
+# checked from, maybe only for young files?
+sub _recommend_url_for {
+    my($self, $file) = @_;
+    my $urllist = $self->_get_urllist;
+    if ($file =~ s|/CHECKSUMS(.gz)?$||) {
+        my $fullstats = $self->_ftp_statistics();
+        my $history = $fullstats->{history} || [];
+        while (my $last = pop @$history) {
+            last if $last->{end} - time > 3600; # only young results are interesting
+            next unless $file eq File::Basename::dirname($last->{file});
+            return $last->{thesiteurl};
+        }
+    }
+    if ($CPAN::Config->{randomize_urllist}
+        &&
+        rand(1) < $CPAN::Config->{randomize_urllist}
+       ) {
+        $urllist->[int rand scalar @$urllist];
+    } else {
+        return ();
+    }
+}
+
+sub _get_urllist {
+    my($self) = @_;
+    $CPAN::Config->{urllist} ||= [];
+    unless (ref $CPAN::Config->{urllist} eq 'ARRAY') {
+        $CPAN::Frontend->mywarn("Malformed urllist; ignoring.  Configuration file corrupt?\n");
+        $CPAN::Config->{urllist} = [];
+    }
+    my @urllist = grep { defined $_ and length $_ } @{$CPAN::Config->{urllist}};
+    for my $u (@urllist) {
+        CPAN->debug("u[$u]") if $CPAN::DEBUG;
+        if (UNIVERSAL::can($u,"text")) {
+            $u->{TEXT} .= "/" unless substr($u->{TEXT},-1) eq "/";
+        } else {
+            $u .= "/" unless substr($u,-1) eq "/";
+            $u = CPAN::URL->new(TEXT => $u, FROM => "USER");
+        }
+    }
+    \@urllist;
+}
+
 #-> sub CPAN::FTP::ftp_get ;
 sub ftp_get {
     my($class,$host,$dir,$file,$target) = @_;
@@ -3030,31 +3222,27 @@ sub localize {
     # Try the list of urls for each single object. We keep a record
     # where we did get a file from
     my(@reordered,$last);
-    $CPAN::Config->{urllist} ||= [];
-    unless (ref $CPAN::Config->{urllist} eq 'ARRAY') {
-        $CPAN::Frontend->mywarn("Malformed urllist; ignoring.  Configuration file corrupt?\n");
-        $CPAN::Config->{urllist} = [];
-    }
-    $last = $#{$CPAN::Config->{urllist}};
+    my $ccurllist = $self->_get_urllist;
+    $last = $#$ccurllist;
     if ($force & 2) { # local cpans probably out of date, don't reorder
 	@reordered = (0..$last);
     } else {
 	@reordered =
 	    sort {
-		(substr($CPAN::Config->{urllist}[$b],0,4) eq "file")
+		(substr($ccurllist->[$b],0,4) eq "file")
 		    <=>
-		(substr($CPAN::Config->{urllist}[$a],0,4) eq "file")
+		(substr($ccurllist->[$a],0,4) eq "file")
 		    or
 		defined($ThesiteURL)
 		    and
-                ($CPAN::Config->{urllist}[$b] eq $ThesiteURL)
+                ($ccurllist->[$b] eq $ThesiteURL)
 		    <=>
-                ($CPAN::Config->{urllist}[$a] eq $ThesiteURL)
+                ($ccurllist->[$a] eq $ThesiteURL)
 	    } 0..$last;
     }
     my(@levels);
     $Themethod ||= "";
-    $self->debug("Themethod[$Themethod]") if $CPAN::DEBUG;
+    $self->debug("Themethod[$Themethod]reordered[@reordered]") if $CPAN::DEBUG;
     if ($Themethod) {
 	@levels = ($Themethod, grep {$_ ne $Themethod} qw/easy hard hardest/);
     } else {
@@ -3065,28 +3253,25 @@ sub localize {
     local $ENV{FTP_PASSIVE} = 
         exists $CPAN::Config->{ftp_passive} ?
         $CPAN::Config->{ftp_passive} : 1;
-    for $levelno (0..$#levels) {
+    my $ret;
+    my $stats = $self->_new_stats($file);
+  LEVEL: for $levelno (0..$#levels) {
         my $level = $levels[$levelno];
 	my $method = "host$level";
 	my @host_seq = $level eq "easy" ?
 	    @reordered : 0..$last;  # reordered has CDROM up front
-        my @urllist = grep { defined $_ and length $_ }
-            map { $CPAN::Config->{urllist}[$_] } @host_seq;
-        for my $u (@urllist) {
-            CPAN->debug("u[$u]") if $CPAN::DEBUG;
-            if (UNIVERSAL::can($u,"text")) {
-                $u->{TEXT} .= "/" unless substr($u->{TEXT},-1) eq "/";
-            } else {
-                $u .= "/" unless substr($u,-1) eq "/";
-                $u = CPAN::URL->new(TEXT => $u, FROM => "USER");
-            }
-        }
+        my @urllist = map { $ccurllist->[$_] } @host_seq;
         for my $u (@CPAN::Defaultsites) {
             push @urllist, $u unless grep { $_ eq $u } @urllist;
         }
         $self->debug("synth. urllist[@urllist]") if $CPAN::DEBUG;
         my $aslocal_tempfile = $aslocal . ".tmp" . $$;
-	my $ret = $self->$method(\@urllist,$file,$aslocal_tempfile);
+        if (my $recommend = $self->_recommend_url_for($file)) {
+            @urllist = grep { $_ ne $recommend } @urllist;
+            unshift @urllist, $recommend;
+        }
+        $self->debug("synth. urllist[@urllist]") if $CPAN::DEBUG;
+	$ret = $self->$method(\@urllist,$file,$aslocal_tempfile,$stats);
 	if ($ret) {
             CPAN->debug("ret[$ret]aslocal[$aslocal]") if $CPAN::DEBUG;
             if ($ret eq $aslocal_tempfile) {
@@ -3102,11 +3287,18 @@ sub localize {
             # utime $now, $now, $aslocal; # too bad, if we do that, we
                                           # might alter a local mirror
             $self->debug("level[$level]") if $CPAN::DEBUG;
-            return $ret;
+            last LEVEL;
 	} else {
             unlink $aslocal_tempfile;
             last if $CPAN::Signal; # need to cleanup
 	}
+    }
+    if ($ret) {
+        $stats->{filesize} = -s $ret;
+    }
+    $self->_add_to_statistics($stats);
+    if ($ret) {
+        return $ret;
     }
     unless ($CPAN::Signal) {
         my(@mess);
@@ -3134,11 +3326,21 @@ sub localize {
     return;
 }
 
+sub _set_attempt {
+    my($self,$stats,$method,$url) = @_;
+    push @{$stats->{attempts}}, {
+                                 method => $method,
+                                 start => _mytime,
+                                 url => $url,
+                                };
+}
+
 # package CPAN::FTP;
 sub hosteasy {
-    my($self,$host_seq,$file,$aslocal) = @_;
+    my($self,$host_seq,$file,$aslocal,$stats) = @_;
     my($ro_url);
   HOSTEASY: for $ro_url (@$host_seq) {
+        $self->_set_attempt($stats,"easy",$ro_url);
 	my $url .= "$ro_url$file";
 	$self->debug("localizing perlish[$url]") if $CPAN::DEBUG;
 	if ($url =~ /^file:/) {
@@ -3181,6 +3383,7 @@ sub hosteasy {
 		}
 	    }
 	}
+	$self->debug("it was not a file URL") if $CPAN::DEBUG;
         if ($CPAN::META->has_usable('LWP')) {
             $CPAN::Frontend->myprint("Fetching with LWP:
   $url
@@ -3222,19 +3425,13 @@ sub hosteasy {
                 # Net::FTP can still succeed where LWP fails. So we do not
                 # skip Net::FTP anymore when LWP is available.
             }
-	} elsif (
-                 UNIVERSAL::can($ro_url,"text")
-                 and
-                 $ro_url->{FROM} eq "USER"
-                ){
-            my $ret = $self->hosthard([$ro_url],$file,$aslocal);
-            return $ret if $ret;
         } else {
             $CPAN::Frontend->mywarn("  LWP not available\n");
 	}
         return if $CPAN::Signal;
 	if ($url =~ m|^ftp://(.*?)/(.*)/(.*)|) {
 	    # that's the nice and easy way thanks to Graham
+            $self->debug("recognized ftp") if $CPAN::DEBUG;
 	    my($host,$dir,$getfile) = ($1,$2,$3);
 	    if ($CPAN::META->has_usable('Net::FTP')) {
 		$dir =~ s|/+|/|g;
@@ -3263,15 +3460,27 @@ sub hosteasy {
 		    }
 		}
 		# next HOSTEASY;
-	    }
+	    } else {
+                CPAN->debug("Net::FTP does not count as usable atm") if $CPAN::DEBUG;
+            }
 	}
+        if (
+            UNIVERSAL::can($ro_url,"text")
+            and
+            $ro_url->{FROM} eq "USER"
+           ){
+            ##address #17973: default URLs should not try to override
+            ##user-defined URLs just because LWP is not available
+            my $ret = $self->hosthard([$ro_url],$file,$aslocal,$stats);
+            return $ret if $ret;
+        }
         return if $CPAN::Signal;
     }
 }
 
 # package CPAN::FTP;
 sub hosthard {
-  my($self,$host_seq,$file,$aslocal) = @_;
+  my($self,$host_seq,$file,$aslocal,$stats) = @_;
 
   # Came back if Net::FTP couldn't establish connection (or
   # failed otherwise) Maybe they are behind a firewall, but they
@@ -3283,6 +3492,7 @@ sub hosthard {
   my($aslocal_dir) = File::Basename::dirname($aslocal);
   File::Path::mkpath($aslocal_dir);
   HOSTHARD: for $ro_url (@$host_seq) {
+        $self->_set_attempt($stats,"hard",$ro_url);
 	my $url = "$ro_url$file";
 	my($proto,$host,$dir,$getfile);
 
@@ -3418,7 +3628,7 @@ returned status $estatus (wstat $wstatus)$size
 
 # package CPAN::FTP;
 sub hosthardest {
-    my($self,$host_seq,$file,$aslocal) = @_;
+    my($self,$host_seq,$file,$aslocal,$stats) = @_;
 
     my($ro_url);
     my($aslocal_dir) = File::Basename::dirname($aslocal);
@@ -3443,6 +3653,7 @@ config variable with
 });
     $CPAN::Frontend->mysleep(2);
   HOSTHARDEST: for $ro_url (@$host_seq) {
+        $self->_set_attempt($stats,"hardest",$ro_url);
 	my $url = "$ro_url$file";
 	$self->debug("localizing ftpwise[$url]") if $CPAN::DEBUG;
 	unless ($url =~ m|^ftp://(.*?)/(.*)/(.*)|) {
@@ -5424,16 +5635,11 @@ sub _signature_business {
                 my $rv = Module::Signature::verify();
                 if ($rv != Module::Signature::SIGNATURE_OK() and
                     $rv != Module::Signature::SIGNATURE_MISSING()) {
-                    $CPAN::Frontend->myprint(
-                                             qq{\nSignature invalid for }.
-                                             qq{distribution file. }.
-                                             qq{Please investigate.\n\n}.
-                                             $self->as_string,
-                                             $CPAN::META->instance(
-                                                                   'CPAN::Author',
-                                                                   $self->cpan_userid,
-                                                                  )->as_string
-                                            );
+                    $CPAN::Frontend->mywarn(
+                                            qq{\nSignature invalid for }.
+                                            qq{distribution file. }.
+                                            qq{Please investigate.\n\n}
+                                           );
 
                     my $wrap =
                         sprintf(qq{I'd recommend removing %s. Its signature
@@ -6313,7 +6519,7 @@ sub _find_prefs {
     if ($@) {
         $CPAN::Frontend->mydie("Cannot create directory $prefs_dir");
     }
-    my $yaml_module = $CPAN::Config->{yaml_module} || "YAML";
+    my $yaml_module = CPAN->_yaml_module;
     if ($CPAN::META->has_inst($yaml_module)) {
         my $dh = DirHandle->new($prefs_dir)
             or die Carp::croak("Couldn't open '$prefs_dir': $!");
@@ -8536,6 +8742,19 @@ a list of all modules that are both available from CPAN and currently
 installed within @INC. The name of the bundle file is based on the
 current date and a counter.
 
+=head2 hosts
+
+This commands provides a statistical overview over recent download
+activities. The data for this is collected in the YAML file
+C<FTPstats.yml> in your C<cpan_home> directory. If no YAML module is
+configured or YAML not installed, then no stats are provided.
+
+=head2 mkmyconfig
+
+mkmyconfig() writes your own CPAN::MyConfig file into your ~/.cpan/
+directory so that you can save your own preferences instead of the
+system wide ones.
+
 =head2 recompile
 
 recompile() is a very special command in that it takes no argument and
@@ -8567,12 +8786,6 @@ every step that might have failed before.
 The C<upgrade> command first runs an C<r> command with the given
 arguments and then installs the newest versions of all modules that
 were listed by that.
-
-=head2 mkmyconfig
-
-mkmyconfig() writes your own CPAN::MyConfig file into your ~/.cpan/
-directory so that you can save your own preferences instead of the
-system wide ones.
 
 =head2 The four C<CPAN::*> Classes: Author, Bundle, Module, Distribution
 
@@ -9470,6 +9683,7 @@ defined:
   prefs_dir          local directory to store per-distro build options
   proxy_user         username for accessing an authenticating proxy
   proxy_pass         password for accessing an authenticating proxy
+  randomize_urllist  add some randomness to the sequence of the urllist
   scan_cache	     controls scanning of cache ('atstart' or 'never')
   shell              your favorite shell
   show_upload_date   boolean if commands should try to determine upload date
@@ -9540,11 +9754,11 @@ Calls the external command cwd.
 
 =back
 
-=head2 Note on urllist parameter's format
+=head2 Note on the format of the urllist parameter
 
 urllist parameters are URLs according to RFC 1738. We do a little
 guessing if your URL is not compliant, but if you have problems with
-file URLs, please try the correct format. Either:
+C<file> URLs, please try the correct format. Either:
 
     file://localhost/whatever/ftp/pub/CPAN/
 
@@ -9574,6 +9788,17 @@ add a new site at runtime it may happen that the previously preferred
 site will be tried another time. This means that if you want to disallow
 a site for the next transfer, it must be explicitly removed from
 urllist.
+
+=head2 Maintaining the urllist parameter
+
+If you have YAML.pm (or some other YAML module configured in
+C<yaml_module>) installed, CPAN.pm collects a few statistical data
+about recent downloads. You can view the statistics with the C<hosts>
+command or inspect them directly by looking into the C<FTPstats.yml>
+file in your C<cpan_home> directory.
+
+It's recommended to set the C<randomize_urllist> parameter to get some
+randomness into the URL selection.
 
 =head2 prefs_dir for avoiding interactive questions (ALPHA)
 
