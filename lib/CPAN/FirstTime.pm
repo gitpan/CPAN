@@ -19,7 +19,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec ();
 use vars qw($VERSION $urllist);
-$VERSION = sprintf "%.6f", substr(q$Rev: 1240 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 1257 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -172,8 +172,21 @@ Shall we use it as the general CPAN build and cache directory?
 
             $default = $cpan_home;
             my $loop = 0;
-            while ($ans = prompt("CPAN build and cache directory?",$default)) {
-                unless (File::Spec->file_name_is_absolute($ans)) {
+            my $last_ans;
+          PROMPT: while ($ans = prompt("CPAN build and cache directory?",$default)) {
+                if (File::Spec->file_name_is_absolute($ans)) {
+                    my @cpan_home = split /[\/\\]/, $ans;
+                  DIR: for my $dir (@cpan_home) {
+                        if ($dir =~ /^~/ and (!$last_ans or $ans ne $last_ans)) {
+                            $CPAN::Frontend
+                                ->mywarn("Warning: a tilde in the path will be ".
+                                         "taken as a literal tilde. Please ".
+                                         "confirm again if you want to keep it\n");
+                            $last_ans = $default = $ans;
+                            next PROMPT;
+                        }
+                    }
+                } else {
                     require Cwd;
                     my $cwd = Cwd::cwd();
                     my $absans = File::Spec->catdir($cwd,$ans);
@@ -1433,10 +1446,12 @@ yaml_module => qq{Which YAML implementation would you prefer?},
 randomize_urllist_intro => qq{
 
 CPAN.pm can introduce some randomness when using hosts for download
-that are configured in the urllist parameter. Enter a value between 0
-and 1 to indicate how often you want to let CPAN.pm try a random host
-from the urllist. A value of one means 'use always a random host
-first', zero means 'use always the urllist in the order configured'.
+that are configured in the urllist parameter. Enter a numeric value
+between 0 and 1 to indicate how often you want to let CPAN.pm try a
+random host from the urllist. A value of one specifies to always use a
+random host as the first try. A value of zero means no randomness at
+all. Anything in between specifies how often, on average, a random
+host should be tried first.
 
 },
 

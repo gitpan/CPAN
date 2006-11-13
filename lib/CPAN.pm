@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_61';
+$CPAN::VERSION = '1.88_62';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -58,7 +58,7 @@ $CPAN::Perl ||= CPAN::find_perl();
 $CPAN::Defaultdocs ||= "http://search.cpan.org/perldoc?";
 $CPAN::Defaultrecent ||= "http://search.cpan.org/recent";
 
-
+# our globals are getting a mess
 use vars qw(
             $AUTOLOAD
             $Be_Silent
@@ -71,6 +71,7 @@ use vars qw(
             $HAS_USABLE
             $Have_warned
             $META
+            $RUN_DEGRADED
             $Signal
             $Suppress_readline
             $VERSION
@@ -590,7 +591,6 @@ use vars qw(
 $COLOR_REGISTERED ||= 0;
 
 {
-    # $GLOBAL_AUTOLOAD_RECURSION = 12;
     $autoload_recursion   ||= 0;
 
     #-> sub CPAN::Shell::AUTOLOAD ;
@@ -701,7 +701,6 @@ sub all_objects {
 sub checklock {
     my($self) = @_;
     my $lockfile = File::Spec->catfile($CPAN::Config->{cpan_home},".lock");
-    my $run_degraded = 0;
     if (-f $lockfile && -M _ > 0) {
 	my $fh = FileHandle->new($lockfile) or
             $CPAN::Frontend->mydie("Could not open lockfile '$lockfile': $!");
@@ -722,8 +721,9 @@ sub checklock {
                                            "reports other host $otherhost and other ".
                                            "process $otherpid.\n".
                                            "Cannot proceed.\n"));
-	}
-	elsif (defined $otherpid && $otherpid) {
+	} elsif ($RUN_DEGRADED) {
+            $CPAN::Frontend->mywarn("Running in degraded mode (experimental)\n");
+        } elsif (defined $otherpid && $otherpid) {
 	    return if $$ == $otherpid; # should never happen
 	    $CPAN::Frontend->mywarn(
 				    qq{
@@ -738,7 +738,7 @@ There seems to be running another CPAN process (pid $otherpid).  Contacting...
                 if ($ans =~ /^y/i) {
                     $CPAN::Frontend->mywarn("Running in degraded mode (experimental).
 Please report if something unexpected happens\n");
-                    $run_degraded = 1;
+                    $RUN_DEGRADED = 1;
                     for ($CPAN::Config) {
                         $_->{build_dir_reuse} = 0;
                         $_->{commandnumber_in_prompt} = 0;
@@ -814,7 +814,8 @@ Please make sure the directory exists and is writable.
             sleep 1;
         }
     }
-    if (!$run_degraded && !$self->{LOCKFH}) {
+    # locking
+    if (!$RUN_DEGRADED && !$self->{LOCKFH}) {
         my $fh;
         unless ($fh = FileHandle->new("+>>$lockfile")) {
             if ($! =~ /Permission/) {
@@ -1727,10 +1728,11 @@ sub hosts {
         } else {
             $start = $last->{start};
         }
+        next unless $last->{thesiteurl}; # C-C? bad filenames?
         $S{start} = $start;
         $S{end} ||= $last->{end};
         my $dltime = $last->{end} - $start;
-        my $dlsize = $last->{filesize};
+        my $dlsize = $last->{filesize} || 0;
         my $url = $last->{thesiteurl}->text;
         my $s = $S{ok}{$url} ||= {};
         $s->{n}++;
@@ -1757,9 +1759,9 @@ sub hosts {
     $R .= sprintf "Log ends  : %s\n", scalar(localtime $S{end}) || "unknown";
     if ($res->{ok} && @{$res->{ok}}) {
         $R .= sprintf "\nSuccessful downloads:
-   N        kB  secs       kB/s url\n";
+   N       kB  secs      kB/s url\n";
         for (sort { $b->[3] <=> $a->[3] } @{$res->{ok}}) {
-            $R .= sprintf "%4d %9d %5d %10.1f %s\n", @$_;
+            $R .= sprintf "%4d %8d %5d %9.1f %s\n", @$_;
         }
     }
     if ($res->{no} && @{$res->{no}}) {
@@ -2361,6 +2363,7 @@ sub expand {
     $self->expand_by_method($class,$methods,@args);
 }
 
+#-> sub CPAN::Shell::expand_by_method ;
 sub expand_by_method {
     my $self = shift;
     my($class,$methods,@args) = @_;
@@ -2519,6 +2522,7 @@ installed. To activate colorized output, please install Term::ANSIColor.\n\n";
 }
 
 
+#-> sub CPAN::Shell::print_ornamented ;
 sub print_ornamented {
     my($self,$what,$ornament) = @_;
     return unless defined $what;
@@ -2552,6 +2556,8 @@ Please choose a different color (Hint: try 'o conf init color.*')\n";
     }
 }
 
+#-> sub CPAN::Shell::myprint ;
+
 # where is myprint/mywarn/Frontend/etc. documented? We need guidelines
 # where to use what! I think, we send everything to STDOUT and use
 # print for normal/good news and warn for news that need more
@@ -2562,18 +2568,21 @@ sub myprint {
     $self->print_ornamented($what, $CPAN::Config->{colorize_print}||'bold blue on_white');
 }
 
+#-> sub CPAN::Shell::myexit ;
 sub myexit {
     my($self,$what) = @_;
     $self->myprint($what);
     exit;
 }
 
+#-> sub CPAN::Shell::mywarn ;
 sub mywarn {
     my($self,$what) = @_;
     $self->print_ornamented($what, $CPAN::Config->{colorize_warn}||'bold red on_white');
 }
 
 # only to be used for shell commands
+#-> sub CPAN::Shell::mydie ;
 sub mydie {
     my($self,$what) = @_;
     $self->print_ornamented($what, $CPAN::Config->{colorize_warn}||'bold red on_white');
@@ -2586,7 +2595,7 @@ sub mydie {
     die "\n";
 }
 
-# sub CPAN::Shell::colorable_makemaker_prompt
+# sub CPAN::Shell::colorable_makemaker_prompt ;
 sub colorable_makemaker_prompt {
     my($foo,$bar) = @_;
     if (CPAN::Shell->colorize_output) {
@@ -2602,6 +2611,7 @@ sub colorable_makemaker_prompt {
 }
 
 # use this only for unrecoverable errors!
+#-> sub CPAN::Shell::unrecoverable_error ;
 sub unrecoverable_error {
     my($self,$what) = @_;
     my @lines = split /\n/, $what;
@@ -2625,11 +2635,13 @@ sub unrecoverable_error {
     $self->mydie(join "", @lines);
 }
 
+#-> sub CPAN::Shell::mysleep ;
 sub mysleep {
     my($self, $sleep) = @_;
     sleep $sleep;
 }
 
+#-> sub CPAN::Shell::setup_output ;
 sub setup_output {
     return if -t STDOUT;
     my $odef = select STDERR;
@@ -3551,8 +3563,11 @@ Trying with "$funkyftp$src_switch" to get
           if ($f eq "lynx") {
               # lynx returns 0 when it fails somewhere
               if (-s $asl_ungz) {
-                  my $content = do { local *FH; open FH, $asl_ungz or die; local $/; <FH> };
-                  if ($content =~ /^<.*<title>[45]/si) {
+                  my $content = do { local *FH;
+                                     open FH, $asl_ungz or die;
+                                     local $/;
+                                     <FH> };
+                  if ($content =~ /^<.*(<title>[45]|Error [45])/si) {
                       $CPAN::Frontend->mywarn(qq{
 No success, the file that lynx has has downloaded looks like an error message:
 $content
@@ -5467,7 +5482,7 @@ sub patch {
         local $ENV{PATCH_GET} = 0; # shall replace -g0 which is not
                                    # supported everywhere (and then,
                                    # not ever necessary there)
-        my $args = "-p1 -N --fuzz=3";
+        my $stdpatchargs = "-N --fuzz=3";
         my $countedpatches = @$patches == 1 ? "1 patch" : (scalar @$patches . " patches");
         $CPAN::Frontend->myprint("Going to apply $countedpatches:\n");
         for my $patch (@$patches) {
@@ -5484,9 +5499,11 @@ sub patch {
             }
             $CPAN::Frontend->myprint("  $patch\n");
             my $readfh = CPAN::Tarzip->TIEHANDLE($patch);
+            my $thispatchargs = join " ", $stdpatchargs, $self->_patch_p_parameter($readfh);
+            $readfh = CPAN::Tarzip->TIEHANDLE($patch);
             my $writefh = FileHandle->new;
-            unless (open $writefh, "|$patchbin $args") {
-                my $fail = "Could not fork '$patchbin $args'";
+            unless (open $writefh, "|$patchbin $thispatchargs") {
+                my $fail = "Could not fork '$patchbin $thispatchargs'";
                 $CPAN::Frontend->mywarn("$fail; cannot continue\n");
                 $self->{unwrapped} = CPAN::Distrostatus->new("NO -- $fail");
                 delete $self->{build_dir};
@@ -5506,6 +5523,19 @@ sub patch {
         $self->{patched}++;
     }
     return 1;
+}
+
+sub _patch_p_parameter {
+    my($self,$fh) = @_;
+    my($cnt_files,$cnt_p0files);
+    local($_);
+    while ($_ = $fh->READLINE) {
+        next unless /^[\*\+]{3}\s(\S+)/;
+        my $file = $1;
+        $cnt_files++;
+        $cnt_p0files++ if -f $file;
+    }
+    return $cnt_files==$cnt_p0files ? "-p0" : "-p1";
 }
 
 #-> sub CPAN::Distribution::_edge_cases
@@ -6358,8 +6388,8 @@ is part of the perl-%s distribution. To install that, you need to run
                 return;
             }
 	} else {
-            if (my $expect = $self->prefs->{pl}{expect}) {
-                $ret = $self->_run_via_expect($system,$expect);
+            if (my $expect_model = $self->_prefs_with_expect("pl")) {
+                $ret = $self->_run_via_expect($system,$expect_model);
                 if (! defined $ret
                     && $self->{writemakefile}
                     && $self->{writemakefile}->failed) {
@@ -6430,9 +6460,9 @@ is part of the perl-%s distribution. To install that, you need to run
             $ENV{$e} = $env->{$e};
         }
     }
-    my $expect = $self->prefs->{make}{expect};
+    my $expect_model = $self->_prefs_with_expect("make");
     my $want_expect = 0;
-    if ( $expect && @$expect ) {
+    if ( $expect_model && @{$expect_model->{talk}} ) {
         my $can_expect = $CPAN::META->has_inst("Expect");
         if ($can_expect) {
             $want_expect = 1;
@@ -6443,7 +6473,7 @@ is part of the perl-%s distribution. To install that, you need to run
     }
     my $system_ok;
     if ($want_expect) {
-        $system_ok = $self->_run_via_expect($system,$expect) == 0;
+        $system_ok = $self->_run_via_expect($system,$expect_model) == 0;
     } else {
         $system_ok = system($system) == 0;
     }
@@ -6461,52 +6491,109 @@ is part of the perl-%s distribution. To install that, you need to run
 
 # CPAN::Distribution::_run_via_expect
 sub _run_via_expect {
-    my($self,$system,$expect) = @_;
-    CPAN->debug("system[$system]expect[$expect]") if $CPAN::DEBUG;
+    my($self,$system,$expect_model) = @_;
+    CPAN->debug("system[$system]expect_model[$expect_model]") if $CPAN::DEBUG;
     if ($CPAN::META->has_inst("Expect")) {
-        my $expo = Expect->new;
+        my $expo = Expect->new;  # expo Expect object;
         $expo->spawn($system);
-        my $ran_into_timeout;
-      EXPECT: for (my $i = 0; $i <= $#$expect; $i+=2) {
-            my($next,$send) = @$expect[$i,$i+1];
-            my($timeout,$re);
-            if (ref $next) {
-                $timeout = $next->{timeout};
-                $re = $next->{expect};
-            } else {
-                $timeout = 15;
-                $re = $next;
-            }
-            CPAN->debug("timeout[$timeout]re[$re]") if $CPAN::DEBUG;
-            my $regex = eval "qr{$re}";
-            $expo->expect($timeout,
-                          [ eof => sub {
-                                my $but = $expo->clear_accum;
-                                $CPAN::Frontend->mywarn("EOF (maybe harmless) system[$system]
-expected[$regex]\nbut[$but]\n\n");
-                                last EXPECT;
-                            } ],
-                          [ timeout => sub {
-                                my $but = $expo->clear_accum;
-                                $CPAN::Frontend->mywarn("TIMEOUT system[$system]
-expected[$regex]\nbut[$but]\n\n");
-                                $ran_into_timeout++;
-                            } ],
-                          -re => $regex);
-            if ($ran_into_timeout){
-                # note that the caller expects 0 for success
-                $self->{writemakefile} =
-                    CPAN::Distrostatus->new("NO timeout during expect dialog");
-                return;
-            }
-            $expo->send($send);
+        my $expecta = $expect_model->{talk};
+        if ($expect_model->{mode} eq "expect") {
+            return $self->_run_via_expect_deterministic($expo,$expecta);
+        } elsif ($expect_model->{mode} eq "expect-in-any-order") {
+            return $self->_run_via_expect_anyorder($expo,$expecta);
+        } else {
+            die "Panic: Illegal expect mode: $expect_model->{mode}";
         }
-        $expo->soft_close;
-        return $expo->exitstatus();
     } else {
         $CPAN::Frontend->mywarn("Expect not installed, falling back to system()\n");
         return system($system);
     }
+}
+
+sub _run_via_expect_anyorder {
+    my($self,$expo,$expecta) = @_;
+    my $timeout = 3; # currently unsettable
+    my @expectacopy = @$expecta; # we trash it!
+    my $but = "";
+  EXPECT: while () {
+        my($eof,$ran_into_timeout);
+        my @match = $expo->expect($timeout,
+                                  [ eof => sub {
+                                        $eof++;
+                                    } ],
+                                  [ timeout => sub {
+                                        $ran_into_timeout++;
+                                    } ],
+                                  -re => eval"qr{.}",
+                                 );
+        if ($match[2]) {
+            $but .= $match[2];
+        }
+        $but .= $expo->clear_accum;
+        if ($eof) {
+            $expo->soft_close;
+            return $expo->exitstatus();
+        } elsif ($ran_into_timeout) {
+            # warn "DEBUG: they are asking a question, but[$but]";
+            for (my $i = 0; $i <= $#expectacopy; $i+=2) {
+                my($next,$send) = @expectacopy[$i,$i+1];
+                my $regex = eval "qr{$next}";
+                # warn "DEBUG: will compare with regex[$regex].";
+                if ($but =~ /$regex/) {
+                    # warn "DEBUG: will send send[$send]";
+                    $expo->send($send);
+                    splice @expectacopy, $i, 2; # never allow reusing an QA pair
+                    next EXPECT;
+                }
+            }
+            my $why = "could not answer a question during the dialog";
+            $CPAN::Frontend->mywarn("Failing: $why\n");
+            $self->{writemakefile} =
+                CPAN::Distrostatus->new("NO $why");
+            return;
+        }
+    }
+}
+
+sub _run_via_expect_deterministic {
+    my($self,$expo,$expecta) = @_;
+    my $ran_into_timeout;
+  EXPECT: for (my $i = 0; $i <= $#$expecta; $i+=2) {
+        my($next,$send) = @$expecta[$i,$i+1];
+        my($timeout,$re);
+        if (ref $next) {
+            $timeout = $next->{timeout};
+            $re = $next->{expect};
+        } else {
+            $timeout = 15;
+            $re = $next;
+        }
+        CPAN->debug("timeout[$timeout]re[$re]") if $CPAN::DEBUG;
+        my $regex = eval "qr{$re}";
+        $expo->expect($timeout,
+                      [ eof => sub {
+                            my $but = $expo->clear_accum;
+                            $CPAN::Frontend->mywarn("EOF (maybe harmless)
+expected[$regex]\nbut[$but]\n\n");
+                            last EXPECT;
+                        } ],
+                      [ timeout => sub {
+                            my $but = $expo->clear_accum;
+                            $CPAN::Frontend->mywarn("TIMEOUT
+expected[$regex]\nbut[$but]\n\n");
+                            $ran_into_timeout++;
+                        } ],
+                      -re => $regex);
+        if ($ran_into_timeout){
+            # note that the caller expects 0 for success
+            $self->{writemakefile} =
+                CPAN::Distrostatus->new("NO timeout during expect dialog");
+            return;
+        }
+        $expo->send($send);
+    }
+    $expo->soft_close;
+    return $expo->exitstatus();
 }
 
 # CPAN::Distribution::_find_prefs
@@ -7058,9 +7145,9 @@ sub test {
             $ENV{$e} = $env->{$e};
         }
     }
-    my $expect = $self->prefs->{test}{expect};
+    my $expect_model = $self->_prefs_with_expect("test");
     my $want_expect = 0;
-    if ( $expect && @$expect ) {
+    if ( $expect_model && @{$expect_model->{talk}} ) {
         my $can_expect = $CPAN::META->has_inst("Expect");
         if ($can_expect) {
             $want_expect = 1;
@@ -7111,7 +7198,7 @@ sub test {
                                     "not supported when distroprefs specify ".
                                     "an interactive test\n");
         }
-        $tests_ok = $self->_run_via_expect($system,$expect) == 0;
+        $tests_ok = $self->_run_via_expect($system,$expect_model) == 0;
     } elsif ( $ready_to_report ) {
         $tests_ok = CPAN::Reporter::test($self, $system);
     } else {
@@ -7154,6 +7241,24 @@ sub test {
         $CPAN::Frontend->mywarn("  $system -- NOT OK\n");
     }
     $self->store_persistent_state;
+}
+
+sub _prefs_with_expect {
+    my($self,$where) = @_;
+    return unless my $prefs = $self->prefs;
+    return unless my $where_prefs = $prefs->{$where};
+    if ($where_prefs->{expect}) {
+        return {
+                mode => "expect",
+                talk => $where_prefs->{expect},
+               };
+    } elsif ($where_prefs->{"expect-in-any-order"}) {
+        return {
+                mode => "expect-in-any-order",
+                talk => $where_prefs->{"expect-in-any-order"},
+               };
+    }
+    return;
 }
 
 #-> sub CPAN::Distribution::clean ;
@@ -7425,13 +7530,20 @@ sub _check_binary {
     $CPAN::Frontend->myprint(qq{ + _check_binary($binary)\n})
       if $CPAN::DEBUG;
 
-    local *README;
-    $pid = open README, "which $binary|"
-      or $CPAN::Frontend->mydie(qq{Could not fork 'which $binary': $!});
-    while (<README>) {
-	$out .= $_;
+    if ($CPAN::META->has_inst("File::Which")) {
+        return File::Which::which($binary);
+    } else {
+        local *README;
+        $pid = open README, "which $binary|"
+            or $CPAN::Frontend->mywarn(qq{Could not fork 'which $binary': $!\n});
+        return unless $pid;
+        while (<README>) {
+            $out .= $_;
+        }
+        close README
+            or $CPAN::Frontend->mywarn("Could not run 'which $binary': $!\n")
+                and return;
     }
-    close README or die "Could not run 'which $binary': $!";
 
     $CPAN::Frontend->myprint(qq{   + $out \n})
       if $CPAN::DEBUG && $out;
@@ -8853,7 +8965,14 @@ module or not.
 
 If you do not enter the shell, the available shell commands are both
 available as methods (C<CPAN::Shell-E<gt>install(...)>) and as
-functions in the calling package (C<install(...)>).
+functions in the calling package (C<install(...)>).  Before calling low-level
+commands it makes sense to initialize components of CPAN you need, e.g.:
+
+  CPAN::HandleConfig->load;
+  CPAN::Shell::setup_output;
+  CPAN::Index->reload;
+
+High-level commands do such initializations automatically.
 
 There's currently only one class that has a stable interface -
 CPAN::Shell. All commands that are available in the CPAN shell are
@@ -9797,7 +9916,8 @@ about recent downloads. You can view the statistics with the C<hosts>
 command or inspect them directly by looking into the C<FTPstats.yml>
 file in your C<cpan_home> directory.
 
-It's recommended to set the C<randomize_urllist> parameter to get some
+To get some interesting statistics it is recommended to set the
+C<randomize_urllist> parameter that introduces some amount of
 randomness into the URL selection.
 
 =head2 prefs_dir for avoiding interactive questions (ALPHA)
