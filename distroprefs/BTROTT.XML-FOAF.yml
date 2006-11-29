@@ -1,6 +1,6 @@
 --- 
 match:
-  distribution: "^BTROTT/XML-Feed-0"
+  distribution: "^BTROTT/XML-FOAF-"
 pl: 
   expect-in-any-order:
     - "Auto-install"

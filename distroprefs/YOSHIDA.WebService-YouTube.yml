@@ -1,8 +1,12 @@
---- 
+---
 match:
-  module: "^URI::Fetch$"
-pl: 
-  expect-in-any-order:
+  distribution: "^YOSHIDA/WebService-YouTube-"
+pl:
+  expect:
+    - "Auto-install"
+    - "y\n"
+    - "Auto-install"
+    - "y\n"
     - "Auto-install"
     - "y\n"
     - "Auto-install"

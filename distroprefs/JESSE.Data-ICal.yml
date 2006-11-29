@@ -1,6 +1,6 @@
---- 
+---
 match:
-  distribution: "^BTROTT/XML-Feed-0"
+  distribution: "^JESSE/Data-ICal-"
 pl: 
   expect-in-any-order:
     - "Auto-install"

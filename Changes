@@ -1,3 +1,49 @@
+2006-11-23  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 1.88_63: nothing major, only bugfixes and tiny new features.
+	Still a lot to do for 1.89.
+
+	* address #23315: there were still some uncought exceptions in
+	CPAN::Tarzip that broke megainstalls by Steve Peters; now hopefully all
+	fixed
+
+	* address #22584: do not set VERSION to "undef" when 0
+
+	* bugfix: delete backups during downloading of new index files
+
+	* bugfix: repair all risky ->can with UNIVERSAL::can; thanks to Adriano
+	Rodrigues for the report!
+
+	* bugfix: dirname(undef) can die: protect against it when an entry in
+	FTPstats has no associated file
+
+	* the failed command now prints its rows sorted by command (as before)
+	but within each command by time.
+
+	* the prereq check under the Module::Build installer is now performed by
+	reading the _build/prereqs file instead of calling Module::Build
+	directly. (Suggested by Ken Williams)
+
+	* cleanup of the cache directory is now disabled for batch jobs;
+	documentation is updated about the lock file the shell is holding
+
+	* now setting the environment variable PERL5_CPAN_IS_RUNNING; tentative
+	patch for Module::Install in my CPAN homedirectory
+
+	* support for fallback Data::Dumper and Storable files in the prefs_dir
+	directory when YAML is not available (alpha)
+
+	* new support for cpanconfig/check_sigs in distroprefs to temporarily
+	switch signature checking on or off. See distroprefs/00.README for
+	details and distroprefs/JESSE.HTTP-Server-Simple.yml for an example (alpha)
+
+	* new keyword "goto" in distroprefs to nominate a delegate distro. See
+	distroprefs/00.README for details and distroprefs/ABH.XML-RSS.yml for an
+	example (alpha)
+
+	* small portions of patches from Randy Kobes applied to support
+	CPAN::SQLite (pre-alpha; see Makefile.PL how to invoke)
+
 2006-11-13  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
 	* release 1.88_62

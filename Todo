@@ -1,81 +1,752 @@
-2006-11-12  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+2006-11-29  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-	* BUG: randomize_urllist cannot be set on the shell commandline: because
-	it ends in "list", it becomes always an array:))
+	* DBD::mysql: I'm sure there is just a defined() somewhere missing in
+	the Makefile.PL
 
-	FIXED
+	* Need to patch Module::AutoInstall and test antirecursion with an
+	environment variable. Errr, I need to patch the inc/ directory of
+	Plagger then. Done and patch for now in the patches directory.
 
-	* Todo: guess the patch option -p0 or -p1
+	Remember that there's also a rant in 00.README
 
-	* distroprefs with artificial intelligence: find out how to write a
-	distropref with so much AI that it handles several different dialogues.
-	I just realized that YAML::Syck talked me into a different dialogue on
-	some older bleadperl that had YAML 0.60 installed:
+	* Batch jobs without a lock should not be allowed to cleanup the cache
+	directory. And then document the lock policy and that there are lockless
+	batch runs. DONE
 
-*** WARNING ***
+2006-11-28  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
-This release breaks compatibility with versions earlier than version 0.60 of
-YAML::Syck and YAML.pm when serializing blessed references.
+	* DBD::SQLite again: With bleadperl 29398 and current CPAN.pm I tried to
+	install /home/src/perl/cpan-sql-stuff/CPAN-SQLite/. but again it failed
+	because DBD::SQLite did not write its SQLite.xsi file. I fear there's
+	something being (not) done in the Makefile.PL instead of during make.
 
-See the COMPATIBILITY file for more information.
+	Yes. On the second try DBD::SQLite builds perfectly well. So one must
+	make sure that they are installed in this order. Maybe this is normal
+	for DBDs? I have never noticed this before. Hrm. This would be a case
+	for re-running perl Makefile.PL after building the prereqs.
 
-*** Pre-0.60 version of YAML.pm (0.53) detected.
-Continue installing YAML::Syck? [y]
+	If we had 'commandline', we would write
 
-	We would like to answer to this question yes if it comes. Or we would
-	like to upgrade YAML first.
+make:
+	commandline: "make; $PERL Makefile.PL; make"
 
-	One would think that Expect collects data and compares them to a pool of
-	regular expressions each of which has an associated answer. As soon as
-	one expression matches, its answer is given and it is taken out of the
-	pool. On EOF do not even complain. Very similar to what we do now. Is it
-	even worth to keep the current interface? Yes, because it has the
-	potential to break. Because Expect itself does not provide it. We must
-	write some code in between:
+	Or something like that. Will test as soon as we have 'commandline'.
 
-	Variant 1: match on /./, look at the whole collected string, do the
-	match loop. On success do as we do now, on failure continue as we do
-	now. On timeout do like we do now. On EOF exit the loop silently. As
-	test write a distro that asks 12 questions in random order and dies if
-	the wrong answer is given.
+	* Observing what autoinstall does:
 
-	Variant 2: match on /./ until timeout is reached. Now do your own
-	matching. On success do as we do now, on failure give up. One question
-	that we cannot answer is too much. There is no timeout error, just a "no
-	prepared regex matches the question". On EOF exit the loop silently.
+/home/src/perl/repoperls/installed-perls/perl/p6siswe/perl-5.8.0@29397/bin/perl 
+"-Iinc" Makefile.PL --config= --installdeps=File::Find::Rule,0,UNIVERSAL::requir
+e,0.1,Template::Provider::Encoding,0.04,Text::Tags,0,DateTime::Format::Mail,0,Da
+teTime::Format::W3CDTF,0,DateTime::Format::Strptime,0,Cache::Cache,1.04,Module::
+Pluggable::Fast,0,HTML::ResolveLink,0,MIME::Types,1.16,XML::Feed,0.12,XML::Atom,
+0.23,Term::Encoding,0,Encode::Detect,1,HTTP::Cookies::Mozilla,0,XML::Liberal,0.1
+4,XML::RSS::Liberal,0,HTML::TreeBuilder::XPath,0,HTML::FormatText,0,DateTime::Fo
+rmat::Japanese,0,HTML::Scrubber,0,XML::Feed,0.09,XML::Atom,0.20,Net::SMTP::TLS,0
+,Mail::Address,0,HTML::Scrubber,0,Time::Duration::Parse,0,WebService::Bloglines,
+0.11,Cache::FastMmap,0,POE::Component::Client::HTTP,0,Xango,1.04,DateTime::Forma
+t::Epoch,0,WWW::Mixi,0.48,SVN::Core,0,SVN::Client,0,WebService::YouTube,0,WWW::B
+abelfish,0,Text::Emoticon,0,HTML::ResolveLink,0,Email::Address,0,Lingua::ZH::Han
+Detect,0,Text::Language::Guess,0,IP::Country,0,Text::Hatena,0,Hatena::Keyword,0,
+Image::Info,0,Text::Markdown,0,Regexp::Common::profanity_us,0,HTML::ResolveLink,
+0.02,Text::Kakasi,0,Mail::SpamAssassin,0,URI::Find,0,URI::Find,0,Audio::Beep,0,P
+OE::Component::IRC,0,POE::Component::IKC::Client,0,Net::NetSend,0,Text::CSV_PP,0
+,Net::Delicious,0,Mail::IMAPClient,0,Template::Plugin::JavaScript,0,Net::Movable
+Type,0,PDF::FromHTML,0,Palm::PalmDoc,0,Text::WrapI18N,0,Data::Serializer,0,Data:
+:ICal,0,Search::Estraier,0,File::Grep,0,KinoSearch,0,DBIx::Class::Schema,0,XML::
+FOAF,0,Config::INI::Simple,0,HTML::TreeBuilder::XPath,0,Lingua::EN::Summarize,0,
+Text::Original,0,Lingua::JA::Summarize::Extract,0
+CPAN: File::HomeDir loaded ok (v0.58)
 
-	Variant 2 is much better.
+	Yes, this goes really into recursion. Since I have "reuse" turned on,
+	the damage is limited but if I had it not on, it would be a lot of
+	expensive noops.
 
-	Today I wrote CPAN-Test-Dummy-Perl5-Make-Expect-1.00.tar.gz for that.
+	The question is simply: how can I prevent autoinstall from going into
+	recursion? I want it to do its detective work and return it to me. Ahhh,
+	it does so! It writes them in traditional style into the Makefile. All I
+	need to prevent is that this target (the "installdeps" target) is run
+	during 'make'. Or that it is being run but does nothing. Or whatever
+	that does not repeat what I have already done.
+
+	* Observing that expect-in-any-order is much slower than expect (of
+	course) and that one could safe minutes for Plagger if a timeout were
+	set to 0.1 or so.
+
+2006-11-27  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Broken: 30shell.t. Recently something changed this:
+
+# NEXT: m /_NEXISTE_/
+# EXPECT: Contact Author J. Cpantest Hietaniemi(?s:.*?cpan[^>]*?>)
+# GOT: m /_NEXISTE_/
+# Module    _NEXISTE_              (Contact Author J. Cpantest Hietaniemi <nospam@nospam>)
+# Module    _NEXISTE_::_NEXISTE_   (Contact Author J. Cpantest Hietaniemi <nospam@nospam>)
+# 2 items found
+
+	to this:
+
+# Module    _NEXISTE_              (N/A)
+# Module    _NEXISTE_::_NEXISTE_   (N/A)
+# 2 items found
+
+	Who was it? First time I need a binary search on my own code:)
+
+	Standing at HEAD: fail as above
+
+	Switching back to 1310: fails with Looks like you planned 227 tests but
+	only ran 163.
+
+	Running forward with a quick obvious fix: Looks like you planned 227
+	tests but only ran 159.
+
+	Switching to 1300: Looks like you planned 227 tests but only ran 163.
+
+	1290: completely broken
+	To 1291: Looks like you planned 227 tests but only ran 159.
+
+	To 1281: All tests successful
+
+	1286: ok
+
+	88 ok
+
+	89 ok
+
+	91 ok ???
+
+	1300 ok ???
+
+	1310 ok ???
+
+	Obviously a timing related bug. The ls command seems expensive. Maybe
+	perl is slower or the sqlite patch made CPAN.pm slower. Setting the
+	default timeout to 30 and ripping out the sqlite patch brings us test ok
+	again. Putting back in the sqlite stuff with the small obvious fix in
+	the exists method brings test ok again. Setting timout back to 20 again
+	and just increasing the timout for the 'ls ANDK' command to 30 brings
+	test ok again. All of the successes in the SVN directory.
+
+	* Todo: if some other processes have deleted my build_dir while I was
+	running, heck maybe I can do that even myself, react accordingly
+
+2006-11-26  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* CPAN::SQLite has the dependency on LWP::Simple missing
+
+	* bug:
+
+	force get /home/src/perl/cpan-sql-stuff/CPAN-SQLite/.
+
+	goes through all of urllist and tries to download
+	ftp://cpan.mirrors.skynet.be/pub/CPAN/authors/id//home/src/perl/cpan-sql-stuff/CPAN-SQLite/.
+	etc.
+
+	And after that we cannot work with the
+	/home/src/perl/cpan-sql-stuff/CPAN-SQLite/. directory anymore, somehow
+	the internal state has lost the connection to the real directory.
+
+	* observed a strange behaviour: trying
+
+	test /home/src/perl/cpan-sql-stuff/CPAN-SQLite/.
+
+	early, immediately after Bundle::CPANxxl. Dependency on SQLite is
+	recognized, recursive dependency on DBI is recognized, but SQLite does
+	not build a SQLite.xsi which seems to indicate that it did not find DBI.
+
+	install helps, so we are still unfriendly to testers?
+
+2006-11-25  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* priorities: bugfixing; SQLite; Kwalify;
+
+	redesigning the force pragma: biggie; see showstopper alert
+
+	distroprefs left over: single ersatzcommand for the test mantras: we
+	currently can change the make command and the arguments at the end but
+	the word test is always on the command line and this looks silly. But
+	maybe not worth a new keyword. But I've also proposed ->{test}{skip}, so
+	the two can be folded perhaps? ---- On the bycicle it occurred to me: we
+	add "commandline" to each of get/make/test/install and then the user can
+	even say "cd .... && cvs up" or "perl -e 1". I like it.
+
+	11-17 lists a few things for documentation.
+
+	restructure the expect keyword family
+
+	TTL stuff
+
+	make up your mind about install_tested.
+
+	* Why did I get no problem with Module::Pluggable before but now do?
+	Hmm. Installing on naked 29367 gives no errors. Installing on
+	module-rich 29376 gives one test failure:
+
+t/02works_taint............NOK 3/5                                           
+#   Failed test 'is deeply'
+#   at t/02works_taint.t line 20.
+#     Structures begin differing at:
+#          $got->[0] = 'Module::Pluggable::Fast'
+#     $expected->[0] = 'Module::Pluggable::Object'
+t/02works_taint............NOK 5/5                                           
+#   Failed test 'is deeply class'
+#   at t/02works_taint.t line 29.
+#     Structures begin differing at:
+#          $got->[0] = 'Module::Pluggable::Fast'
+#     $expected->[0] = 'Module::Pluggable::Object'
+# Looks like you failed 2 tests of 5.
+t/02works_taint............dubious                                           
+        Test returned status 2 (wstat 512, 0x200)
+DIED. FAILED tests 3, 5
+        Failed 2/5 tests, 60.00% okay
+
+	Aha, seems to be a broken test.
+	http://rt.cpan.org/Ticket/Display.html?id=23607
+
+	* Now I have changed Plagger YAML file to answer y to all optional
+	features and now it installs even Spamassassin.
+
+	* 23315 rings a bell now..... eliminated many Tarzip exceptions by
+	protecting with eval rev. 1386
+
+	* Slaven reports bug: there is a yml file in dot directories named
+	"..yml" FIXED in svk rev. 1390
+
+2006-11-24  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Jifty 0.61123_01 is out and the tests fail on Module::Refresh missing
+	and Test::Base as far as I can see.
+
+	Kwalify is out.
+
+	Jifty says what it would like to have:
+
+- App::CLI                       ...missing. (would need 0.03)
+- Email::Send                    ...missing. (would need 1.99_01)
+- HTML::Mason                    ...missing. (would need 1.3101)
+- HTML::Mason::Plugin            ...missing.
+- HTTP::Server::Simple           ...missing. (would need 0.20)
+- HTTP::Server::Simple::Recorder ...missing.
+- XML::Simple                    ...missing.
+- Module::Install::Admin         ...missing. (would need 0.50)
+- Test::HTTP::Server::Simple     ...missing. (would need 0.02)
+- Test::WWW::Mechanize           ...missing. (would need 1.04)
+- Class::Accessor::Named         ...missing.
+- Devel::Cover                   ...missing.
+- Module::Install::Admin         ...missing. (would need 0.50)
+- PAR::Dist::FromCPAN            ...missing.
+
+	Now that I have Module::Refresh and Test::Base Jifty fails tests due to
+	HTML::Mason.
+
+	* But when we have four different force flavors, we will demand a
+	superforce that works like the force now does and sets all "lower" ones?
+
+	* Todo: distroprefs mechanism is still inefficient in that it scans too
+	often the whole distro_dir. (But it's super to have that while
+	developing new rules)
+
+2006-11-23  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Trying to get a binary search running for XML-Feed-0.12. I need to go
+	before 20000 where I haven't been for quite a while and nothing works.
+
+	I need to break a circular dependency ExtUtils::CBuilder => File::Spec
+	=> PathTools => ExtUtils::CBuilder
+
+	I'm hung at the moment with 19096: it cannot build
+	Scalar-List-Utils-1.18 because it fails during perl Makefile.PL:
+
+	Can't call method "load" on an undefined value at inc/Module/Install.pm line 180
+
+	I have tried to install Module::Install myself but this did not help.
+
+	Removing the whole inc directory does not help either. When I improve
+	the code at line 180, it just gets reverted magically. This is what I
+	tried to insert:
+
+		my $obj = eval { $self->load($method) };
+        if ($@) {
+          my $err = $@;
+          require Carp;
+          confess $err;
+        }
+        $obj or return;
+
+	Running in the debugger fails also because it fails at compile time.
+
+	Giving up on 19096, trying 19523.
+
+	Same thing but I realise that I can skip Scalar-List-Utils. Now I need
+	to install LWP with notest. And XML::Atom fails because 'Undefined
+	subroutine &utf8::is_utf8 called at t/18-unicode.t line 17.' Use notest
+	again. And XML-Feed's test still fails with
+
+t/01-parse............NOK 44/72                                              
+#   Failed test at t/01-parse.t line 59.
+#                   'Hello!...'
+#     doesn't match '(?-xism:<p>Hello!</p>)'
+t/01-parse............NOK 45/72                                              
+#   Failed test at t/01-parse.t line 60.
+#          got: undef
+#     expected: 'Hello!...'
+# Looks like you failed 2 tests of 72.
+t/01-parse............dubious                                                
+        Test returned status 2 (wstat 512, 0x200)
+DIED. FAILED tests 44-45
+        Failed 2/72 tests, 97.22% okay
+
+	Trying 19096 again. This time XML::Atom cannot write a Build file with
+	the same Module::Install bug as above. Giving up.
+
+	Maybe investigate within the maint branch?
+
+	Yes! This shows us an interesting fact: under 29163 we see the same
+	failure. Under my /usr/local/perl-5.8.8/ we do not see it. 27048 which
+	is closest to 27040 (which would be 5.8.8 exactly).
+
+	Same failure. So it's very likely a module dependency. Some recent
+	module upgrade probably. my 5.8.8 installation might still have the old
+	one and updating breaks? The successfully testing 5.8.8 says
+
+  CPAN.pm: Going to build B/BT/BTROTT/XML-Feed-0.12.tar.gz
+
+*** Module::AutoInstall version 1.02
+*** Checking for Perl dependencies...
+[Core Features]
+- LWP                      ...loaded. (5.805)
+- HTML::TokeParser         ...loaded. (2.35)
+- Test::More               ...loaded. (0.62)
+- Class::ErrorHandler      ...loaded. (0.01)
+- Feed::Find               ...loaded. (0.06)
+- URI::Fetch               ...loaded. (0.08)
+- XML::RSS                 ...loaded. (1.10 >= 1.01)
+- XML::Atom                ...loaded. (0.23 >= 0.08)
+- DateTime                 ...loaded. (0.35)
+- DateTime::Format::Mail   ...loaded. (0.30)
+- DateTime::Format::W3CDTF ...loaded. (0.04)
+- List::Util               ...loaded. (1.18)
+*** Module::AutoInstall configuration finished.
+Checking whether your kit is complete...
+Looks good
+
+
+	The failing one under 27048 says
+
+*** Module::AutoInstall version 1.020
+*** Checking for Perl dependencies...
+[Core Features]
+- LWP                      ...loaded. (5.805)
+- HTML::TokeParser         ...loaded. (2.350)
+- Test::More               ...loaded. (0.620)
+- Class::ErrorHandler      ...loaded. (0.010)
+- Feed::Find               ...loaded. (0.060)
+- URI::Fetch               ...loaded. (0.080)
+- XML::RSS                 ...loaded. (1.200 >= 1.01)
+- XML::Atom                ...loaded. (0.230 >= 0.08)
+- DateTime                 ...loaded. (0.350)
+- DateTime::Format::Mail   ...loaded. (0.300)
+- DateTime::Format::W3CDTF ...loaded. (0.040)
+- List::Util               ...loaded. (1.180)
+*** Module::AutoInstall configuration finished.
+Checking whether your kit is complete...
+Looks good
+
+	Yes, and when I downgrade XML::RSS to 1.1, then the test failure goes
+	away.
+
+	Bingo. Another case for "goto".
+
+	* I'm conviced now that we need more force flavors and that force shall
+	be limited in scope
+
+	force get     shall re-fetch
+	force make    shall not re-fetch   but run make again
+	force test    shall not make again but try to test again
+	force install shall not test again but try to install
+
+2006-11-22  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* I just wrote in a mail to Sendu Bala:
+
+  > On a tangentially related note, are there any plans to make CPAN do
+  > anything useful with the 'recommends'/'optional_features' information
+  > in a META.yml file?
+
+No. I never considered this a job for CPAN.pm. If I had the time,
+inclination and fu to write talk-me-through-optional-features
+software, I'd write it independently from CPAN.pm.
+
+I think of CPAN.pm as the glue between the user and the CPAN mantras.
+CPAN.pm 1.89 will allow the users to store their preferences about
+optional things in any CPAN package, no matter how the packages
+themselves manage them. If you play with 1.88_62 see the 00.README in
+the distroprefs directory. But it's no
+talk-me-through-optional-features software.
+
+Or if you prefer a drawing:
+
+     +----------+       +----------------+       +----------+
+     |          |       |    mantras     |       |          |
+     |          |       |perl Makefile.PL|       |          |
+     |   user   |       |make            |       |  module  |
+     |          |       |make test       |       |          |
+     |          |       |make install    |       |          |
+     +----------+  ^^^  +----------------+  ^^^  +----------+
+                   |||                      |||   
+                    ||Gap filled             ||Gap for
+                     |by CPAN.pm              |options software
+
+
+	* hosts statistics: the host with the most unsuccessful downloads is
+	which? Of course the one that lead the urllist. That doesn't prove
+	anything.
+
+	* document build_requires and when you talk about prerequisites, name
+	the option names explicitly.
+
+	* answer Sendu Bala two mails, one private, one on cpan-workers
+
+2006-11-21  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* From a mail I sent to Slaven about Tk:
+
+Mit 20002 bekomme ich t/regexp.t     2   512    21    2  10-11
+Mit 29332             t/regexp.t     0    11    21   36  4-21
+
+Letzteres entspricht wohl Deinem Coredump.
+
+Noch sehe ich keine wirklich saubere Strategie fuer binsearch. Die
+bereits frueher angewendete mit 'notest install' zuerst und dann
+nochmaligem test von regexp.t scheint die einfachste im Moment. Den
+habe ich auch grade eben gestartet.
+
+Sauber waere wohl, wenn man 'make test' dazu bringen koennte, nur
+schlicht und einfach ein einziges Skript aufzurufen. --> Todo
+
+	* After all the prereq hassles with XML::Atom I finally could install it
+	for perl 20002 after many manual interventions but without overrule
+	(except when we call the XML::LibXML=1.61003 decision as an overrule)
+
+	After the same hassles under 29332 I see the test failure
+
+t/02-content...........NOK 23/32                                             
+#   Failed test at t/02-content.t line 62.
+#          got: 'xml'
+#     expected: 'base64'
+# Looks like you failed 1 test of 32.
+t/02-content...........dubious                                               
+        Test returned status 1 (wstat 256, 0x100)
+DIED. FAILED test 23
+        Failed 1/32 tests, 96.88% okay
+
+	This means that if I just got the proper prerequisites I'd have run a
+	binarysearch in no time.
+
+*** Module::AutoInstall version 1.030
+*** Checking for Perl dependencies...
+[Core Features]
+- MIME::Base64             ...loaded. (3.07_0100)
+- URI                      ...missing.
+- Class::Data::Inheritable ...missing.
+==> Auto-install the 2 mandatory module(s) from CPAN? [y] y
+[Faster XML parsing with libxml]
+- XML::LibXML              ...missing. (would need 1.54)
+==> Auto-install the 1 optional module(s) from CPAN? [y] y
+[Pure perl XML parsing with XML::XPath]
+- XML::XPath               ...missing.
+==> Auto-install the 1 optional module(s) from CPAN? [n] y
+[Client/Server for Atom API]
+- LWP                      ...missing.
+- LWP::Authen::Wsse        ...missing.
+- Digest::SHA1             ...missing.
+- DateTime                 ...missing.
+==> Auto-install the 4 optional module(s) from CPAN? [y] y
+[Feed and API Auto-discovery]
+- HTML::Parser             ...missing.
+==> Auto-install the 1 optional module(s) from CPAN? [y] y
+CPAN: File::HomeDir loaded ok
+*** Dependencies will be installed the next time you type 'make'.
+    (You may need to do that as the 'root' user.)
+*** Module::AutoInstall configuration finished.
+
+	Next step is to document what is wrong with the prereqs and present the
+	findings to author.
+
+	1. Test fails on XML::XPath.         requires bug
+	2. Ditto on LWP::UserAgent           requires bug
+	3. Ditto on Digest::SHA1             requires bug
+	4. Ditto on DateTime                 requires bug
+	5. Ditto on XML::LibXML not so obviously!) requires bug
+
+	XML::XPath
+	LWP::UserAgent
+	Digest::SHA1
+	DateTime
+	XML::LibXML
+	
+	It may be the case that the author thought that a user that says no to
+	an optional feature will accept failing tests. But I'd expect that if I
+	say no to a feature then this feature is not tested at all. And I'd
+	argue this is important because a user can usually not reliably
+	differentiate proprely between failing tests due to bugs and failing
+	tests due to missing prereqs. No bug on Module::AutoInstall side.
+
+	Now our manual binary search stands at 27069(ok) and 29332(not ok) and
+	our patch seems to be clear: add the above 5 modules to requires and not
+	as optional modules.
+
+	Done and it worked with 28618.
+
+	* Need a way to specify a different distribution for a module. Say, we
+	realize that the officially current XML::LibXML 1.62 is broken but some
+	PAJAS/XML-LibXML-1.61003.tar.gz still works. I think, I'd like
+
+	  ->{goto} = "PAJAS/XML-LibXML-1.61003.tar.gz"
 
 	DONE
 
-	* Todo: offer the choice between (readline) Gnu and Perl and Coro. See
-	my trials in the bin/ directory (SVN only)
+	* Need a way to specify notest from distroprefs. When we know Strptime
+	doesn't pass a test but we know that the problem is harmless or can be
+	ignored for some reason. I think, I'd like ->{test}{skip} = 1
 
-	* Mail::Send problem persists that Test::Reporter's mails do not arrive
-	when sent with Mail::Send but do when sent with Net::SMTP (IIRC). In any
-	case I must disable installation of Mail::Send somehow or debug.
-	Test::Reporter has got a wish item via RT already some weeks ago.
+	* Todo: LWP::Authen::Wsse is an optional prereq of XML::Atom but did not
+	get installed. Need to find out how to signal to AutoInstall that I want
+	all recommendations installed. Ahh, I find that XML::Atom not only uses
+	AutoInstall but also Module::Build and that writes a _build/prereq file
+	and I could read that. I would then find that 'recommends' hashref and I
+	could then start installing what I find there.
 
-	* Bug: Uuuuuh, pressing ^C and then trying an illegal command, ugliness:
+	But how do I know that the user wants that the recommendations be
+	installed?
 
-	LWP failed with code[500] message[read timeout]
-Trying to get away with old file:
-6114541  500 -rw-rw-r--  1 1000     1000       504953 Nov  8 08:02 /home/k/.cpan/sources/modules/02packages.details.txt.gz
-Going to read /home/k/.cpan/sources/modules/02packages.details.txt.gz
-  Database was generated on Tue, 07 Nov 2006 12:25:12 GMT
-.
-Caught SIGINT, trying to continue
+	While watching what Module::Install is doing and trying out variations I
+	get the impression that I have no chance to do the right thing. If the
+	user says, he wants the recommendations, they still do not end up in
+	META.yml or _build/prereqs or where else should I look?
+
+	After the user has said that he wants everything, we see
+
+Checking prerequisites...
+ * Optional prerequisite LWP::Authen::Wsse is not installed
+ * Optional prerequisite XML::LibXML is not installed
+ * Optional prerequisite DateTime is not installed
+
+	But nobody builds or installs them. I find them nowhere in the build
+	directory stored away. And yet, when I test XML::Atom, it requires it
+	magically and I have to install them manually.
+
+2006-11-20  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Randy sent rkobes-cpan4.diff which should fit to cvs rev. 1.21 of
+	CPAN/SQLite.pm.
+
+	* Todo: the order of lines in the "failed" command or "failed" report
+	section is, given identical command ID, I believe, random. Need a
+	timestamp for finer granular sorting. That would make the listing much
+	more useful because the first is the most important, all others may be
+	followup errors.
+
+2006-11-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Todo: write a Makefile target for the 3 *.dd files in distroprefs DONE
+
+	* Todo: Storable support for distroprefs DONE
+
+2006-11-18  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Since I fixed the bootstrapping problem of YAML/Expect/ReadLine by
+	allowing fallback dd files, I thought that now I would be able to run
+	binary searches more often for broken (or unexpectedly fixed) modules.
+	My first victim should be DateTime::Format::Strptime. But binary search
+	converged towards 2794[123] and it was so obvious from mere watching
+	that this turning point was not the Strptime problem but some other
+	Params::Validate related problem. P:V 0.86 broke at 27942 and so
+	DateTime could not be built and Date::Time::Locale could not be built
+	and Strptime could also not pass its tests.
+
+	At some point in time later P:V worked again and so we have this
+	eclipse: at 27942 the still working Strptime disappeared in the shadow
+	of P:V and when P:V started to work again, Strptime was broken (or was
+	it not?). If it broke we cannot see where it broke unless we start
+	another higher level view that throws extra patches around.
+
+	The good news is that we can determine the duration of the eclipse of
+	P:V: it broke at 27942 and reappeared between 28156 and 28181 (closer
+	examination pending).
+
+	Very nice: Strptime worked with 28181 and so we can run another binary
+	search between 28181 and 29312. Breakage at 28325 and report sent to P5P
+
+	* kwalify schema language: http://rubyforge.org/frs/?group_id=815&release_id=5513
+
+	Yaml mode: http://svn.clouder.jp/repos/public/yaml-mode/trunk
+
+	cvs -d :pserver:anonymous@srezic.cvs.sourceforge.net:/cvsroot/srezic co Kwalify
+
+	/home/src/perl/srezic/Kwalify/.
+
+	Todo: integrate schemacheck into a test and put Kwalify into the Bundle
+
+	for f in distroprefs/*.yml; do
+	  /home/src/perl/repoperls/installed-perls/perl/pSI5eZY/perl-5.8.0@29319/bin/pkwalify -f cpan_distroprefs_schema.yml $f 
+	done
+
+2006-11-17  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* make _get_urllist a public method for Randy.
+
+	* Write manpage for CPAN::HandleConfig, esp load().
+
+	* I realize that CPAN::FTP::localize is undocumented and is what Randy
+	wants.
+
+	* why is reuse_old_builddir (sp?) turned off in degraded mode? I think
+	there is no good reason. FIXED
+
+	* Observed that the E of DONE is in the second line during "03". Take
+	the algorithm in reanimate_build_dir() around line 4175 in all three
+	index files. It's easier to read and workd even for @items < 76. DONE
+
+	* display the commandid during the failed command -- just for a while. I
+	want to see how big the holes are and if they look plausible. -- They
+	have all the same number! FIXED
+
+	* Bug: ~/.cpan/sources/modules is full with backup files FIXED in 1360
+
+2006-11-16  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* I just added the decicive line to Makefile.PL so that I can
+	conveniently start messing around with CPAN::SQLite support:
+
+	/home/src/perl/cpan-sql-stuff/CPAN-SQLite/.   # (!)
+
+	% make run-with-sqlite
+/home/src/perl/repoperls/installed-perls/perl/pDtzfB5/perl-5.8.0@29285/bin/perl -I$HOME/.cpan -Ilib -MCPAN::SQLite -MCPAN::MyConfig -MCPAN -e '$CPAN::Config->{use_sqlite}++; shell'
+CPAN: Term::ANSIColor loaded ok (v1.11)
+
+cpan shell -- CPAN exploration and modules installation (v1.8862)
+ReadLine support enabled
+
+cpan[1]> d MSCHILLI/Log-Log4perl-1.07.tar.gz                
+CPAN: YAML::Syck loaded ok (v0.71)
+Going to read /home/k/.cpan/build/
+............................................................................DONE
+Found 593 old builds, restored the state of 337
+Updating database file ...
+Can't exec "cpandb": No such file or directory at /home/src/perl/repoperls/installed-perls/perl/pDtzfB5/perl-5.8.0@29285/lib/site_perl/5.9.5/CPAN/SQLite/META.pm line 179.
+system cpandb --update failed: -1 at /home/src/perl/repoperls/installed-perls/perl/pDtzfB5/perl-5.8.0@29285/lib/site_perl/5.9.5/CPAN/SQLite/META.pm line 179.
+ at lib/CPAN.pm line 276
+        CPAN::shell() called at -e line 1
+
+
+	Uh. Patch rkobes-cpan3.diff backed out. Now I probably know where to start.
+
+2006-11-15  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Integrate freshness into hosts stats. (#17353)
+
+	* Integrate hosts into $META like authors, distributions, and modules?
+	If we're cautious, this might turn into an automatic optimization.
+
+	If Coro does index downloads for us, we do not have to fear slow
+	connections and can gather better data.
+
+	* Allow dd or st files instead of yml in distroprefs for bootstrapping
+	purpose. DONE
+
+2006-11-14  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Todo: avoid ->can everywhere and replace with UNIVERSAL::can. See
+	Adriano Rodrigues' bugreport. DONE
+
+	* Randy says:
+
+	The only data CPAN::SQLite really needs from CPAN.pm is:
+	- a location to store the database file; for this,
+	it's presently using $CPAN::Config->{cpan_home},
+	which I believe is the same location as Metadata;
+	- the name of the database file; in this I've been
+	using a new config entry $CPAN::Config->{sqlite_dbname},
+	or 'cpandb-sqlite', as a default;
+	- the location (directory) beneath which the CPAN
+	indices are kept; I've been using
+	$CPAN::Config->{keep_source_where}, assuming
+	it's a simple directory.
 	
-cpan> hosts
-Refusing to autoload 'hosts' while signal pending at lib/CPAN.pm line 590.
+	The guessing for this in CPAN::SQLite comes when it's
+	not being run under CPAN.pm.
+	
+	As for CPAN::SQLite providing data to CPAN.pm,
+	that's being done solely in CPAN::SQLite::META,
+	and it uses
+	  $CPAN::META->instance($class => $id)->set(%data);
+	for everything, except for CONTAINSMODS, where
+	it uses
+	  $d = $CPAN::META->instance($class => $id);
+	  $d->{CONTAINSMODS} = \%list_of_mods;
+	
+	* Catalyst would be another candidate for a large dependency list.
 
+	* Guessing of -p0/-p1 for patch maybe wrong if the patch tries to create
+	a new file against, say, /dev/null.
 
-	* if we make the TTLs setable, maybe we should make the TTL for
-	CHECKSUMS file too. In any case we have the problem of imacat also when
-	the TTL of the local copy of the CHECKSUMS file has not yet been
-	reached!
+	* Expect structure. We can leave expect as it is but expect-in-any-order
+	needs a way to set the timeout. The structure must change, I fear.
+
+	* Would be nice: integrate the config variable name into the init
+	dialogs such that one has a chance to learn their names over time.
+
+	* Would be nice: 'o conf /check/' to list all variables matching a regex.
+
+	* This looks silly:
+
+	cpan[15]> o conf commit
+commit: wrote '/home/k/.cpan/CPAN/MyConfig.pm'
+Please use 'o conf commit' to make the config permanent!
+
+	FIXED
+
+	* SQL-Translator-0.07 has a broken signature
+	(reported 9 months ago at
+	https://rt.cpan.org/Ticket/Display.html?id=16852). When trying to
+	install CLACO/Handel-0.99_15 I see this warning running by quite often
+	instead of only once and testing of it again and again. And the same for
+	Email-Valid and DBIx-Class-Validation.
+
+	Why?
+
+  CLACO/Handel-0.99_15.tar.gz
+  /usr/bin/make test -- NOT OK
+Failed during this command:
+  LYOKATO/FormValidator-Simple-0.19.tar.gz     : make_test NO
+  MIYAGAWA/Email-Valid-Loose-0.05.tar.gz       : make_test NO
+  CLACO/DBIx-Class-Validation-0.01001.tar.gz   : make_test NO
+  DROLSKY/DateTime-Format-MySQL-0.04.tar.gz    : make_test NO
+  RICKM/DateTime-Format-Strptime-1.0700.tar.gz : make_test NO
+  CLACO/DBIx-Class-UUIDColumns-0.01000.tar.gz  : make_test NO one dependency not OK (SQL::Translator)
+  RJBS/Email-Valid-0.176.tar.gz                : make_test NO
+  DROLSKY/DateTime-Format-Builder-0.7807.tar.gz: make_test NO
+  KCLARK/SQL-Translator-0.07.tar.gz            : signature_verify NO
+  CLACO/Handel-0.99_15.tar.gz                  : make_test NO
+
+	Besides the need to find out why the tests are repeated so often, it may
+	be a good idea to support check_sigs via distroprefs.
+
+	* I realize that it's quite pointless to try downloading with "fancy"
+	when there is Net::FTP installed. OTOH, *sometimes* it may be clueful. I
+	should explain in a FAQ that it makes sense to disable the externel
+	programs once one has Net::FTP and LWP. The problem only appears if you
+	have many hosts in the urllist and try to download a fresh file: here
+	you want to try only with one method and cycle through the hosts
+	quickly.
+
+2006-11-13  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Randy Kobes needs an API to find out where the index files are
+	located. And the whole SQLite needs to be integrated. First question is
+	what do we use from it. Only the readonly stuff, I suppose. And the
+	urllist. And all this might need to be combined with the TTL stuff and
+	separate loading of index files.
 
 	* Bug that has to do with install_tested or build_dir_reuse or degraded
 	shell mode or some use of ^C at the wrong moment:
@@ -113,6 +784,33 @@ Refusing to autoload 'hosts' while signal pending at lib/CPAN.pm line 590.
 	At least I get the impression this extreme case happens only on ^C, but
 	some other methods of dieing will certainly exist as well.
 
+	* Todo: offer the choice between (readline) Gnu and Perl and Coro. See
+	my trials in the bin/ directory (SVN only)
+
+	* Mail::Send problem persists that Test::Reporter's mails do not arrive
+	when sent with Mail::Send but do when sent with Net::SMTP (IIRC). In any
+	case I must disable installation of Mail::Send somehow or debug.
+	Test::Reporter has got a wish item via RT already some weeks ago.
+
+	* Bug: Uuuuuh, pressing ^C and then trying an illegal command, ugliness:
+
+	LWP failed with code[500] message[read timeout]
+Trying to get away with old file:
+6114541  500 -rw-rw-r--  1 1000     1000       504953 Nov  8 08:02 /home/k/.cpan/sources/modules/02packages.details.txt.gz
+Going to read /home/k/.cpan/sources/modules/02packages.details.txt.gz
+  Database was generated on Tue, 07 Nov 2006 12:25:12 GMT
+.
+Caught SIGINT, trying to continue
+	
+cpan> hosts
+Refusing to autoload 'hosts' while signal pending at lib/CPAN.pm line 590.
+
+
+	* if we make the TTLs setable, maybe we should make the TTL for
+	CHECKSUMS file too. In any case we have the problem of imacat also when
+	the TTL of the local copy of the CHECKSUMS file has not yet been
+	reached!
+
 	* Coro. See also notes below, search for anyevent	
 
 	* Observing in a shell in degraded mode: it wrote a new Metadata file.
@@ -129,10 +827,6 @@ Refusing to autoload 'hosts' while signal pending at lib/CPAN.pm line 590.
 	* write a patch for Test::Reporter so you can choose the mail sending
 	module? Reported 2005-07:
 	http://rt.cpan.org/Ticket/Display.html?id=13836
-
-	* Randy Kobes needs an API to find out where the index files are
-	located. And the whole SQLite needs to be integrated. First question is
-	what do we use from it. Only the readonly stuff, I suppose.
 
 	* Investigate if I want Math::Bigint::GMP in the core. Think of
 	Crypt::DH and the horrible test timings when Math::Bigint::GMP is not
@@ -320,6 +1014,60 @@ need the middle man.
 	* hr ================ no todos below this line ================ /hr
 
 	* hr ================ no todos below this line ================ /hr
+
+2006-11-12  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* BUG: randomize_urllist cannot be set on the shell commandline: because
+	it ends in "list", it becomes always an array:))
+
+	FIXED
+
+	* Todo: guess the patch option -p0 or -p1
+
+	DONE
+
+	* distroprefs with artificial intelligence: find out how to write a
+	distropref with so much AI that it handles several different dialogues.
+	I just realized that YAML::Syck talked me into a different dialogue on
+	some older bleadperl that had YAML 0.60 installed:
+
+*** WARNING ***
+
+This release breaks compatibility with versions earlier than version 0.60 of
+YAML::Syck and YAML.pm when serializing blessed references.
+
+See the COMPATIBILITY file for more information.
+
+*** Pre-0.60 version of YAML.pm (0.53) detected.
+Continue installing YAML::Syck? [y]
+
+	We would like to answer to this question yes if it comes. Or we would
+	like to upgrade YAML first.
+
+	One would think that Expect collects data and compares them to a pool of
+	regular expressions each of which has an associated answer. As soon as
+	one expression matches, its answer is given and it is taken out of the
+	pool. On EOF do not even complain. Very similar to what we do now. Is it
+	even worth to keep the current interface? Yes, because it has the
+	potential to break. Because Expect itself does not provide it. We must
+	write some code in between:
+
+	Variant 1: match on /./, look at the whole collected string, do the
+	match loop. On success do as we do now, on failure continue as we do
+	now. On timeout do like we do now. On EOF exit the loop silently. As
+	test write a distro that asks 12 questions in random order and dies if
+	the wrong answer is given.
+
+	Variant 2: match on /./ until timeout is reached. Now do your own
+	matching. On success do as we do now, on failure give up. One question
+	that we cannot answer is too much. There is no timeout error, just a "no
+	prepared regex matches the question". On EOF exit the loop silently.
+
+	Variant 2 is much better.
+
+	Today I wrote CPAN-Test-Dummy-Perl5-Make-Expect-1.00.tar.gz for that.
+
+	DONE
 
 2006-11-11  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
 
@@ -677,9 +1425,9 @@ Fetching with Net::FTP
 	I want to share the build_dir first because this is currently the most
 	dangerous spot. I suppose we can have it by using File::Temp for the
 	individual build_dir. We would have to turn off build_dir_reuse for the
-	second process. Nobody would ever overwrite a build_dir. Some guys would
-	remove old directories and this would do no harm. Should be done in rev.
-	1183.
+	second process (Update 2006-11-17: Why?). Nobody would ever overwrite a
+	build_dir. Some guys would remove old directories and this would do no
+	harm. Should be done in rev. 1183.
 
 	Even if the second uses the same perl as the first one, we could coexist
 	because many commands scan the INC repeatedly. Things we do not scan
@@ -1307,6 +2055,9 @@ drwxr-xr-x  35 k k     8192 Oct 15 21:19 perl-p-5.8.0@29023/
 	No XML::SAX::ExpatXS
 
 	Finished installing prereqs, all tests except Mysql pass which is OK.
+	(mysql fails for me only because my mysql has no password and you cannot
+	specify on the commandline that it has no passwd. You can only specify A
+	password but it must not be empty)
 
 	make install is OK.
 
