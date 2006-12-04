@@ -13,11 +13,12 @@ use vars qw($VERSION);
 use vars qw(@DD_PREFS @ST_PREFS);
 
 @DD_PREFS = qw(
-               GBARR.libnet
-               ILYAZ.Term-ReadLine-Perl
-               INGY.YAML
-               RGIERSIG.Expect
-               ABW.Template-Toolkit
+               distroprefs/GBARR.libnet
+               distroprefs/ILYAZ.Term-ReadLine-Perl
+               distroprefs/INGY.YAML
+               distroprefs/RGIERSIG.Expect
+               distroprefs/ABW.Template-Toolkit
+               lib/CPAN/Kwalify/distroprefs
               );
 
 @ST_PREFS = qw(
@@ -205,11 +206,17 @@ ALL_PERLS = /usr/bin/perl \
 # not sorted because order matters
 MEGA_COLLECTION = Expect \
 		Bundle::CPANxxl \
+		CPAN::DistnameInfo \
+		DBI \
+		/home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
+		Kwalify \
 		Font::TTF \
 		CDB_File \
 		Math::BigInt::GMP \
 		IPC::ShareLite \
-		Plagger Bundle::Phalanx100 \
+		Data::Dump \
+		Plagger \
+		Bundle::Phalanx100 \
 		Jifty \
 		Coro \
 		Getopt::Euclid \
@@ -226,10 +233,8 @@ MEGA_COLLECTION = Expect \
 		SVN::Notify::Config \
 		SVN::Notify::Mirror \
 		Term::ReadLine::Gnu \
-		CPAN::DistnameInfo \
 		Event::Lib \
-		Kwalify \
-		/home/src/perl/cpan-sql-stuff/CPAN-SQLite/.
+		Math::Approx::Symbolic \
 
 }
 }
@@ -294,7 +299,7 @@ run :
 	$(PERL) -Ilib -MCPAN -eshell
 
 run-with-sqlite :
-	$(PERL) -I$$HOME/.cpan -Ilib -MCPAN::SQLite -MCPAN::MyConfig -MCPAN -e '$$CPAN::Config->{use_sqlite}++; $$CPAN::Config->{sqlite_dbname}="/home/k/.cpan/cpandb-sqlite"; shell'
+	$(PERL) -I$$HOME/.cpan -Ilib -MCPAN::SQLite -MCPAN::MyConfig -MCPAN -e '$$CPAN::Config->{use_sqlite}++; $$CPAN::Config->{sqlite_dbname}="cpandb-sqlite"; shell'
 
 testrun_very_offline : rm_mirrored_by run_emu_offline
 
@@ -576,20 +581,21 @@ st-prefs ::
 
   for my $base (@main::DD_PREFS) {
     push @m, qq{
-dd-prefs :: distroprefs/$base.dd
+dd-prefs :: $base.dd
 
-distroprefs/$base.dd :
-	ysh < distroprefs/$base.yml > distroprefs/$base.dd
+$base.dd : Makefile
+	echo "SKIPPING ysh -MYAML::Syck < $base.yml > $base.dd.new && mv $base.dd.new $base.dd"
+	\$(PERL) -MYAML::Syck=LoadFile -MData::Dumper -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); print Data::Dumper->new(\\\@y)->Indent(1)->Useqq(1)->Purity(1)->Dump' $base > $base.dd.new && mv $base.dd.new $base.dd
 
 };
   }
 
   for my $base (@main::ST_PREFS) {
     push @m, qq{
-st-prefs :: distroprefs/$base.st
+st-prefs :: $base.st
 
-distroprefs/$base.st : Makefile
-	\$(PERL) -MYAML::Syck=LoadFile -MStorable=nstore -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); nstore(\\\@y, "\$\$x.st")' distroprefs/$base
+$base.st : Makefile
+	\$(PERL) -MYAML::Syck=LoadFile -MStorable=nstore -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); nstore(\\\@y, "\$\$x.st")' $base
 
 };
   }

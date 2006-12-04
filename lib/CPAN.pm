@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_63';
+$CPAN::VERSION = '1.88_64';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -268,7 +268,7 @@ ReadLine support %s
                 require Carp;
                 Carp::cluck($@);
             }
-            if ($command =~ /^(make|test|install|force|notest|clean|report|upgrade)$/) {
+            if ($command =~ /^(make|test|install|ff?orce|notest|clean|report|upgrade)$/) {
                 CPAN::Shell->failed($CPAN::CurrentCommandId,1);
             }
             soft_chdir_with_alternatives(\@cwd);
@@ -1266,7 +1266,7 @@ sub tidyup {
 				     $self->{DU}, $self->{'MAX'})
 			    );
     return if $CPAN::Signal;
-    $self->force_clean_cache($toremove);
+    $self->_clean_cache($toremove);
     return if $CPAN::Signal;
   }
 }
@@ -1356,11 +1356,12 @@ sub disk_usage {
     $self->{DU};
 }
 
-#-> sub CPAN::CacheMgr::force_clean_cache ;
-sub force_clean_cache {
+#-> sub CPAN::CacheMgr::_clean_cache ;
+sub _clean_cache {
     my($self,$dir) = @_;
     return unless -e $dir;
-    unless (File::Basename::dirname($dir) eq $CPAN::Config->{build_dir}) {
+    unless (File::Spec->canonpath(File::Basename::dirname($dir))
+	    eq File::Spec->canonpath($CPAN::Config->{build_dir})) {
         $CPAN::Frontend->mywarn("Directory '$dir' not below $CPAN::Config->{build_dir}, ".
                                 "will not remove\n");
         $CPAN::Frontend->mysleep(5);
@@ -1445,8 +1446,8 @@ Upgrade
  upgrade  WORDs or /REGEXP/ or NONE    upgrade some/matching/all modules
 
 Pragmas
- force COMMAND    unconditionally do command
- notest COMMAND   skip testing
+ force  CMD    try hard to do command
+ notest CMD    skip testing
 
 Other
  h,?           display this menu       ! perl-code   eval a perl command
@@ -1822,13 +1823,14 @@ sub reload {
         my $failed;
         my @relo = (
                     "CPAN.pm",
-                    "CPAN/HandleConfig.pm",
-                    "CPAN/FirstTime.pm",
-                    "CPAN/Tarzip.pm",
                     "CPAN/Debug.pm",
-                    "CPAN/Version.pm",
+                    "CPAN/FirstTime.pm",
+                    "CPAN/HandleConfig.pm",
+                    "CPAN/Kwalify.pm",
                     "CPAN/Queue.pm",
                     "CPAN/Reporter.pm",
+                    "CPAN/Tarzip.pm",
+                    "CPAN/Version.pm",
                    );
       MFILE: for my $f (@relo) {
             next unless exists $INC{$f};
@@ -1837,7 +1839,7 @@ sub reload {
             $p =~ s|/|::|g;
             $CPAN::Frontend->myprint("($p");
             local($SIG{__WARN__}) = paintdots_onreload(\$redef);
-            $self->reload_this($f) or $failed++;
+            $self->_reload_this($f) or $failed++;
             my $v = eval "$p\::->VERSION";
             $CPAN::Frontend->myprint("v$v)");
         }
@@ -1856,8 +1858,8 @@ index    re-reads the index files\n});
 }
 
 # reload means only load again what we have loaded before
-#-> sub CPAN::Shell::reload_this ;
-sub reload_this {
+#-> sub CPAN::Shell::_reload_this ;
+sub _reload_this {
     my($self,$f,$args) = @_;
     CPAN->debug("f[$f]") if $CPAN::DEBUG;
     return 1 unless $INC{$f}; # we never loaded this, so we do not
@@ -1891,7 +1893,7 @@ sub reload_this {
     $reload->{$f} ||= $^T;
     my $must_reload = $mtime > $reload->{$f};
     $args ||= {};
-    $must_reload ||= $args->{force};
+    $must_reload ||= $args->{reloforce};
     if ($must_reload) {
         my $fh = FileHandle->new($file) or
             $CPAN::Frontend->mydie("Could not open $file: $!");
@@ -1963,7 +1965,7 @@ sub recompile {
                             # don't do it twice
 	$cpan_file = $module->cpan_file;
 	my $pack = $CPAN::META->instance('CPAN::Distribution',$cpan_file);
-	$pack->force;
+	$pack->force; # 
 	$dist{$cpan_file}++;
     }
     for $cpan_file (sort keys %dist) {
@@ -4277,8 +4279,9 @@ sub reload_x {
 #-> sub CPAN::Index::rd_authindex ;
 sub rd_authindex {
     my($cl, $index_target) = @_;
-    my @lines;
     return unless defined $index_target;
+    return if $CPAN::Config->{use_sqlite};
+    my @lines;
     $CPAN::Frontend->myprint("Going to read $index_target\n");
     local(*FH);
     tie *FH, 'CPAN::Tarzip', $index_target;
@@ -4318,6 +4321,7 @@ sub userid {
 sub rd_modpacks {
     my($self, $index_target) = @_;
     return unless defined $index_target;
+    return if $CPAN::Config->{use_sqlite};
     $CPAN::Frontend->myprint("Going to read $index_target\n");
     my $fh = CPAN::Tarzip->TIEHANDLE($index_target);
     local $_;
@@ -4530,6 +4534,7 @@ happen.\a
 sub rd_modlist {
     my($cl,$index_target) = @_;
     return unless defined $index_target;
+    return if $CPAN::Config->{use_sqlite};
     $CPAN::Frontend->myprint("Going to read $index_target\n");
     my $fh = CPAN::Tarzip->TIEHANDLE($index_target);
     local $_;
@@ -4581,6 +4586,7 @@ sub rd_modlist {
 sub write_metadata_cache {
     my($self) = @_;
     return unless $CPAN::Config->{'cache_metadata'};
+    return if $CPAN::Config->{use_sqlite};
     return unless $CPAN::META->has_usable("Storable");
     my $cache;
     foreach my $k (qw(CPAN::Bundle CPAN::Author CPAN::Module
@@ -4600,6 +4606,7 @@ sub write_metadata_cache {
 sub read_metadata_cache {
     my($self) = @_;
     return unless $CPAN::Config->{'cache_metadata'};
+    return if $CPAN::Config->{use_sqlite};
     return unless $CPAN::META->has_usable("Storable");
     my $metadata_file = File::Spec->catfile($CPAN::Config->{cpan_home},"Metadata");
     return unless -r $metadata_file and -f $metadata_file;
@@ -5535,7 +5542,8 @@ EOF
 sub store_persistent_state {
     my($self) = @_;
     my $dir = $self->{build_dir};
-    unless (File::Basename::dirname($dir) eq $CPAN::Config->{build_dir}) {
+    unless (File::Spec->canonpath(File::Basename::dirname($dir))
+	    eq File::Spec->canonpath($CPAN::Config->{build_dir})) {
         $CPAN::Frontend->mywarn("Directory '$dir' not below $CPAN::Config->{build_dir}, ".
                                 "will not store persistent state\n");
         return;
@@ -6212,7 +6220,7 @@ sub eq_CHECKSUM {
 #-> sub CPAN::Distribution::force ;
 sub force {
   my($self, $method) = @_;
-  for my $att (qw(
+ ATTRIBUTE: for my $att (qw(
                   CHECKSUM_STATUS
                   archived
                   badtestcnt
@@ -6232,8 +6240,12 @@ sub force {
                   writemakefile
                   yaml_content
  )) {
-    delete $self->{$att};
-    CPAN->debug(sprintf "att[%s]", $att) if $CPAN::DEBUG;
+      if ($self->id =~ /\.$/ && $att =~ /(unwrapped|build_dir)/ ) {
+          # cannot be undone for local distros
+          next ATTRIBUTE;
+      }
+      delete $self->{$att};
+      CPAN->debug(sprintf "att[%s]", $att) if $CPAN::DEBUG;
   }
   if ($method && $method =~ /make|test|install/) {
     $self->{"force_update"}++; # name should probably have been force_install
@@ -6713,6 +6725,22 @@ expected[$regex]\nbut[$but]\n\n");
     return $expo->exitstatus();
 }
 
+sub _validate_distropref {
+    my($self,@args) = @_;
+    if (
+        $CPAN::META->has_inst("CPAN::Kwalify")
+        &&
+        $CPAN::META->has_inst("Kwalify")
+       ) {
+        eval {CPAN::Kwalify::_validate("distroprefs",@args);};
+        if ($@) {
+            $CPAN::Frontend->mywarn($@);
+        }
+    } else {
+        CPAN->debug("not validating '@args'") if $CPAN::DEBUG;
+    }
+}
+
 # CPAN::Distribution::_find_prefs
 sub _find_prefs {
     my($self) = @_;
@@ -6793,6 +6821,7 @@ sub _find_prefs {
                 # $DB::single=1;
               ELEMENT: for my $y (0..$#distropref) {
                     my $distropref = $distropref[$y];
+                    $self->_validate_distropref($distropref,$abs,$y);
                     my $match = $distropref->{match};
                     unless ($match) {
                         CPAN->debug("no 'match' in abs[$abs], skipping");
@@ -7109,7 +7138,8 @@ sub prereq_pm {
         $breq =  $yaml->{build_requires} || {};
         undef $req unless ref $req eq "HASH" && %$req;
         if ($req) {
-            if ($yaml->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
+            if ($yaml->{generated_by} &&
+                $yaml->{generated_by} =~ /ExtUtils::MakeMaker version ([\d\._]+)/) {
                 my $eummv = do { local $^W = 0; $1+0; };
                 if ($eummv < 6.2501) {
                     # thanks to Slaven for digging that out: MM before
@@ -7519,6 +7549,7 @@ sub clean {
 sub goto {
     my($self,$goto) = @_;
     my($method) = (caller(1))[3];
+    $goto = $self->normalize($goto);
     CPAN->instance("CPAN::Distribution",$goto)->$method;
 }
 
@@ -9292,12 +9323,12 @@ objects may be bundles, modules or distributions.
 
 =item CPAN::Bundle::force($method,@args)
 
-Forces CPAN to perform a task that normally would have failed. Force
-takes as arguments a method name to be called and any number of
-additional arguments that should be passed to the called method. The
-internals of the object get the needed changes so that CPAN.pm does
-not refuse to take the action. The C<force> is passed recursively to
-all contained objects.
+Forces CPAN to perform a task that it normally would have refused to
+do. Force takes as arguments a method name to be called and any number
+of additional arguments that should be passed to the called method.
+The internals of the object get the needed changes so that CPAN.pm
+does not refuse to take the action. The C<force> is passed recursively
+to all contained objects.
 
 =item CPAN::Bundle::get()
 
@@ -10577,10 +10608,12 @@ See L<http://www.perl.com/perl/misc/Artistic.html>
 =head1 TRANSLATIONS
 
 Kawai,Takanori provides a Japanese translation of this manpage at
-http://member.nifty.ne.jp/hippo2000/perltips/CPAN.htm
+http://homepage3.nifty.com/hippo2000/perltips/CPAN.htm
 
 =head1 SEE ALSO
 
 cpan(1), CPAN::Nox(3pm), CPAN::Version(3pm)
 
 =cut
+
+
