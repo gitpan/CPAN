@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_64';
+$CPAN::VERSION = '1.88_65';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -425,10 +425,15 @@ sub _init_sqlite () {
             &&
             $CPAN::META->has_inst("CPAN::SQLite::META")
            ) {
-        $CPAN::Frontend->mywarn(qq{SQLite not installed, cannot work with CPAN::SQLite});
+        $CPAN::Frontend->mywarn(qq{SQLite not installed, cannot work with CPAN::SQLite})
+            unless $Have_warned->{"CPAN::SQLite"}++;
         return;
     }
     $CPAN::SQLite ||= CPAN::SQLite::META->new($CPAN::META);
+}
+
+sub _sqlite_running {
+    ($CPAN::Config->{use_sqlite} && _init_sqlite()) ? 1 : 0;
 }
 
 package CPAN::CacheMgr;
@@ -971,7 +976,7 @@ sub exists {
     ### Carp::croak "exists called without class argument" unless $class;
     $id ||= "";
     $id =~ s/:+/::/g if $class eq "CPAN::Module";
-    if ($CPAN::Config->{use_sqlite} && CPAN::_init_sqlite) { # not yet officially supported
+    if (CPAN::_sqlite_running) {
         return (exists $META->{readonly}{$class}{$id} or
                 $CPAN::SQLite->set($class, $id));
     } else {
@@ -2445,7 +2450,7 @@ sub expand_by_method {
                     defined $command ? $command : "UNDEFINED",
                    ) if $CPAN::DEBUG;
 	if (defined $regex) {
-            if ($CPAN::Config->{use_sqlite} && CPAN::_init_sqlite) { # not yet officially supported
+            if (CPAN::_sqlite_running) {
                 $CPAN::SQLite->search($class, $regex);
             }
             for $obj (
@@ -2718,7 +2723,7 @@ sub setup_output {
 }
 
 #-> sub CPAN::Shell::rematein ;
-# RE-adme||MA-ke||TE-st||IN-stall
+# RE-adme||MA-ke||TE-st||IN-stall : nearly everything runs through here
 sub rematein {
     my $self = shift;
     my($meth,@some) = @_;
@@ -2843,14 +2848,29 @@ to find objects with matching identifiers.
 		$obj->$pragma($meth);
 	    }
         }
-        if ($obj->can('called_for')) {
+        if (UNIVERSAL::can($obj, 'called_for')) {
             $obj->called_for($s);
         }
         CPAN->debug(qq{pragma[@pragma]meth[$meth]}.
                     qq{ID[$obj->{ID}]}) if $CPAN::DEBUG;
 
         push @qcopy, $obj;
-        if ($obj->$meth()){
+        if (! UNIVERSAL::can($obj,$meth)) {
+            # Must never happen
+            my $serialized = "";
+            if (0) {
+            } elsif ($CPAN::META->has_inst("YAML::Syck")) {
+                $serialized = YAML::Syck::Dump($obj);
+            } elsif ($CPAN::META->has_inst("YAML")) {
+                $serialized = YAML::Dump($obj);
+            } elsif ($CPAN::META->has_inst("Data::Dumper")) {
+                $serialized = Data::Dumper::Dumper($obj);
+            } else {
+                require overload;
+                $serialized = overload::StrVal($obj);
+            }
+            $CPAN::Frontend->mydie("Panic: obj[$serialized] cannot meth[$meth]");
+        } elsif ($obj->$meth()){
             CPAN::Queue->delete($s);
         } else {
             CPAN->debug("failed");
@@ -4193,7 +4213,7 @@ sub reload {
     if ($CPAN::Config->{build_dir_reuse}) {
         $self->reanimate_build_dir;
     }
-    if ($CPAN::Config->{use_sqlite} && CPAN::_init_sqlite) { # not yet officially supported
+    if (CPAN::_sqlite_running) {
         $CPAN::SQLite->reload(time => $time, force => $force)
             if not $LAST_TIME;
     }
@@ -4280,7 +4300,7 @@ sub reload_x {
 sub rd_authindex {
     my($cl, $index_target) = @_;
     return unless defined $index_target;
-    return if $CPAN::Config->{use_sqlite};
+    return if CPAN::_sqlite_running;
     my @lines;
     $CPAN::Frontend->myprint("Going to read $index_target\n");
     local(*FH);
@@ -4321,7 +4341,7 @@ sub userid {
 sub rd_modpacks {
     my($self, $index_target) = @_;
     return unless defined $index_target;
-    return if $CPAN::Config->{use_sqlite};
+    return if CPAN::_sqlite_running;
     $CPAN::Frontend->myprint("Going to read $index_target\n");
     my $fh = CPAN::Tarzip->TIEHANDLE($index_target);
     local $_;
@@ -4534,7 +4554,7 @@ happen.\a
 sub rd_modlist {
     my($cl,$index_target) = @_;
     return unless defined $index_target;
-    return if $CPAN::Config->{use_sqlite};
+    return if CPAN::_sqlite_running;
     $CPAN::Frontend->myprint("Going to read $index_target\n");
     my $fh = CPAN::Tarzip->TIEHANDLE($index_target);
     local $_;
@@ -4586,7 +4606,7 @@ sub rd_modlist {
 sub write_metadata_cache {
     my($self) = @_;
     return unless $CPAN::Config->{'cache_metadata'};
-    return if $CPAN::Config->{use_sqlite};
+    return if CPAN::_sqlite_running;
     return unless $CPAN::META->has_usable("Storable");
     my $cache;
     foreach my $k (qw(CPAN::Bundle CPAN::Author CPAN::Module
@@ -4606,7 +4626,7 @@ sub write_metadata_cache {
 sub read_metadata_cache {
     my($self) = @_;
     return unless $CPAN::Config->{'cache_metadata'};
-    return if $CPAN::Config->{use_sqlite};
+    return if CPAN::_sqlite_running;
     return unless $CPAN::META->has_usable("Storable");
     my $metadata_file = File::Spec->catfile($CPAN::Config->{cpan_home},"Metadata");
     return unless -r $metadata_file and -f $metadata_file;
@@ -5437,7 +5457,11 @@ EOF
         for $f (@dirents) { # is already without "." and ".."
             my $from = File::Spec->catdir($from_dir,$f);
             my $to = File::Spec->catdir($packagedir,$f);
-            File::Copy::move($from,$to) or Carp::confess("Couldn't move $from to $to: $!");
+            unless (File::Copy::move($from,$to)) {
+                my $err = $!;
+                $from = File::Spec->rel2abs($from);
+                Carp::confess("Couldn't move $from to $to: $err");
+            }
         }
     } else { # older code below, still better than nothing when there is no File::Temp
         my($distdir);
@@ -6567,7 +6591,7 @@ is part of the perl-%s distribution. To install that, you need to run
     }
     if ($self->{modulebuild}) {
         unless (-f "Build") {
-            my $cwd = Cwd::cwd;
+            my $cwd = CPAN::anycwd();
             $CPAN::Frontend->mywarn("Alert: no Build file available for 'make $self->{id}'".
                                     " in cwd[$cwd]. Danger, Will Robinson!");
             $CPAN::Frontend->mysleep(5);
@@ -6997,7 +7021,13 @@ of modules we are processing right now?", "yes");
         # color them as dirty
         for my $p (@prereq) {
             # warn "calling color_cmd_tmps(0,1)";
-            CPAN::Shell->expandany($p)->color_cmd_tmps(0,1);
+            my $any = CPAN::Shell->expandany($p);
+            if ($any) {
+                $any->color_cmd_tmps(0,1);
+            } else {
+                $CPAN::Frontend->mywarn("Warning (maybe a bug): Cannot expand prereq '$p'\n");
+                $CPAN::Frontend->mysleep(2);
+            }
         }
         # queue them and re-queue yourself
         CPAN::Queue->jumpqueue([$id,$self->{reqtype}],
@@ -7415,25 +7445,29 @@ sub test {
     if ( $tests_ok ) {
         {
             my @prereq;
+
             for my $m (keys %{$self->{sponsored_mods}}) {
                 my $m_obj = CPAN::Shell->expand("Module",$m);
-                my $d_obj = $m_obj->distribution;
-                if ($d_obj) {
-                    if (!$d_obj->{make_test}
-                        ||
-                        $d_obj->{make_test}->failed){
-                        #$m_obj->dump;
-                        push @prereq, $m;
-                    }
+                # XXX we need available_version which reflects
+                # $ENV{PERL5LIB} so that already tested but not yet
+                # installed modules are counted.
+                my $available_version = $m_obj->available_version;
+                if ($available_version &&
+                    !CPAN::Version->vlt($available_version,$self->{PREREQ_PM}{$m})
+                   ) {
+                    CPAN->debug("m[$m] good enough available_version[$available_version]")
+                        if $CPAN::DEBUG;
+                } else {
+                    push @prereq, $m;
                 }
             }
             if (@prereq){
                 my $cnt = @prereq;
                 my $which = join ",", @prereq;
-                my $verb = $cnt == 1 ? "one dependency not OK ($which)" :
+                my $but = $cnt == 1 ? "one dependency not OK ($which)" :
                     "$cnt dependencies missing ($which)";
-                $CPAN::Frontend->mywarn("Tests succeeded but $verb\n");
-                $self->{make_test} = CPAN::Distrostatus->new("NO $verb");
+                $CPAN::Frontend->mywarn("Tests succeeded but $but\n");
+                $self->{make_test} = CPAN::Distrostatus->new("NO $but");
                 $self->store_persistent_state;
                 return;
             }
@@ -7500,7 +7534,7 @@ sub clean {
     my $system;
     if ($self->{modulebuild}) {
         unless (-f "Build") {
-            my $cwd = Cwd::cwd;
+            my $cwd = CPAN::anycwd();
             $CPAN::Frontend->mywarn("Alert: no Build file available for 'clean $self->{id}".
                                     " in cwd[$cwd]. Danger, Will Robinson!");
             $CPAN::Frontend->mysleep(5);
@@ -7545,12 +7579,21 @@ sub clean {
     $self->store_persistent_state;
 }
 
-#-> sub CPAN::Distribution::install ;
+#-> sub CPAN::Distribution::goto ;
 sub goto {
     my($self,$goto) = @_;
-    my($method) = (caller(1))[3];
     $goto = $self->normalize($goto);
+
+    # inject into the queue
+
+    CPAN::Queue->delete($self->id);
+    CPAN::Queue->jumpqueue([$goto,$self->{reqtype}]);
+
+    # and run where we left off
+
+    my($method) = (caller(1))[3];
     CPAN->instance("CPAN::Distribution",$goto)->$method;
+
 }
 
 #-> sub CPAN::Distribution::install ;
@@ -8739,13 +8782,29 @@ sub clean  { shift->rematein('clean') }
 #-> sub CPAN::Module::inst_file ;
 sub inst_file {
     my($self) = @_;
+    $self->_file_in_path([@INC]);
+}
+
+#-> sub CPAN::Module::available_file ;
+sub available_file {
+    my($self) = @_;
+    my $sep = $Config::Config{path_sep};
+    my $perllib = $ENV{PERL5LIB};
+    $perllib = $ENV{PERLLIB} unless defined $perllib;
+    my @perllib = split(/$sep/,$perllib) if defined $perllib;
+    $self->_file_in_path([@perllib,@INC]);
+}
+
+#-> sub CPAN::Module::file_in_path ;
+sub _file_in_path {
+    my($self,$path) = @_;
     my($dir,@packpath);
     @packpath = split /::/, $self->{ID};
     $packpath[-1] .= ".pm";
     if (@packpath == 1 && $packpath[0] eq "readline.pm") {
         unshift @packpath, "Term", "ReadLine"; # historical reasons
     }
-    foreach $dir (@INC) {
+    foreach $dir (@$path) {
 	my $pmfile = File::Spec->catfile($dir,@packpath);
 	if (-f $pmfile){
 	    return $pmfile;
@@ -8774,33 +8833,25 @@ sub xs_file {
 sub inst_version {
     my($self) = @_;
     my $parsefile = $self->inst_file or return;
-    local($^W) = 0 if $] < 5.00303 && $ExtUtils::MakeMaker::VERSION < 5.38;
-    my $have;
+    my $have = $self->parse_version($parsefile);
+    $have;
+}
 
-    $have = MM->parse_version($parsefile);
+#-> sub CPAN::Module::inst_version ;
+sub available_version {
+    my($self) = @_;
+    my $parsefile = $self->available_file or return;
+    my $have = $self->parse_version($parsefile);
+    $have;
+}
+
+#-> sub CPAN::Module::parse_version ;
+sub parse_version {
+    my($self,$parsefile) = @_;
+    my $have = MM->parse_version($parsefile);
     $have = "undef" unless defined $have && length $have;
     $have =~ s/^ //; # since the %vd hack these two lines here are needed
     $have =~ s/ $//; # trailing whitespace happens all the time
-
-    # My thoughts about why %vd processing should happen here
-
-    # Alt1 maintain it as string with leading v:
-    # read index files     do nothing
-    # compare it           use utility for compare
-    # print it             do nothing
-
-    # Alt2 maintain it as what it is
-    # read index files     convert
-    # compare it           use utility because there's still a ">" vs "gt" issue
-    # print it             use CPAN::Version for print
-
-    # Seems cleaner to hold it in memory as a string starting with a "v"
-
-    # If the author of this module made a mistake and wrote a quoted
-    # "v1.13" instead of v1.13, we simply leave it at that with the
-    # effect that *we* will treat it like a v-tring while the rest of
-    # perl won't. Seems sensible when we consider that any action we
-    # could take now would just add complexity.
 
     $have = CPAN::Version->readable($have);
 
@@ -9276,12 +9327,6 @@ tricks:
 
 =head2 Methods in the other Classes
 
-The programming interface for the classes CPAN::Module,
-CPAN::Distribution, CPAN::Bundle, and CPAN::Author is still considered
-beta and partially even alpha. In the following paragraphs only those
-methods are documented that have proven useful over a longer time and
-thus are unlikely to change.
-
 =over 4
 
 =item CPAN::Author::as_glimpse()
@@ -9631,9 +9676,20 @@ Returns the filename of the module found in @INC. The first file found
 is reported just like perl itself stops searching @INC when it finds a
 module.
 
+=item CPAN::Module::available_file()
+
+Returns the filename of the module found in PERL5LIB or @INC. The
+first file found is reported. The advantage of this method over
+C<inst_file> is that modules that have been tested but not yet
+installed are included because PERL5LIB keeps track of tested modules.
+
 =item CPAN::Module::inst_version()
 
-Returns the version number of the module in readable format.
+Returns the version number of the installed module in readable format.
+
+=item CPAN::Module::available_version()
+
+Returns the version number of the available module in readable format.
 
 =item CPAN::Module::install()
 
@@ -10021,6 +10077,7 @@ defined:
   scan_cache	     controls scanning of cache ('atstart' or 'never')
   shell              your favorite shell
   show_upload_date   boolean if commands should try to determine upload date
+  sqlite_dbname      filename of the sqlite DB
   tar                location of external program tar
   term_is_latin      if true internal UTF-8 is translated to ISO-8859-1
                      (and nonsense for characters outside latin range)
@@ -10028,6 +10085,7 @@ defined:
   test_report        email test reports (if CPAN::Reporter is installed)
   unzip              location of external program unzip
   urllist	     arrayref to nearby CPAN sites (or equivalent locations)
+  use_sqlite         use CPAN::SQLite for metadata storage (fast and lean)
   username           your username if you CPAN server wants one
   wait_list          arrayref to a wait server to try (See CPAN::WAIT)
   wget               path to external prg
