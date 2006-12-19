@@ -9,6 +9,29 @@ $VAR1 = {
     },
     "test" => {
       "mapping" => {
+        "eexpect" => {
+          "mapping" => {
+            "talk" => {
+              "sequence" => [
+                {
+                  "type" => "text"
+                }
+              ],
+              "type" => "seq"
+            },
+            "timeout" => {
+              "type" => "number"
+            },
+            "mode" => {
+              "enum" => [
+                "deterministic",
+                "anyorder"
+              ],
+              "type" => "text"
+            }
+          },
+          "type" => "map"
+        },
         "env" => {
           "mapping" => {
             "=" => {
@@ -32,6 +55,9 @@ $VAR1 = {
             }
           ],
           "type" => "seq"
+        },
+        "commandline" => {
+          "type" => "text"
         }
       },
       "type" => "map"

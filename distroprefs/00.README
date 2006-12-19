@@ -102,8 +102,8 @@ read them.
 =head1 BLUEPRINT
 
 The following example contains all supported keywords and structures
-with the exception of C<expect-in-any-order> which can be used instead
-of C<expect>.
+with the exception of C<eexpect> which can be used instead of
+C<expect>.
 
   --- 
   comment: "Demo"
@@ -132,6 +132,8 @@ of C<expect>.
     env: {}
 
     expect: []
+
+    commendline: "echo SKIPPING make"
 
   test: 
     args: []
@@ -167,6 +169,34 @@ keywords is as follows:
 
 A comment
 
+=item cpanconfig [hash]
+
+Temporarily override assorted C<CPAN.pm> configuration variables.
+
+Supported are: C<build_requires_install_policy>, C<check_sigs>,
+C<make>, C<make_install_make_command>, C<prefer_installer>,
+C<test_report>
+
+=item disabled [boolean]
+
+Specifies that this distribution shall not be processed at all.
+
+=item goto [string]
+
+The canonical name of a delegate distribution that shall be installed
+instead. Useful when a new version that, although it tests OK itself,
+breaks something else.
+
+=item install [hash]
+
+Processing instructions for the C<make install> or C<./Build install>
+phase of the CPAN mantra. See below under I<Processiong Instructions>.
+
+=item make [hash]
+
+Processing instructions for the C<make> or C<./Build> phase of the
+CPAN mantra. See below under I<Processiong Instructions>.
+
 =item match [hash]
 
 A hashref with one or more of the keys C<distribution>, C<modules>, or
@@ -188,45 +218,6 @@ values must all match. If this is the case then the hashref
 represented by the YAML document is returned as the preference
 structure for the current distribution.
 
-=item disabled [boolean]
-
-Specifies that this distribution shall not be processed at all.
-
-=item goto [string]
-
-The canonical name of a delegate distribution that shall be installed
-instead. Useful when a new version that, although it tests OK itself,
-breaks something else.
-
-=item cpanconfig [hash]
-
-Temporarily override assorted C<CPAN.pm> configuration variables.
-
-Supported are: C<build_requires_install_policy>, C<check_sigs>,
-C<make>, C<make_install_make_command>, C<prefer_installer>,
-C<test_report>
-
-=item pl [hash]
-
-Processing instructions for the C<perl Makefile.PL> or C<perl
-Build.PL> phase of the CPAN mantra. See below under I<Processiong
-Instructions>.
-
-=item make [hash]
-
-Processing instructions for the C<make> or C<./Build> phase of the
-CPAN mantra. See below under I<Processiong Instructions>.
-
-=item test [hash]
-
-Processing instructions for the C<make test> or C<./Build test> phase
-of the CPAN mantra. See below under I<Processiong Instructions>.
-
-=item install [hash]
-
-Processing instructions for the C<make install> or C<./Build install>
-phase of the CPAN mantra. See below under I<Processiong Instructions>.
-
 =item patches [array]
 
 An array of patches on CPAN or on the local disk to be applied in
@@ -234,40 +225,79 @@ order via the external patch program. If the value for the C<-p>
 parameter is C<0> or C<1> is determined by reading the patch
 beforehand.
 
+=item pl [hash]
+
+Processing instructions for the C<perl Makefile.PL> or C<perl
+Build.PL> phase of the CPAN mantra. See below under I<Processiong
+Instructions>.
+
+=item test [hash]
+
+Processing instructions for the C<make test> or C<./Build test> phase
+of the CPAN mantra. See below under I<Processiong Instructions>.
+
 =back
 
 =head2 Processing Instructions
 
 =over
 
-=item env [hash]
-
-Environment variables to be set during the command
-
 =item args [array]
 
 Arguments to be added to the command line
 
-=item expect [array]
+=item commandline
 
-A reference to an array that contains alternating questions and
-answers. Questions are regular expressions and answers are literal
+A full commandline that will be executed as it stands by a system
+call. During the execution the environment variable PERL will is set
+to $^X.
+
+=item eexpect [hash]
+
+Extended C<expect>. This is a hash reference with three allowed keys,
+C<mode>, C<timeout>, and C<talk>.
+
+C<mode> may have the values C<deterministic> for the case where all
+questions come in the order written down and C<anyorder> for the case
+where the questions may come in any order. The default mode is
+C<deterministic>.
+
+C<timeout> denotes a timeout in seconds. Floating point timeouts are
+OK. In the case of a C<mode=deterministic> the timeout denotes the
+timeout per question, in the case of C<mode=anyorder> it denotes the
+timeout per byte received from the stream or questions.
+
+C<talk> is a reference to an array that contains alternating questions
+and answers. Questions are regular expressions and answers are literal
 strings. The Expect module will then watch the stream coming from the
 execution of the external program (C<perl Makefile.PL>, C<perl
-Build.PL>, C<make>, etc.) and as soon as the stream matches the
-regular expression, it will inject the according answer.
+Build.PL>, C<make>, etc.).
 
-=item expect-in-any-order [array]
+In the case of C<mode=deterministic> the CPAN.pm will inject the
+according answer as soon as the stream matches the regular expression.
+In the case of C<mode=anyorder> the CPAN.pm will answer a question as
+soon as the timeout is reached for the next byte in the input stream.
+In the latter case it removes the according question/answer pair from
+the array, so if you want to answer the question C<Do you really want
+to do that> several times, then it must be included in the array at
+least as often as you want this answer to be given.
 
-Like C<expect> but the order of the questions asked by the
-distribution software is not deterministic. Note that when C<CPAN.pm>
-gives an answer, it removes the according pair from the array, so if
-you want to answer the question C<Do you really want to do that>
-several times, then it must be included in the array that often.
+=item env [hash]
+
+Environment variables to be set during the command
+
+=item expect [array]
+
+C<< expect: <array> >> is a short notation for
+
+  eexpect:
+    mode: deterministic
+    timeout: 15
+    talk: <array>
 
 =back
 
-=head1 PATCHES
+=head1 DEALING WITH PATCHES
 
 My procedure when I encounter a broken package:
 

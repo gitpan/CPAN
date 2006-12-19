@@ -6,6 +6,8 @@ use ExtUtils::MakeMaker qw(:DEFAULT);
 use File::Path;
 eval { require File::Spec; };
 my $HAVE_FILE_SPEC = !$@;
+eval { require YAML::Syck; };
+my $HAVE_YAML_SYCK = !$@;
 use File::Basename qw(basename);
 require Config;
 my $HAVE_MAKE = basename($Config::Config{make}) eq "make"; # file-scoped!
@@ -237,6 +239,7 @@ MEGA_COLLECTION = Expect \
 		Math::Approx::Symbolic \
 		Devel::Size \
 		Bundle::Slash \
+		Locale::Maketext::Gettext \
 
 }
 }
@@ -290,12 +293,16 @@ release ::
 checkout ::
 	svn co https://pause.perl.org:5460/svn/cpanpm/trunk ./
 
-megainstall: termreadkeyinstall
-	$(PERL) -Ilib -MCPAN -e 'install(qw($(MEGA_COLLECTION)));CPAN::Shell->failed' > megainstall.`date +%Y%m%dT%H%M`.out 2>&1
+megainstall: termreadkeyinstall logs/.exists
+	$(PERL) -Ilib -MCPAN -e 'install(qw($(MEGA_COLLECTION)));CPAN::Shell->failed' > logs/megainstall.`date +%Y%m%dT%H%M`.out 2>&1
 
 # nohup needed by my zsh
-termreadkeyinstall:
-	nohup $(PERL) -Ilib -MCPAN -e 'install(qw(Term::ReadKey))' < /dev/null > rk.`date +%Y%m%dT%H%M`.out 2>&1
+termreadkeyinstall: logs/.exists
+	nohup $(PERL) -Ilib -MCPAN -e 'install(qw(Term::ReadKey))' < /dev/null > logs/rk.`date +%Y%m%dT%H%M`.out 2>&1
+
+logs/.exists :
+	mkdir -p logs
+	touch $@
 
 run :
 	$(PERL) -Ilib -MCPAN -eshell
@@ -585,21 +592,27 @@ st-prefs ::
     push @m, qq{
 dd-prefs :: $base.dd
 
-$base.dd : Makefile
-	echo "SKIPPING ysh -MYAML::Syck < $base.yml > $base.dd.new && mv $base.dd.new $base.dd"
+};
+
+    if ($HAVE_YAML_SYCK) {
+      push @m, qq{$base.dd : Makefile
 	\$(PERL) -MYAML::Syck=LoadFile -MData::Dumper -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); print Data::Dumper->new(\\\@y)->Indent(1)->Useqq(1)->Purity(1)->Dump' $base > $base.dd.new && mv $base.dd.new $base.dd
 
 };
+    }
   }
 
   for my $base (@main::ST_PREFS) {
     push @m, qq{
 st-prefs :: $base.st
 
-$base.st : Makefile
+};
+    if ($HAVE_YAML_SYCK) {
+      push @m, qq{$base.st : Makefile
 	\$(PERL) -MYAML::Syck=LoadFile -MStorable=nstore -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); nstore(\\\@y, "\$\$x.st")' $base
 
 };
+    }
   }
 
   join "", @m;

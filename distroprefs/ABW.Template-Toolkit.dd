@@ -1,5 +1,5 @@
 $VAR1 = {
-  "comment" => "The patch is a reaction to http://rt.cpan.org/Ticket/Display.html?id=20807 ; for the options you would probably prefer setting TT_* commandline args",
+  "comment" => "\nThe patch is a reaction to\nhttp://rt.cpan.org/Ticket/Display.html?id=20807 ; for the options\nyou would probably prefer setting TT_* commandline args\n",
   "match" => {
     "distribution" => "^ABW/Template-Toolkit-2.15"
   },
@@ -39,22 +39,5 @@ $VAR2 = {
   "comment" => "Prohibit working with 2.14",
   "match" => {
     "distribution" => "^ABW/Template-Toolkit-2.14"
-  }
-};
-$VAR3 = {
-  "comment" => "2 alternative ways to disable",
-  "cpanconfig" => {
-    "make" => "false"
-  },
-  "match" => {
-    "distribution" => "^ABW/Template-Toolkit-2.14"
-  },
-  "pl" => {
-    "expect" => [
-      {
-        "timeout" => 1,
-        "expect" => "expect the unexpectable to trigger a timeout"
-      }
-    ]
   }
 };
