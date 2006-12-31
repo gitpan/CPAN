@@ -19,7 +19,7 @@ CPAN mantra. Well since the event of Module::Build we have two mantras:
 But some modules cannot be built with this mantra. They try to get
 some extra data from the user via environment, extra arguments or
 interactively thus disturbing the installation of large bundles like
-Phalanx100 or modules like Plagger.
+Phalanx100 or modules with many dependencies like Plagger.
 
 The distroprefs system of C<CPAN.pm> addresses this problem by
 allowing the user to specify extra informations and recipes in YAML
@@ -159,9 +159,7 @@ C<expect>.
 =head1 LANGUAGE SPECS
 
 Every YAML document represents a single hash reference. The valid keys
-in this hash are C<comment>, C<match>, C<disabled>, C<cpanconfig>,
-C<pl>, C<make>, C<test>, C<install>, C<patches>. The meanings of these
-keywords is as follows:
+in this hash are as follows:
 
 =over
 
@@ -175,7 +173,8 @@ Temporarily override assorted C<CPAN.pm> configuration variables.
 
 Supported are: C<build_requires_install_policy>, C<check_sigs>,
 C<make>, C<make_install_make_command>, C<prefer_installer>,
-C<test_report>
+C<test_report>. Please report as a bug when you need another one
+supported.
 
 =item disabled [boolean]
 
@@ -184,8 +183,9 @@ Specifies that this distribution shall not be processed at all.
 =item goto [string]
 
 The canonical name of a delegate distribution that shall be installed
-instead. Useful when a new version that, although it tests OK itself,
-breaks something else.
+instead. Useful when a new version, although it tests OK itself,
+breaks something else or a developer release or a fork is already
+uploaded that is better than the last released version.
 
 =item install [hash]
 
@@ -225,6 +225,12 @@ order via the external patch program. If the value for the C<-p>
 parameter is C<0> or C<1> is determined by reading the patch
 beforehand.
 
+Note: if the C<applypatch> program is installed and C<CPAN::Config>
+knows about it B<and> a patch is written by the C<makepatch> program,
+then C<CPAN.pm> lets C<applypatch> apply the patch. Both C<makepatch>
+and C<applypatch> are available from CPAN in the C<JV/makepatch-*>
+distribution.
+
 =item pl [hash]
 
 Processing instructions for the C<perl Makefile.PL> or C<perl
@@ -250,7 +256,8 @@ Arguments to be added to the command line
 
 A full commandline that will be executed as it stands by a system
 call. During the execution the environment variable PERL will is set
-to $^X.
+to $^X. If C<commandline> is specified, the content of C<args> is not
+used.
 
 =item eexpect [hash]
 

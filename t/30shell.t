@@ -18,16 +18,30 @@ BEGIN {
     }
 }
 
-use Config;
-use CPAN::FirstTime ();
-use File::Spec ();
-
-sub _f ($) {File::Spec->catfile(split /\//, shift);}
-sub _d ($) {File::Spec->catdir(split /\//, shift);}
+use File::Copy qw(cp);
 use File::Path qw(rmtree mkpath);
-rmtree _d"t/dot-cpan/sources";
-rmtree _d"t/dot-cpan/build";
-mkpath _d"t/dot-cpan/build";
+
+use lib "t";
+use local_utils;
+
+local_utils::cleanup_dot_cpan();
+local_utils::prepare_dot_cpan();
+
+BEGIN {
+    for my $x ("_f",
+               "_d",
+               "read_myconfig",
+               "mydiag",
+               "mreq",
+               "splitchunk",
+               "test_name",
+               "run_shell_cmd_lit",
+              ) {
+        no strict "refs";
+        *$x = \&{"local_utils\::$x"};
+    }
+}
+
 {
     local *FH;
     open *FH, (">"._f"t/dot-cpan/build/Something-From-Builddir-0.00.yml") or die;
@@ -70,35 +84,20 @@ perl:
 time: 1
 EOF
 }
-rmtree _d"t/dot-cpan/prefs";
-unlink _f"t/dot-cpan/Metadata";
-unlink _f"t/dot-cpan/.lock";
-mkpath _d"t/dot-cpan/sources/authors/id/A/AN/ANDK";
 
-use File::Copy qw(cp);
 cp _f"t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd",
     _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS"
     or die "Could not cp t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS.2nd ".
     "over t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS: $!";
-END {
-    unlink _f"t/dot-cpan/sources/authors/id/A/AN/ANDK/CHECKSUMS";
-}
-cp _f"t/CPAN/TestConfig.pm", _f"t/CPAN/MyConfig.pm"
-    or die "Could not cp t/CPAN/TestConfig.pm over t/CPAN/MyConfig.pm: $!";
-cp _f"t/CPAN/TestMirroredBy", _f"t/dot-cpan/sources/MIRRORED.BY"
-    or die "Could not cp t/CPAN/TestMirroredBy over t/dor-cpan/sources/MIRRORED.BY: $!";
-mkpath _d"t/dot-cpan/Bundle";
 cp _f"t/CPAN/CpanTestDummies-1.55.pm",
     _f"t/dot-cpan/Bundle/CpanTestDummies.pm" or die
     "Could not cp t/CPAN/CpanTestDummies-1.55.pm over ".
     "t/dot-cpan/Bundle/CpanTestDummies.pm: $!";
-mkpath _d"t/dot-cpan/prefs";
 cp _f"distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml",
     _f"t/dot-cpan/prefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml" or die
     "Could not cp distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml to ".
     "t/dot-cpan/prefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml: $!";
 
-use Cwd;
 my $cwd = Cwd::cwd;
 
 open FH, (">" . _f"t/dot-cpan/prefs/TestDistroPrefsFile.yml") or die "Could not open: $!";
@@ -113,17 +112,6 @@ match:
 patches:
   - "$cwd/t/CPAN/TestPatch.txt"
 EOF
-END {
-    unlink _f"t/dot-cpan/prefs/TestDistroPrefsFile.yml";
-    unlink _f"t/dot-cpan/prefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml";
-}
-
-sub read_myconfig () {
-    local *FH;
-    open *FH, _f"t/CPAN/MyConfig.pm" or die "Could not read t/CPAN/MyConfig.pm: $!";
-    local $/;
-    eval <FH>;
-}
 
 my @prgs;
 {
@@ -158,11 +146,6 @@ plan tests => (
                # + scalar @modules
               );
 
-sub mreq ($) {
-    my $m = shift;
-    eval "require $m; 1";
-}
-
 {
     my $m;
     for $m (@modules) {
@@ -171,7 +154,7 @@ sub mreq ($) {
 }
 {
     my $p;
-    my(@path) = split /$Config{path_sep}/, $ENV{PATH};
+    my(@path) = split /$Config::Config{path_sep}/, $ENV{PATH};
     for my $p (@programs) {
         $HAVE->{$p}++ if CPAN::FirstTime::find_exe($p,\@path);
     }
@@ -189,19 +172,33 @@ is($CPAN::Config->{histsize},100,"histsize is 100 before testing");
     my %ociv;
     @ociv{@ociv_tests} = ();
     my $keys = %CPAN::HandleConfig::keys; # to keep warnings silent
+    # kwnt => "key words not tested"
     my @kwnt = sort grep { not exists $ociv{$_} }
         grep { ! m/
                    ^(?:
                    urllist
-                   |inhibit_startup_message
-                   |username
-                   |password
-                   |proxy_(?:user|pass)
-                   |.*_list
                    |.*_hash
+                   |.*_list
+                   |applypatch
+                   |build_dir_reuse
+                   |build_requires_install_policy
+                   |colorize_output
+                   |colorize_print
+                   |colorize_warn
+                   |commands_quote
+                   |inhibit_startup_message
+                   |password
+                   |patch
+                   |prefs_dir
+                   |proxy_(?:user|pass)
+                   |randomize_urllist
+                   |use_sqlite
+                   |username
+                   |yaml_module
                   )$/x }
             keys %CPAN::HandleConfig::keys;
-    my $test_tuning = 0;
+    my $test_tuning = 0; # from time to time we set it to 1 to find
+                         # untested config variables
     if ($test_tuning) {
         ok(@kwnt==0,"key words not tested[@kwnt]");
         die if @kwnt;
@@ -211,33 +208,8 @@ is($CPAN::Config->{histsize},100,"histsize is 100 before testing");
 }
 
 my $prompt = "cpan>";
-my $prompt_re = "cpan[^>]*?>"; # note: replicated in DATA!
-my $t = File::Spec->catfile($cwd,"t");
-my $timeout = 30;
-
-my @system = (
-              $^X,
-              "-I$t",                 # get this test's own MyConfig
-              "-Mblib",
-              "-MCPAN::MyConfig",
-              "-MCPAN",
-              ($INC{"Devel/Cover.pm"} ? "-MDevel::Cover" : ()),
-              # (@ARGV) ? "-d" : (), # force subtask into debug, maybe useful
-              "-e",
-              # "\$CPAN::Suppress_readline=1;shell('$prompt\n')",
-              "\@CPAN::Defaultsites = (); shell",
-             );
-
-# shamelessly stolen from Test::Builder
-sub mydiag {
-    my(@msgs) = @_;
-    my $msg = join '', map { defined($_) ? $_ : 'undef' } @msgs;
-    # Escape each line with a #.
-    $msg =~ s/^/# /gm;
-    # Stick a newline on the end if it needs it.
-    $msg .= "\n" unless $msg =~ /\n\Z/;
-    print $msg;
-}
+my $prompt_re = "cpan[^>]*>"; # note: replicated in DATA!
+my $default_timeout = 30;
 
 $|=1;
 if ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
@@ -250,29 +222,13 @@ my $expo;
 if ($RUN_EXPECT) {
     $expo = Expect->new;
     $ENV{LANG} = "C";
-    $expo->spawn(@system);
+    $expo->spawn(run_shell_cmd_lit($cwd));
     $expo->log_stdout(0);
     $expo->notransfer(1);
 } else {
-    my $system = join(" ", map { "\"$_\"" } @system)." > test.out";
+    my $system = join(" ", map { "\"$_\"" } run_shell_cmd_lit($cwd))." > test.out";
     warn "# DEBUG: system[$system]";
     open SYSTEM, "| $system" or die;
-}
-
-sub splitchunk ($) {
-    my $ch = shift;
-    my @s = split /(^\#[A-Za-z]:)/m, $ch;
-    shift @s; # leading empty string
-    for (my $i = 0; $i < @s; $i+=2) {
-        $s[$i] =~ s/\#//;
-        $s[$i] =~ s/://;
-    }
-    @s;
-}
-
-sub test_name {
-    my($prog,$comment) = @_;
-    ($comment||"") . ($prog ? " (testing command '$prog')" : "[empty RET]")
 }
 
 my $skip_the_rest;
@@ -343,8 +299,12 @@ TUPL: for my $i (0..$#prgs){
         if ($notexpected) {
             mydiag "NOTEXPECT: $notexpected";
         }
+        my $this_timeout = $test_timeout || $default_timeout;
+        if ($INC{"Devel/Cover.pm"}) {
+            $this_timeout*=30;
+        }
         $expo->expect(
-                      $test_timeout || $timeout,
+                      $this_timeout,
                       [ eof => sub {
                             my $got = $expo->clear_accum;
                             mydiag "EOF on i[$i]prog[$prog]
@@ -386,6 +346,7 @@ if ($RUN_EXPECT) {
     $expo->soft_close;
 } else {
     close SYSTEM or die "Could not close SYSTEM filehandle: $!";
+    mydiag "Finished test script, going to interprete it.";
     open SYSTEM, "test.out" or die "Could not open test.out for reading: $!";
     local $/;
     my $biggot = <SYSTEM>;
@@ -400,7 +361,7 @@ if ($RUN_EXPECT) {
             mydiag "NOTEXPECT: $notexpected";
         }
         my $ok = 1;
-        if ($biggot =~ /(\G.*?$expected)/sgc) {
+        if ($biggot =~ /(\G(?s:.*?)$expected)/gc) {
             my $got = $1;
             mydiag "GOT: $got\n";
             $pos = pos $biggot;
@@ -412,6 +373,7 @@ if ($RUN_EXPECT) {
             }
         } else {
             mydiag "FAILED at pos[$pos] in test.out";
+            last;
             $ok = 0;
         }
         ok($ok, test_name($prog,$comment));
@@ -420,12 +382,15 @@ if ($RUN_EXPECT) {
 
 read_myconfig;
 is($CPAN::Config->{histsize},100,"histsize is 100 after testing");
-rmtree _d"t/dot-cpan";
+
+#END {
+    local_utils::cleanup_dot_cpan();
+#}
 
 # note: E=expect; P=program(=print); T=timeout; R=requires(=relies_on); N=Notes(internal); C=Comment(visible during testing)
 __END__
 ########
-#E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*?>)
+#E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*>)
 ########
 #P:o conf init urllist
 #E:(MIRR).+?y\]
@@ -864,9 +829,15 @@ __END__
 #P:b
 #E:(?s:Bundle::Snapshot\S+\s+\(N/A\))
 ########
+#P:o debug all
+#E:CPAN[\s\S]+?CacheMgr[\s\S]+?FirstTime
+########
 #P:b Bundle::CpanTestDummies
 #E:\sCONTAINS.+?CPAN::Test::Dummy::Perl5::Make.+?CPAN::Test::Dummy::Perl5::Make::Zip
 #R:Archive::Zip
+########
+#P:o debug 0
+#E:turned off
 ########
 #P:install ANDK/NotInChecksums-0.000.tar.gz
 #E:(?s:awry.*?yes)
@@ -894,16 +865,22 @@ __END__
 #E:CPAN-Test-Dummy
 #R:Text::Glob
 ########
+#P:o debug all
+#E:CPAN[\s\S]+?CacheMgr[\s\S]+?FirstTime
+########
 #P:test CPAN::Test::Dummy::Perl5::Make
 #E:test\s+--\s+OK
 ########
 #P:test CPAN::Test::Dummy::Perl5::Build
-#E:test\s+--\s+OK
+#E:\s\sANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz[\s\S]*?test\s+--\s+OK
 #R:Module::Build
-#T:60
+#T:75
+########
+#P:o debug 0
+#E:turned off
 ########
 #P:test CPAN::Test::Dummy::Perl5::Make::Zip
-#E:test\s+--\s+OK
+#E:Has already been tested successfully
 #R:Archive::Zip
 ########
 #P:failed
@@ -1006,15 +983,15 @@ __END__
 #e:'notest' => 1,
 ########
 #P:dump Bundle::CpanTestDummies
-#E:\}
+#E:\},.*?CPAN::Bundle.*?;
 #R:Module::Build
 ########
 #P:dump CPAN::Test::Dummy::Perl5::Build::Fails
-#E:\}
+#E:\},.*?CPAN::Module.*?;
 #R:Module::Build
 ########
 #P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
-#E:\}
+#E:\},.*?CPAN::Distribution.*?;
 #R:Module::Build
 ########
 #P:test Bundle::CpanTestDummies
@@ -1023,7 +1000,7 @@ __END__
 #T:30
 ########
 #P:get Bundle::CpanTestDummies
-#E:Is already unwrapped
+#E:Has already been unwrapped
 ########
 #P:dump ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz
 #E:\}.*?CPAN::Distribution
@@ -1032,7 +1009,7 @@ __END__
 #E:prereq_pm\s+build_requires:\S+requires:\S+
 ########
 #P:notest make Bundle::CpanTestDummies
-#E:Has already been processed
+#E:Has already been made
 ########
 #P:clean Bundle::CpanTestDummies
 #E:Failed during this command
@@ -1163,10 +1140,10 @@ S for status
 N for notes (just for the test writer, otherwise invisible)
 
 
-The script starts a CPAN shell and feed it the chunks such that the P
-line is injected, the output of the shell is parsed and compared to
-the expression in the E line. With T the timeout can be changed (the
-default is rather low, maybe 10 seconds, see the code for details).
+The script starts a CPAN shell and feeds it with chunks. The P line is
+injected and the output of the shell is parsed and compared to the
+expression in the E line. With T the timeout can be changed (the
+default is rather low, maybe 30 seconds, see the code for details).
 The expression in R is used to filter tests. The keyword in S may be
 one of C<run> to run this test, C<skip> to skip it, and C<quit> to
 stop testing immediately when this test is reached.

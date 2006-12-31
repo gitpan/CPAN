@@ -19,7 +19,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec ();
 use vars qw($VERSION $urllist);
-$VERSION = sprintf "%.6f", substr(q$Rev: 1379 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 1398 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -318,9 +318,16 @@ Shall we use it as the general CPAN build and cache directory?
     #= External programs
     #
 
-    my @external_progs = qw/bzip2 gzip tar unzip make
-                      curl lynx wget ncftpget ncftp ftp
-                      gpg patch/;
+    my @external_progs = qw/bzip2 gzip tar unzip
+
+                            make
+
+                            curl lynx wget ncftpget ncftp ftp
+
+                            gpg
+
+                            patch applypatch
+                            /;
     my(@path) = split /$Config{'path_sep'}/, $ENV{'PATH'};
     if (!$matcher or "@external_progs" =~ /$matcher/) {
         $CPAN::Frontend->myprint($prompts{external_progs});

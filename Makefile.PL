@@ -159,7 +159,9 @@ WriteMakefile(
               ($ExtUtils::MakeMaker::VERSION >= 6.3002 ?
                (LICENSE      => "perl") : (),
               ),
-              clean        => { FILES => "lib/CPAN/Config.pm" },
+              clean        => {
+                               FILES => "lib/CPAN/Config.pm t/dot-cpan/FTPstats.yml",
+                              },
               @sign,
               ($] >= 5.005 ?
                (
@@ -209,10 +211,13 @@ ALL_PERLS = /usr/bin/perl \
 MEGA_COLLECTION = Expect \
 		Bundle::CPANxxl \
 		CPAN::DistnameInfo \
-		DBI \
+		/home/src/perl/devel-cover/SVN/. \
 		/home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
 		Kwalify \
 		Font::TTF \
+		Term::ReadLine::Gnu \
+		/home/src/perl/tk/SVN/. \
+		Tk::Tree \
 		CDB_File \
 		Math::BigInt::GMP \
 		IPC::ShareLite \
@@ -234,12 +239,12 @@ MEGA_COLLECTION = Expect \
 		SVN::Mirror \
 		SVN::Notify::Config \
 		SVN::Notify::Mirror \
-		Term::ReadLine::Gnu \
 		Event::Lib \
 		Math::Approx::Symbolic \
 		Devel::Size \
 		Bundle::Slash \
 		Locale::Maketext::Gettext \
+		Test::Without::Module \
 
 }
 }
@@ -352,13 +357,21 @@ howto-release:
 META.yml: metafile
 	$(CP) $(DISTVNAME)/META.yml  ./META.yml
 
-testcover: testdistros
+install-devel-cover-unless-uptodate:
+	$(PERL) -Ilib -MCPAN -e 'CPAN::Shell->install("/home/src/perl/devel-cover/SVN/.") unless CPAN::Shell->expand("Module","Devel::Cover")->uptodate'
+
+install-devel-cover-unconditionally:
+	$(PERL) -Ilib -MCPAN -e 'CPAN::Shell->install("/home/src/perl/devel-cover/SVN/.")'
+
+testcover: testdistros install-devel-cover-unless-uptodate
 	:>SIGNATURE
 	$(PERL) -MDevel::Cover -e 0
 	`dirname $(PERL)`/cover -delete
 	HARNESS_PERL_SWITCHES=-MDevel::Cover $(MAKE) test
 	`dirname $(PERL)`/cover
-	$(PERL) bin/post-prc-coverage.pl cover_db/blib-lib-CPAN-pm--subroutine.html
+
+man:
+	$(PERL)doc -F lib/CPAN.pm
 
 testdistros: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz \
@@ -380,6 +393,13 @@ testdistros: \
 testshell-with-protocol: testdistros
 	$(PERL) -e 'for ("protocols"){-d $$_ or mkdir $$_, 0755}'
 	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | \
+		tee protocols/make-test-`date +%Y%m%dT%H%M%S`
+	ls -lt protocols | head
+
+testshell-with-protocol-without-expect: testdistros
+	$(PERL) -e 'for ("protocols"){-d $$_ or mkdir $$_, 0755}'
+	CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT=1 $(MAKE) test \
+		TEST_FILES=t/30shell.t TEST_VERBOSE=1 | \
 		tee protocols/make-test-`date +%Y%m%dT%H%M%S`
 	ls -lt protocols | head
 
