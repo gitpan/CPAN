@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 1399 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 1467 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -17,6 +17,7 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 1399 $,4)/1000000 + 5.4;
 %keys = map { $_ => undef }
     (
      "applypatch",
+     "auto_commit",
      "build_cache",
      "build_dir",
      "build_dir_reuse",
@@ -24,6 +25,7 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 1399 $,4)/1000000 + 5.4;
      "bzip2",
      "cache_metadata",
      "check_sigs",
+     "colorize_debug",
      "colorize_output",
      "colorize_print",
      "colorize_warn",
@@ -202,9 +204,13 @@ sub edit {
                 if exists $keys{$o} or defined $CPAN::Config->{$o};
 	}
         if ($changed) {
-            $CPAN::CONFIG_DIRTY = 1;
-            $CPAN::Frontend->myprint("Please use 'o conf commit' to ".
-                                     "make the config permanent!\n\n");
+            if ($CPAN::Config->{auto_commit}) {
+                $self->commit;
+            } else {
+                $CPAN::CONFIG_DIRTY = 1;
+                $CPAN::Frontend->myprint("Please use 'o conf commit' to ".
+                                         "make the config permanent!\n\n");
+            }
         }
     }
 }
@@ -552,9 +558,12 @@ $configpm initialized.
     CPAN::FirstTime::init($configpm, %args);
 }
 
+
+# returns mandatory but missing entries in the Config
 sub missing_config_data {
     my(@miss);
     for (
+         "auto_commit",
          "build_cache",
          "build_dir",
          "cache_metadata",
@@ -675,7 +684,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 1399 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 1467 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {

@@ -26,6 +26,7 @@ distroprefs/CLKAO.SVN-Mirror.yml
 distroprefs/DBROBINS.Net-SSH-Perl.yml
 distroprefs/DCONWAY.Parse-RecDescent.yml
 distroprefs/DJKERNEN.Mail-IMAPClient.yml
+distroprefs/DLAND.Crypt-SSLeay.yml
 distroprefs/DMAKI.DateTime-Format-Japanese.yml
 distroprefs/DMAKI.DateTime-Util-Astro.yml
 distroprefs/DMAKI.DateTime-Util-Calc.yml
@@ -34,6 +35,7 @@ distroprefs/DROLSKY.Params-Validate.yml
 distroprefs/DURIST.WWW-Babelfish.yml
 distroprefs/EESTABROO.IMAP-Admin.yml
 distroprefs/FDALY.Test-Deep.yml
+distroprefs/FLUFFY.Class-MethodMaker.yml
 distroprefs/GAAS.libwww.yml
 distroprefs/GBARR.Authen-SASL.yml
 distroprefs/GBARR.libnet.dd
@@ -41,6 +43,7 @@ distroprefs/GBARR.libnet.yml
 distroprefs/GBARR.perl-ldap.yml
 distroprefs/GEOFF.Apache-Test.yml
 distroprefs/GIULIENK.Audio-Beep.yml
+distroprefs/HAYASHI.Term-ReadLine-Gnu.yml
 distroprefs/ILYAZ.Math-Pari.yml
 distroprefs/ILYAZ.Term-ReadLine-Perl.dd
 distroprefs/ILYAZ.Term-ReadLine-Perl.yml
@@ -54,6 +57,7 @@ distroprefs/JESSE.Jifty.yml
 distroprefs/JJORE.Carp-Clan.yml
 distroprefs/JMASON.Mail-SpamAssassin.yml
 distroprefs/JPEACOCK.SVN-Notify-Mirror.yml
+distroprefs/JPIERCE.IO-Pager.yml
 distroprefs/KASEI.Class-Accessor.yml
 distroprefs/KBROWN.SOAP.yml
 distroprefs/KCLARK.SQL-Translator.yml
@@ -84,7 +88,6 @@ distroprefs/RJBS.Data-UUID.yml
 distroprefs/RJBS.Email-Send.yml
 distroprefs/RRWO.Graphics-ColorNames.yml
 distroprefs/SCHWERN.Exporter-Lite.yml
-distroprefs/SCHWERN.UNIVERSAL-require.yml
 distroprefs/SREZIC.Tk-Autoscroll.yml
 distroprefs/TIMB.DBI.yml
 distroprefs/URI.File-Slurp.yml
@@ -110,6 +113,7 @@ MANIFEST.SKIP
 META.yml
 PAUSE2003.pub
 PAUSE2005.pub
+PAUSE2007.pub
 README
 scripts/cpan
 SIGNATURE			Public-key signature (added by MakeMaker)

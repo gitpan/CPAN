@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_67';
+$CPAN::VERSION = '1.88_68';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -264,7 +264,7 @@ ReadLine support %s
 	    $CPAN::META->debug("line[".join("|",@line)."]") if $CPAN::DEBUG;
 	    my $command = shift @line;
 	    eval { CPAN::Shell->$command(@line) };
-	    if ($@){
+	    if ($@ && "$@" =~ /\S/){
                 require Carp;
                 Carp::cluck("Catching error: '$@'");
             }
@@ -1200,6 +1200,7 @@ sub cleanup {
   return unless defined $META->{LOCK};
   return unless -f $META->{LOCK};
   $META->savehist;
+  close $META->{LOCKFH};
   unlink $META->{LOCK};
   # require Carp;
   # Carp::cluck("DEBUGGING");
@@ -1253,6 +1254,13 @@ sub is_installed {
     delete $self->{is_tested}{$what};
 }
 
+sub _list_sorted_descending_is_tested {
+    my($self) = @_;
+    sort
+        { ($self->{is_tested}{$b}||0) <=> ($self->{is_tested}{$a}||0) }
+            keys %{$self->{is_tested}}
+}
+
 #-> sub CPAN::set_perl5lib
 sub set_perl5lib {
     my($self,$for) = @_;
@@ -1269,15 +1277,15 @@ sub set_perl5lib {
     #my @dirs = map {("$_/blib/arch", "$_/blib/lib")} keys %{$self->{is_tested}};
     #$CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB.\n");
 
-    my @dirs = map {("$_/blib/arch", "$_/blib/lib")} sort
-        { ($self->{is_tested}{$b}||0) <=> ($self->{is_tested}{$a}||0) }
-            keys %{$self->{is_tested}};
+    my @dirs = map {("$_/blib/arch", "$_/blib/lib")} $self->_list_sorted_descending_is_tested;
     if (@dirs < 12) {
         $CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB for '$for'\n");
     } elsif (@dirs < 24) {
-        my @d = map {s/^\Q$CPAN::Config->{build_dir}\E/%BUILDDIR%/; $_} @dirs;
-        $CPAN::Frontend->myprint("Prepending blib/arch and blib/lib subdirs of ".
-                                 "@d to PERL5LIB; ".
+        my @d = map {my $cp = $_;
+                     $cp =~ s/^\Q$CPAN::Config->{build_dir}\E/%BUILDDIR%/;
+                     $cp
+                 } @dirs;
+        $CPAN::Frontend->myprint("Prepending @d to PERL5LIB; ".
                                  "%BUILDDIR%=$CPAN::Config->{build_dir} ".
                                  "for '$for'\n"
                                 );
@@ -1319,8 +1327,7 @@ sub tidyup {
     my($toremove) = shift @{$self->{FIFO}};
     unless ($toremove =~ /\.yml$/) {
         $CPAN::Frontend->myprint(sprintf(
-                                         "Deleting from cache".
-                                         ": $toremove (%.1f>%.1f MB)\n",
+                                         "DEL: $toremove (%.1f>%.1f MB)\n",
                                          $self->{DU}, $self->{'MAX'})
                                 );
     }
@@ -1582,11 +1589,13 @@ sub globls {
             $pathglob = $2;
             $author = CPAN::Shell->expand_by_method('CPAN::Author',
                                                     ['id'],
-                                                    $a2) or die "No author found for $a2";
+                                                    $a2)
+                or $CPAN::Frontend->mydie("No author found for $a2\n");
         } else {
             $author = CPAN::Shell->expand_by_method('CPAN::Author',
                                                     ['id'],
-                                                    $a) or die "No author found for $a";
+                                                    $a)
+                or $CPAN::Frontend->mydie("No author found for $a\n");
         }
         if ($silent) {
             my $alpha = substr $author->id, 0, 1;
@@ -1854,8 +1863,10 @@ sub hosts {
                             ];
     }
     my $R = ""; # report
-    $R .= sprintf "Log starts: %s\n", scalar(localtime $S{start}) || "unknown";
-    $R .= sprintf "Log ends  : %s\n", scalar(localtime $S{end}) || "unknown";
+    if ($S{start} && $S{end}) {
+        $R .= sprintf "Log starts: %s\n", $S{start} ? scalar(localtime $S{start}) : "unknown";
+        $R .= sprintf "Log ends  : %s\n", $S{end}   ? scalar(localtime $S{end})   : "unknown";
+    }
     if ($res->{ok} && @{$res->{ok}}) {
         $R .= sprintf "\nSuccessful downloads:
    N       kB  secs      kB/s url\n";
@@ -2116,16 +2127,39 @@ sub report {
                                 # re-run (as documented)
 }
 
+# experimental (compare with _is_tested)
 #-> sub CPAN::Shell::install_tested
 sub install_tested {
     my($self,@some) = @_;
-    $CPAN::Frontend->mywarn("install_tested() requires no arguments.\n"),
+    $CPAN::Frontend->mywarn("install_tested() must not be called with arguments.\n"),
         return if @some;
     CPAN::Index->reload;
 
-    for my $d (%{$CPAN::META->{readwrite}{'CPAN::Distribution'}}) {
-        my $do = CPAN::Shell->expandany($d);
-        next unless $do->{build_dir};
+    for my $b (reverse $CPAN::META->_list_sorted_descending_is_tested) {
+        my $yaml = "$b.yml";
+        unless (-f $yaml){
+            $CPAN::Frontend->mywarn("No YAML file for $b available, skipping\n");
+            next;
+        }
+        my $yaml_content = CPAN::_yaml_loadfile($yaml);
+        my $id = $yaml_content->[0]{ID};
+        unless ($id){
+            $CPAN::Frontend->mywarn("No ID found in '$yaml', skipping\n");
+            next;
+        }
+        my $do = CPAN::Shell->expandany($id);
+        unless ($do){
+            $CPAN::Frontend->mywarn("Could not expand ID '$id', skipping\n");
+            next;
+        }
+        unless ($do->{build_dir}) {
+            $CPAN::Frontend->mywarn("Distro '$id' has no build_dir, skipping\n");
+            next;
+        }
+        unless ($do->{build_dir} eq $b) {
+            $CPAN::Frontend->mywarn("Distro '$id' has build_dir '$do->{build_dir}' but expected '$b', skipping\n");
+            next;
+        }
         push @some, $do;
     }
 
@@ -2136,15 +2170,15 @@ sub install_tested {
     $CPAN::Frontend->mywarn("No distributions tested with this build of perl found.\n"),
         return unless @some;
 
-    @some = grep { not $_->uptodate } @some;
-    $CPAN::Frontend->mywarn("No non-uptodate distributions tested with this build of perl found.\n"),
-        return unless @some;
+    # @some = grep { not $_->uptodate } @some;
+    # $CPAN::Frontend->mywarn("No non-uptodate distributions tested with this build of perl found.\n"),
+    #     return unless @some;
 
     CPAN->debug("some[@some]");
     for my $d (@some) {
         my $id = $d->can("pretty_id") ? $d->pretty_id : $d->id;
         $CPAN::Frontend->myprint("install_tested: Running for $id\n");
-        $CPAN::Frontend->sleep(1);
+        $CPAN::Frontend->mysleep(1);
         $self->install($d);
     }
 }
@@ -2405,6 +2439,23 @@ sub status {
                     Devel::Size::total_size($CPAN::META->{$k}{$k2})/1024,
                           scalar keys %{$CPAN::META->{$k}{$k2}};
         }
+    }
+}
+
+# experimental (must run after failed or similar [I think])
+# intended as a preparation ot install_tested
+#-> sub CPAN::Shell::is_tested
+sub _is_tested {
+    my($self) = @_;
+    for my $b (reverse $CPAN::META->_list_sorted_descending_is_tested) {
+        my $time;
+        if ($CPAN::META->{is_tested}{$b}) {
+            $time = scalar(localtime $CPAN::META->{is_tested}{$b});
+        } else {
+            $time = scalar localtime;
+            $time =~ s/\S/?/g;
+        }
+        $CPAN::Frontend->myprint(sprintf "%s %s\n", $time, $b);
     }
 }
 
@@ -2671,7 +2722,7 @@ sub print_ornamented {
     if ($self->colorize_output) {
         if ( $CPAN::DEBUG && $swhat =~ /^Debug\(/ ) {
             # if you want to have this configurable, please file a bugreport
-            $ornament = "black on_cyan";
+            $ornament = $CPAN::Config->{colorize_debug} || "black on_cyan";
         }
         my $color_on = eval { Term::ANSIColor::color($ornament) } || "";
         if ($@) {
@@ -3190,25 +3241,42 @@ sub _add_to_statistics {
             $stats->{end} = time;
         }
         my $fh = FileHandle->new;
-        my $fullstats = $self->_ftp_statistics($fh);
-        $fullstats->{history} ||= [];
-        my @debug = scalar @{$fullstats->{history}};
-        push @{$fullstats->{history}}, $stats;
         my $time = time;
-        shift @{$fullstats->{history}}
-            while $time - $fullstats->{history}[0]{start} > 30*86400; # one month too much?
-        push @debug, scalar @{$fullstats->{history}};
-        push @debug, scalar localtime($fullstats->{history}[0]{start});
-        {
-            # local $CPAN::DEBUG = 512;
-            CPAN->debug(sprintf("DEBUG history: before[%d]after[%d]oldest[%s]",
-                                @debug,
-                               )) if $CPAN::DEBUG;
+        my $sdebug = 0;
+        my @debug;
+        @debug = $time if $sdebug;
+        my $fullstats = $self->_ftp_statistics($fh);
+        close $fh;
+        $fullstats->{history} ||= [];
+        push @debug, scalar @{$fullstats->{history}} if $sdebug;
+        push @debug, time if $sdebug;
+        push @{$fullstats->{history}}, $stats;
+        # arbitrary hardcoded constants until somebody demands to have
+        # them settable
+        while (
+               @{$fullstats->{history}} > 9999
+               || $time - $fullstats->{history}[0]{start} > 30*86400  # one month
+              ) {
+            shift @{$fullstats->{history}}
         }
-        seek $fh, 0, 0;
-        truncate $fh, 0;
+        push @debug, scalar @{$fullstats->{history}} if $sdebug;
+        push @debug, time if $sdebug;
+        push @debug, scalar localtime($fullstats->{history}[0]{start}) if $sdebug;
         # need no eval because if this fails, it is serious
-        CPAN->_yaml_dumpfile($fh,$fullstats);
+        my $sfile = File::Spec->catfile($CPAN::Config->{cpan_home},"FTPstats.yml");
+        CPAN->_yaml_dumpfile("$sfile.$$",$fullstats);
+        if ( $sdebug||$CPAN::DEBUG ) {
+            local $CPAN::DEBUG = 512; # FTP
+            push @debug, time;
+            CPAN->debug(sprintf("DEBUG history: before_read[%d]before[%d]at[%d]".
+                                "after[%d]at[%d]oldest[%s]dumped backat[%d]",
+                                @debug,
+                               ));
+        }
+        # Win32 cannot rename a file to an existing filename
+        unlink($sfile) if ($^O eq 'MSWin32');
+        rename "$sfile.$$", $sfile
+            or $CPAN::Frontend->mydie("Could not rename '$sfile.$$' to '$sfile': $!\n");
     }
 }
 
@@ -5363,9 +5431,13 @@ sub containsmods {
     my $mod_id = $mod->{ID} or next;
     # warn "mod_file[$mod_file] dist_id[$dist_id] mod_id[$mod_id]";
     # sleep 1;
+    if ($CPAN::Signal) {
+        delete $self->{CONTAINSMODS};
+        return;
+    }
     $self->{CONTAINSMODS}{$mod_id} = undef if $mod_file eq $dist_id;
   }
-  keys %{$self->{CONTAINSMODS}};
+  keys %{$self->{CONTAINSMODS}||{}};
 }
 
 #-> sub CPAN::Distribution::upload_date ;
@@ -6442,12 +6514,14 @@ sub force {
                               ],
                   );
   my $methodmatch = 0;
+  my $ldebug = 0;
  PHASE: for my $phase (qw(unknown get make test install)) { # order matters
       $methodmatch = 1 if $fforce || $phase eq $method;
       next unless $methodmatch;
     ATTRIBUTE: for my $att (@{$phase_map{$phase}}) {
           if ($phase eq "get") {
-              if ($self->id =~ /\.$/ && $att =~ /(unwrapped|build_dir)/ ) {
+              if (substr($self->id,-1,1) eq "."
+                  && $att =~ /(unwrapped|build_dir|archived)/ ) {
                   # cannot be undone for local distros
                   next ATTRIBUTE;
               }
@@ -6457,9 +6531,21 @@ sub force {
                  ) {
                   delete $CPAN::META->{is_tested}{$self->{build_dir}};
               }
+          } elsif ($phase eq "test") {
+              if ($att eq "make_test"
+                  && $self->{make_test}
+                  && $self->{make_test}{COMMANDID}
+                  && $self->{make_test}{COMMANDID} == $CPAN::CurrentCommandId
+                 ) {
+                  # endless loop too likely
+                  next ATTRIBUTE;
+              }
           }
           delete $self->{$att};
-          CPAN->debug(sprintf "phase[%s]att[%s]", $phase, $att) if $CPAN::DEBUG;
+          if ($ldebug || $CPAN::DEBUG) {
+              # local $CPAN::DEBUG = 16; # Distribution
+              CPAN->debug(sprintf "id[%s]phase[%s]att[%s]", $self->id, $phase, $att);
+          }
       }
   }
   if ($method && $method =~ /make|test|install/) {
@@ -6563,7 +6649,6 @@ is part of the perl-%s distribution. To install that, you need to run
     local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
-
     $CPAN::META->set_perl5lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
@@ -6799,10 +6884,11 @@ is part of the perl-%s distribution. To install that, you need to run
                                         " in cwd[$cwd]. Danger, Will Robinson!");
                 $CPAN::Frontend->mysleep(5);
             }
-            $system = sprintf "%s %s", $self->_build_command(), $CPAN::Config->{mbuild_arg};
+            $system = join " ", $self->_build_command(), $CPAN::Config->{mbuild_arg};
         } else {
-            $system = join " ", $self->_make_command(), $CPAN::Config->{make_arg};
+            $system = join " ", $self->_make_command(),  $CPAN::Config->{make_arg};
         }
+        $system =~ s/\s+$//;
         my $make_arg = $self->make_x_arg("make");
         $system = sprintf("%s%s",
                           $system,
@@ -6947,6 +7033,7 @@ expected[$regex]\nbut[$but]\n\n");
     return $expo->exitstatus();
 }
 
+#-> CPAN::Distribution::_validate_distropref
 sub _validate_distropref {
     my($self,@args) = @_;
     if (
@@ -6963,7 +7050,7 @@ sub _validate_distropref {
     }
 }
 
-# CPAN::Distribution::_find_prefs
+#-> CPAN::Distribution::_find_prefs
 sub _find_prefs {
     my($self) = @_;
     my $distroid = $self->pretty_id;
@@ -7054,7 +7141,10 @@ sub _find_prefs {
                         next ELEMENT;
                     }
                     my $ok = 1;
-                    for my $sub_attribute (keys %$match) {
+                    # do not take the order of C<keys %$match> because
+                    # "module" is by far the slowest
+                    for my $sub_attribute (qw(distribution perl module)) {
+                        next unless exists $match->{$sub_attribute};
                         my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
                         if ($sub_attribute eq "module") {
                             my $okm = 0;
@@ -7078,6 +7168,7 @@ sub _find_prefs {
                                                    "Please ".
                                                    "remove, cannot continue.");
                         }
+                        last if $ok == 0; # short circuit
                     }
                     #CPAN->debug(sprintf "ok[%d]", $ok) if $CPAN::DEBUG;
                     if ($ok) {
@@ -7251,29 +7342,29 @@ sub unsat_prereq {
     my(@need);
     my %merged = (%{$prereq_pm->{requires}||{}},%{$prereq_pm->{build_requires}||{}});
   NEED: while (my($need_module, $need_version) = each %merged) {
-        my($have_version,$inst_file);
+        my($available_version,$available_file);
         if ($need_module eq "perl") {
-            $have_version = $];
-            $inst_file = $^X;
+            $available_version = $];
+            $available_file = $^X;
         } else {
             my $nmo = $CPAN::META->instance("CPAN::Module",$need_module);
             next if $nmo->uptodate;
-            $inst_file = $nmo->inst_file;
+            $available_file = $nmo->available_file;
 
             # if they have not specified a version, we accept any installed one
             if (not defined $need_version or
                 $need_version eq "0" or
                 $need_version eq "undef") {
-                next if defined $inst_file;
+                next if defined $available_file;
             }
 
-            $have_version = $nmo->inst_version;
+            $available_version = $nmo->available_version;
         }
 
         # We only want to install prereqs if either they're not installed
         # or if the installed version is too old. We cannot omit this
         # check, because if 'force' is in effect, nobody else will check.
-        if (defined $inst_file) {
+        if (defined $available_file) {
             my(@all_requirements) = split /\s*,\s*/, $need_version;
             local($^W) = 0;
             my $ok = 0;
@@ -7281,13 +7372,13 @@ sub unsat_prereq {
                 if ($rq =~ s|>=\s*||) {
                 } elsif ($rq =~ s|>\s*||) {
                     # 2005-12: one user
-                    if (CPAN::Version->vgt($have_version,$rq)){
+                    if (CPAN::Version->vgt($available_version,$rq)){
                         $ok++;
                     }
                     next RQ;
                 } elsif ($rq =~ s|!=\s*||) {
                     # 2005-12: no user
-                    if (CPAN::Version->vcmp($have_version,$rq)){
+                    if (CPAN::Version->vcmp($available_version,$rq)){
                         $ok++;
                         next RQ;
                     } else {
@@ -7299,14 +7390,14 @@ sub unsat_prereq {
                     $ok++;
                     next RQ;
                 }
-                if (! CPAN::Version->vgt($rq, $have_version)){
+                if (! CPAN::Version->vgt($rq, $available_version)){
                     $ok++;
                 }
-                CPAN->debug(sprintf("need_module[%s]inst_file[%s]".
-                                    "inst_version[%s]rq[%s]ok[%d]",
+                CPAN->debug(sprintf("need_module[%s]available_file[%s]".
+                                    "available_version[%s]rq[%s]ok[%d]",
                                     $need_module,
-                                    $inst_file,
-                                    $have_version,
+                                    $available_file,
+                                    $available_version,
                                     CPAN::Version->readable($rq),
                                     $ok,
                                    )) if $CPAN::DEBUG;
@@ -7657,6 +7748,7 @@ sub test {
         {
             my @prereq;
 
+            # local $CPAN::DEBUG = 16; # Distribution
             for my $m (keys %{$self->{sponsored_mods}}) {
                 my $m_obj = CPAN::Shell->expand("Module",$m);
                 # XXX we need available_version which reflects
@@ -7665,12 +7757,17 @@ sub test {
                 my $available_version = $m_obj->available_version;
                 my $available_file = $m_obj->available_file;
                 if ($available_version &&
-                    !CPAN::Version->vlt($available_version,$self->{PREREQ_PM}{$m})
+                    !CPAN::Version->vlt($available_version,$self->{prereq_pm}{$m})
                    ) {
                     CPAN->debug("m[$m] good enough available_version[$available_version]")
                         if $CPAN::DEBUG;
-                } elsif ($self->{PREREQ_PM}{$m} == 0
-                         && $available_file) {
+                } elsif ($available_file
+                         && (
+                             !$self->{prereq_pm}{$m}
+                             ||
+                             $self->{prereq_pm}{$m} == 0
+                            )
+                        ) {
                     # lex Class::Accessor::Chained::Fast which has no $VERSION
                     CPAN->debug("m[$m] have available_file[$available_file]")
                         if $CPAN::DEBUG;
@@ -9634,7 +9731,8 @@ do. Force takes as arguments a method name to be called and any number
 of additional arguments that should be passed to the called method.
 The internals of the object get the needed changes so that CPAN.pm
 does not refuse to take the action. The C<force> is passed recursively
-to all contained objects.
+to all contained objects. See also the section above on the C<force>
+and the C<fforce> pragma.
 
 =item CPAN::Bundle::get()
 
@@ -9714,7 +9812,8 @@ Forces CPAN to perform a task that it normally would have refused to
 do. Force takes as arguments a method name to be called and any number
 of additional arguments that should be passed to the called method.
 The internals of the object get the needed changes so that CPAN.pm
-does not refuse to take the action.
+does not refuse to take the action. See also the section above on the
+C<force> and the C<fforce> pragma.
 
 =item CPAN::Distribution::get()
 
@@ -9925,7 +10024,8 @@ Forces CPAN to perform a task that it normally would have refused to
 do. Force takes as arguments a method name to be called and any number
 of additional arguments that should be passed to the called method.
 The internals of the object get the needed changes so that CPAN.pm
-does not refuse to take the action.
+does not refuse to take the action. See also the section above on the
+C<force> and the C<fforce> pragma.
 
 =item CPAN::Module::get()
 
@@ -10151,13 +10251,22 @@ with this floppy. See also below the paragraph about CD-ROM support.
 
 =item has_inst($module)
 
-Returns true if the module is installed. See the source for details.
+Returns true if the module is installed. Used to load all modules into
+the running CPAN.pm which are considered optional. The config variable
+C<dontload_list> can be used to intercept the C<has_inst()> call such
+that an optional module is not loaded despite being available. For
+example the following command will prevent that C<YAML.pm> is being
+loaded:
+
+    cpan> o conf dontload_list push YAML
+
+See the source for details.
 
 =item has_usable($module)
 
-Returns true if the module is installed and several and is in a usable
-state. Only useful for a handful of modules that are used internally.
-See the source for details.
+Returns true if the module is installed and is in a usable state. Only
+useful for a handful of modules that are used internally. See the
+source for details.
 
 =item instance($module)
 
@@ -10265,6 +10374,7 @@ Currently the following keys in the hash reference $CPAN::Config are
 defined:
 
   applypatch         path to external prg
+  auto_commit        commit all changes to config variables to disk
   build_cache        size of cache for directories to build modules
   build_dir          locally accessible directory to build modules
   build_dir_reuse    boolean if distros in build_dir are persistent
@@ -10278,6 +10388,7 @@ defined:
                      quote on Windows, single tick everywhere else;
                      can be set to space to disable quoting
   check_sigs         if signatures should be verified
+  colorize_debug     Term::ANSIColor attributes for debugging output
   colorize_output    boolean if Term::ANSIColor should colorize output
   colorize_print     Term::ANSIColor attributes for normal output
   colorize_warn      Term::ANSIColor attributes for warnings

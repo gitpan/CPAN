@@ -211,26 +211,25 @@ ALL_PERLS = /usr/bin/perl \
 MEGA_COLLECTION = Expect \
 		Bundle::CPANxxl \
 		CPAN::DistnameInfo \
-		/home/src/perl/devel-cover/SVN/. \
+		Devel::Cover \
 		/home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
 		Kwalify \
+		Coro \
 		Font::TTF \
-		Term::ReadLine::Gnu \
 		/home/src/perl/tk/SVN/. \
 		Tk::Tree \
-		CDB_File \
+		PadWalker \
 		Math::BigInt::GMP \
 		IPC::ShareLite \
 		Data::Dump \
+		Cache::File \
 		Plagger \
 		Bundle::Phalanx100 \
 		Jifty \
-		Coro \
 		Getopt::Euclid \
 		DBIx::Class \
 		IPC::PubSub \
 		Bundle::Pause \
-		PadWalker \
 		Graph::Easy \
 		Module::Plan::Base \
 		Cache::Memcached \
@@ -245,6 +244,16 @@ MEGA_COLLECTION = Expect \
 		Bundle::Slash \
 		Locale::Maketext::Gettext \
 		Test::Without::Module \
+		Class::MethodMaker \
+		Class::C3 \
+		IO::Pager \
+		Object::Signature \
+		PerlIO::eol \
+		Number::Format \
+		Template::Plugin::Number::Format \
+		Test::JSON \
+		Term::ReadLine::Gnu \
+		CDB_File \
 
 }
 }
@@ -299,7 +308,7 @@ checkout ::
 	svn co https://pause.perl.org:5460/svn/cpanpm/trunk ./
 
 megainstall: termreadkeyinstall logs/.exists
-	$(PERL) -Ilib -MCPAN -e 'install(qw($(MEGA_COLLECTION)));CPAN::Shell->failed' > logs/megainstall.`date +%Y%m%dT%H%M`.out 2>&1
+	$(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load;$$CPAN::DEBUG|=16;install(qw($(MEGA_COLLECTION)));CPAN::Shell->failed' > logs/megainstall.`date +%Y%m%dT%H%M`.out 2>&1
 
 # nohup needed by my zsh
 termreadkeyinstall: logs/.exists

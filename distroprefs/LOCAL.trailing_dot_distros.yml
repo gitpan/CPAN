@@ -11,10 +11,17 @@ match:
 pl:
   commandline: "cvs -q up -dP; $PERL Makefile.PL"
 ---
+comment: "Xvfb :121 must be started by somebody else"
 match:
-  distribution: "/home/src/perl/tk/SVN/\.$"
+  distribution: "^/home/src/perl/tk/SVN/\.$"
 pl:
   commandline: "svn up && $PERL Makefile.PL XFT=1"
 test:
   env:
     BATCH: 1
+    DISPLAY: ":121"
+---
+match:
+  distribution: "^/home/src/perl/devel-cover/SVN/\.$"
+pl:
+  commandline: "svn up && $PERL Makefile.PL"
