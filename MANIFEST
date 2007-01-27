@@ -10,6 +10,7 @@ distroprefs/ADAMK.Algorithm-Dependency.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Build-Fails.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml
 distroprefs/ATOURBIN.rpm-build-perl.yml
+distroprefs/AUDREYT.Jifty-DBI.yml
 distroprefs/AUDREYT.Module-Install.yml
 distroprefs/AUDREYT.Module-Signature.yml
 distroprefs/AUDREYT.PDF-FromHTML.yml
@@ -22,6 +23,7 @@ distroprefs/BTROTT.XML-Feed.yml
 distroprefs/BTROTT.XML-FOAF.yml
 distroprefs/BYRNE.SOAP-Lite.yml
 distroprefs/CAPTTOFU.DBD-mysql.yml
+distroprefs/CLKAO.App-CLI.yml
 distroprefs/CLKAO.SVN-Mirror.yml
 distroprefs/DBROBINS.Net-SSH-Perl.yml
 distroprefs/DCONWAY.Parse-RecDescent.yml
@@ -54,6 +56,7 @@ distroprefs/JCRISTY.PerlMagick.yml
 distroprefs/JESSE.Data-ICal.yml
 distroprefs/JESSE.HTTP-Server-Simple.yml
 distroprefs/JESSE.Jifty.yml
+distroprefs/JHOBLITT.DateTime-Format-ISO8601.yml
 distroprefs/JJORE.Carp-Clan.yml
 distroprefs/JMASON.Mail-SpamAssassin.yml
 distroprefs/JPEACOCK.SVN-Notify-Mirror.yml
@@ -74,9 +77,11 @@ distroprefs/MIYAGAWA.XML-Atom.yml
 distroprefs/MLEHMANN.Coro.yml
 distroprefs/MSERGEANT.CDB_File.yml
 distroprefs/MSERGEANT.DBD-SQLite.yml
+distroprefs/MSERGEANT.DBIx-AnyDBD.yml
 distroprefs/NI-S.Tk.yml
 distroprefs/NIKIP.Authen-PAM.yml
 distroprefs/OLAF.Net-DNS.yml
+distroprefs/OVID.TAPx-Parser.yml
 distroprefs/PCIMPRICH.XML-SAX-ExpatXS.yml
 distroprefs/PETDANCE.HTML-Tidy.yml
 distroprefs/PETDANCE.WWW-Mechanize.yml

@@ -1,3 +1,33 @@
+2007-01-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 1.88_71: this does not yet qualify as a release candidate for
+	1.89 because it incorporates a major bugfix; but otherwise I think this
+	is feature complete for a release
+
+	* document treatment of requires and build_requires declarations
+
+	* integrate the distroprefs README into the manpage
+
+	* introduce negative distroprefs caching for the current command
+
+	* new commands C<is_tested> and C<install_tested> (inspired by Ilya
+	Zakharevich)
+
+	* fix completion bug with notest and fforce pragma
+
+	* delete distro objects in memory that are cleaned up by the CacheMgr
+
+	* fix a bug that only fired when prefer_installer was set to MB but
+	Module::Build was not yet installed
+
+	* fix a serious dependency resolution bug triggered by the new
+	family of Compress::Zlib module distributions
+
+	* limit recursion detection to those commands that need it and let
+	others, like 'look', continue to work; at the same time make recursion
+	detection a serious error that throws an exception and does not try to
+	continue to execute
+
 2007-01-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* release 1.88_69

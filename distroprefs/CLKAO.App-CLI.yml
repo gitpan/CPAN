@@ -1,12 +1,10 @@
---- 
+---
 match:
-  distribution: "^JESSE/Jifty-"
+  distribution: "^CLKAO/App-CLI-"
 pl: 
+  args: ["--defaultdeps"]
   env:
     PERL_AUTOINSTALL: --skip    
-  args: ["--defaultdeps"]
 make:
   env:
     PERL_AUTOINSTALL: --skip    
-cpanconfig:
-  check_sigs: 0

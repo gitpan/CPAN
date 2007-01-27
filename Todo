@@ -1,3 +1,525 @@
+2007-01-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* what's going on with JHOBLITT/DateTime-Format-ISO8601-0.0403.tar.gz?
+
+	rt.cpan.org has the solution in ticket 24335. Patch by Aaron Crane (=ARC)
+
+	Aaron's patch cannot be copy and pasted because of some whitespace
+	problems. So I try to apply it manually.
+
+	======================Dealing With Patches==================
+
+	My procedure when I encounter a broken package:
+
+    look DISTRO
+    cd ..
+    rsync -va DISTRODIR/ DISTRODIR.orig/
+    # fix the distro in DISTRODIR
+    diff -urp DISTRODIR.orig DISTRODIR > DISTRODIR-ANDK-01.patch
+    gzip DISTRODIR-ANDK-01.patch
+
+	I then upload the resulting patch to my CPAN patches/ directory and
+	write a YAML file into my prefs_dir/ directory that contains roughly
+
+    ---
+    comment: "This patch fixes ..."
+    match:
+      distribution: "^DISTRO$"
+
+    patches:
+      - ANDK/patches/DISTRODIR-ANDK-01.patch
+
+	That's all. From then I can install that distro for any perl version on
+	that machine.
+
+	Uploaded to CPAN and a new distropref file is made.
+	
+	* yesterday I built maintperl 29988 and somehow megainstall failed with
+	Jifty-DBI asking auto-install questions. I suppose the question was
+	asked by a different perl and an old CPAN because I do have a Jifty-DBI
+	distropref file that should prevent questions asking.
+
+	NO! The malfunctioning started exactly at 23:40 when the disk also
+	started failing. So I suppose we can simply restart a megainstall on
+	29988 now.
+
+	No. Still hanging. No signs of being the wrong perl. Trying with 'make run'.
+
+______________________ D i s t r o P r e f s ______________________
+                      AUDREYT.Jifty-DBI.yml[0]                      
+Running make for A/AU/AUDREYT/Jifty-DBI-0.32.tar.gz
+  Has already been unwrapped into directory /home/k/.cpan/build/Jifty-DBI-0.32-LUlvH7
+  '/home/src/perl/repoperls/installed-perls/maint-5.8/pLUMXwK/perl-5.8.0@29988/bin/perl Makefile.PL' returned status 2, won't make
+
+	'fforce make ...' first scans the build_dir for sizes which takes a
+	while, maybe the resync of the RAID is slowing it down. After that the
+	distroprefs mechanics answer the auto-install question(s).
+
+	But 'test Jifty::DBI' fails some tests. It tests many dependencies, so
+	let's look at the summary:
+
+  AUDREYT/Jifty-DBI-0.32.tar.gz
+  /usr/bin/make test -- NOT OK
+Failed during this command:
+ JHOBLITT/DateTime-Format-ISO8601-0.0403.tar.gz: make_test NO
+ AUDREYT/Jifty-DBI-0.32.tar.gz                : make_test NO
+
+cpan[4]> is_tested 
+Sat Jan 27 06:08:02 2007 /home/k/.cpan/build/FreezeThaw-0.43-MyeZXx
+Sat Jan 27 06:08:07 2007 /home/k/.cpan/build/DBIx-DBSchema-0.31-Wrf6R4
+Sat Jan 27 06:08:17 2007 /home/k/.cpan/build/Lingua-EN-Inflect-1.89-8UYDiB
+Sat Jan 27 06:08:36 2007 /home/k/.cpan/build/Cache-Simple-TimedExpiry-0.27-rznB3I
+
+	Ahja, just the normal autoinstall misbehaviour. Because something
+	failed, it tries to go into recursion. My normal patch
+	ANDK/Module-AutoInstall-in-inc-ANDK-01.patch seems to take the
+	appropriate amount of care for that.
+
+2007-01-26  Andreas J Koenig  <akoenig@iconmobile.com>
+
+	* document build_requires and when you talk about prerequisites, name
+	the option names explicitly. DONE
+
+	* note/explain the improved behaviour on recursion detection in the
+	Changes file. DONE.
+
+	* Bug: batch jobs scan for sizes although they never delete anything. So
+	either teach them to delete under certain conditions or do not scan for
+	sizes. LATER
+
+	* Today I found a bug in Tk::Pod when trying with bleadperl:
+
+	/..../tkpod -I lib CPAN
+
+	Need to have a closer look some day.
+
+	A test script also failed but I installed it with 'force notest install
+	Tk::Pod' because I had more interest in getting _71 out.
+
+	Sent a patch to Slaven today which commented out an else in line 190 or
+	so.
+
+2007-01-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* bug: 'fforce instTAB' doesn't do completion.
+
+	FIXED in SVK rev. 1762
+
+2007-01-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Today I also saw an uninstallable IO::AIO 2.32: the AIO.pm file was
+	not found within blib although it was there in blib/lib/IO/IO/AIO.pm.
+	Who is playing a false game? Diff between 3.31 and 2.32 shows:
+
++    PM           => {
++                   'AIO.pm'            => '$(INST_LIBDIR)/IO/AIO.pm',
++                    },
+
+	Bug fixed and reported to Marc:
+
+--- Makefile.PL~	2007-01-22 16:58:24.000000000 +0100
++++ Makefile.PL	2007-01-23 08:04:38.000000000 +0100
+@@ -61,7 +61,7 @@
+     VERSION_FROM => "AIO.pm",
+     LIBS         => ['-lpthread -lrt', '-lpthread', '-lpthreads', ''],
+     PM           => {
+-    		    'AIO.pm'		=> '$(INST_LIBDIR)/IO/AIO.pm',
++    		    'AIO.pm'		=> '$(INST_LIBDIR)/AIO.pm',
+                     },
+     clean        => { FILES => "autoconf/config.h autoconf/config.log autoconf/config.status" },
+ });
+
+
+	* Today I saw this:
+
+cpan[15]> install Coro
+Running install for module 'Coro'
+Running make for M/ML/MLEHMANN/Coro-3.41.tar.gz
+  Has already been unwrapped into directory /home/k/.cpan/build/Coro-3.41-xlIZvI
+  Has already been made
+Running make test
+  Couldn't chdir to '/home/k/.cpan/build/Coro-3.41-xlIZvI': No such file or directory
+Running make install
+  make test had returned bad status, won't install without force
+
+	This was already somewhere in my Todo list: give up objects in memory
+	that cannot fulfil some promise or at least offer the solution which is
+
+	fforce install Coro # but no, this is not an appropriate suggestion
+
+	Or remove the objects from memory while CacheMgr is running. Or both! If
+	we delete it ourselves, the deletion from memory is appropriate
+
+  --DONE in ~ SVK rev. 1760 --
+
+	but if somebody else deletes it we must offer a better solution than the
+	above breakage.
+
+	Suggest "maybe try 'force get $ID' to clean up the object in memory" or
+	something like that. Or "to reset everything" or "to start with a fresh
+	distro"... Nothing seems really good and correct. LATER
+	
+	* Today Ken confirmed that _build/prereqs is safe to rely on. Good news,
+	Thanks Ken!
+
+	* Todo before 71: write a Changes file. Declare YAML::Tiny not supported
+	DONE; support is_tested and install_tested and document them (DONE SVK
+	rev 1763); integrate the distroprefs README into the manpage (DONE SVK
+	rev. 1766); speed up distroprefs parsing with a cache DONE in SVK rev.
+	1764;
+
+	It would be nice to understand the failures that were reported through
+	testers and the one I saw on my dev05 box and the ones I saw on OSX but
+	it will again be a developer release after all, so maybe these will have
+	to wait.
+
+	The test failure on dev05 is not reproducable. OSX?
+
+	OSX passes all tests with my first _71 test build.
+	
+	* Today I tried 1.88_69 on OSX wit 5.8.6 as it comes preinstalled.
+	File::HomeDir has issues and I could not use CPAN::Reporter to write a
+	report because it said there was no config file. Will have to revisit
+	this.
+
+	* For several days I have kept Kwalify out with dontload_list. Today I
+	opened the door again and let 29923 work through megainstall. All's
+	well.
+
+2007-01-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* We need a speedup of the distroprefs stuff. Currently we're going
+	through readdir and YAML::Load thousand times per module. We should
+	probably cache the whole directory structure once per command and delete
+	it from re-used build_dirs. DONE with negative per-command distroprefs
+	cache.
+
+2007-01-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Today I have a segv with 29895 when running CPAN.pm. It may be
+	relevant that I erroneously left YAML::Tiny configured? I reconfigured
+	to prefer YAML::Syck and ... the SEGV remains. Configuring limit
+	coredumpsize 100m now. The SEGV seems to bring the box to its knees and
+	the logfile of the first run of 29895 says 'Out of memory'. And the core
+	file is indeed 100m and has no stack. Setting coredumpsize to 1000m now.
+	The problem comes immediately after loading Kwalify 1.13
+
+	29887 was the last before 895 and its logfile is large. It came to the
+	place where it loaded YAML::Tiny and from there is broke but not with a
+	SEGV. So something between 29887 and 29895 is evil. How ironic that most
+	of these patches are related to CPAN.pm!
+
+	The newest core file is 1000M large, gdb needs a long time to load it
+	and again says "No stack" when I say 'bt'.
+
+	Next idea is to 'o conf dontload_list push Kwalify'. Now we get a step
+	further. CPAN tries to install Archive::Zip, then becomes very slow,
+	grows to 55M and then starts scanning build_dir for sizes. From that
+	point it succeeds in building and installing, just a bit slow it seems,
+	but this may be just the normal distroprefs slowness. Bundle::CPANxxl is
+	installed now and megainstall is running. After a while I discover that
+	I made a typo for yaml_module and said YAML::Sync. Of course this leads
+	to slowness. Interesting mistake though, we might want to guard against
+	it. 'make megainstall' finishes just as we're used to.
+
+	FirstTime warns on misspelled module names since SVK rev. 1761.
+
+2007-01-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* DBIx::Class has DBD::SQLite as build_requires. Thus it is being built,
+	not installed and CPAN::SQLite does not demand it as prerequisite
+	because it finds it (?) but then the install_driver fails during the
+	tests. Weird.
+
+	As a first alternative I try to install DBD::SQLite explicitly
+	immediately before CPAN::SQLite.
+
+	* See the two fails on CPAN testers for 1.88_69!
+
+	They are both MSWin32 and 397036 is 5.8.5 and fails
+
+t/31sessions.......dubious
+	Test returned status 5 (wstat 1280, 0x500)
+DIED. FAILED tests 10-11, 14, 22, 26
+	Failed 5/30 tests, 83.33% okay
+
+	Output impossible to read
+
+	398304 is 5.8.8 and fails
+
+t/31sessions.......# DEBUG: name[first]system["C:\strawberry-perl\perl\bin\perl.exe" "-IC:\strawberry-perl\.cpanplus\5.8.8\build\CPAN-1.88_69\t" "-Mblib" "-MCPAN::MyConfig" "-MCPAN" "-e" "@CPAN::Defaultsites = (); shell" > test.out] at t/31sessions.t line 147.
+
+#   Failed test 'command[dump $::x=4*6+1]'
+#   at t/31sessions.t line 162.
+#                   'Lockfile removed.
+# '
+#     doesn't match '/= 25;/'
+Use of uninitialized value in pattern match (m//) at t/31sessions.t line 162.
+
+
+	It seems there is no output at all to parse.
+
+	* Look into YAML::Tiny; doesn't seem to work. We need a better catch on
+	the problem it is causing: currently I do not see where it is failing.
+
+2007-01-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* learn something new every day: less -R preserves the ANSI color
+	sequences. Best way to analyse the captured output.
+
+	* maint@29776 breaks DBI, need to check with 29802. Failure mailed to
+	P5P. Fixed by Nicholas.
+
+2007-01-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* And the next new bug: again an endless loop between PDF::FromHTML and
+	XML::Twig. I'm not sure in which state CPAN.pm was when this run
+	started, so I rerun from scratch with 29779 and stop the usual loop.
+
+	No, the bug is there. The distro of PDF::FromHTML is the next on the
+	loop and it depends on XML::Twig. The latter fails its tests but
+	nonetheless re-queing is done. Instead of simply continuing with normal
+	business because we do not need to requeue. What a mess.
+
+	OK, sure, by removing the "next" for sponsored modules we gave the
+	option that things get requeued that have failed. Should also have an
+	easy fix.
+	
+	Tomorrow: megainstall with maintperl@29776, blead@297{79,80}, etc.
+
+	(aside: the stupid thing about dot distros is that they are being
+	needlessly rerun)
+
+	Maybe write a failed_within_this_command() method?
+
+	Is it true that batch jobs scan for sizes and then do not delete
+	anything from build_dir? It seems so. My first 'make run' after a while
+	faces 3.3 GB and in all batch jobs I saw the dot painting "for sizes".
+
+	(The last successful testshell protocol I have with Expect on is
+	make-test-20061230T172249.)
+
+	30shell fails and it is again hard to find the offending test. Another
+	proof that new tests must go into 31sessions.t. But 31session does not
+	finish. Easily reproducable by trying to install
+	CPAN::Test::Dummy::Perl5::Make::CircDepeOne
+
+	It seems that the recursion detection is now broken. We reach the limit
+	of 100 in CPAN::Queue which should never be reached. If I say ^C there,
+	then I see a seemingly endless loop of "Has already been...". Somehow we
+	seem to bypass the color_cmd_tmps.
+
+	It seems that everybody who puts something onto the queue is responsible
+	for calling color_cmd_tmps? How silly if true :-( But it seems that we
+	*are* calling color_cmd_tmps before jumpqueue in follow_prereqs. Yes,
+	but we call it with $color=1 and this has already been called before we
+	had the prereqs and so it returns early. We probably must call it with
+	$color=2? How obfuscated if true :-( Yes, and by calling with $color=2
+	and preventing an early return of all color_cmd_tmps when $color==2 I
+	start to pass on 31sessions.t. Recursion detection is now even faster,
+	we do not even arrive at testing which I consider a good thing.
+
+	But it comes at a price. The disadvantage is that it is a die() and the
+	usual "Failed during this command" gets lost. So what do we want?
+
+	The result in older versions was:
+
+Recursive dependency detected:
+    CPAN::Test::Dummy::Perl5::Make::CircDepeOne
+ => A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne-1.00.tar.gz
+ => CPAN::Test::Dummy::Perl5::Make::CircDepeThree
+ => A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree-1.00.tar.gz
+ => CPAN::Test::Dummy::Perl5::Make::CircDepeTwo
+ => A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo-1.00.tar.gz
+ => CPAN::Test::Dummy::Perl5::Make::CircDepeOne.
+Cannot continue.
+Failed during this command:
+ ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo-1.00.tar.gz: make_test NO one dependency not OK (CPAN::Test::Dummy::Perl5::Make::CircDepeOne)
+ ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeThree-1.00.tar.gz: make_test NO one dependency not OK (CPAN::Test::Dummy::Perl5::Make::CircDepeTwo)
+ ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeOne-1.00.tar.gz: make_test NO one dependency not OK (CPAN::Test::Dummy::Perl5::Make::CircDepeThree)
+
+	Looking at that again it appears not a very clever answer because the
+	"Failed" summary does not talk about the recursion detection. I think I
+	prefer the die().
+
+	On the other hand we need to help people in this situation and 'look
+	Foo' should not fail because of recursion. This is easily fixable: we
+	simply call color_cmd_tmps only for "make|test|install".
+
+2007-01-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Hunting bugs. The first reliable way to produce the needless loop
+	CBuilder<->File::Spec was to install a fresh maintperl@19726 and make
+	mega_install on top. It takes a while. I need a quicker way better yet a
+	testcase.
+
+	The next best program which still runs for a long time is
+
+	/home/src/perl/repoperls/installed-perls/*/p*/perl-5*@29726/bin/perl -Ilib -MCPAN -e 'CPAN::HandleConfig->load;$CPAN::DEBUG|=16;$CPAN::DEBUG|=32;$CPAN::DEBUG|=32768;install(qw(Expect Bundle::CPANxxl))' >& ttt.out
+
+	Unfortunately this reproduces it only once. Fortunately I now understand
+	the problem: CBuilder comes with a perfectly well suited Build.PL and
+	with a Makefile.PL. My prefer_installer says "MB". But when MB is not
+	yet installed, this must not be taken seriously. The bug is that CPAN.pm
+	actually tries to execute the Build.PL and fails and then refuses to
+	retry. This should have an easy fix in get() and now I believe, a
+	testcase for this might be a bit too hard given that Module::Build will
+	be in the core soon.
+
+	I think I fixed it.
+
+	Now I'm curious how this influences the Zlib bug. The endless loop
+	problem was, after all, a completely separate bug, uniq to the situation
+	described above. So I can remove the "next" in the sponsored_modules
+	loop and expect that it delays the testing of Compress::Zlib?
+
+	I seem to see a new bug now: CPAN::Reporter builds, tests, installs and
+	immediately tests again. --> another investigation necessary
+
+	But yes, the other bug is now also fixed by removing the "next" hack.
+
+2007-01-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Feature: On recursive dependency please dump the required version.
+
+	* Bug: recursive dependency ExtUtils::CBuilder <-> File::Spec
+
+	CPAN.pm gave me this puzzle today when trying to build on top of 5.8.9-tobe
+
+  Recursive dependency detected:
+      ExtUtils::CBuilder
+   => K/KW/KWILLIAMS/ExtUtils-CBuilder-0.18.tar.gz
+   => File::Spec
+   => K/KW/KWILLIAMS/PathTools-3.24.tar.gz
+   => ExtUtils::CBuilder.
+  Cannot continue.
+
+	But File::Spec 3.12 is installed, so the recursive dependency should be
+	breakable.
+
+	AND the dump command should not fail under recursive dependency.
+
+	Interstingly, the problem went away without special intervention. I
+	remember now that I have seen it before and that it disappeared. Hrm.
+
+	* Bug: 5.8.9 cannot install Compress::Zlib 2.003
+
+	----      PMQS/Compress-Zlib-2.003.tar.gz     ---- (0)
+    IO::Compress::Gzip::Constants [requires]
+    IO::Uncompress::Base [requires]
+    IO::Compress::Base [requires]
+    IO::Uncompress::Gunzip [requires]
+    IO::Compress::Gzip [requires]
+    Compress::Raw::Zlib [requires]
+    IO::Compress::Base::Common [requires]
+
+	[[[
+    IO::Compress::Gzip::Constants PMQS/IO-Compress-Zlib-2.003.tar.gz (1)
+    IO::Uncompress::Base          PMQS/IO-Compress-Base-2.003.tar.gz (2)
+    IO::Compress::Base            PMQS/IO-Compress-Base-2.003.tar.gz (2)
+    IO::Uncompress::Gunzip        PMQS/IO-Compress-Zlib-2.003.tar.gz (1)
+    IO::Compress::Gzip            PMQS/IO-Compress-Zlib-2.003.tar.gz (1)
+	  Compress::Raw::Zlib           PMQS/Compress-Raw-Zlib-2.003.tar.gz (3)
+    IO::Compress::Base::Common    PMQS/IO-Compress-Base-2.003.tar.gz (2)
+
+  (1)
+----    PMQS/IO-Compress-Zlib-2.003.tar.gz    ----
+    IO::Uncompress::Base [requires] (2)
+    IO::Compress::Base [requires]   (2)
+    Compress::Raw::Zlib [requires]  (3)
+
+	(2) PMQS/IO-Compress-Base-2.003.tar.gz (OK: 44923)
+
+	(3) PMQS/Compress-Raw-Zlib-2.003.tar.gz (OK: 45150)
+
+	(1) PMQS/IO-Compress-Zlib-2.003.tar.gz (OK: 45329)
+	
+	(0 in 45401) Won't repeat unsuccessful test during this command
+	
+	]]]
+
+
+43878:	[0mmake[1]: Entering directory `/home/k/.cpan/build/Compress-Zlib-2.003-z0UL8v'
+PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/maint-5.8/prPS0AD/perl-5.8.0@29726/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/000prereq.....
+#     Failed test (t/000prereq.t at line 46)
+#     Tried to use 'Compress::Raw::Zlib'.
+#     Error:  Can't locate Compress/Raw/Zlib.pm in @INC (@INC contains: t t/compress /home/k/.cpan/build/Compress-Zlib-2.003-z0UL8v/blib/lib /home/k/.cpan/build/Compress-Zlib-2.003-z0UL8v/blib/arch /home/src/perl/repoperls/installed-perls/maint-5.8/prPS0AD/perl-5.8.0@29726/lib/5.8.8/i686-linux-64int /home/src/perl/repoperls/installed-perls/maint-5.8/prPS0AD/perl-5.8.0@29726/lib/5.8.8 /home/src/perl/repoperls/installed-perls/maint-5.8/prPS0AD/perl-5.8.0@29726/lib/site_perl/5.8.8/i686-linux-64int /home/src/perl/repoperls/installed-perls/maint-5.8/prPS0AD/perl-5.8.0@29726/lib/site_perl/5.8.8 .) at (eval 3) line 2.
+
+	Why does it try testing C-Z too early? Could we convince CPAN.pm to
+	retry testing in 45401? Dump its state at both points in time?
+
+	Update 2007-01-11 akoenig : Found a "next" at the end of unsat_prereq
+	that skipped already sponsored modules. Removed it because it looks as
+	if it were responsible for the above bug. After that the infinite
+	recursion problem between CBuilder and File::Spec dominated the next run
+	and the normal recursion detection mechanism did not help to break the
+	loop. To put the bad to the ugly it turned out that the recursion
+	between CBuilder and File::Path is a wrong recursion in that the
+	available version of File::Spec in 5.8.9 is 1.12 and CBuilder does not
+	specify a version number, so is really satisfied with 1.12 but somebody
+	else seems to require 1.19 and so CPAN.pm is hunting for that without a
+	real reason. So we have a big bug here and no time to fix it.
+
+	See also the "next WHAT" in CPAN::Queue::jumpqueue. If we keep it, we
+	keep the queue at 100 instances of File-Spec-XXX.tar.gz without growing.
+	If we remove it, the queue grows. Both cases are infinite loops, so
+	neither better than the other.
+
+2007-01-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Watch the Module::Build space for updates to the question of calling
+	M:B methods or parsing _build/*. Ken seemed to argue for the file (?)
+
+	FINI
+
+	* Slaven tells me that he can confirm the Term::ReadLine::Gnu behaviour
+	in the t/callback.t test that I find so annoying for 5.9.5(debugging)
+	but not for 5.8.8. I.e. with 5.8.8 the window gets closed automatically
+	while with 5.9.5 it stays.
+
+	This would normally be solved with a binary search but as always with
+	big distros there are risks. Tk under randomly picked 21846 segfaults
+	during make test. Same for 23300.
+
+	25302 dies quickly with
+
+	/home/src/perl/repoperls/installed-perls/perl/pq4nEoU/perl-5.8.0@25302/bin/perl: symbol lookup error: /home/src/perl/tk/SVN/blib/arch/auto/Tk/Event/Event.so: undefined symbol: Perl_newXS_flags
+
+	28810 dies quickly with
+
+	Strange: could not load Tk library: Assertion (svtype)((_svi)->sv_flags & 0xff) >= SVt_PV failed: file "Event.xs", line 33 at /home/src/perl/repoperls/installed-perls/perl/pPOaCtI/perl-5.8.0@28810/lib/5.9.4/i686-linux-64int/DynaLoader.pm line 224.
+Compilation failed in require at /home/src/perl/tk/SVN/blib/lib/Tk.pm line 13.
+BEGIN failed--compilation aborted at /home/src/perl/tk/SVN/blib/lib/Tk.pm line 13.
+Compilation failed in require at (eval 3) line 3.
+
+	and 29411 similarly with
+
+	Strange: could not load Tk library: Assertion (svtype)((_svi)->sv_flags & 0xff) >= SVt_PV failed: file "Event.xs", line 33 at /home/src/perl/repoperls/installed-perls/perl/pXADjKY/perl-5.8.0@29411/lib/5.9.5/i686-linux-64int/DynaLoader.pm line 226.
+Compilation failed in require at /home/src/perl/tk/SVN/blib/lib/Tk.pm line 13.
+BEGIN failed--compilation aborted at /home/src/perl/tk/SVN/blib/lib/Tk.pm line 13.
+
+
+2007-01-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: distroprefs mechanism is still inefficient in that it scans too
+	often the whole distro_dir. (But it's super to have that while
+	developing new rules). And it's a drag especially when people have only
+	YAML and no YAML::Syck because they were not told or have no compiler or
+	whatsoever. Or revisit the caching mechanism for the YAMLs and count the
+	actual YAML activities.
+
+	Also, reduce the default max counter for FTPstats to 1000 or 14 days or
+	so and make it settable.
+
+	* The speed factor that I wrote about a few times recently is due to the
+	YAML::Syck being 100 times faster than YAML. Whenever for some reason
+	YAML::Syck is missing, the whole CPAN.pm feels like running on a 386
+	whatever we are doing, because we now have too many tasks delegated to
+	YAML format. What to do?
+
+	* 00.README into the manpage now?
+
 2007-01-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Bug: I say 'force test JHOBLITT/DateTime-Format-ISO8601-0.0403.tar.gz'
@@ -88,7 +610,7 @@ Sun Jan  7 08:06:31 2007 /home/k/.cpan/build/DateTime-Format-Builder-0.7807-VYcg
 
 	No, the 'dont_load_list' is preventing YAML to be loaded at the moment.
 
-	* Release the bundles that are already rewritten for a while
+	* Release the bundles that are already rewritten for a while DONE
 
 	* Speed things up by reading distroprefs less often or otherwise find
 	out who is so slow here. What happens between 'Running make for
@@ -297,8 +819,9 @@ Law is when you get what you pay for.
 	goes well.
 	
 	* bug: force get on a dot distro removes {archived} which confuses make
+	FIXED
 
-	* distcc/ccache: I should use it for Tk
+	* distcc/ccache: I should use it for Tk. USING IT
 
 	* Xvfb for testing Tk: Slaven writes
 
@@ -395,13 +918,6 @@ Law is when you get what you pay for.
 
 	* make up your mind about install_tested.
 
-	* Todo: distroprefs mechanism is still inefficient in that it scans too
-	often the whole distro_dir. (But it's super to have that while
-	developing new rules)
-
-	* document build_requires and when you talk about prerequisites, name
-	the option names explicitly.
-
 	* make _get_urllist a public method for Randy.
 
 	* Write manpage for CPAN::HandleConfig, esp load().
@@ -454,9 +970,6 @@ Refusing to autoload 'hosts' while signal pending at lib/CPAN.pm line 590.
 	reached!
 
 	* Coro. See also notes below, search for anyevent	
-
-	* Watch the Module::Build space for updates to the question of calling
-	M:B methods or parsing _build/*. Ken seemed to argue for the file (?)
 
 	* write a patch for Test::Reporter so you can choose the mail sending
 	module? Reported 2005-07:
