@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_71';
+$CPAN::VERSION = '1.88_72';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -182,14 +182,7 @@ sub shell {
                 $CPAN::Frontend->mywarn("Terminal does not support AddHistory.\n");
                 last;
             }
-            my($fh) = FileHandle->new;
-            open $fh, "<$histfile" or last;
-            local $/ = "\n";
-            while (<$fh>) {
-                chomp;
-                $term->AddHistory($_);
-            }
-            close $fh;
+            $META->readhist($term,$histfile);
         }}
         for ($CPAN::Config->{term_ornaments}) { # alias
             local $Term::ReadLine::termcap_nowarn = 1;
@@ -487,6 +480,7 @@ use strict;
                                     clean
                                     cvs_import
                                     dump
+                                    failed
                                     force
                                     fforce
                                     hosts
@@ -1090,6 +1084,16 @@ sub has_usable {
                                         }
                                     },
                                   ],
+               'Archive::Tar' => [
+                                  sub {require Archive::Tar;
+                                       unless (Archive::Tar::->VERSION >= 1.00) {
+                                            for ("Will not use Archive::Tar, need 1.00\n") {
+                                                $CPAN::Frontend->mywarn($_);
+                                                die $_;
+                                            }
+                                       }
+                                  },
+                                 ],
               };
     if ($usable->{$mod}) {
         for my $c (0..$#{$usable->{$mod}}) {
@@ -1154,7 +1158,7 @@ sub has_inst {
 	$CPAN::Frontend->mysleep(3);
     } elsif ($mod eq "Digest::SHA"){
         if ($Have_warned->{"Digest::SHA"}++) {
-            $CPAN::Frontend->myprint(qq{CPAN: checksum security checks disabled}.
+            $CPAN::Frontend->myprint(qq{CPAN: checksum security checks disabled }.
                                      qq{because Digest::SHA not installed.\n});
         } else {
             $CPAN::Frontend->mywarn(qq{
@@ -1234,6 +1238,19 @@ sub cleanup {
       $CPAN::Frontend->mywarn("Warning: Configuration not saved.\n");
   }
   $CPAN::Frontend->myprint("Lockfile removed.\n");
+}
+
+#-> sub CPAN::readhist
+sub readhist {
+    my($self,$term,$histfile) = @_;
+    my($fh) = FileHandle->new;
+    open $fh, "<$histfile" or last;
+    local $/ = "\n";
+    while (<$fh>) {
+        chomp;
+        $term->AddHistory($_);
+    }
+    close $fh;
 }
 
 #-> sub CPAN::savehist
@@ -1514,6 +1531,7 @@ sub scan_cache {
     return if $self->{SCAN} eq 'never';
     $CPAN::Frontend->mydie("Unknown scan_cache argument: $self->{SCAN}")
 	unless $self->{SCAN} eq 'atstart';
+    return unless $CPAN::META->{LOCK};
     $CPAN::Frontend->myprint(
 			     sprintf("Scanning cache %s for sizes\n",
 				     $self->{ID}));
@@ -3286,6 +3304,7 @@ sub _new_stats {
 sub _add_to_statistics {
     my($self,$stats) = @_;
     my $yaml_module = CPAN::_yaml_module;
+    $self->debug("yaml_module[$yaml_module]") if $CPAN::DEBUG;
     if ($CPAN::META->has_inst($yaml_module)) {
         $stats->{thesiteurl} = $ThesiteURL;
         if (CPAN->has_inst("Time::HiRes")) {
@@ -3616,7 +3635,9 @@ sub localize {
     if ($ret) {
         $stats->{filesize} = -s $ret;
     }
+    $self->debug("before _add_to_statistics") if $CPAN::DEBUG;
     $self->_add_to_statistics($stats);
+    $self->debug("after _add_to_statistics") if $CPAN::DEBUG;
     if ($ret) {
         unlink "$aslocal.bak$$";
         return $ret;
@@ -7811,6 +7832,11 @@ sub test {
     } else {
         $system = join " ", $self->_make_command(), "test";
     }
+    my $make_test_arg = $self->make_x_arg("test");
+    $system = sprintf("%s%s",
+                      $system,
+                      $make_test_arg ? " $make_test_arg" : "",
+                     );
     my($tests_ok);
     my %env;
     while (my($k,$v) = each %ENV) {

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                CPAN
-version:             1.88_71
+version:             1.88_72
 abstract:            query, download and build perl modules from CPAN sites
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.3101
