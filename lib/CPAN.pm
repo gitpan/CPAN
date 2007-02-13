@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.88_72';
+$CPAN::VERSION = '1.88_73';
 $CPAN::VERSION = eval $CPAN::VERSION;
 
 use CPAN::HandleConfig;
@@ -729,10 +729,11 @@ sub _perl_fingerprint {
     if (defined $dll) {
         $mtime_dll = (-f $dll ? (stat(_))[9] : '-1');
     }
+    my $mtime_perl = (-f $^X ? (stat(_))[9] : '-1');
     my $this_fingerprint = {
                             '$^X' => $^X,
                             sitearchexp => $Config::Config{sitearchexp},
-                            'mtime_$^X' => (stat $^X)[9],
+                            'mtime_$^X' => $mtime_perl,
                             'mtime_dll' => $mtime_dll,
                            };
     if ($other_fingerprint) {
@@ -1786,7 +1787,7 @@ sub o {
                 CPAN::HandleConfig->prettyprint($k);
 	    }
 	    $CPAN::Frontend->myprint("\n");
-	} else {
+        } else {
             if (CPAN::HandleConfig->edit(@o_what)) {
             } else {
                 $CPAN::Frontend->myprint(qq{Type 'o conf' to view all configuration }.
@@ -2790,7 +2791,7 @@ sub print_ornamented {
         my $color_on = eval { Term::ANSIColor::color($ornament) } || "";
         if ($@) {
             print "Term::ANSIColor rejects color[$ornament]: $@\n
-Please choose a different color (Hint: try 'o conf init color.*')\n";
+Please choose a different color (Hint: try 'o conf init /color/')\n";
         }
         print $color_on,
             $swhat,
@@ -2996,6 +2997,15 @@ to find objects with matching identifiers.
         my $s = $q->as_string;
         my $reqtype = $q->reqtype || "";
         $obj = CPAN::Shell->expandany($s);
+        unless ($obj) {
+            # don't know how this can happen, maybe we should panic,
+            # but maybe we get a solution from the first user who hits
+            # this unfortunate exception?
+            $CPAN::Frontend->mywarn("Warning: Could not expand string '$s' ".
+                                    "to an object. Skipping.");
+            $CPAN::Frontend->mysleep(5);
+            next;
+        }
         $obj->{reqtype} ||= "";
         {
             # force debugging because CPAN::SQLite somehow delivers us
@@ -7667,13 +7677,17 @@ sub prereq_pm {
 
                 #  Regexp modified by A.Speer to remember actual version of file
                 #  PREREQ_PM hash key wants, then add to
-                while ( $p =~ m/(?:\s)([\w\:]+)=>q\[(.*?)\],?/g ){
+                while ( $p =~ m/(?:\s)([\w\:]+)=>(q\[.*?\]|undef),?/g ){
                     # In case a prereq is mentioned twice, complain.
                     if ( defined $req->{$1} ) {
                         warn "Warning: PREREQ_PM mentions $1 more than once, ".
                             "last mention wins";
                     }
-                    $req->{$1} = $2;
+                    my($m,$n) = ($1,$2);
+                    if ($n =~ /^q\[(.*?)\]$/) {
+                        $n = $1;
+                    }
+                    $req->{$m} = $n;
                 }
                 last;
             }
@@ -8790,7 +8804,38 @@ sub color_cmd_tmps {
     return if exists $self->{incommandcolor}
         && $color==1
         && $self->{incommandcolor}==$color;
-    return if $depth>=1 && $self->uptodate;
+    return if $color==0 && !$self->{incommandcolor};
+    if ($color>=1) {
+        if ( $self->uptodate ) {
+            $self->{incommandcolor} = $color;
+            return;
+        } elsif (my $have_version = $self->available_version) {
+            # maybe what we have is good enough
+            if (@$ancestors) {
+                my $who_asked_for_me = $ancestors->[-1];
+                my $obj = CPAN::Shell->expandany($who_asked_for_me);
+                if (0) {
+                } elsif ($obj->isa("CPAN::Bundle")) {
+                    # bundles cannot specify a minimum version
+                    return;
+                } elsif ($obj->isa("CPAN::Distribution")) {
+                    if (my $prereq_pm = $obj->prereq_pm) {
+                        for my $k (keys %$prereq_pm) {
+                            if (my $want_version = $prereq_pm->{$k}{$self->id}) {
+                                if (CPAN::Version->vcmp($have_version,$want_version) >= 0) {
+                                    $self->{incommandcolor} = $color;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        $self->{incommandcolor} = $color; # set me before recursion,
+                                          # so we can break it
+    }
     if ($depth>=$CPAN::MAX_RECURSION){
         $CPAN::Frontend->mydie(CPAN::Exception::RecursiveDependency->new($ancestors));
     }
@@ -10657,7 +10702,8 @@ through the pager specified in C<$CPAN::Config->{pager}>.
 Returns the content of the META.yml of this distro as a hashref. Note:
 works only after an attempt has been made to C<make> the distribution.
 Returns undef otherwise. Also returns undef if the content of META.yml
-is dynamic.
+is not authoritative. (The rules about what exactly makes the content
+authoritative are still in flux.)
 
 =item CPAN::Distribution::test()
 

@@ -208,16 +208,24 @@ ALL_PERLS = /usr/bin/perl \
             /usr/local/perl-5.6.2/bin/perl
 
 # not sorted because order matters
-MEGA_COLLECTION = Expect \
-		Bundle::CPANxxl \
+MEGA_BASE = Bundle::CPANxxl \
 		CPAN::DistnameInfo \
-		Devel::Cover \
-		Kwalify \
+		DBD::SQLite \
+		/home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
+		/home/src/perl/tk/SVN/. \
+
+
+MEGA_INSTALL = Devel::Cover \
 		Coro \
 		Font::TTF \
 		YAML::Tiny \
 		PadWalker \
+		LWP::UserAgent \
+		SOAP::Lite \
 		Data::Float \
+		bigint \
+		Math::BigInt::FastCalc \
+		Math::BigRat \
 		Math::BigInt::GMP \
 		IPC::ShareLite \
 		Data::Dump \
@@ -227,9 +235,6 @@ MEGA_COLLECTION = Expect \
 		Getopt::Euclid \
 		DBIx::Class \
 		IPC::PubSub \
-		DBD::SQLite \
-		/home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
-		/home/src/perl/tk/SVN/. \
 		Tk::Tree \
 		Tk::Pod \
 		Bundle::Phalanx100 \
@@ -258,6 +263,10 @@ MEGA_COLLECTION = Expect \
 		Test::JSON \
 		Term::ReadLine::Gnu \
 		CDB_File \
+		Catalyst \
+		Module::Info \
+		String::Similarity \
+		Test::Deep \
 
 }
 }
@@ -312,7 +321,7 @@ checkout ::
 	svn co https://pause.perl.org:5460/svn/cpanpm/trunk ./
 
 megainstall: termreadkeyinstall logs/.exists
-	$(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load;$$CPAN::DEBUG=0;install(qw($(MEGA_COLLECTION)));CPAN::Shell->failed' > logs/megainstall.`date +%Y%m%dT%H%M`.out 2>&1
+	$(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load;$$CPAN::DEBUG=0;install(qw($(MEGA_BASE)), map {$$_->[0]} sort {$$a->[1]<=>$$b->[1]} map {[$$_,rand(1)]} qw($(MEGA_INSTALL)));CPAN::Shell->failed' > logs/megainstall.`date +%Y%m%dT%H%M`.out 2>&1
 
 depefails:
 	$(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load;$$CPAN::DEBUG|=16;$$CPAN::DEBUG|=32;$$CPAN::DEBUG|=32768;install(qw(CPAN::Test::Dummy::Perl5::Build::DepeFails));'
@@ -635,6 +644,9 @@ dd-prefs :: $base.dd
 	\$(PERL) -MYAML::Syck=LoadFile -MData::Dumper -e '\$\$x=shift; \@y=LoadFile("\$\$x.yml"); print Data::Dumper->new(\\\@y)->Indent(1)->Useqq(1)->Purity(1)->Dump' $base > $base.dd.new && mv $base.dd.new $base.dd
 
 };
+    } elsif (0) {
+      # we should only say this on author's machine:
+      warn "Warning (usually harmless): have no YAML::Syck, cannot write rules for foreign prefs"
     }
   }
 

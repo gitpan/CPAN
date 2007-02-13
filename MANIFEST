@@ -16,6 +16,7 @@ distroprefs/AUDREYT.Module-Signature.yml
 distroprefs/AUDREYT.PDF-FromHTML.yml
 distroprefs/AUDREYT.YAML-Syck.yml
 distroprefs/BTROTT.Convert-PEM.yml
+distroprefs/BTROTT.Crypt-DH.yml
 distroprefs/BTROTT.Crypt-DSA.yml
 distroprefs/BTROTT.Feed-Find.yml
 distroprefs/BTROTT.URI-Fetch.yml
@@ -33,6 +34,7 @@ distroprefs/DMAKI.DateTime-Format-Japanese.yml
 distroprefs/DMAKI.DateTime-Util-Astro.yml
 distroprefs/DMAKI.DateTime-Util-Calc.yml
 distroprefs/DMAKI.Xango.yml
+distroprefs/DMAKI.XML-RSS-Liberal.yml
 distroprefs/DROLSKY.Params-Validate.yml
 distroprefs/DURIST.WWW-Babelfish.yml
 distroprefs/EESTABROO.IMAP-Admin.yml
@@ -61,6 +63,7 @@ distroprefs/JJORE.Carp-Clan.yml
 distroprefs/JMASON.Mail-SpamAssassin.yml
 distroprefs/JPEACOCK.SVN-Notify-Mirror.yml
 distroprefs/JPIERCE.IO-Pager.yml
+distroprefs/JROBINSON.DBIx-Class.yml
 distroprefs/KASEI.Class-Accessor.yml
 distroprefs/KBROWN.SOAP.yml
 distroprefs/KCLARK.SQL-Translator.yml
@@ -75,6 +78,7 @@ distroprefs/MIROD.XML-Twig.yml
 distroprefs/MIYAGAWA.Plagger.yml
 distroprefs/MIYAGAWA.XML-Atom.yml
 distroprefs/MLEHMANN.Coro.yml
+distroprefs/MRAMBERG.Catalyst-Runtime.yml
 distroprefs/MSERGEANT.CDB_File.yml
 distroprefs/MSERGEANT.DBD-SQLite.yml
 distroprefs/MSERGEANT.DBIx-AnyDBD.yml
@@ -94,6 +98,7 @@ distroprefs/RJBS.Email-Send.yml
 distroprefs/RRWO.Graphics-ColorNames.yml
 distroprefs/SCHWERN.Exporter-Lite.yml
 distroprefs/SREZIC.Tk-Autoscroll.yml
+distroprefs/SREZIC.Tk-Pod.yml
 distroprefs/TELS.Math-BigInt-GMP.yml
 distroprefs/TIMB.DBI.yml
 distroprefs/URI.File-Slurp.yml

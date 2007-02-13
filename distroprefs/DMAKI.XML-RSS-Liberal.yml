@@ -1,6 +1,6 @@
 ---
 match:
-  distribution: "DMAKI/DateTime-(Util-Astro-0|Event-Lunar-0)"
+  distribution: "DMAKI/XML-RSS-Liberal-"
 pl:
   env:
     PERL_AUTOINSTALL: --skip
