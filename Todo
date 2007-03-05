@@ -1,3 +1,200 @@
+2007-03-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* blead@30460:
+
+ext/Time/HiRes/t/HiRes......................................FAILED at test 35
+[...]
+../ext/Time/HiRes/t/HiRes.t: overall time allowed for tests (90s) exceeded!
+ok
+
+	* Strange failures with bleadperl @30458:
+
+ ADAMK/Test-ClassAPI-1.03.tar.gz              : make_test NO
+ ADAMK/File-Flat-1.00.tar.gz                  : make_test NO
+ ADAMK/Test-Inline-2.201.tar.gz               : make_test NO
+ RUZ/DBIx-SearchBuilder-1.47.tar.gz           : make_test NO
+ JESSE/Class-ReturnValue-0.53.tar.gz          : make_test NO one dependency not OK (Test::Inline)
+ ADAMK/Algorithm-Dependency-1.102.tar.gz      : make_test NO one dependency not OK (Test::ClassAPI)
+
+	when I tried all these, they worked fine.
+
+	It seems that ADAMK/Test-ClassAPI-1.03 is depending on Params::Util but
+	not declaring it? Yes, that's it. Already reported as
+	http://rt.cpan.org/Ticket/Display.html?id=25009
+
+	* Todo(???): introduce --notest and --force, etc. I'm not fond of it but
+	Slaven has observed that two users expected it would work that way.
+
+	* 29026 broke Text::Template
+
+t/09-error.........Illegal value `WLUNCH' for TYPE parameter at t/09-error.t line 41
+t/09-error.........FAILED test 3
+        Failed 1/5 tests, 80.00% okay
+
+	It's a \Q\` matter and shall be treated as a bug in user code, I suppose.
+
+	https://rt.cpan.org/Ticket/Display.html?id=23620 and a new distroprefs
+	file. I only looked into RT too late:(
+
+	* off topic: replace "falling" with "decreasing" where appropriate
+
+2007-03-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* just sent a report about Exporter::Simple. Debugging shows that it was
+	sent with Net::SMTP. Same for XML::Compile. Neither arrived at testers.
+	Maybe I had a different smtp host then? I do not remember to ever have
+	changed it.
+
+	smtp_server=localhost
+
+	We should try	mx.develooper.com ?
+
+	Tried that with Attribute::Util. Debugging says that it was sending to
+	develooper.
+
+	Or maybe I shouldn't have changed my email address?
+
+	Changing back to andreas.koenig.gmwojprw@franz.ak.mind.de and reporting
+	about UNIVERSAL::exports.
+
+	YES, this was it. So I need to turn the clock back: I have not reported
+	anything for quite a while:(
+
+	* whats missing for this release?
+
+	cpan -r bug report      # mail to brian is on the way
+
+	Jost's sun-solaris test # no idea what to do
+
+	can we have RT          # Bundle::RT is in
+
+	and Tcl in megainstall  # DONE
+
+	* my internet access is broken at the moment. When it is back I need to
+	answer two posts by Eric Wilhelm.
+
+	* possible bug: when a distroprefs file has "match" but no valid keyword
+	under match/, then it seems that it matches always instead of being
+	rejected as invalid. We must make the one of the match subthingies
+	mandatory. Need to study
+	http://www.kuwata-lab.com/kwalify/users-guide.01.html for that when my
+	internet is back.
+
+	FIXED in svk rev. 2002 or so.
+
+2007-03-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* New FAILS from testers: Jost on Sun sees only 4 OKs in 30shell on
+	solaris and a dubious. Slaven saw one test in 31sessions failing.
+
+	The Slaven thing can be averted by taking out a piece of the "Expected"
+	regexp. DONE
+
+	For the failure on sun I need a different strategy. Something that gives
+	more feedback.
+
+t/30shell..........dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 5-230
+	Failed 226/230 tests, 1.74% okay
+
+	* off topic: Richard's talk about debugger brings me the idea to patch
+	it to support saving of terminal history. I started implementing it and
+	then lost track of my changes. Now in k75:/home/src/perl/perl5db/
+
+	* bring the FirstTime dialogs into POD and back
+
+	* somebody reports that RT does recursion. But what is the driving
+	module for RT? RSPIER/Bundle-RT-0.030601.tar.gz ? No, this will only
+	tell CPAN to install "most of RT's dependent modules". Not RT itself.
+	--> this needs a bugreport.
+
+	* wishlist Mark Overmeer: less output
+
+	* http://www.youtube.com/watch?v=daJ1Hs_y738 screencast hint from
+	Juergen Christoffel
+
+2007-03-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* XML::Simple failed a test today. When I came and tested it again, it
+	succeeded. Fortunately the tests spit out helpful diagnostics. Looks
+	like XML::SAX must be installed? No, this seems not the problem. So
+	maybe a intermittant failure.
+
+t/3_Storable......
+no element found at line 1, column 0, byte 0 at /home/src/perl/repoperls/installed-perls/perl/pvDPEkV/perl-5.8.0@30435/lib/site_perl/5.9.5/i686-linux-64int/XML/Parser.pm line 187
+# Looks like you planned 23 tests but only ran 13.
+# Looks like your test died just after 13.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+
+	* http://rt.cpan.org//Ticket/Display.html?id=25223
+
+	contact brian
+
+2007-02-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Perl::Repository::APC needs a doc patch that it doesn't work on case
+	insensitive file systems.
+
+	* Tcl needs some attention to compile?
+
+2007-02-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* supposedly a bug: Slaven found both cpanconfig and cpan_config FIXED
+
+	* todo: document match/perlconfig DONE
+
+2007-02-24  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* jochen stenzel asked me for a comparison of CPAN::Site and dot
+	distributions or better said, a summary about the options we have today
+	to support modules besides CPAN itself.
+
+	My current favorite is to have all distros that are not on CPAN in a
+	repository, check the repository out on the local disk, ideally always
+	in the same path/location. Then write a Bundle file that contains all
+	"root" directories of these non-distros and install the Bundle. (Note to
+	self: need to write detailed instructions how to do all that). The
+	advantage of this is that nobody needs to make releases, all code is
+	checked out at any point in time and is current. If one needs to make
+	sure that the software is in a stable state, this can be achieved with
+	the options provided by the revision control software. The disadvantage
+	of this method is that CPAN.pm knows nothing about the state of the
+	distros, it just installs them and does not keep a record that it did so
+	and cannot determine if there is a newer version. If you install the
+	Bundle again immediately after you have installed, it just starts from
+	the beginning again (rinse, repeat).
+
+	I must try if 'cpan .' also works for a Bundle. I do not think it does.
+
+	Then I must study how CPAN::Site works nowadays. The problem with that
+	always was that it required manual work on the side of the maintainer of
+	the additional repository.
+
+	Of course, the ideal solution would be if CPAN.pm could just "subscribe"
+	to any number of parallel Universes and then mix them with some
+	algorithm (first wins; manual conflict resolution; etc.). Still, this
+	would require skills on the side of the archive maintainers or muchly
+	improved tools for them.
+
+	pip by Adam Kennedy tries to solve the problem (I think) by injecting
+	distros/tarballs into the author "LOCAL" directory. Simple quick
+	solution but no integration into an index at all, so the same
+	disadvantage as the dot distros (rinse,repeat) but with the additional
+	(of course very minor) disadvantage that somebody must make releases,
+	tar them together and then CPAN.pm has to unroll them again.
+
+2007-02-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* scripts installation broken. Tried it with pingomatic and keepcool. FIXED
+
+	* when was notest introduced? In 1.80, December 2005. New features by
+	Slaven this year are: 'cpan .', scripts, 'perl -I. -MCPAN' now works.
+
+	* consider different sorting of directory listings. suggested by Slaven.
+	REJECT
+
 2007-02-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Chris has tested _76: twice OK, once NOT on 31sessions/28th test.

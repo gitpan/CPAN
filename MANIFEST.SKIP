@@ -23,8 +23,9 @@
 ^distroprefs/ttt.nodbi.yml
 ^distroprefs/ttt.nodbi.yml.bak
 ^distroprefs/ttt.nomailsend.yml
+^distroprefs/BRIANSKI.XML-Comma.yml
 ^eg/
-^gpw9-cpan-talk\.pod$
+^gpw9-cpan-talk\.
 ^lib/CPAN/Config\.pm
 ^lib/CPAN\.pm@
 ^lib/CPAN\.pm\.wrong_idea_for_cleanup
@@ -54,6 +55,7 @@
 ^t/dot-cpan/.lock
 ^t/dot-cpan/Bundle/CpanTestDummies.pm
 ^t/dot-cpan/Bundle/Snap
+^t/dot-cpan/FTPstats.yml
 ^t/dot-cpan/Metadata
 ^t/dot-cpan/build
 ^t/dot-cpan/histfile

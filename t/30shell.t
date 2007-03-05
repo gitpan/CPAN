@@ -2,7 +2,7 @@ use strict;
 
 # there's POD at the very end of this file
 
-use vars qw($HAVE_EXPECT $RUN_EXPECT $HAVE);
+use vars qw($RUN_EXPECT $HAVE);
 BEGIN {
     $|++;
     #chdir 't' if -d 't';
@@ -14,10 +14,13 @@ BEGIN {
             print "1..0 # Skip: no Expect, maybe try env CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT=1\n";
             eval "require POSIX; 1" and POSIX::_exit(0);
         }
-    } else {
-        $HAVE_EXPECT = 1;
     }
 }
+
+# all tests try to answer questions. If somebody sets
+# PERL_MM_USE_DEFAULT to true just to prevent blocking when I ask
+# questions, they break these tests.
+$ENV{PERL_MM_USE_DEFAULT} = 0;
 
 use File::Copy qw(cp);
 use File::Path qw(rmtree mkpath);
@@ -348,7 +351,7 @@ if ($RUN_EXPECT) {
     $expo->soft_close;
 } else {
     close SYSTEM or die "Could not close SYSTEM filehandle: $!";
-    mydiag "Finished test script, going to interprete it.";
+    mydiag "Finished running test script, going to read its output.";
     open SYSTEM, "test.out" or die "Could not open test.out for reading: $!";
     local $/;
     my $biggot = <SYSTEM>;

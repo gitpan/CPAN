@@ -244,6 +244,7 @@ MEGA_INSTALL = Devel::Cover \
 		Graph::Easy \
 		Module::Plan::Base \
 		Cache::Memcached \
+		Cache::Memcached::XS \
 		File::Rsync \
 		Net::SSH \
 		SVN::Mirror \
@@ -272,6 +273,21 @@ MEGA_INSTALL = Devel::Cover \
 		Alzabo \
 		Module::Build::Convert \
 		Devel::Hide \
+		Lucene \
+		ANDK/keepcool-0.344 \
+		SREZIC/pingomatic-1.013 \
+		XML::Compile \
+		Bundle::Perl6 \
+		Config::JSON \
+		PAR \
+		Bundle::RT \
+		CPAN::YACSmoke \
+		Tcl \
+		Filter::Util::Call \
+		Compress::LZF \
+		POE::Component::CPAN::YACSmoke \
+		Test::YAML::Meta \
+		Module::Install \
 
 }
 }
@@ -282,7 +298,7 @@ sub postamble {
   push @m, q{
 # the subdirs on MY OWN BOX are allowed here (only used for make dist!)
 verify-no-subdir:
-	@$(PERL) -e 'my$$s=join",",grep{!/^(CPAN|DIST|bin|blib|cover_db|distroprefs|eg|inc|lib|logs|patches|protocols|related|release-lib|scripts|t)\z/&&-d($$_)}glob"*";die"unexpected dir:$$s"if$$s'
+	@$(PERL) -e 'my$$s=join",",grep{!/^(CPAN|DIST|bin|blib|cover_db|distroprefs|eg|gpw9-cpan-talk.d|inc|lib|logs|patches|protocols|related|release-lib|scripts|t)\z/&&-d($$_)}glob"*";die"unexpected dir:$$s"if$$s'
 
 setversion:
 	$(PERL) Makefile.PL --setversion
@@ -341,6 +357,9 @@ logs/.exists :
 
 run :
 	$(PERL) -Ilib -MCPAN -eshell
+
+record-session :
+	$(PERL) -Ilib -MCPAN -e '$$CPAN::Suppress_readline=$$CPAN::Echo_readline=1;shell' | tee ttt.out
 
 run-with-sqlite :
 	$(PERL) -I$$HOME/.cpan -Ilib -MCPAN::SQLite -MCPAN::MyConfig -MCPAN -e '$$CPAN::Config->{use_sqlite}++; $$CPAN::Config->{sqlite_dbname}="cpandb-sqlite"; shell'
