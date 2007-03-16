@@ -10,10 +10,14 @@ BEGIN {
     eval { require Expect };
     if ($@) {
         unless ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
-            $|=1;
             print "1..0 # Skip: no Expect, maybe try env CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT=1\n";
             eval "require POSIX; 1" and POSIX::_exit(0);
         }
+    }
+    eval { require YAML };
+    if ($YAML::VERSION && $YAML::VERSION < 0.60) {
+        print "1..0 # Skip: YAML too old for this test\n";
+        eval "require POSIX; 1" and POSIX::_exit(0);
     }
 }
 
@@ -146,6 +150,8 @@ plan tests => (
                scalar @prgs
                + 2                     # 2 histsize tests
                + 1                     # 1 RUN_EXPECT feedback
+               + 1                     # run_..._cmd feedback
+               + 1                     # spawn/open
                + 1                     # 1 count keys for 'o conf init variable'
                # + scalar @modules
               );
@@ -222,18 +228,22 @@ if ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
 } else {
     $RUN_EXPECT = 1;
 }
-ok(1,"RUN_EXPECT[$RUN_EXPECT]");
+ok(1,"RUN_EXPECT[$RUN_EXPECT]\$^X[$^X]");
 my $expo;
+my @run_shell_cmd_lit = run_shell_cmd_lit($cwd);
+ok(scalar @run_shell_cmd_lit,"@run_shell_cmd_lit");
 if ($RUN_EXPECT) {
     $expo = Expect->new;
     $ENV{LANG} = "C";
-    $expo->spawn(run_shell_cmd_lit($cwd));
+    my $spawned = $expo->spawn(@run_shell_cmd_lit);
+    ok($spawned, "could at least spawn a process and \$! is[$!]");
     $expo->log_stdout(0);
     $expo->notransfer(1);
 } else {
-    my $system = join(" ", map { "\"$_\"" } run_shell_cmd_lit($cwd))." > test.out";
-    warn "# DEBUG: system[$system]";
-    open SYSTEM, "| $system" or die;
+    my $system = join(" ", map { "\"$_\"" } @run_shell_cmd_lit)." > test.out";
+    # warn "# DEBUG: system[$system]";
+    my $opened = open SYSTEM, "| $system";
+    ok($opened, "Could at least open a process pipe and $! is [$!]");
 }
 
 my $skip_the_rest;
@@ -1011,13 +1021,14 @@ __END__
 #E:\}.*?CPAN::Distribution
 ########
 #P:d ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz
+#R:Module::Build
 #E:prereq_pm\s+build_requires:\S+requires:\S+
 ########
 #P:notest make Bundle::CpanTestDummies
 #E:Has already been made
 ########
 #P:clean Bundle::CpanTestDummies
-#E:Failed during this command
+#E:No Makefile
 ########
 #P:clean Bundle::CpanTestDummies
 #E:make clean already called once
@@ -1045,7 +1056,7 @@ __END__
 #T:60
 ########
 #P:install CPAN::Test::Dummy::Perl5::Make::CircDepeOne
-#E:is up to date|Recursive dependency detected[\s\S]+?Cannot continue\.
+#E:is up to date|circular dependency
 #T:60
 ########
 #P:o conf defaults

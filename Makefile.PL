@@ -288,6 +288,13 @@ MEGA_INSTALL = Devel::Cover \
 		POE::Component::CPAN::YACSmoke \
 		Test::YAML::Meta \
 		Module::Install \
+		App::Ack \
+		IO::Async::Buffer \
+		Time::HiRes::Value \
+		String::Expand \
+		Config::XPath \
+		Alien::wxWidgets \
+		Moose \
 
 }
 }
@@ -441,7 +448,7 @@ testdistros: \
 # will do)
 testshell-with-protocol: testdistros
 	$(PERL) -e 'for ("protocols"){-d $$_ or mkdir $$_, 0755}'
-	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 | \
+	$(MAKE) test TEST_FILES=t/30shell.t TEST_VERBOSE=1 PERL='$(PERL)' | \
 		tee protocols/make-test-`date +%Y%m%dT%H%M%S`
 	ls -lt protocols | head
 

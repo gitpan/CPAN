@@ -1,3 +1,395 @@
+2007-03-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* clean 31sessions.t output and run 30shell without Expect and clean
+	that stderr thing too.
+
+	This doesn't seem to be possible to do reliably. As soon as I let STDOUT
+	and STDERR be joint with 2>&1 some tests fail. I think I'd prefer to
+	have the Test:: stuff refrain from using STDERR alltogether and as long
+	as they don't (or can't?) I'll let some STDERR escape.
+
+	And this?
+
+make[1]: Entering directory `/home/k/.cpan/build/CPAN-Test-Dummy-Perl5-Make-Failearly-1.02-8r8dgG'
+make[1]: *** No rule to make target `clean'.  Stop.
+
+	Ah, if {writemakefile} failed, do not try 'make clean'! DONE
+
+2007-03-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Class::MOP needs a binary search because test t/003methods.t fails in
+	blead but not in 22000. But a naive binary search discovers breakage in
+	t/081_meta_package_extension.t on patch 26370. But we certainly can
+	ignore that because this test works again nowadays. So I need a
+	distropref to limit tests.
+
+	Learn something new about Module::Build:
+
+	    ./Build test --test_files t/mytest.t
+
+	So now binary search again without the 081 test:
+
+----Program----
+eval {require Class::MOP};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pL9BuO7/perl-5.8.0@26486/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pHxMchK/perl-5.8.0@26487/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Change 26487 by nicholas@nicholas-saigo on 2005/12/26 12:31:01
+
+	Rework constant.pm to take advantage of the space savings of proxy
+	constant subroutines whenever it can.
+
+% ./Build test --verbose --test_files t/003_methods.t                                                                                                [CPANSHELL]
+t/003_methods....1..64
+ok 1 - use Class::MOP;
+ok 2 - use Class::MOP::Class;
+ok 3 - ... our method is not yet blessed
+not ok 4 - ... we added the method successfully
+
+#   Failed test '... we added the method successfully'
+#   at t/003_methods.t line 65.
+# died: Not a GLOB reference at /home/k/.cpan/build/Class-MOP-0.37-SpVpcK/blib/lib/Class/MOP/Package.pm line 197.
+Not a GLOB reference at /home/k/.cpan/build/Class-MOP-0.37-SpVpcK/blib/lib/Class/MOP/Package.pm line 197.
+# Looks like you planned 64 tests but only ran 4.
+# Looks like you failed 1 test of 4 run.
+# Looks like your test died just after 4.
+dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 4-64
+        Failed 61/64 tests, 4.69% okay
+Failed Test     Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/003_methods.t  255 65280    64  121  4-64
+
+	REPORT sent to P5P.
+	
+2007-03-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Do you want to build wxWidgets? [yes] y
+Which archive type? [tar.gz] tar.gz
+Do you want to include OpenGL support [no] n
+Creating new 'Build' script for 'Alien-wxWidgets' version '0.28'
+MBARBON/Alien-wxWidgets-0.28.tar.gz requires perl '5.6'; you have only 5.009005; giving up
+
+	Looks like a bug in Alien::wxWidgets but somehow I feel guilty. Reported
+	via RT.
+
+2007-03-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Jost sent me the test output with TEST_VERBOSE and it was sooo
+	frustrating:
+
+PERL_DL_NONLAZY=1 /usr/local/perl-5.8.8/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(1, 'blib/lib', 'blib/arch')" t/30shell.t
+t/30shell....1..230
+ok 1 - histsize is 100 before testing
+ok 2 - Another dummy test
+ok 3 - RUN_EXPECT[1]
+ok 4 - empty test %h=()
+# PRESSING RETURN
+# EXPECT: (?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*>)
+# Looks like you planned 230 tests but only ran 4.
+# EOF on i[1]prog[]
+# expected[(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*>)]
+# got[]
+# 
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 5-230
+	Failed 226/230 tests, 1.74% okay
+Failed Test Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/30shell.t  255 65280   230  452  5-230
+Failed 1/1 test scripts. 226/230 subtests failed.
+
+	I see no way short of incrementall improve diagnostics there and hope
+	that the next release shows us more. DONE.
+
+
+2007-03-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: when I ^C a job, then it seems that some "force" is kept around
+	for the next command. We must clear all modules, distros and bundles
+	from 'force' bits when we let a Signal interrupt us. I'm not actually
+	sure this is what happened but I have the impression that it is possible.
+
+	Or maybe we have a different bug. This is the command:
+
+	fforce test DMAKI/DateTime-Calendar-Japanese-0.05.tar.gz
+
+	requires DMAKI/DateTime-Calendar-Japanese-0.05.tar.gz
+
+	This in turn
+
+	  DateTime::Util::Astro::Moon [requires]
+    DateTime::Util::Calc [requires]
+    DateTime::Util::Astro::Common [requires]
+    DateTime::Event::SolarTerm [requires]
+
+	DMAKI/DateTime-Util-Astro-0.08.tar.gz is the first one and it complains
+	about Calc missing.
+
+	DMAKI/DateTime-Util-Calc-0.13.tar.gz then complains about nothing, runs
+	tests that fail for some reason. So we come back to Astro. This fails
+	tests apparently because Calc is missing.
+
+	So then we come to Calc again because it was on the list above. We fail
+	the tests again, but I frankly do not understand why they are run at
+	all. Normally we do not run a test twice within a single command.
+
+	Then comes Astro again because of DateTime::Util::Astro::Common and
+	fails again tests.
+
+	Then we reach the last one on the list, SolarTerm. This again depends on
+	Calc, so we build Calc again, fail, test SolarTerm, fail and ***finish***.
+
+	So now my impression is that the setting of $xo->{make} might cause bad
+	things to happen because we are not paying attention to the status of
+	make/test/install before that, no? No, it's the fforce that make things
+	so ugly. Because all parties inherit the fforce, they need to retest so
+	often. So probably no bug at all, just ugly.
+
+	CLOSED.
+	
+	* Bug: 
+
+Recursive dependency detected:
+    DMAKI/DateTime-Calendar-Japanese-0.05.tar.gz
+ => DateTime::Calendar::Chinese (have: ; requires: 0.02)
+ => DMAKI/DateTime-Calendar-Chinese-0.05.tar.gz
+ => DateTime::Util::Astro::Moon (have: ; requires: >= 0.04)
+ => DMAKI/DateTime-Util-Astro-0.08.tar.gz
+ => Math::BigInt (have: 1.77; unknown status)
+ => TELS/math/Math-BigInt-1.80.tar.gz
+ => bignum (have: 0.17; requires: 0.19)
+ => TELS/math/bignum-0.19.tar.gz
+ => Math::BigInt (have: 1.77; requires: 1.79).
+Cannot resolve.
+
+	All involved parties get the stigma of circular dependency. That seems
+	wrong. Only Math::BigInt and bignum should get it.
+
+	OK, I fixed this but now D:Event:SolarTerm, D:U:Calc, D:U:Astro,
+	D:Event:Lunar somehow fall into a spiral of unresolvable dependecies and
+	are never redeemed from it. No? Maybe I was just impatient.
+
+	FIXED.
+
+	* HTML::CalendarMonth is failing but the error output is really large. I
+	just tried to report() it and must check later if the mail actually
+	arrived. --- It seems this report never arrives.
+
+	* There was a mail from David Cantrell about a failure on OpenBSD which
+	I could not imagine any reason for.
+
+	ANSWERED.
+
+2007-03-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Continue discussing the perlmonks bug with P5P. Only Schwern has
+	answered and we need a resolution. Either document as it is at the
+	moment or change it and then document it. I tend to the former because
+	it is consistent.
+	
+2007-03-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* David Golden sends me a link to perlmonks
+	http://perlmonks.org/?node_id=603402
+
+	It's about 1.8802. This guy does a
+
+	setenv PERL5LIB /home/me/build/perl-addons/inst/usr/local/lib/perl5:/home/me/build/perl-addons/inst/usr/local/lib/perl5/site_perl
+
+	and sets for the './Build install' command?
+    Your choice:  [] --destdir /home/me/build/perl-addons/inst
+
+	and for 'make install' command?
+    Your choice:  [] DESTDIR=/home/me/build/perl-addons/inst
+
+	When he installs Params::Validate, it indeed gets installed into that
+	directory but when he asks 
+
+	! use Params::Validate; print "$Params::Validate::VERSION\n"
+
+	he gets an error
+
+	When he quits the shell and enters it again and repeats the command, it
+	is OK.
+
+
+	Reproducing:
+
+>16:18:39 k@k75:~/sources/CPAN/SVK/trunk% rm -rf ~/.cpan_pm_603402/destdir
+>16:18:46 k@k75:~/sources/CPAN/SVK/trunk% PERL5LIB=/home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl /home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/bin/perl -I ~/.cpan_pm_603402 -MCPAN::MyConfig -Ilib -MCPAN -eshell
+CPAN: Term::ANSIColor loaded ok (v1.11)
+
+cpan shell -- CPAN exploration and modules installation (v1.8879)
+ReadLine support enabled
+
+cpan[1]> install Acme::Meta
+CPAN: Storable loaded ok (v2.15)
+Going to read /home/k/.cpan/Metadata
+  Database was generated on Thu, 08 Mar 2007 14:08:52 GMT
+Running install for module 'Acme::Meta'
+CPAN: YAML::Syck loaded ok (v0.82)
+Running make for N/NW/NWCLARK/Acme-Meta-0.02.tar.gz
+CPAN: LWP::UserAgent loaded ok (v2.033)
+CPAN: URI::URL loaded ok (v5.03)
+CPAN: Digest::SHA loaded ok (v5.44)
+CPAN: Module::Signature loaded ok (v0.55)
+Signature for /home/ftp/pub/CPAN/authors/id/N/NW/NWCLARK/CHECKSUMS ok
+CPAN: Compress::Zlib loaded ok (v2.004)
+Checksum for /home/ftp/pub/CPAN/authors/id/N/NW/NWCLARK/Acme-Meta-0.02.tar.gz ok
+Scanning cache /home/k/.cpan_pm_603402/build for sizes
+............................................................................DONE
+Acme-Meta-0.02
+Acme-Meta-0.02/Meta.pm
+Acme-Meta-0.02/MANIFEST
+Acme-Meta-0.02/t
+Acme-Meta-0.02/Changes
+Acme-Meta-0.02/README
+Acme-Meta-0.02/Makefile.PL
+Acme-Meta-0.02/META.yml
+Acme-Meta-0.02/t/1.t
+CPAN: File::Temp loaded ok (v0.18)
+Package came without SIGNATURE
+
+
+  CPAN.pm: Going to build N/NW/NWCLARK/Acme-Meta-0.02.tar.gz
+
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Acme::Meta
+cp Meta.pm blib/lib/Acme/Meta.pm
+Manifying blib/man3/Acme::Meta.3
+  NWCLARK/Acme-Meta-0.02.tar.gz
+  /usr/bin/make -- OK
+Running make test
+PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/1....ok                                                                    
+All tests successful.
+Files=1, Tests=2,  0 wallclock secs ( 0.07 cusr +  0.00 csys =  0.07 CPU)
+  NWCLARK/Acme-Meta-0.02.tar.gz
+  /usr/bin/make test -- OK
+Running make install
+Installing /home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8/Acme/Meta.pm
+Installing /home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/man/man3/Acme::Meta.3
+Writing /home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8/i686-linux-64int/auto/Acme/Meta/.packlist
+Appending installation info to /home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/5.8.8/i686-linux-64int/perllocal.pod
+  NWCLARK/Acme-Meta-0.02.tar.gz
+  make install DESTDIR=/home/k/.cpan_pm_603402/destdir -- OK
+
+cpan[2]> m Acme::Meta      
+Module id = Acme::Meta
+    CPAN_USERID  NWCLARK (Nicholas Clark <nwc10+please+use+perlbug+for+perl+queries@colon.colondot.net>)
+    CPAN_VERSION 0.02
+    CPAN_FILE    N/NW/NWCLARK/Acme-Meta-0.02.tar.gz
+    UPLOAD_DATE  2006-10-01
+    MANPAGE      Acme::Meta - Enhances the Meta package
+    INST_FILE    (not installed)
+
+
+cpan[3]> ! use Acme::Meta  
+Can't locate Acme/Meta.pm in @INC (@INC contains: /home/k/.cpan_pm_603402 /home/k/sources/CPAN/SVK/trunk/lib /home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl /home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/5.8.8/i686-linux-64int /home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/5.8.8 /home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8/i686-linux-64int /home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8 /home/k/sources/CPAN/SVK/trunk) at (eval 48) line 2.
+BEGIN failed--compilation aborted at (eval 48) line 2.
+
+cpan[3]> q
+Lockfile removed.
+>16:20:19 k@k75:~/sources/CPAN/SVK/trunk% PERL5LIB=/home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl /home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/bin/perl -I ~/.cpan_pm_603402 -MCPAN::MyConfig -Ilib -MCPAN -eshell
+CPAN: Term::ANSIColor loaded ok (v1.11)
+
+cpan shell -- CPAN exploration and modules installation (v1.8879)
+ReadLine support enabled
+
+cpan[1]> ! use Acme::Meta
+cpan[1]> m Acme::Meta    
+CPAN: Storable loaded ok (v2.15)
+Going to read /home/k/.cpan/Metadata
+  Database was generated on Thu, 08 Mar 2007 14:08:52 GMT
+CPAN: LWP::UserAgent loaded ok (v2.033)
+CPAN: YAML::Syck loaded ok (v0.82)
+CPAN: URI::URL loaded ok (v5.03)
+Module id = Acme::Meta
+    CPAN_USERID  NWCLARK (Nicholas Clark <nwc10+please+use+perlbug+for+perl+queries@colon.colondot.net>)
+    CPAN_VERSION 0.02
+    CPAN_FILE    N/NW/NWCLARK/Acme-Meta-0.02.tar.gz
+    UPLOAD_DATE  2006-10-01
+    MANPAGE      Acme::Meta - Enhances the Meta package
+    INST_FILE    /home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8/Acme/Meta.pm
+    INST_VERSION 0.02
+
+
+
+	So the bug is real and reproducable with blead. It seems to be about
+	@INC expansion. Before I installed Acme::Meta I had this @INC:
+
+cpan[1]> dump @INC
+CPAN: Storable loaded ok (v2.15)
+Going to read /home/k/.cpan/Metadata
+  Database was generated on Thu, 08 Mar 2007 14:08:52 GMT
+CPAN: Data::Dumper loaded ok (v2.121_11)
+$VAR1 = '/home/k/.cpan_pm_603402';
+$VAR2 = '/home/k/sources/CPAN/SVK/trunk/lib';
+$VAR3 = '/home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl';
+$VAR4 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/5.8.8/i686-linux-64int';
+$VAR5 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/5.8.8';
+$VAR6 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8/i686-linux-64int';
+$VAR7 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8';
+$VAR8 = '/home/k/sources/CPAN/SVK/trunk';
+
+	After I installed Acme::Meta I had this @INC:
+
+cpan[1]> dump @INC         
+CPAN: Storable loaded ok (v2.15)
+Going to read /home/k/.cpan/Metadata
+  Database was generated on Thu, 08 Mar 2007 14:08:52 GMT
+CPAN: Data::Dumper loaded ok (v2.121_11)
+$VAR1 = '/home/k/.cpan_pm_603402';
+$VAR2 = '/home/k/sources/CPAN/SVK/trunk/lib';
+$VAR3 = '/home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8/i686-linux-64int';
+$VAR4 = '/home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8';
+$VAR5 = '/home/k/.cpan_pm_603402/destdir/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl';
+$VAR6 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/5.8.8/i686-linux-64int';
+$VAR7 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/5.8.8';
+$VAR8 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8/i686-linux-64int';
+$VAR9 = '/home/src/perl/repoperls/installed-perls/maint-5.8/pZ22fQT/perl-5.8.0@30509/lib/site_perl/5.8.8';
+$VAR10 = '/home/k/sources/CPAN/SVK/trunk';
+
+
+	So apparently I knew too little about @INC population.
+
+	It seems perl 5.8.8 scans the PERL5LIB directories at startup if they
+	exist and only populates @INC for directories that either are explicitly
+	mentioned or that really exist. The directories .../5.8.8 and
+	.../5.8.8/i686-linux-64int are not added as long as they are not
+	created.
+
+	And apparently I had always relied that perl solves it for me.
+
+	POSTED analysis to P5P with the subject "Composing @INC from PERL5LIB".
+	
+
+	* David Cantrell reports that YAML must be > 0.39 if we want to use it.
+
+2007-03-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Oh Joy of having authors who carefully track the dependencies between
+	their packages. bignum currently depends on Math::BigInt 1.79. But
+	current version is 1.80. But Math-BigIng-1.80 depends on bignum 0.19. So
+	if I have 1.77 I must first install 1.79, then I can install bignum and
+	only then I can install BigInt 1.80.
+
+	I'm sure some people will call it a bug that CPAN.pm is not able to
+	install the old version 1.79 as a dependency of 1.80.
+
 2007-03-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* blead@30460:
