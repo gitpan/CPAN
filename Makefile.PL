@@ -210,91 +210,138 @@ ALL_PERLS = /usr/bin/perl \
 
 
 # not sorted because order matters
-MEGA_BASE = Bundle::CPANxxl \
-		CPAN::DistnameInfo \
-		DBD::SQLite \
-		/home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
-		/home/src/perl/tk/SVN/. \
+MEGA_BASE = \
+ Bundle::CPANxxl \
+ CPAN::DistnameInfo \
+ DBD::SQLite \
+ /home/src/perl/tk/SVN/. \
+ /home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
 
 
-MEGA_INSTALL = Devel::Cover \
-		Coro \
-		Font::TTF \
-		YAML::Tiny \
-		PadWalker \
-		LWP::UserAgent \
-		SOAP::Lite \
-		Data::Float \
-		bigint \
-		Math::BigInt::FastCalc \
-		Math::BigRat \
-		Math::BigInt::GMP \
-		IPC::ShareLite \
-		Data::Dump \
-		Cache::File \
-		Plagger \
-		Jifty \
-		Getopt::Euclid \
-		DBIx::Class \
-		IPC::PubSub \
-		Tk::Tree \
-		Tk::Pod \
-		Bundle::Phalanx100 \
-		Bundle::Pause \
-		Graph::Easy \
-		Module::Plan::Base \
-		Cache::Memcached \
-		Cache::Memcached::XS \
-		File::Rsync \
-		Net::SSH \
-		SVN::Mirror \
-		SVN::Notify::Config \
-		SVN::Notify::Mirror \
-		Event::Lib \
-		Math::Approx::Symbolic \
-		Devel::Size \
-		Bundle::Slash \
-		Locale::Maketext::Gettext \
-		Test::Without::Module \
-		Class::MethodMaker \
-		Class::C3 \
-		IO::Pager \
-		Object::Signature \
-		PerlIO::eol \
-		Number::Format \
-		Template::Plugin::Number::Format \
-		Test::JSON \
-		Term::ReadLine::Gnu \
-		CDB_File \
-		Catalyst \
-		Module::Info \
-		String::Similarity \
-		Test::Deep \
-		Alzabo \
-		Module::Build::Convert \
-		Devel::Hide \
-		Lucene \
-		ANDK/keepcool-0.344 \
-		SREZIC/pingomatic-1.013 \
-		XML::Compile \
-		Bundle::Perl6 \
-		Config::JSON \
-		PAR \
-		Bundle::RT \
-		CPAN::YACSmoke \
-		Tcl \
-		Filter::Util::Call \
-		Compress::LZF \
-		POE::Component::CPAN::YACSmoke \
-		Test::YAML::Meta \
-		Module::Install \
-		App::Ack \
-		IO::Async::Buffer \
-		Time::HiRes::Value \
-		String::Expand \
-		Config::XPath \
-		Alien::wxWidgets \
-		Moose \
+MEGA_INSTALL = \
+ ANDK/keepcool-0.344 \
+ AltaVista::BabelFish \
+ Alzabo \
+ App::Ack \
+ Bundle::Pause \
+ Bundle::Perl6 \
+ Bundle::Phalanx100 \
+ Bundle::RT \
+ Bundle::Slash \
+ CDB_File \
+ CPAN::Unwind \
+ CPAN::YACSmoke \
+ Cache::File \
+ Cache::Memcached \
+ Cache::Memcached::XS \
+ Carp::Always \
+ Catalyst \
+ Class::C3 \
+ Class::MethodMaker \
+ Compress::LZF \
+ Config::JSON \
+ Config::XPath \
+ Coro \
+ Curses \
+ Daemon::Generic \
+ Crypt::OpenPGP \
+ DBIx::Class \
+ DBIx::Perlish \
+ DBIx::Simple \
+ Data::Dump \
+ Data::Float \
+ Devel::Command \
+ Devel::Cover \
+ Devel::Hide \
+ Devel::Modlist \
+ Devel::Required \
+ Devel::Size \
+ Devel::Trace \
+ Devel::ebug \
+ Devel::ebug::HTTP \
+ Event::Lib \
+ ExtUtils::ModuleMaker \
+ FLV::Info \
+ File::Rsync \
+ Filter::Util::Call \
+ Font::TTF \
+ Getopt::Euclid \
+ Getopt::Mixed \
+ Graph::Easy \
+ HTML::Template::Compiled \
+ IO::Async::Buffer \
+ IO::Pager \
+ IPC::PubSub \
+ IPC::ShareLite \
+ Image::Pngslimmer \
+ JSON::XS \
+ Jifty \
+ LWP::UserAgent \
+ Locale::Maketext::Gettext \
+ Lucene \
+ Math::Approx::Symbolic \
+ Math::BigInt::FastCalc \
+ Math::BigInt::GMP \
+ Math::BigRat \
+ Module::Build::Convert \
+ Module::Info \
+ Module::Install \
+ Module::Plan::Base \
+ Moose \
+ Net::SSH \
+ Net::Twitter \
+ Number::Format \
+ Object::Signature \
+ Object::Tiny \
+ PAR \
+ PAR::Dist::FromCPAN \
+ PAR::Packer \
+ PDL \
+ POE::Component::CPAN::YACSmoke \
+ PadWalker \
+ Params::Smart \
+ Parse::BACKPAN::Packages \
+ Perl::Dist \
+ PerlIO::eol \
+ Perlbal \
+ Petal \
+ Petal::Utils \
+ Plagger \
+ Pugs::Compiler::Perl6 \
+ Pugs::Compiler::Rule \
+ Quantum::Superpositions \
+ SOAP::Lite \
+ SREZIC/pingomatic-1.013 \
+ SVN::Mirror \
+ SVN::Notify::Config \
+ SVN::Notify::Mirror \
+ Scalar::Defer \
+ String::Expand \
+ String::Similarity \
+ Taint::Util \
+ Tcl \
+ Template::Plugin::Number::Format \
+ Term::ReadLine::Gnu \
+ Term::Size \
+ Term::Size::Perl \
+ Test::Deep \
+ Test::JSON \
+ Test::Without::Module \
+ Test::YAML::Meta \
+ Tie::Cache::LRU \
+ Tie::Cycle \
+ Tie::DxHash \
+ Time::HiRes::Value \
+ Tk::Pod \
+ Tk::Tree \
+ Voting::Condorcet::RankedPairs \
+ XML::Compile \
+ X500::DN \
+ YAML::Tiny \
+ Yahoo::Search \
+ bignum \
+ mixin \
+
 
 }
 }
@@ -348,9 +395,12 @@ release ::
 checkout ::
 	svn co https://pause.perl.org:5460/svn/cpanpm/trunk ./
 
+# 16=Distribution; 1024=Shell; 32768=Queue
+# $$CPAN::DEBUG|=16;$$CPAN::DEBUG|=1024;$$CPAN::DEBUG|=32768;
 megainstall: termreadkeyinstall logs/.exists
-	$(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load;$$CPAN::DEBUG=0;install(qw($(MEGA_BASE)), map {$$_->[0]} sort {$$a->[1]<=>$$b->[1]} map {[$$_,rand(1)]} qw($(MEGA_INSTALL)));CPAN::Shell->failed' > logs/megainstall.`date +%Y%m%dT%H%M`.out 2>&1
+	$(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load;install(qw($(MEGA_BASE)), map {$$_->[0]} sort {$$a->[1]<=>$$b->[1]} map {[$$_,rand(1)]} qw($(MEGA_INSTALL)));CPAN::Shell->failed' > logs/megainstall.`date +%Y%m%dT%H%M`.out 2>&1
 
+# 16=Distribution; 32=Bundle; 32768=Queue
 depefails:
 	$(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load;$$CPAN::DEBUG|=16;$$CPAN::DEBUG|=32;$$CPAN::DEBUG|=32768;install(qw(CPAN::Test::Dummy::Perl5::Build::DepeFails));'
 
