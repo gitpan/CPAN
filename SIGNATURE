@@ -14,19 +14,19 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 ChangeLog
+SHA1 5778ec622ccf2270c270447d7098e1c7a3285648 ChangeLog
 SHA1 9b97524a7a91c815e46b19302a33829d3c26bbbf ChangeLog.old
-SHA1 306eff8e678ede28baca9e4956d535406db7396e Changes
+SHA1 57bd1ceb9028a261e76fc5e5e086bc0b4a6a8ccf Changes
 SHA1 a029ffa2f2252bb8914eb658666244710994d256 Changes.old
-SHA1 80984bdaa41265280cc44b00b3129b23bc2fcf31 MANIFEST
-SHA1 92978b056732c493188fcfecb991b699f3ad4ecb MANIFEST.SKIP
-SHA1 40a9fb2bc99a79ef23925bdc422f8b6e326e38aa META.yml
-SHA1 712a67bd74d2c15378ccef0e5cd130ab17822c41 Makefile.PL
+SHA1 262560c8bfd582c1412c300e5850a86ea07f105d MANIFEST
+SHA1 a540df4a6f25e998f3f8be0c098115e23e9fbdb2 MANIFEST.SKIP
+SHA1 1a899e242343fbcdc16018b50836da4ef0140f51 META.yml
+SHA1 5dec57f15dbc4b852d2b70a720d4ffd9d1d1c845 Makefile.PL
 SHA1 37e858c51409a297ef5d3fb35dc57cd3b57f9a4d PAUSE2003.pub
 SHA1 af016003ad503ed078c5f8254521d13a3e0c494f PAUSE2005.pub
 SHA1 a3941566358617b918e0bb7b5c4c2638f451a9d8 PAUSE2007.pub
-SHA1 457b991dbfed03692bbdad1cae03ad30da2290d7 README
-SHA1 6cc0f154a51c7b9245dedbba5f24c4ff15f3688c Todo
+SHA1 9e6c70435b7756224ffb437c3ce562311f2ba5a5 README
+SHA1 5b5a84ca94d45395b68cf63d154e0def6b34e69e Todo
 SHA1 b5ce8d962741b68c21aab29fb9c4ae73ef5976c9 distroprefs/00.README
 SHA1 22137459ddd261e8c23a11335270b8388c46e73c distroprefs/ABH.XML-RSS.yml
 SHA1 e88676470649738cc3e0b96bbd9fcdd34d001e21 distroprefs/ABW.Template-Toolkit.dd
@@ -35,24 +35,29 @@ SHA1 6b76b5765ddaf14e9adaabcf8fd14fb56969334b distroprefs/ADAMK.Algorithm-Depend
 SHA1 4b46b611acd0265d98e43a8263716f5fae83b9cc distroprefs/ADAMK.Test-ClassAPI.yml
 SHA1 25d2ff1b3f7e949b0e0583b7d0bbad1c6ae3eac9 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Build-Fails.yml
 SHA1 16cd10b9487bccc83436d12ba4cff4afb44ce038 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml
+SHA1 c9e121c137f9ce7cf76ae9d043da832941759ea1 distroprefs/ANDYA.Perl-Version.yml
 SHA1 f864732f9dd0b39fe9f315c19b2e733319d4f2a8 distroprefs/ATOURBIN.rpm-build-perl.yml
 SHA1 36b1676724ef5c04722b478b04bcdfba5a3cffca distroprefs/AUDREYT.Jifty-DBI.yml
-SHA1 a4ee3492f8f9cd560bcdc88c9e837a751e8edf3f distroprefs/AUDREYT.Module-Install.yml
+SHA1 bc143dfd5cf299d2d7f44790f1d6a06d4927ce9c distroprefs/AUDREYT.Module-Install.yml
 SHA1 87c321a5810202240d5bfd6cf8f9f636d830fa8a distroprefs/AUDREYT.Module-Signature.yml
 SHA1 e9adea35699cb94b649ff6ead26442ddb3d96a2c distroprefs/AUDREYT.PDF-FromHTML.yml
 SHA1 d0f8f27d07cc31a3f97580cd63576c29e0758a57 distroprefs/AUDREYT.YAML-Syck.yml
-SHA1 80a61007c8c2afa9015ac10bcf393405868dec8e distroprefs/BRADFITZ.Danga-Socket.yml
+SHA1 80d5b3bfa3ea186520ad9bc6d2dc52d00e98a8df distroprefs/BINGOS.POE-Component-CPAN-YACSmoke.yml
+SHA1 088c0e5a17ebdec15bffe96916d995be20cc3f4d distroprefs/BRADFITZ.Danga-Socket.yml
+SHA1 c6f072064a583b7b62410c23f25fcf4e3827f5a0 distroprefs/BRICAS.Catalyst-Plugin-ConfigLoader.yml
 SHA1 bde7db8ef52fab993cb00fab6df30ca9e3e3c5b4 distroprefs/BTROTT.Convert-PEM.yml
-SHA1 065f945dbb744eff17be2a1b4a6f2a04b84e3e9b distroprefs/BTROTT.Crypt-DH.yml
-SHA1 51af0661857aea220b08f7900a68dbef42b81432 distroprefs/BTROTT.Crypt-DSA.yml
+SHA1 29d371ef23eadb54745af94543142850450944c7 distroprefs/BTROTT.Crypt-DH.yml
+SHA1 f0cd7632431333ee313307c2deb1bb3747d4491d distroprefs/BTROTT.Crypt-DSA.yml
 SHA1 481ef0db99a1e4d4dc5a3ef88f3f6359d1edcc3a distroprefs/BTROTT.Crypt-OpenPGP.yml
 SHA1 170d7a16d7cdac6524dc685fe2abcfacfa5ad1bd distroprefs/BTROTT.Feed-Find.yml
 SHA1 9dce99b6f88ca97f4b6b1d98e13376e818a20f10 distroprefs/BTROTT.URI-Fetch.yml
-SHA1 4dabdbf81b9c60c4f3069e59b0a6f2258156c370 distroprefs/BTROTT.XML-FOAF.yml
-SHA1 f03fc4f4539dedadcb6295224c555d607fc0bd8d distroprefs/BTROTT.XML-Feed.yml
+SHA1 6f147a3b31e2a385b63b6c5af1575e81ad8e310b distroprefs/BTROTT.XML-FOAF.yml
+SHA1 2894f04f6acc12cb3a4fa20881afcacae33e8291 distroprefs/BTROTT.XML-Feed.yml
 SHA1 ea747c753d2660eb9fa00ae2a33cb555f4a77f55 distroprefs/BYRNE.SOAP-Lite.yml
-SHA1 2b0c415775ae6740675f4822336cf41692a363fc distroprefs/CAPTTOFU.DBD-mysql.yml
+SHA1 6d3737d2cbc0c3ad423118de539332ae38df5da4 distroprefs/CAPTTOFU.DBD-mysql.yml
+SHA1 8916edf08ffd24c8b5a1f2b40546f10bc80a373a distroprefs/CFRANKS.HTML-Widget.yml
 SHA1 752fd5d043349c7bb32b58a817b3af4251b6e758 distroprefs/CLKAO.App-CLI.yml
+SHA1 a97c93bab5620a33ec3b940f40a36b29e3d6ab1e distroprefs/CLKAO.IO-Digest.yml
 SHA1 84755defdbb3b2c85d1db01458ced9f4dc8a76c9 distroprefs/CLKAO.SVN-Mirror.yml
 SHA1 062dad779f7fc0d28d6b463b299c6b8a12d053d3 distroprefs/DBROBINS.Net-SSH-Perl.yml
 SHA1 480720e8c9068b1437ce64cb7e69d398a2e76666 distroprefs/DCONWAY.Parse-RecDescent.yml
@@ -65,11 +70,13 @@ SHA1 e997d0f22562fa16e4f6e78a794f6665b7aaf9bb distroprefs/DMAKI.XML-RSS-Liberal.
 SHA1 4ad7d45b0727ed9b0274e4aeb0622242bb958c5c distroprefs/DMAKI.Xango.yml
 SHA1 640e6c03aab5df568d27816e7e6a81adf1359237 distroprefs/DROLSKY.Alzabo.yml
 SHA1 9d9f685d25c01dbaca461f2db96bb3f1121f9a5d distroprefs/DROLSKY.Params-Validate.yml
+SHA1 2b7a140da7801f570832789d8af226248b287af0 distroprefs/DSKOLL.MIME-tools.yml
 SHA1 fe533a848487ea3ea99f21c2f553d3e608efb85f distroprefs/DSUGAL.Devel-Size.yml
 SHA1 1b520fbf589500ea3a74836b94c0aa9005b8f08b distroprefs/DURIST.WWW-Babelfish.yml
 SHA1 47bf06fd295ae32fcd87fb78bb92adeeaeaa2341 distroprefs/EESTABROO.IMAP-Admin.yml
 SHA1 f6821ede5b77f6075eeffd8744cacbdb88d0974d distroprefs/FDALY.Test-Deep.yml
 SHA1 8be3d5141dc0059621cc5d6ea8883719339fff85 distroprefs/FLUFFY.Class-MethodMaker.yml
+SHA1 f10a07cf6d03035010bf4c4ea39eeeea6aa1256f distroprefs/GAAL.Task-Smoke.yml
 SHA1 d4a0be24cd4363c96eb546ee43c67fe8f267215a distroprefs/GAAS.libwww.yml
 SHA1 85ab797901f4f72ebdffc402577939ccea5cb243 distroprefs/GBARR.Authen-SASL.yml
 SHA1 9dd2f59c685e05fccfc788c04586929bcbdcdc64 distroprefs/GBARR.libnet.dd
@@ -77,9 +84,10 @@ SHA1 ff6eb4e4887f137049aff6d8e338cae8c8652a37 distroprefs/GBARR.libnet.yml
 SHA1 d27f83106d5b5f0274c0640b3ffe10177929667d distroprefs/GBARR.perl-ldap.yml
 SHA1 6b523f8a1c008c9e763ad621af2020b4d53ac307 distroprefs/GEOFF.Apache-Test.yml
 SHA1 ff3ab58e7d0c36d871143e46e9343bae48133782 distroprefs/GIULIENK.Audio-Beep.yml
-SHA1 98c951f2d9e242c685f76cf46e814e338ce0f1ac distroprefs/GOZER.mod_perl.yml
+SHA1 4d818832d8fe23c482222ae2d4ef5323dcd132f8 distroprefs/GOZER.mod_perl.yml
 SHA1 3cd31c6d254ae135810d52f56908764a7cced9d9 distroprefs/GRANTM.XML-SAX.yml
 SHA1 0fb3a5e33701e9ec7bc0dd3ae356519ac429948a distroprefs/HAYASHI.Term-ReadLine-Gnu.yml
+SHA1 0dd6c5f2d0a1bca4e14692199caf033123ca8d1f distroprefs/HIROSE.Net-SSL-ExpireDate.yml
 SHA1 f6eab6f096918685c6e59df9d0269dec0a25e141 distroprefs/ILYAZ.Math-Pari.yml
 SHA1 c83ca86914c68b274f827ecd404b764021960e75 distroprefs/ILYAZ.Term-ReadLine-Perl.dd
 SHA1 82d2c14161673677ed737b821373e3da9dfa936a distroprefs/ILYAZ.Term-ReadLine-Perl.yml
@@ -107,7 +115,7 @@ SHA1 f373db1cb917f2a596a109ba1108e11f1783a8b7 distroprefs/LBROCARD.Devel-ebug-HT
 SHA1 e9bd2016d5029e7c5359569bddb9946f2f171de9 distroprefs/LEAKIN.File-Rsync.yml
 SHA1 24bc3ab923f4b21e8e518e635722cfefca064b03 distroprefs/LOCAL.trailing_dot_distros.yml
 SHA1 4aa6ee505c3fd2bd7109533adf2afda7d6f50846 distroprefs/MARKOV.Mail-Box.yml
-SHA1 0b35e9f0c9c9397a8e3fe0f58196ea1b8db21208 distroprefs/MARKOV.MailTools.yml
+SHA1 8f2f519e8b90733e7b63618ff39926815ca21a20 distroprefs/MARKOV.MailTools.yml
 SHA1 713aefbcda0e1c0f2d6c20f347e0c2eb046f2222 distroprefs/MAURICE.IPC-ShareLite.yml
 SHA1 6cdc9056855c24cd4fd77082181fcc002f92d10c distroprefs/MBARBON.Alien-wxWidgets.yml
 SHA1 823a17b1507f9f4ea3c224b561b72797ecb86843 distroprefs/MIROD.XML-Twig.yml
@@ -116,8 +124,10 @@ SHA1 90f34283c38d4516b7f08321b008616ae3c563c0 distroprefs/MIYAGAWA.XML-Atom.yml
 SHA1 6afc4ac0d42adee5bb0282e2ba6c8e1ed2bb5fe8 distroprefs/MJD.Devel-Trace.yml
 SHA1 59c1d7fb23e107b3c161a2f9eb1ded77f0023c5b distroprefs/MJD.Text-Template.yml
 SHA1 42e8041db004a2f9bd0a77743e6a959b2ada3508 distroprefs/MLEHMANN.Coro.yml
+SHA1 4333af01edb629fc896835647490c925e4e1abce distroprefs/MLEHMANN.PApp.yml
 SHA1 729b48e3fcdbb43f23b66fdca0e8610958653d24 distroprefs/MRAMBERG.Catalyst-Runtime.yml
 SHA1 74f3559096258a14ee854ca36fba73113f161635 distroprefs/MRAMBERG.Catalyst-View-TT.yml
+SHA1 3b1f54eb58f0d09d18eda70f0da3d69c200e5983 distroprefs/MSERGEANT.AxKit.yml
 SHA1 509237359e8567b1c5a0237b677ce68eabd4c5b2 distroprefs/MSERGEANT.CDB_File.yml
 SHA1 25cef08a203c071a680d7c46e8ba4059047f59dd distroprefs/MSERGEANT.DBD-SQLite.yml
 SHA1 8097a2957f31048b04b823ff025894ff62a9f7f7 distroprefs/MSERGEANT.DBIx-AnyDBD.yml
@@ -134,51 +144,55 @@ SHA1 c69b896ad3c8dd9e410573d688548dade94c9738 distroprefs/RGIERSIG.Expect.dd
 SHA1 2945c38f22c00b108561bd1e5585e37e1bf60a93 distroprefs/RGIERSIG.Expect.yml
 SHA1 faff33ebc17d0bf928933f25a3f8d94ced7f9686 distroprefs/RJBS.Data-UUID.yml
 SHA1 7e26d24c92af77cf56935920de346a89af7770c5 distroprefs/RJBS.Email-Send.yml
+SHA1 5c71eb32687bb8daf5ea2e9d40a3dbc7ce65749e distroprefs/RRA.PGP-Sign.yml
 SHA1 cd4e611d7b14e78dc2158a121b923f7ed9a9be10 distroprefs/RRWO.Graphics-ColorNames.yml
 SHA1 da6ccad2744265f551ad93c4aed00d98c40efdd8 distroprefs/RUZ.DBIx-SearchBuilder.yml
 SHA1 26019733016fc65fbfb077b7b43d0fb12b8b708e distroprefs/SCHWERN.Exporter-Lite.yml
 SHA1 f7365d94e5401aba990fe43d462323e9eb32b14c distroprefs/SCHWIGON.Class-MethodMaker.yml
+SHA1 ea329929ea66e7c9a30928b73d0ffc82326849a0 distroprefs/SMUELLER.Math-Approx-Symbolic.yml
 SHA1 17ec5f4a8b492cff755da93b1fda8033d5c854b8 distroprefs/SMUELLER.PAR.yml
 SHA1 fdf9eb8c3672d6eaa41a4bae5e2c5e9a61b6e424 distroprefs/SREZIC.Tk-Autoscroll.yml
 SHA1 4a918cbdd8c70bda8b6e4b69d2c578e442d92cba distroprefs/SREZIC.Tk-HistEntry.yml
-SHA1 9e97e8a3fd67c4ce8eb23c3603dcd356c79e8afd distroprefs/SREZIC.Tk-Pod.yml
+SHA1 9a5435df02413b4380a5ff4418f2dc8c66885072 distroprefs/SREZIC.Tk-Pod.yml
 SHA1 6df65d0332537ffc179f06c65871fc296ad370ef distroprefs/STEVAN.Class-MOP.yml
-SHA1 00bb8d1163356c3620f3fc80f2d6053dccf3a402 distroprefs/TELS.Math-BigInt-GMP.yml
+SHA1 16bbab07f3900c03ac7cbcdf41f98992d0c86946 distroprefs/TELS.Math-BigInt-GMP.yml
 SHA1 897413278b941d7ab4aae2077fedd59b300505a6 distroprefs/TIMB.DBI.yml
-SHA1 4266028c2eb988c0e6b483e65bf6bf21df5c20fb distroprefs/URI.File-Slurp.yml
+SHA1 7a315a9795e11a8ef3de7c66af83a883149088cb distroprefs/TSCH.Cairo.yml
+SHA1 41b0504022ec8ed9ba638508b2a3db13f1c3796d distroprefs/URI.File-Slurp.yml
 SHA1 4cc66677ef70c183cf4b1e1d03775abecb2aa393 distroprefs/VKON.Tcl-Tk.yml
 SHA1 5c642c84952287eaae6753c1955aeaa5c808db09 distroprefs/VKON.Tcl.yml
+SHA1 c14546a744b59bdc6afab944dd19e377141757f2 distroprefs/YARON.WWW-Monitor.yml
 SHA1 d901436429a68a96235760113c13c882258877e1 distroprefs/YOSHIDA.WebService-YouTube.yml
 SHA1 40ac95900de76a46d79702d15d987cc57d8e3652 distroprefs/YVES.Data-Dump-Streamer.yml
 SHA1 c554e43b8fac85b3755e45d7adde3266cea7f3c3 distroprefs/ZEV.Test-Dependencies.yml
 SHA1 efbe8e6882a2caa0d741b113959a706830ab5882 inc/Test/Builder.pm
 SHA1 ae1d68262bedc2475e2c6fd478d99b259b4fb109 inc/Test/More.pm
-SHA1 19229ec70996308f60b0278d6601a66136eea01e lib/CPAN.pm
+SHA1 0ff917f525e544ce140d569045a10dedcf834ffe lib/CPAN.pm
 SHA1 e093af1fcd72420fe4bdc85a5bec2b92a301ab97 lib/CPAN/Admin.pm
 SHA1 aa9e4d9384c88c55f9f457e2c2123242d7989406 lib/CPAN/Debug.pm
 SHA1 dc372403bde56dba27df0657ae73cb00b8badaac lib/CPAN/FirstTime.pm
-SHA1 8b4c2259c97cdd3f83d9d915ea778a1e5d2c9b43 lib/CPAN/HandleConfig.pm
+SHA1 33a2ee9460d28e74d09fa8912998a3a23bd63b45 lib/CPAN/HandleConfig.pm
 SHA1 ff82be9d903772e04b14ff3d304ae747f4234ab5 lib/CPAN/Kwalify.pm
 SHA1 b4fb9ad636a4ea29ff7c25eec4a2dc2056face80 lib/CPAN/Kwalify/distroprefs.dd
 SHA1 7502258b4b35301f478bd5a07df1c79ed08fe561 lib/CPAN/Kwalify/distroprefs.yml
 SHA1 17a1ad839531642ace9bf198bf52964c252f3318 lib/CPAN/Nox.pm
 SHA1 ff3763f508ecdce2082f93546b0cecff65333aaa lib/CPAN/Queue.pm
-SHA1 8e2f8374855205c30d1d3ad7ec9243e80e4dfd6c lib/CPAN/Tarzip.pm
+SHA1 7022cde318cca0e577b5d69530d39701a44e3a8e lib/CPAN/Tarzip.pm
 SHA1 5e7167890eb2b83b89c7b9d4f4ab0c6ee6f2f530 lib/CPAN/Version.pm
 SHA1 50c04db5b78a6ccfa59b9faf554ae9e77ead86c7 scripts/cpan
 SHA1 2a3adebb8252dc893681d17460082c2e08aa144a t/00signature.t
 SHA1 215dace24b507de20011d36cbe2d16ddea78bcf3 t/01loadme.t
 SHA1 67e80e1cfc3530932de7743dd0c833b2c387609d t/02nox.t
 SHA1 deb594e0f60aa9c40706f117198ca202cb424b46 t/03pkgs.t
-SHA1 c9d3940889bd5ef41229bd8f24b4edd77bd46865 t/10version.t
+SHA1 c7312219660db8d35de6256893f67b0f797c2fa6 t/10version.t
 SHA1 325d8a2f72d59c4cd2400c72403c05cd614c3abc t/11mirroredby.t
-SHA1 119de7e206775dc0629587cb7f4b93fc2490c6dd t/12cpan.t
+SHA1 d8a1379db5b3c912dc9237907b911280d81a95cc t/12cpan.t
 SHA1 e0e62c08ee1152d64d70180a6a06199ec13b05b1 t/30shell.coverage
-SHA1 e1ee298e39c4ca675206415353ffc3b98894e3bf t/30shell.t
+SHA1 a9a4b5a6c458586a6a0645cfab27e1f44d3aaa22 t/30shell.t
 SHA1 3cbb67e7fc3b7f2d4df8602132ee5878473251da t/31sessions.t
 SHA1 6a79f15a10337bd3450604abf39d4462df2a550b t/50pod.t
 SHA1 5d5d4a23a6fc5238d05aefc62410dcea7a7e8cd8 t/51pod.t
-SHA1 917b6982d84eae13146cee76317c90590c648fd0 t/52podcover.t
+SHA1 820372b39351a9864da299a6ad4eb9efd7941113 t/52podcover.t
 SHA1 413dd29cf8968e69292a2d652e0e0496a8137a01 t/60credentials.t
 SHA1 7efe930efd0a07d8101679ed15d4700dcf208137 t/CPAN/CpanTestDummies-1.55.pm
 SHA1 6f52e538b4aa7960129319a643353f92ba83aedc t/CPAN/TestConfig.pm
@@ -209,7 +223,7 @@ SHA1 93c1153ffb2a6a5314c437638e5e77500507544e t/local_utils.pm
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.6 (GNU/Linux)
 
-iD8DBQFGF0ZI7IA58KMXwV0RAt73AKCGkmNWK8lV6bSwruvIuVXvvTW9YQCgjjgF
-Omx/fMbrd/PK6+MmPoiozUY=
-=if6S
+iD8DBQFGJxJQ7IA58KMXwV0RAlICAJwOrHIagsk3jRF25DbfThdYKfoA6wCfTzGP
+Ij8kjJKAbt06ozT/BLh+YKk=
+=NFZv
 -----END PGP SIGNATURE-----

@@ -1,3 +1,519 @@
+2007-04-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* bug: megainstall contains Bundle::PAUSE which is not published. Should
+	be.
+
+2007-04-17  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* see thread "echo die > Makefile.PL" on module-authors. Fortunately,
+	Joshua argues well.
+
+	* Slaven sent me dependency statistics on freebsd ports of perl modules.
+	I have checked the 208 top lines (20+ references) of 1200. I found
+	IO::Socket::INET6 hanging and added a few others to megainstall.
+
+	* reports should have a counter of open issues on rt.cpan.org. Current
+	value to look up is
+
+	http://rt.cpan.org/Public/Dist/Display.html?Name=Template-Timer
+
+	Currently one would search for the element table and count the number of
+	tr minus one to get the number of new and open issues. The page is
+	declared as XHTML strict but isn't compliant.
+
+2007-04-16  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Most urgent tasks?
+
+	Report Text::Hatena
+
+	Report Locale::TextDomain
+
+	Write a bug report about Coro::Event and its interaction with CPAN.pm or
+	find out how to fix it and write a patch. Turn off distroprefs or work
+	without CPAN.pm to make things more obvious. Look:
+
+	cpan[2]> m Coro::Event      
+Module id = Coro::Event
+    CPAN_USERID  MLEHMANN (Marc Lehmann <pcg@goof.com>)
+    CPAN_VERSION 2.1
+    CPAN_FILE    M/ML/MLEHMANN/Coro-3.6.tar.gz
+    UPLOAD_DATE  2007-04-14
+    MANPAGE      Coro::Event - do events the coro-way
+    INST_FILE    (not installed)
+
+
+	Analyse the endless loop in "fforce test Task::Smoke". Maybe the fforce
+	is to blame?
+
+	FirstTime manpage?
+
+	Implement configure_requires? (testcase RPM::XML)
+
+	Implement a depends/requires keyword for distroprefs? (Testcase
+	Spreadsheet ParseExcel)
+
+	Speedup the cleanup? DONE [...time passes...] But I do not like the new
+	version. I want to see how long it takes/will take. svk rev. 2216 seems
+	to provide that.
+
+	Implement 30shell.t in a way that always emits useful output after a
+	failure?
+
+	Find an opinion on MIME-tools.
+
+	* Bug? "fforce test Task::Smoke" goes into an endless loop.
+	Test-TAP-Model and Task-Smoke play ping pong. All other prreqs are
+	satisfied quickly and prepended to PERL5LIB but these two stay active
+
+  drwx------   6 k k   4096 Apr 16 06:58 Task-Smoke-0.15-5ksBtB
+  -rw-rw-r--   1 k k   1424 Apr 16 06:58 Task-Smoke-0.15-5ksBtB.yml
+  -rw-rw-r--   1 k k   1532 Apr 16 06:58 Test-TAP-Model-0.09-wUFmP9.yml
+  drwx------   5 k k   4096 Apr 16 06:58 Test-TAP-Model-0.09-wUFmP9
+  drwx------   6 k k   4096 Apr 16 06:58 Task-Smoke-0.15-QOiZ85
+  -rw-rw-r--   1 k k   1424 Apr 16 06:58 Task-Smoke-0.15-QOiZ85.yml
+  -rw-rw-r--   1 k k   1532 Apr 16 06:58 Test-TAP-Model-0.09-H3Lqy0.yml
+  drwx------   5 k k   4096 Apr 16 06:58 Test-TAP-Model-0.09-H3Lqy0
+  drwx------   6 k k   4096 Apr 16 06:58 Task-Smoke-0.15-6lDDuP
+  -rw-rw-r--   1 k k   1424 Apr 16 06:58 Task-Smoke-0.15-6lDDuP.yml
+  -rw-rw-r--   1 k k   1532 Apr 16 06:58 Test-TAP-Model-0.09-48ClDJ.yml
+  drwx------   5 k k   4096 Apr 16 06:58 Test-TAP-Model-0.09-48ClDJ
+  drwx------   6 k k   4096 Apr 16 06:57 Task-Smoke-0.15-V3h8gK
+  -rw-rw-r--   1 k k   1424 Apr 16 06:57 Task-Smoke-0.15-V3h8gK.yml
+  -rw-rw-r--   1 k k   1532 Apr 16 06:57 Test-TAP-Model-0.09-MI4CP5.yml
+  drwx------   5 k k   4096 Apr 16 06:57 Test-TAP-Model-0.09-MI4CP5
+  drwx------   6 k k   4096 Apr 16 06:57 Task-Smoke-0.15-0rmHRt
+  -rw-rw-r--   1 k k   1424 Apr 16 06:57 Task-Smoke-0.15-0rmHRt.yml
+  -rw-rw-r--   1 k k   1532 Apr 16 06:57 Test-TAP-Model-0.09-A0HeR8.yml
+  drwx------   5 k k   4096 Apr 16 06:57 Test-TAP-Model-0.09-A0HeR8
+  drwx------   6 k k   4096 Apr 16 06:57 Task-Smoke-0.15-BpPXIa
+
+	After I interrupt the endless loop and say "install Task::Smoke" all is
+	well quickly. Let's page back what was prepended to PERL5LIB?
+
+---- Unsatisfied dependencies detected during ----
+----        GAAL/Task-Smoke-0.15.tar.gz       ----
+    Test::TAP::Model [requires]
+Prepending /home/k/.cpan/build/Test-TAP-HTMLMatrix-0.08-t1Tza8/blib/arch /home/k/.cpan/build/Test-TAP-HTMLMatrix-0.08-t1Tza8/blib/lib /home/k/.cpan/build/Method-Alias-1.03-Xgby0k/blib/arch /home/k/.cpan/build/Method-Alias-1.03-Xgby0k/blib/lib /home/k/.cpan/build/Best-0.11-T3AKJn/blib/arch /home/k/.cpan/build/Best-0.11-T3AKJn/blib/lib to PERL5LIB for 'test'
+Running Build test
+  Delayed until after prerequisites
+Running test for module 'Test::TAP::Model'
+Running make for N/NU/NUFFIN/Test-TAP-Model-0.09.tar.gz
+Prepending /home/k/.cpan/build/Test-TAP-HTMLMatrix-0.08-t1Tza8/blib/arch /home/k/.cpan/build/Test-TAP-HTMLMatrix-0.08-t1Tza8/blib/lib /home/k/.cpan/build/Method-Alias-1.03-Xgby0k/blib/arch /home/k/.cpan/build/Method-Alias-1.03-Xgby0k/blib/lib /home/k/.cpan/build/Best-0.11-T3AKJn/blib/arch /home/k/.cpan/build/Best-0.11-T3AKJn/blib/lib to PERL5LIB for 'get'
+Signature for /home/ftp/pub/CPAN/authors/id/N/NU/NUFFIN/CHECKSUMS ok
+Checksum for /home/ftp/pub/CPAN/authors/id/N/NU/NUFFIN/Test-TAP-Model-0.09.tar.gz ok
+
+
+2007-04-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: write a script that finds the distros in my local installation
+	that have no reports on cpantesters yet. I suppose YACSmoke could do
+	that.
+
+	* Close to 700 now:
+
+	"Found 1238 old builds, restored the state of 691"
+
+2007-04-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Offtopic: Marc's patch for pack 'C' applied on top of 30952. Path:
+	installed-perls/perl/pFvwf7I/perl-5.8.0@30952
+
+	* Coro: in the logfile for 30943 I see that Coro did not build and did
+	not install Coro::Event. Consequently, Continuity failed its tests. What
+	might be the reason? On later retry, Coro built and installed both Coro
+	and Coro::Event. Seeing the prereqs NOW, they contain
+
+                                                  'AnyEvent' => '2.51',
+                                                  'Event' => '1.06',
+                                                  'IO::AIO' => '2.3',
+                                                  'Scalar::Util' => '0'
+
+	And here is the relevant output of Marc's Makefile.PL:
+
+Warning: prerequisite AnyEvent 2.51 not found.
+Warning: prerequisite Event 1.06 not found.
+Warning: prerequisite IO::AIO 2.3 not found.
+
+*** Event not found, not build Event support.
+
+	This seems like a bug to me. He should ask if Event support is wanted
+	and if yes, make Event a prerequisite. At least from my point of view he
+	should do so.
+
+	It has already lead to a wrong bugreport by chris on cpantesters.
+
+	And I have now written to Marc (with CC cpantesters) if he would change
+	things accordingly). Miscommunication happened and so I need to give up:-(
+
+	* Locale::TextDomain needs a binary search. Yay, the first one for a
+	long time that goes back before 20000. We are compiling perls in the
+	[16904,17122] interval! Ouch: 16916, 16951, 16953, 16991, 17022, 17058,
+	17075 do not want to be compiled!
+
+	This needs more attention. Yes, it's DB_File that fails nowadays with
+	these old perls. And we always used -Ui_db. For binsearchaperl the full
+	argument then is
+
+	--config="-Dinstallusrbinperl=n -Uversiononly -Doptimize=-g -des -Duse64bitint -Dusedevel -Ui_db"
+
+----Program----
+eval {require Locale::TextDomain};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pm3UiPL/perl-5.7.3@16904/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pN2DxS9/perl-5.7.3@16905/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Change 16905 by jhi@alpha on 2002/05/30 20:26:32
+
+	Subject: [PATCH perl@16893] lib/blib.t tweak for VMS
+	From: "Craig A. Berry" <craigberry@mac.com>
+	Date: Thu, 30 May 2002 16:22:40 -0500
+	Message-Id: <a05111703b91c44a6865f@[172.16.52.1]>
+
+	Impossible. This patches a test file in core perl, this cannot have
+	consequences on user code.
+
+	So it's likely to depend on a module.
+
+	diff -u =(sort /home/k/.cpan/Bundle/Snapshot_2007_04_14_00.pm) =(sort /home/k/.cpan/Bundle/Snapshot_2007_04_14_01.pm) | less
+
+
+	Nothing obvious. So let's study the test itself.
+
+	It's about how the Austrians say to the month February. Why on earth is
+	16904 able to dig that word "Feber" out of the locale system but 16905
+	not? The files that contain "Feber" are specifically being delivered by
+	Locale::TextDomain, so seem not dependent on my Linux version or the
+	state of my locale installations.
+
+	https://rt.cpan.org/Dist/Display.html?Queue=libintl-perl  is empty.
+
+	So if I cannot find a negative module dependency, it's something in
+	perl?
+
+	Wow: my 16904 was compiled on Gentoo! But comparing the configs does not
+	reveal anything yet.
+
+	Maybe it helps to run the same program in two debuggers step by step?
+
+	One day has passed and when I retry today in a fresh directory, then
+	both 16904 and 16905 succeed on this test while 30952 fails. Heisenbug?
+
+	I'll start with a new binary search. Apparently I did something wrong
+	yesterday. I realize comments in the test output that escaped me
+	yesterday. The new test script filters those comments out
+	(t04find_domain_bug.t).
+
+	With this I'm told that 29052 succeeds but 29053 fails with an Assertion
+	failure. I rerun with new boundary and now the assertion failure did not
+	go away up to 29543 and 29544 was then failing on the
+	04find_domain_bug.t.
+
+	So this seems more logical and proves yesterday's recherche was bogus,
+	most probably not a Heisenbug.
+	
+2007-04-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Devel::ebug again. failed with 30943 but on retry success. The logfile
+	reports
+
+t/return.........YAML Error: Invalid characters in stream. This parser only supports printable ASCII
+   Code: YAML_PARSE_ERR_BAD_CHARS
+   Line: 0
+   Document: 0
+ at /home/src/perl/repoperls/installed-perls/perl/pCufuHQ/perl-5.8.0@30943/lib/site_perl/5.9.5/YAML.pm line 33
+# Looks like your test died before it could output anything.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 1-13
+	Failed 13/13 tests, 0.00% okay
+	[...]
+t/return.t   255 65280    13   26  1-13
+
+	Remember that "20070330T2346 perl 30791" already had a problem. But it
+	was not in the same test. It was
+
+t/break_point....YAML Error: Invalid characters in stream. This parser only supports printable ASCII
+   Code: YAML_PARSE_ERR_BAD_CHARS
+   Line: 0
+   Document: 0
+ at /home/src/perl/repoperls/installed-perls/perl/p6oBwLf/perl-5.8.0@30791/lib/site_perl/5.9.5/YAML.pm line 33
+# Looks like you planned 27 tests but only ran 15.
+# Looks like your test died just after 15.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 16-27
+	Failed 12/27 tests, 55.56% okay
+
+
+	Eeek.
+
+	* 30941 is a suspicious patch file. It mixes perl and maint-5.8 branches
+	in one patch and contains an "edit" without a diff following. As a
+	consequence I get a "maint" and a "perl" versions of 30941 which seems
+	pretty uniq afair. Need to further investigate.
+
+	* Hatena::Keyword seems to need a binary search: maint@30874 is "OK",
+	blead isn't. But the search cannot start with 20002 because prereq Jcode
+	fails there. Need to add Cache::File to the prep script because it is an
+	undecl prereq (already reported as
+	https://rt.cpan.org/Ticket/Display.html?id=23684). blead@23963 is fine
+	with Jcode and H:K. The error message hints at LWP::Protocol. We should
+	verify that this is not a "dependent" failure.
+
+----Program----
+eval q{use Hatena::Keyword 0.04};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pZ7WhmN/perl-5.8.0@23963/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../p35sQ2r/perl-5.8.0@23964/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	But take care, this 23964 failed on all of 00-load, 01-methods and
+	02-caching.t (every time with "Can't locate RPC/XML.pm"). So this binary
+	search was worthless. I think we must now find out when XML::RPC started
+	working again. Please do not confuse XML::RPC and RCP::XML! But it's
+	strange anyway because both modules run and install well under 23964.
+	Now, when I retry the very first binarysearch, it says both 23983 and
+	30943 fail. Cool. So we need 23964 against 23983? Yes, on retry, 23964
+	succeeds and 23983 fails. And the new binary point of balance is
+	2396[45]! When I now apply this balance point against 99999 via
+	RPC::XML, then ***lots*** of compiling, testing, and installing is being
+	done. And we "jump" to what? 29099/29100, such a wide jump! But it has
+	to do with LWP that RPC::XML does not even build. Apparently is LWP an
+	undeclared configure_requires (which is not even implemented yet). When
+	I add LWP to the prep-RPC-XML.pl script? Then both 23965 and 30943 work
+	and there is no binary search. But if I now add both LWP and RPC::XML,
+	in that order, to the prep-Hatena-Keyword.pl? 23965 succeeds and 30943
+	fails and binary search starts. When we reach [24003,24023] it needs to
+	build perls.
+
+----Program----
+eval q{use Hatena::Keyword 0.04};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pQ3Kc3b/perl-5.8.0@24009/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../puKzj8b/perl-5.8.0@24010/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+
+	Change 24010 by rgs@bloom on 2005/03/08 17:53:50
+
+	Subject: Encoding neutral unpack
+	From: perl5-porters@ton.iguana.be (Ton Hospel)
+	Date: Sun, 6 Mar 2005 18:29:38 +0000 (UTC)
+	Message-Id: <d0fi6i$k06$1@post.home.lunix>
+
+t/01-methods......1..25
+[...]
+ok 23
+Content-Length header value was wrong, fixed at /home/src/perl/repoperls/installed-perls/perl/puKzj8b/perl-5.8.0@24010/lib/site_perl/5.9.2/LWP/Protocol/http.pm line 189, <DATA> line 855.
+
+#   Failed test at t/01-methods.t line 49.
+# Looks like you failed 1 test of 25.
+ok 24
+not ok 25
+dubious
+        Test returned status 1 (wstat 256, 0x100)
+DIED. FAILED test 25
+        Failed 1/25 tests, 96.00% okay
+
+
+	When I run this test in the debugger with 24010 (first remove the -T on
+	the shebang), many tests fail.	
+
+
+2007-04-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Nick denies 30900's responsibility. Something else must be it because
+	he sees the crazy loop going back to 30000. So I must gather facts now.
+	Questions?
+
+	MIME-tools is a distribution, not a module. Which module represents
+	MIME-tools? -- MIME::Body
+	
+	Which perls between 30000 and 30900 have MIME::Body installed? -- 30383,
+	30384, 30388, 30391, 30392, 30393, 30394, 30399, 30402, 30405, 30408,
+	30413, 30414, 30415, 30418, 30419, 30420, 30884, 30888, 30898
+
+	Which logfiles have been written for those versions? --
+	30383=>20070223T2127, 30384=>20070224T1000, 30388=>20070224T1500,
+	30391=>20070224T1957, 30392=>20070225T0045, 30393=>20070225T0524,
+	30394=>20070225T1622, 30399=>20070225T2121, 30402=>20070226T0344,
+	30405=>20070226T0904, 30408=>20070226T1412, 30413=>20070226T1902,
+	30414=>20070227T0414, 30415=>20070227T1355, 30418=>20070227T1856,
+	30419=>20070227T2342, 30420=>20070228T0417, 30884=>20070410T1050,
+	30888=>20070410T1614, 30898=>20070410T2143
+
+	The large gap after 30420 jumps into my eyes. What was the next logfile
+	after that? And for which patch? -- 20070228T1244 for 30428
+
+	And the last before 30844? -- 20070409T1809 for 30875
+
+	Did the tests in the succeeding runs really succeed on Entity.t or did
+	they probably skip it? -- All of above cited successful tests were
+	reported as "....ok" for Entity.t. All others complained "Can't locate
+	Mail/Internet.pm in @INC". I should point out that I had banned
+	Mail::Internet from being installed most of the time.
+
+	So which versions of MIME::Body and Mail::Internet did gain the cited
+	successes above? -- MIME::Body was always 5.42. For Mail::Internet it
+	was from 30383 up to 30420 the module version 1.74 and from 30884 up to
+	30898 it was 1.76.
+
+	Would you mind installing Mail::Internet and MIME::Body for 30428 and
+	report? -- For Mail::Internet CPAN.pm chose MARKOV/MailTools-1.76.tar.gz
+	to install and it succeeded. For MIME::Body it chose
+	DSKOLL/MIME-tools-5.420.tar.gz and it succeeded.
+
+	Would you do the same for 30875? -- I did with the same result.
+
+	* Algorithm::Partition comes with a test "99-kwalitee".
+
+use Test::More;
+
+eval { require Test::Kwalitee; Test::Kwalitee->import };
+
+plan( skip_all => 'Test::Kwalitee not installed; skipping' ) if $@;
+
+	Ha, what a gem I haven't noticed yet!
+
+	* Mail::Send has a new release and I just used it to report its own test
+	with 30898 and another one for Continuity. We'll have to check for
+	success later. -- No success.
+
+	* make test on DSKOLL/MIME-tools-5.420.tar.gz goes into a fast endless
+	loop today with blead@30900. We have already 30902 but it seems
+	unrelated.
+
+t/Entity............Use of uninitialized value within %INC in pattern match (m//
+) at /home/src/perl/repoperls/installed-perls/perl/p7R8oCc/perl-5.8.0@30900/lib/
+site_perl/5.9.5/Mail/Field.pm line 114.
+Use of uninitialized value in concatenation (.) or string at /home/src/perl/repo
+perls/installed-perls/perl/p7R8oCc/perl-5.8.0@30900/lib/site_perl/5.9.5/Mail/Fie
+ld.pm line 114.
+closedir() attempted on invalid dirhandle DIR at /home/src/perl/repoperls/instal
+led-perls/perl/p7R8oCc/perl-5.8.0@30900/lib/site_perl/5.9.5/Mail/Field.pm line 9
+1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 482) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 483) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 484) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 485) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 486) line 1.
+[...]
+closedir() attempted on invalid dirhandle DIR at /home/src/perl/repoperls/instal
+led-perls/perl/p7R8oCc/perl-5.8.0@30900/lib/site_perl/5.9.5/Mail/Field.pm line 9
+1.
+[...]
+closedir() attempted on invalid dirhandle DIR at /home/src/perl/repoperls/instal
+led-perls/perl/p7R8oCc/perl-5.8.0@30900/lib/site_perl/5.9.5/Mail/Field.pm line 9
+1.
+closedir() attempted on invalid dirhandle DIR at /home/src/perl/repoperls/instal
+led-perls/perl/p7R8oCc/perl-5.8.0@30900/lib/site_perl/5.9.5/Mail/Field.pm line 9
+1.
+closedir() attempted on invalid dirhandle DIR at /home/src/perl/repoperls/instal
+led-perls/perl/p7R8oCc/perl-5.8.0@30900/lib/site_perl/5.9.5/Mail/Field.pm line 9
+1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 740) line 1.
+Bareword found where operator expected at (eval 740) line 1, near "200::lvchange
+"
+        (Missing operator before ::lvchange?)
+Warning: Use of "require" without parentheses is ambiguous at (eval 741) line 1.
+Bareword found where operator expected at (eval 741) line 1, near "200::lvm"
+        (Missing operator before ::lvm?)
+Warning: Use of "require" without parentheses is ambiguous at (eval 742) line 1.
+Bareword found where operator expected at (eval 742) line 1, near "200::vgcfgres
+tore"
+        (Missing operator before ::vgcfgrestore?)
+Warning: Use of "require" without parentheses is ambiguous at (eval 743) line 1.
+Bareword found where operator expected at (eval 743) line 1, near "200::lvcreate
+"
+        (Missing operator before ::lvcreate?)
+[...about 6 million lines of "closedir attempted" and "require without parsntheses"...]
+Warning: Use of "require" without parentheses is ambiguous at (eval 5936852) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 5936853) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 5936854) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 5936855) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 5936856) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 5936857) line 1.
+Warning: Use of "require" without parentheses is ambiguous at (eval 5936858) line 1.
+
+	The last perl before 30900 was 30898 which installed MIME-tools just
+	fine.
+
+	I built an autobundle snapshot from 30900 and another from 30898. Of
+	course the latter is much bigger because it was not stopped by an
+	endless loop. So the diff is unbalanced.
+
+	Snapshot_2007_04_11_0[01].pm
+
+	Yhe only version difference is in Tk::Tree, impossible that it has an
+	influence.
+
+
+2007-04-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* t/op/pat....................................................FAILED at test 1658
+
+	this is with bleadperl @ 30881
+
+2007-04-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Need tests for dot distros and scripts. megainstall tests both but is
+	too slow and we had no dot distro running on MB.
+
+2007-04-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: my first trial (after the release of 1.90) to use "cpan ." with
+	class-mop failed. It did not try the Build.PL but compleined about the
+	inexistent Makefile.PL. Trying again with full path gave the same ugly
+	result:
+
+Running make for /home/src/perl/class-mop/SVN/.
+Prepending /home/k/.cpan/build/Test-Without-Module-0.09-4HOjGl/blib/arch /home/k/.cpan/build/Test-Without-Module-0.09-4HOjGl/blib/lib to PERL5LIB for 'get'
+  Has already been unwrapped into directory /home/src/perl/class-mop/SVN/.
+Prepending /home/k/.cpan/build/Test-Without-Module-0.09-4HOjGl/blib/arch /home/k/.cpan/build/Test-Without-Module-0.09-4HOjGl/blib/lib to PERL5LIB for 'make'
+
+  CPAN.pm: Going to build /home/src/perl/class-mop/SVN/.
+
+Can't open perl script "Makefile.PL": No such file or directory
+Warning: No success on command[/home/src/perl/repoperls/installed-perls/perl/pqoGi7b/perl-5.8.0@30869/bin/perl Makefile.PL]
+Directory '/home/src/perl/class-mop/SVN/.' not below /home/k/.cpan/build, will not store persistent state
+Prepending /home/k/.cpan/build/Test-Without-Module-0.09-4HOjGl/blib/arch /home/k/.cpan/build/Test-Without-Module-0.09-4HOjGl/blib/lib to PERL5LIB for 'test'
+Running make test
+  Make had some problems, won't test
+CPAN: Module::Build loaded ok (v0.2807)
+Failed during this command:
+ /home/src/perl/class-mop/SVN/.               : writemakefile NO '/home/src/perl/repoperls/installed-perls/perl/pqoGi7b/perl-5.8.0@30869/bin/perl Makefile.PL' returned status 512
+
+	First culprit is the 'return 1;' in line 5730.... FIXED in SVK rev. 2187
+	or so.
+
+	* Nice to have: serialization needs to be able to deal with JSON et.al.
+	too.
+
+	* LWP::UserAgent usage is not centralized, several spots of copy&paste.
+
 2007-04-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Nice to have: an overview over the neuralgic patches up to 5.10 that
@@ -20,7 +536,14 @@
 	check %INC for modules in that distribution. If found, warn the user and
 	suggest that they call "reload cpan" at the prompt.
 
-	Very good idea.
+	Very good idea. But I had to answer:
+
+But it will need some refinement because the
+'reload cpan' command only checks for a static list of modules. It's
+in my Todo file now and will be dealt with after 1.90.
+
+	Maybe we just reload whatever we have loaded at the moment? Dangerous?
+	How to render the process that is now already quite loud?
 
 	* HTML::CalendarMonth is failing but the error output is really large. I
 	just tried to report() it and must check later if the mail actually

@@ -826,7 +826,7 @@ __END__
 #P:o conf ftp ""
 ########
 #P:m Fcntl
-#E:Found \d old builds?, restored the state of \d[\s\S]+?Defines fcntl
+#E:Found \d old builds?, restored the state of (?:\d|none)[\s\S]+?Defines fcntl
 #R:YAML
 ########
 #P:a JHI
@@ -896,7 +896,7 @@ __END__
 ########
 #P:test CPAN::Test::Dummy::Perl5::Make::Zip
 #E:Has already been tested successfully
-#R:Archive::Zip
+#R:Archive::Zip Module::Build
 ########
 #P:failed
 #E:Nothing
@@ -1028,7 +1028,7 @@ __END__
 #E:Has already been made
 ########
 #P:clean Bundle::CpanTestDummies
-#E:No Makefile
+#E:Running clean[\S\s]+Running clean[\S\s]+Running clean
 ########
 #P:clean Bundle::CpanTestDummies
 #E:make clean already called once
@@ -1056,7 +1056,7 @@ __END__
 #T:60
 ########
 #P:install CPAN::Test::Dummy::Perl5::Make::CircDepeOne
-#E:is up to date|circular dependency
+#E:is up to date|Recursive dependency
 #T:60
 ########
 #P:o conf defaults
@@ -1072,7 +1072,7 @@ __END__
 ########
 #P:test CPAN::Test::Dummy::Perl5::Build::Fails
 #E:test -- OK
-#R:YAML patch
+#R:YAML patch Module::Build
 ########
 #P:u /--/
 #E:No modules found for
