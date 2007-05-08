@@ -8,6 +8,7 @@ distroprefs/ABW.Template-Toolkit.dd
 distroprefs/ABW.Template-Toolkit.yml
 distroprefs/ADAMK.Algorithm-Dependency.yml
 distroprefs/ADAMK.Test-ClassAPI.yml
+distroprefs/AGRUNDMA.Catalyst-Plugin-Static-Simple.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Build-Fails.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml
 distroprefs/ANDYA.Perl-Version.yml
@@ -18,10 +19,13 @@ distroprefs/AUDREYT.Module-Install.yml
 distroprefs/AUDREYT.Module-Signature.yml
 distroprefs/AUDREYT.PDF-FromHTML.yml
 distroprefs/AUDREYT.YAML-Syck.yml
+distroprefs/AVIF.Time-Duration.yml
 distroprefs/BINGOS.POE-Component-CPAN-YACSmoke.yml
+distroprefs/BLBLACK.Class-C3.yml
 distroprefs/BRADFITZ.Danga-Socket.yml
 distroprefs/BRIANSKI.XML-Comma.yml
 distroprefs/BRICAS.Catalyst-Plugin-ConfigLoader.yml
+distroprefs/BRICAS.WWW-OpenSearch.yml
 distroprefs/BTROTT.Convert-PEM.yml
 distroprefs/BTROTT.Crypt-DH.yml
 distroprefs/BTROTT.Crypt-DSA.yml
@@ -52,6 +56,7 @@ distroprefs/DSKOLL.MIME-tools.yml
 distroprefs/DSUGAL.Devel-Size.yml
 distroprefs/DURIST.WWW-Babelfish.yml
 distroprefs/EESTABROO.IMAP-Admin.yml
+distroprefs/ERYQ.Convert-BinHex.yml
 distroprefs/FDALY.Test-Deep.yml
 distroprefs/FLUFFY.Class-MethodMaker.yml
 distroprefs/GAAL.Task-Smoke.yml
@@ -66,6 +71,7 @@ distroprefs/GOZER.mod_perl.yml
 distroprefs/GRANTM.XML-SAX.yml
 distroprefs/HAYASHI.Term-ReadLine-Gnu.yml
 distroprefs/HIROSE.Net-SSL-ExpireDate.yml
+distroprefs/HMBRAND.Spreadsheet-Read.yml
 distroprefs/ILYAZ.Math-Pari.yml
 distroprefs/ILYAZ.Term-ReadLine-Perl.dd
 distroprefs/ILYAZ.Term-ReadLine-Perl.yml
@@ -76,7 +82,9 @@ distroprefs/JCRISTY.PerlMagick.yml
 distroprefs/JESSE.Data-ICal.yml
 distroprefs/JESSE.HTTP-Server-Simple.yml
 distroprefs/JESSE.Jifty.yml
+distroprefs/JGMYERS.Encode-Detect.yml
 distroprefs/JHOBLITT.DateTime-Format-ISO8601.yml
+distroprefs/JJORE.AI-Prolog.yml
 distroprefs/JJORE.Carp-Clan.yml
 distroprefs/JMASON.Mail-SpamAssassin.yml
 distroprefs/JMGDOC.OpenOffice-OODoc.yml
@@ -84,6 +92,7 @@ distroprefs/JPEACOCK.SVN-Notify-Mirror.yml
 distroprefs/JPIERCE.IO-Pager.yml
 distroprefs/JROBINSON.DBIx-Class.yml
 distroprefs/JSTENZEL.Getopt-ArgvFile.yml
+distroprefs/KANE.CPANPLUS.yml
 distroprefs/KASEI.Class-Accessor.yml
 distroprefs/KBROWN.SOAP.yml
 distroprefs/KCLARK.SQL-Translator.yml
@@ -128,6 +137,7 @@ distroprefs/RJBS.Email-Send.yml
 distroprefs/RRA.PGP-Sign.yml
 distroprefs/RRWO.Graphics-ColorNames.yml
 distroprefs/RUZ.DBIx-SearchBuilder.yml
+distroprefs/SCHWERN.Class-Fields.yml
 distroprefs/SCHWERN.Exporter-Lite.yml
 distroprefs/SCHWIGON.Class-MethodMaker.yml
 distroprefs/SMUELLER.Math-Approx-Symbolic.yml
@@ -139,6 +149,7 @@ distroprefs/STEVAN.Class-MOP.yml
 distroprefs/TELS.Math-BigInt-GMP.yml
 distroprefs/TIMB.DBI.yml
 distroprefs/TSCH.Cairo.yml
+distroprefs/TSCH.Gtk2.yml
 distroprefs/URI.File-Slurp.yml
 distroprefs/VKON.Tcl-Tk.yml
 distroprefs/VKON.Tcl.yml
@@ -163,6 +174,7 @@ lib/CPAN/Version.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+megainstall.txt
 META.yml
 PAUSE2003.pub
 PAUSE2005.pub

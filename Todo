@@ -1,3 +1,460 @@
+2007-05-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Perlbal 1.57 maybe needs a binary search although I have mixed success
+	in maintperl. But I have never success on blead with "configuration
+	error". The failure with maint@31100 is always in t/17-webserver-concat
+	and repeating the test several times does not change that. maint@30961
+	exposes the same failure and an additional one in 15-webserver.
+	maint@30765 has the one in 17 only. maint@30588 succeeds. maint@30210
+	again has failure in 15 but not the one in 17. When I repeated the test
+	it succeeded.
+
+	_S_IFMT and S_IFDIR and S_IFREG are involved in the failure in the 17X
+	test.
+
+	http://groups.google.de/group/perl.perl5.porters/msg/d65da80913cff3ff
+
+	where Alex Tourbin post 'fixed Fcntl::S_IFMT() breakage introduced by
+	change 30674 (blead 26701)'
+
+	Aha. So this is it and the chapter is not yet closed.
+
+	To run a binary search we probably must exclude the flaky test 15x. And
+	then 45x and 12x turn out to flaky as well.
+	
+	* RMUHLE/classes-0.943.tar.gz needs a binary search
+
+	* EDPRATOMO/Algorithm-Permute-0.06.tar.gz needs a binary search.
+
+cc -c   -DDEBUGGING -fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g   -DVERSION=\"0.06\" -DXS_VERSION=\"0.06\" -fPIC "-I/home/src/perl/repoperls/installed-perls/perl/p9xHaBy/perl-5.8.0@31166/lib/5.9.5/i686-linux-64int/CORE"  -DPERL_EXT Permute.c
+Permute.xs: In function 'permute_engine':
+Permute.xs:126: error: 'XPVAV' has no member named 'xav_array'
+Permute.c: In function 'XS_Algorithm__Permute_next':
+Permute.c:245: warning: cast to pointer from integer of different size
+Permute.c: In function 'XS_Algorithm__Permute_DESTROY':
+Permute.c:296: warning: cast to pointer from integer of different size
+Permute.c: In function 'XS_Algorithm__Permute_peek':
+Permute.c:331: warning: cast to pointer from integer of different size
+Permute.c: In function 'XS_Algorithm__Permute_reset':
+Permute.c:367: warning: cast to pointer from integer of different size
+Permute.xs: In function 'XS_Algorithm__Permute_permute':
+Permute.xs:306: error: 'XPVAV' has no member named 'xav_array'
+Permute.xs:347: error: 'XPVAV' has no member named 'xav_array'
+
+	* Template-Timer: I'm already used to seeing it fail. But I just
+	discovered that there were 4 consecutive sessions where it succeeded:
+
+20070430T1340 perl          31107  634 NOT OK
+20070501T0032 perl          31110  760 OK
+20070501T1746 perl          31111  769 OK
+20070502T0515 perl          31113  416 OK
+20070502T1604 perl          31117  431 OK
+20070502T2300 perl          31120  505 NOT OK
+
+	It is not that simple that Template were missing. There is something
+	else going on.
+
+	* Apache-Session started to have a Semaphore problem recently:
+
+20070417T1509 perl          30970  116 OK
+20070417T2056 perl          30971    0 OK
+20070418T2250 perl          30977  145 NOT OK
+
+	The semaphore tells us:
+
+t/99flex...........Permission denied at /home/sand/.cpan/build/Apache-Session-1.82-jeBTMQ/blib/lib/Apache/Session/Lock/Semaphore.pm line 92.
+        (in cleanup) Permission denied at /home/sand/.cpan/build/Apache-Session-1.82-jeBTMQ/blib/lib/Apache/Session/Lock/Semaphore.pm line 92.
+
+	When I run the same test as user k it works.
+
+	The IPC::Semaphore manpage says:
+
+If you get an invalid argument message, that usually means that the system
+is unhappy with the number of semaphores that you requested.  Try decreasing
+the number of semaphores.  The semaphore blocks that this package creates
+are persistent until the system is rebooted, so if you request 8 sempahores
+one time and 16 sempahores the next, it won't work.  Use the system
+commands ipcs and ipcrm to inspect and remove unwanted semphore blocks.
+
+	Let's do that!... Done and now Apache-Session passes all tests and
+	report is written to cpantesters. Phew! Apologies for the bogus report
+	if anybody reads this.
+
+2007-05-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* SWF-Builder now probably nailed with
+	http://rt.cpan.org/Ticket/Display.html?id=26971
+
+	* Todo: write a distropref for CPANPLUS with a goto 1.79_01.
+
+2007-05-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* RRWO/CPAN-YACSmoke-0.03.tar.gz also broke recently
+
+20070422T1717 perl          31019  817 OK
+20070423T0905 maint-5.8     31011    0 NOT OK
+20070423T1448 perl          31029  284 NOT OK
+
+	That's a normal dependency on Regexp::Assemble. But why on maint? This
+	was a dependency on the (then) broken CPANPLUS.
+
+	And why do I have no maint result since then? Because CPANPLUS is still
+	recursively dependent on itself.
+
+	* ROBM/Cache-FastMmap-1.14.tar.gz came under the wheels:
+
+20070417T1509 perl          30970  583 OK
+20070418T2250 perl          30977  424 NOT OK
+
+	http://rt.cpan.org/Ticket/Display.html?id=26951
+
+	One should really run the whole megainstall with a random userid to find
+	more of these bugs.
+
+2007-05-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Jarkko's Graph is now seismograph and consistently failing apparently
+	starting with 31105. But there was another interval where it failed!
+	That interval started with 31079:
+
+----Program----
+eval q{use Graph 0.81};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pnKRDVH/perl-5.8.0@31078/bin/perl----
+N/A
+
+----EOF ($?='0')----
+----Output of .../pGHaMwh/perl-5.8.0@31079/bin/perl----
+OK
+
+----EOF ($?='0')----
+
+	and ended with 31104. But 31105 is an impossible candidate for a
+	breaker. Maybe we must pay attn to the date once more?
+
+20070428T1842 perl          31104    0 OK
+20070429T0705 perl          31105    0 NOT OK
+
+	So what changed between the two perls?
+
+	/home/k/.cpan/Bundle/Snapshot_2007_05_05_0[01].pm
+
+	Heap           0.71   => 0.80
+	Module::Build  0.2807 => 0.2808
+	Math::BaseCalc ???    => 1.011
+
+	Yes, downgrading Heap fixes it. http://rt.cpan.org/Ticket/Display.html?id=26943
+
+	* Locale::TextDomain seems to have been fixed or improved some day (30971) but
+	it still fails occasionally.
+
+	* JSON 1.12 needed a binary search and it ended with
+
+----Program----
+eval q{use JSON 1.12};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pB7ZOd0/perl-5.8.0@27263/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pWOlwj4/perl-5.8.0@27264/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Change 27264 by nicholas@nicholas-saigo on 2006/02/21 19:04:39
+
+	Reorder the SV flags so that SVp_?OK and SVf_?OK occupy 8 contiguous
+	bits (0x0000XX00). This makes perl 3K smaller with -Os on x86 FreeBSD,
+	and might also help on other architectures (eg with 8 contiguous bits,
+	the SvOK() test on ARM won't need an intermediate constant).
+	
+
+2007-05-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Gtk2 has the dependency Extutils::Depends as I discovered today and
+	then Glib.pm. Both not mentioned in the prereq decl or maybe mentioned
+	in the Makefile.PL but PREREQ_FATAL is set and MakeMaker still does not
+	let me override it.
+
+	A small patch now at least lets me install the prereqs and demonstrates
+	nicely that configure_requires is really needed.
+
+	Annoyingly it says
+
+*** can not find package gtk+-2.0 >= 2.0.0
+*** check that it is properly installed and available in PKG_CONFIG_PATH
+ at Makefile.PL line 69
+
+	And I cannot find out which package I have to install on debian and I
+	remember that on previous occasions I did not find out the problem
+	either.
+
+	The message above comes from ExtUtils::PkgConfig. Maybe it is broken?
+
+	Maybe I must remove libgtk 1.2 first?
+
+	Nope. Test program insists:
+
+% /home/src/perl/repoperls/installed-perls/perl/p2VJt9O/perl-5.8.0@31136/bin/perl -le '
+use ExtUtils::PkgConfig; 
+$package ="gtk+-2.0";
+%pkg_info = ExtUtils::PkgConfig->find ($package); 
+'
+*** can not find package gtk+-2.0
+*** check that it is properly installed and available in PKG_CONFIG_PATH
+ at -e line 4
+
+	I put the patch into the patches directory and give up for now.
+
+	* make a release for Adam and send it to him before actually releasing
+	(because I broke pip)
+
+	* Net::Libdnet on debian needs to change d to dumb in two spots:
+
+	Libdnet.xs must say include dumbnet.h and Makefile.PL must say -ldumbnet.
+
+	That runs all tests OK. That should be wrapped into a DEFINE.
+
+	* Nothing TODO: Event 1.08 broken in blead. It's just the test suite,
+	not Event itself. It was discussed on P5P.
+
+2007-05-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* XML::Validator::Schema fails tests. Binary search points to 29118.
+	Repeating the binary search with different starting points
+
+	* disabled modules get no "markup" in the output to split them out of
+	the logfile.
+
+	* 2688{4,6} by Matthias. Complicated materiel from a scriptwriter who
+	needs cleanup help for build_dir. Maybe we should make build_dir_reuse
+	mandatory too.
+
+2007-05-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Last run had a lot of fails but it seems the first failure was due to
+	a timeout (DBI), the others were just dependency traps. The batch job
+	running colorout-to-dir.pl apparently drew too many ressources. I've
+	added a sleep.
+
+2007-05-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* The UTF-8 HOWTO is by Bruno Haible. Markus Kuhn wrote
+	http://www.cl.cam.ac.uk/~mgk25/unicode.html which is a FAQ. The latter
+	contains 'How should the UTF-8 mode be activated?'
+
+	* Todo: Devel::Symdump fails recur test with 5.00504.
+
+	* Todo: Jesse Vincent #26840
+
+2007-04-30  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Locale::TextDomain: I realize now that the results are mixed. One NOT
+	OK between 4 or 5 OKs. So there's something very fishy going on.
+
+	* Theoretical prereq bug needs testing: "test" must ask for "available"
+	modules (which includes the part coming from PERL5LIB), but "install"
+	must ask for "installed" modules (but this only for requires, not for
+	build_requires).
+ 
+	* Bug: patch(1) does not understand --fuzz everywhere as reported by MAREKR
+	in https://rt.cpan.org/Ticket/Display.html?id=26664
+
+	Need a module or better probing.
+
+	* http://use.perl.org/comments.pl?threshold=0&mode=nested&commentsort=0&op=Change&sid=35312
+
+	Barbie asks for getting CPAN.pm support into CPAN::YACSmoke
+
+	* parrot should be advised on a group account on pause.
+
+2007-04-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Interesting ticket: https://rt.cpan.org/Ticket/Display.html?id=26727
+
+	about redrawing the current line after something has moved the cursor.
+
+2007-04-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Jifty again. Same recipe as last time, still no clue.
+
+	* Here broke Tk and Regexp-Assemble:
+
+20070422T1717 perl        31019
+20070423T1448 perl        31029
+
+	Slaven determined 31027. In addition a binary search is running in case
+	we need it again.
+
+----Program----
+eval {require Regexp::Assemble};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../phti9p4/perl-5.8.0@31025/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pgwvrPP/perl-5.8.0@31027/bin/perl----
+N/A
+
+----EOF ($?='0')----
+Need a perl between 31025 and 31027
+(but 31026 could not successfully be used to build perl)
+
+	REPORTED to P5P
+
+2007-04-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Jifty hangs again in the middle of its tests. The last lines in the
+	output file ()megainstall.20070426T1003.out) are:
+
+#   Failed test 'use Jifty::Test::WWW::Mechanize;'
+#   at t/Continuations/t/04-before-blocks.t line 18.
+#     Tried to use 'Jifty::Test::WWW::Mechanize'.
+#     Error:  Base class package "Test::WWW::Mechanize" is empty.
+#     (Perhaps you need to 'use' the module which defines that package first.)
+#  at /home/sand/.cpan/build/Jifty-0.70422-sTB0F8/blib/lib/Jifty/Test/WWW/Mechan
+ize.pm line 5
+# BEGIN failed--compilation aborted at t/Continuations/t/04-before-blocks.t line
+ 18.
+# Compilation failed in require at (eval 928) line 2.
+# BEGIN failed--compilation aborted at (eval 928) line 2.
+Can't locate object method "new" via package "Jifty::Test::WWW::Mechanize" at t/
+Continuations/t/04-before-blocks.t line 22.
+# Looks like you planned 9 tests but only ran 2.
+# Looks like you failed 1 test of 2 run.
+
+
+
+	See further below for a similar example on 2007-04-01. I must now kill
+	the hanging jobs and then see how the logfile continues. Maybe it gives
+	me a clue?
+
+	OR NO! much better I first try to input something in the interactive
+	window. I enter RET twice and "y\n" 7 times. Nothing.
+
+	I find the job that hange by stepping down the pid->ppid chain (pstree
+	did not show me these processes). 29902 is my megainstall:
+
+% ps -o user,pid,ppid -a | grep 29902
+sand     29902 29901
+sand     29654 29902
+% ps -o user,pid,ppid -a | grep 29654
+sand     29654 29902
+sand     29818 29654
+% ps -o user,pid,ppid -a | grep 29818
+sand     29818 29654
+sand     29886 29818
+% ps -o user,pid,ppid -a | grep 29886
+sand     29886 29818
+% ps auxww|grep 29886
+sand     29886  0.0  0.0      0     0 pts/5    Z+   12:38   0:03 [perl] <defunct>
+
+	Oh it's a zombie! Neither kill nor kill -9 do anything useful. So the
+	parent is to kill?
+
+% ps auxww|grep 29818
+sand     29818  0.0  0.3   9080  4900 pts/5    S+   12:36   0:00 /home/src/perl/repoperls/installed-perls/perl/pJHvqE3/perl-5.8.0@31080/bin/perl -MExtUtils::Command::MM -e test_harness(0, 'inc', 'blib/lib', 'blib/arch') t/00-load.t t/01-dependencies.t t/01-test-mechanize.t t/01-test-web.t t/01-version_checks.t t/02-connect.t t/03-form-protocol.t t/03-is_passing-no_plan.t t/03-is_passing.t t/03-test-mailbox.t t/04-test_file.t t/05-dispatcher.t t/06-forms.t t/07-limit-actions.t t/08-client.t t/09-url.t t/10-i18n.t t/11-config-files.t t/12-param-schema.t t/99-pod-coverage.t t/99-pod.t t/DateTime.t t/Continuations/t/00-prototype.t t/Continuations/t/01-raw-api.t t/Continuations/t/02-api.t t/Continuations/t/03-gc.t t/Continuations/t/04-before-blocks.t t/Mapper/t/00-prototype.t t/Mapper/t/01-raw-api.t t/Mapper/t/02-api.t t/TestApp-Plugin-PasswordAuth/t/00-model-User.t t/TestApp-Plugin-PasswordAuth/t/01-tokengen.t t/TestApp-Plugin-PasswordAuth/t/11-current_user.t t/TestApp-Plugin-PasswordAuth/t/12-signup.t t/TestApp-Plugin-REST/t/00-model-User.t t/TestApp-Plugin-REST/t/00-prototype.t t/TestApp-Plugin-REST/t/01-config.t t/TestApp-Plugin-REST/t/02-basic-use.t t/TestApp/t/00-model-User.t t/TestApp/t/00-prototype.t t/TestApp/t/01-config.t t/TestApp/t/02-dispatch-show-rule-in-wrong-ruleset.t t/TestApp/t/02-dispatch.t t/TestApp/t/03-static.t t/TestApp/t/04-sessions.t t/TestApp/t/05-editactions-Cachable.t t/TestApp/t/05-editactions-Record.t t/TestApp/t/06-validation.t t/TestApp/t/07-sandboxing.t t/TestApp/t/08-notifications.t t/TestApp/t/09-redirect.t t/TestApp/t/10-compress.t t/TestApp/t/11-current_user.t t/TestApp/t/12-search.t t/TestApp/t/13-page-regions.t t/TestApp/t/14-template-paths.t t/TestApp/t/15-template-subclass.t t/TestApp/t/i18n-standalone.t t/TestApp/t/instance_id.t t/TestApp/t/regex_meta_in_path_info.t t/TestApp/t/upgrade.t
+
+	Now I killed it. The output leads to the end of Jifty's tests:
+
+make[3]: *** [test_dynamic] Beendet
+make[3]: Leaving directory `/home/sand/.cpan/build/Jifty-0.70422-sTB0F8'
+  JESSE/Jifty-0.70422.tar.gz
+  /usr/bin/make test -- NOT OK
+
+	
+	
+	
+	
+
+
+	* my emacs could not send this email with a insufficient error message:
+
+From: andreas.koenig.7os6VVqR@franz.ak.mind.de (Andreas J. Koenig)
+To: andreas.koenig.gmwojprw@franz.ak.mind.de
+Cc: cpan-testers@perl.org, FERREIRA@cpan.org
+Subject: Re: FAIL Term-Size-Unix-0.203 i686-linux-64int 2.6.18-4-k7
+References: <200704260541.l3Q5fqb0015972@franz.ak.mind.de>
+X-Draft-From: ("cpan-testers" 116264)
+Gcc: nnml:sent
+Date: Thu, 26 Apr 2007 08:10:41 +0200
+In-Reply-To: <200704260541.l3Q5fqb0015972@franz.ak.mind.de> (andreas koenig
+	gmwojprw's message of "Thu, 26 Apr 2007 07:41:52 +0200")
+Message-ID: <87fy6nis2m.fsf@k75.linux.bogus>
+User-Agent: Gnus/5.110006 (No Gnus v0.6) Emacs/21.4 (gnu/linux)
+--text follows this line--
+>>>>> On Thu, 26 Apr 2007 07:41:52 +0200, andreas.koenig.gmwojprw@franz.ak.mind.de said:
+
+  > ------------------------------
+  > TESTER COMMENTS
+  > ------------------------------
+
+  > Additional comments from tester: 
+
+It turns out that the test only fails when run under CPAN::Reporter.
+Somehow the IO layer that CPAN::Reporter uses fools Term::Size::Unix
+so that the test fails.
+
+I can reproduce a similar effect by simply running
+
+    make test > /dev/null < /dev/null
+
+The STDERR of this is:
+
+  $ make test > /dev/null < /dev/null
+  # Testing Term::Size::Unix 0.203, Perl 5.009005, /home/src/perl/repoperls/installed-perls/perl/pGHaMwh/perl-5.8.0@31079/bin/perl
+
+  #   Failed test at t/01_basic.t line 7.
+
+  #   Failed test at t/01_basic.t line 10.
+  #     Structures begin differing at:
+  #          $got->[0] = ''
+  #     $expected->[0] = '80'
+
+  #   Failed test at t/01_basic.t line 16.
+  Use of uninitialized value in concatenation (.) or string at t/01_basic.t line 21.
+  # This terminal is x characters,
+  Use of uninitialized value in concatenation (.) or string at t/01_basic.t line 21.
+  #   and x pixels.
+  # Looks like you failed 3 tests of 6.
+  Failed 1/3 test programs. 3/13 subtests failed.
+  make[1]: *** [test_dynamic] Error 255
+
+
+2007-04-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* the logfile is 34MB instead of 11, who is to blame? 20070424T2309 has
+	197018 lines while 20070424T0304 had 151351. There must be one very log
+	line? No. The longest line in each case is 4145. I need the distribution
+	of the lengths and here I discover 44719 lines with the same length, 507
+	bytes.
+
+	It is a database dump or some such with the columns
+
+	|Elt|Got|Elt|Expected|
+
+	with lots of whitespace. This comes out in the middle of the tests of
+	PJCJ/Devel-Cover-0.61.tar.gz. There seems to be a call to eq_or_diff
+	when t/at1.t fails and this spits out >22MB.
+
+	This was between 31046 and 31058.
+
+	This binary search must run at1.t and capture its output and output
+	something like 'length $output < 100000 ? "ok" : "not ok"'.
+
+2007-04-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Found 2481 old builds, restored the state of 968
+
+	maintperl brings more weight because less fails (110)
+
 2007-04-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Found 1948 old builds, restored the state of 939
@@ -151,9 +608,9 @@ DIED. FAILED tests 9-29
 
 	* Most urgent tasks?
 
-	Report Text::Hatena
+	Report Text::Hatena (JKONDO/Text-Hatena-0.20.tar.gz)
 
-	Report Locale::TextDomain
+	Report Locale::TextDomain (GUIDO/libintl-perl-1.16.tar.gz)
 
 	Write a bug report about Coro::Event and its interaction with CPAN.pm or
 	find out how to fix it and write a patch. Turn off distroprefs or work
@@ -349,6 +806,8 @@ N/A
 
 	So this seems more logical and proves yesterday's recherche was bogus,
 	most probably not a Heisenbug.
+
+	Update 2007-05-05 akoenig: Locale::TextDomain succeeded @31148!
 	
 2007-04-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 

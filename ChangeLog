@@ -1,4 +1,606 @@
 ----------------------------------------------------------------------
+r2400:  k | 2007-05-08 22:08:08 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+upp the cersion number for an official release -- ADAMK has sent approval -- Thanks Adam!
+----------------------------------------------------------------------
+r2399:  k | 2007-05-08 19:52:45 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/KANE.CPANPLUS.yml
+
+cpanplus got a new dev release
+----------------------------------------------------------------------
+r2397:  k | 2007-05-08 09:05:03 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/KANE.CPANPLUS.yml
+
+cpanplus still recursively dependent on itself
+----------------------------------------------------------------------
+r2395:  k | 2007-05-07 20:53:35 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  A  /local/cpanpm/trunk/distroprefs/AGRUNDMA.Catalyst-Plugin-Static-Simple.yml
+
+break the handbrake
+----------------------------------------------------------------------
+r2393:  k | 2007-05-07 08:12:32 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  A  /local/cpanpm/trunk/distroprefs/ERYQ.Convert-BinHex.yml
+
+another distropref
+----------------------------------------------------------------------
+r2391:  k | 2007-05-07 01:44:10 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+  A  /local/cpanpm/trunk/distroprefs/SCHWERN.Class-Fields.yml
+
+patching Class::Fields
+----------------------------------------------------------------------
+r2389:  k | 2007-05-07 00:47:01 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  A  /local/cpanpm/trunk/distroprefs/BLBLACK.Class-C3.yml
+
+new distroprefs
+----------------------------------------------------------------------
+r2388:  k | 2007-05-07 00:27:07 +0200
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/distroprefs/ABW.Template-Toolkit.dd
+
+ r2387@k75 (orig r1818):  k | 2007-05-07 00:23:40 +0200
+ the DD version of the TT distroprefs has been autogened
+
+----------------------------------------------------------------------
+r2385:  k | 2007-05-07 00:20:16 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+prepare a private release for ADAMK
+----------------------------------------------------------------------
+r2383:  k | 2007-05-07 00:09:24 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+
+prepare a private release for ADAMK
+----------------------------------------------------------------------
+r2381:  k | 2007-05-06 13:41:06 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/MANIFEST
+  A  /local/cpanpm/trunk/distroprefs/AVIF.Time-Duration.yml
+  A  /local/cpanpm/trunk/distroprefs/BRICAS.WWW-OpenSearch.yml
+  M  /local/cpanpm/trunk/distroprefs/MSERGEANT.AxKit.yml
+  M  /local/cpanpm/trunk/distroprefs/TSCH.Gtk2.yml
+  M  /local/cpanpm/trunk/megainstall.txt
+
+more megainstall, improved distroprefs
+----------------------------------------------------------------------
+r2379:  k | 2007-05-05 16:24:41 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/MSERGEANT.AxKit.yml
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+do some probing before invoking patch(1); the change is small but the indenting lets it looks large
+----------------------------------------------------------------------
+r2377:  k | 2007-05-05 11:57:22 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+  A  /local/cpanpm/trunk/bin/show-history.pl
+
+make the out2d script slower to be less demanding on resources; first stab at a script to provide historical overviews on distros from the logs
+----------------------------------------------------------------------
+r2375:  k | 2007-05-05 09:24:47 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.rnc
+
+the last patch changed the schema
+----------------------------------------------------------------------
+r2373:  k | 2007-05-05 09:04:19 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+add a sequence number to each distro so we can reconstruct the original order
+----------------------------------------------------------------------
+r2371:  k | 2007-05-05 08:26:47 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/BTROTT.Feed-Find.yml
+  M  /local/cpanpm/trunk/distroprefs/BTROTT.URI-Fetch.yml
+  M  /local/cpanpm/trunk/distroprefs/BTROTT.XML-FOAF.yml
+
+there were still recursive calls to CPANPLUS in URI::Fetch on April 27
+----------------------------------------------------------------------
+r2369:  k | 2007-05-05 04:08:35 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+new distroprefs for Time::Duration
+----------------------------------------------------------------------
+r2367:  k | 2007-05-05 03:40:32 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/JJORE.AI-Prolog.yml
+  M  /local/cpanpm/trunk/distroprefs/TSCH.Gtk2.yml
+  M  /local/cpanpm/trunk/megainstall.txt
+  A  /local/cpanpm/trunk/patches/Gtk2-1.144-ANDK-01.patch
+
+new distroprefs file AI::Prolog
+----------------------------------------------------------------------
+r2362:  k | 2007-05-04 06:14:07 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+
+notes about libdnet
+----------------------------------------------------------------------
+r2361:  k | 2007-05-04 06:13:53 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+another case where we want to say goodbye
+----------------------------------------------------------------------
+r2360:  k | 2007-05-04 06:13:27 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/ADAMK.Algorithm-Dependency.yml
+  M  /local/cpanpm/trunk/distroprefs/AUDREYT.Jifty-DBI.yml
+  M  /local/cpanpm/trunk/distroprefs/AUDREYT.Module-Install.yml
+  M  /local/cpanpm/trunk/distroprefs/BTROTT.Crypt-OpenPGP.yml
+
+discovered several trailing whitespaces by chance
+----------------------------------------------------------------------
+r2359:  k | 2007-05-04 06:13:04 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MSERGEANT.AxKit.yml
+
+axkit can ask more questions depending on what is installed
+----------------------------------------------------------------------
+r2356:  k | 2007-05-04 04:40:18 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+treating LOCAL the same as dot distros breaks pip
+----------------------------------------------------------------------
+r2355:  k | 2007-05-04 04:06:36 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/t/10version.t
+
+add two tests inspired by Mail::SPF
+----------------------------------------------------------------------
+r2353:  k | 2007-05-03 08:27:05 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/JGMYERS.Encode-Detect.yml
+
+patch a several years old dependency bug in Encode::Detect
+----------------------------------------------------------------------
+r2351:  k | 2007-05-03 02:44:52 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/ABW.Template-Toolkit.yml
+
+new distropref for TT
+----------------------------------------------------------------------
+r2349:  k | 2007-05-02 09:07:21 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+better diagnostic message when a module ist disabled via distroprefs
+----------------------------------------------------------------------
+r2346:  k | 2007-05-01 13:22:47 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+detect encoding and unctrl control characters to produce waterproof XML
+----------------------------------------------------------------------
+r2345:  k | 2007-05-01 13:20:09 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+remove the emdash from the distrostatus object, it irritates when parsing the logfiles; make sure that goodbye does not return a true value
+----------------------------------------------------------------------
+r2343:  k | 2007-05-01 09:18:38 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+
+autogen
+----------------------------------------------------------------------
+r2341:  k | 2007-05-01 09:13:24 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+not my best day wrt backslashes
+----------------------------------------------------------------------
+r2339:  k | 2007-05-01 06:11:41 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+bugfix
+----------------------------------------------------------------------
+r2337:  k | 2007-05-01 06:08:34 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+separate the megainstall data from the Makefile.PL and break the long lines
+----------------------------------------------------------------------
+r2335:  k | 2007-05-01 06:03:54 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/megainstall.txt
+
+separate the megainstall data from the Makefile.PL and break the long lines
+----------------------------------------------------------------------
+r2333:  k | 2007-05-01 05:01:29 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST.SKIP
+  M  /local/cpanpm/trunk/Makefile.PL
+  M  /local/cpanpm/trunk/Todo
+  D  /local/cpanpm/trunk/gpw9-cpan-talk.d
+  D  /local/cpanpm/trunk/gpw9-cpan-talk.pod
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/t/12cpan.t
+  A  /local/cpanpm/trunk/talks
+  A  /local/cpanpm/trunk/talks/gpw9-cpan-talk.d (from /local/cpanpm/trunk/gpw9-cpan-talk.d:1977)
+  A  /local/cpanpm/trunk/talks/gpw9-cpan-talk.pod (from /local/cpanpm/trunk/gpw9-cpan-talk.pod:1973)
+
+cleanup the compat tweaks for 5.00504 and hide the talk from the rest of the build system
+----------------------------------------------------------------------
+r2311:  k | 2007-05-01 04:34:39 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+  A  /local/cpanpm/trunk/bin/colorout-to-dir.rnc
+
+notes; megainstall now splits its logfile
+----------------------------------------------------------------------
+r2310:  k | 2007-05-01 04:34:04 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN/Kwalify.pm
+
+compatibility tweak (Jesse Vincent)
+----------------------------------------------------------------------
+r2309:  k | 2007-05-01 04:33:36 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/BRIANSKI.XML-Comma.yml
+  A  /local/cpanpm/trunk/distroprefs/TSCH.Gtk2.yml
+
+new distroprefs
+----------------------------------------------------------------------
+r2308:  k | 2007-05-01 04:33:08 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+compatibility tweak for 5.00504 (Jesse Vincent); megainstall now splits its logfile
+----------------------------------------------------------------------
+r2307:  k | 2007-05-01 04:31:33 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+compatibility tweak (Jesse Vincent)
+----------------------------------------------------------------------
+r2306:  k | 2007-04-30 02:22:55 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+yet better diagnostics on various failure modes
+----------------------------------------------------------------------
+r2305:  k | 2007-04-29 20:52:19 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+better diagnostics on various failure modes
+----------------------------------------------------------------------
+r2304:  k | 2007-04-29 05:36:46 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/HMBRAND.Spreadsheet-Read.yml
+  M  /local/cpanpm/trunk/distroprefs/RRA.PGP-Sign.yml
+
+new distroprefs
+----------------------------------------------------------------------
+r2303:  k | 2007-04-29 05:36:28 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+redirect tthe rk output also to logs/megainstall... to have things in one place
+----------------------------------------------------------------------
+r2302:  k | 2007-04-29 05:34:59 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+this version runs well but has a bug described in the POD
+----------------------------------------------------------------------
+r2301:  k | 2007-04-29 05:33:57 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+a cpantesters reports revealed again that 5.8.0 has a bug in calling methods on overloaded stringify
+----------------------------------------------------------------------
+r2300:  k | 2007-04-29 05:32:59 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/t/30shell.t
+
+up the timeouts for slow machines
+----------------------------------------------------------------------
+r2299:  k | 2007-04-28 07:38:34 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+escape the distroname because + is allowed in the filename
+----------------------------------------------------------------------
+r2298:  k | 2007-04-28 03:09:35 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+cleanup and running now over the whole directory
+----------------------------------------------------------------------
+r2297:  k | 2007-04-28 02:14:04 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+now looks quite effective
+----------------------------------------------------------------------
+r2296:  k | 2007-04-28 01:24:37 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+the order makes speed, not less residuum
+----------------------------------------------------------------------
+r2295:  k | 2007-04-28 00:31:12 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+colorout-to-dir: this version had only 520k residuum, much better; should we not change the order?
+----------------------------------------------------------------------
+r2294:  k | 2007-04-28 00:21:48 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+
+colorout-to-dir: result not bad but 1MB residuum seems a bit much
+----------------------------------------------------------------------
+r2293:  k | 2007-04-27 22:10:47 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/bin/colorout-to-dir.pl
+  M  /local/cpanpm/trunk/bin/colorterm-to-html.pl
+
+notes and new script(WIP) to split the logfiles
+----------------------------------------------------------------------
+r2292:  k | 2007-04-27 22:10:07 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+three new megainstalls
+----------------------------------------------------------------------
+r2291:  k | 2007-04-27 22:09:34 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+found amissing newline while writing split code for the logfiles
+----------------------------------------------------------------------
+r2290:  k | 2007-04-23 02:09:24 +0200
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/distroprefs/ABW.Template-Toolkit.dd
+  M  /local/cpanpm/trunk/distroprefs/ILYAZ.Term-ReadLine-Perl.dd
+
+ r2288@k75 (orig r1768):  k | 2007-04-23 02:03:24 +0200
+ prepare release
+
+----------------------------------------------------------------------
+r2287:  k | 2007-04-23 02:03:03 +0200
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/Makefile.PL
+
+ r2285@k75 (orig r1766):  k | 2007-04-23 02:00:41 +0200
+ prepare release
+ r2286@k75 (orig r1767):  k | 2007-04-23 02:02:47 +0200
+ prepare release
+
+----------------------------------------------------------------------
+r2283:  k | 2007-04-23 01:58:42 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST.SKIP
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/perlbug
+  A  /local/cpanpm/trunk/perlbug/c3-mro.txt
+  A  /local/cpanpm/trunk/perlbug/html-format.txt
+
+notes
+----------------------------------------------------------------------
+r2279:  k | 2007-04-22 14:54:13 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+
+preparations for the next release
+----------------------------------------------------------------------
+r2278:  k | 2007-04-22 14:44:38 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/JSTENZEL.Getopt-ArgvFile.yml
+
+distroprefs maintainance; notes
+----------------------------------------------------------------------
+r2277:  k | 2007-04-22 14:34:43 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/BRIANSKI.XML-Comma.yml
+  M  /local/cpanpm/trunk/distroprefs/JSTENZEL.Getopt-ArgvFile.yml
+
+distroprefs maintainance; notes
+----------------------------------------------------------------------
+r2265:  k | 2007-04-22 09:48:34 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/MANIFEST.SKIP
+  M  /local/cpanpm/trunk/Makefile.PL
+
+a few more into megainstall
+----------------------------------------------------------------------
+r2264:  k | 2007-04-22 09:47:49 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+give all File::Temp using spots a tmpdir (bugged by Slaven)
+----------------------------------------------------------------------
+r2263:  k | 2007-04-22 02:20:23 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+
+notes
+----------------------------------------------------------------------
+r2262:  k | 2007-04-22 02:20:11 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/t/12cpan.t
+
+most of the kwalify stuff does not work without sufficient YAML fu
+----------------------------------------------------------------------
+r2261:  k | 2007-04-22 02:19:37 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+5.8.0 seems to have an overload bug, this is a workaround
+----------------------------------------------------------------------
+r2260:  k | 2007-04-22 02:18:23 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN/Kwalify/distroprefs.dd
+
+now with sorted keys
+----------------------------------------------------------------------
+r2259:  k | 2007-04-22 02:16:47 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+
+collecting new relevant modules for megainstall; close to Phalanx1000
+----------------------------------------------------------------------
+r2258:  k | 2007-04-22 02:16:12 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+turn on sorting for Data::Dumper conversions to have predictable results
+----------------------------------------------------------------------
+r2257:  k | 2007-04-22 02:11:50 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+  M  /local/cpanpm/trunk/distroprefs/ADAMK.Algorithm-Dependency.yml
+  A  /local/cpanpm/trunk/distroprefs/ASCOPE.Net-Google.yml
+  M  /local/cpanpm/trunk/distroprefs/BINGOS.POE-Component-CPAN-YACSmoke.yml
+  A  /local/cpanpm/trunk/distroprefs/BWARFIELD.GDGraph.yml
+  A  /local/cpanpm/trunk/distroprefs/JMGDOC.OpenOffice-OODoc.yml
+  A  /local/cpanpm/trunk/distroprefs/LYOKATO.FormValidator-Simple.yml
+  A  /local/cpanpm/trunk/distroprefs/OVID.Class-Trait.yml
+
+collecting new relevant modules for megainstall; close to Phalanx1000
+----------------------------------------------------------------------
+r2256:  k | 2007-04-22 01:55:18 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/bin/mimfbsd.pl
+
+find more relevant modules for megainstall
+----------------------------------------------------------------------
+r2255:  k | 2007-04-22 01:40:44 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/t/30shell.t
+
+make 30shell.t talk about the failing test
+----------------------------------------------------------------------
+r2252:  k | 2007-04-20 09:09:06 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/BTROTT.XML-FOAF.yml
+
+small tweaks to megainstall
+----------------------------------------------------------------------
+r2251:  k | 2007-04-19 08:03:25 +0200
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/t/30shell.t
+
+ r2249@k75 (orig r1747):  k | 2007-04-18 22:41:42 +0200
+ weird test failures on Slaven's box
+
+----------------------------------------------------------------------
+r2248:  k | 2007-04-19 08:02:49 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/Makefile.PL
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/BINGOS.POE-Component-CPAN-YACSmoke.yml
+  A  /local/cpanpm/trunk/distroprefs/BRICAS.Catalyst-Plugin-ConfigLoader.yml
+  M  /local/cpanpm/trunk/distroprefs/BTROTT.XML-FOAF.yml
+  M  /local/cpanpm/trunk/distroprefs/BTROTT.XML-Feed.yml
+  A  /local/cpanpm/trunk/distroprefs/CFRANKS.HTML-Widget.yml
+  A  /local/cpanpm/trunk/distroprefs/CLKAO.IO-Digest.yml
+  A  /local/cpanpm/trunk/distroprefs/MSERGEANT.AxKit.yml
+  A  /local/cpanpm/trunk/distroprefs/RRA.PGP-Sign.yml
+  A  /local/cpanpm/trunk/distroprefs/SMUELLER.Math-Approx-Symbolic.yml
+  A  /local/cpanpm/trunk/distroprefs/TSCH.Cairo.yml
+
+add a few hundred distros to megainstall and some distroprefs for those
+----------------------------------------------------------------------
+r2245:  k | 2007-04-18 19:39:12 +0200
+Changed paths:
+  M  /local/cpanpm/trunk/t/52podcover.t
+
+tighten the version scope of the podcover test (thanks to David Cantrell for spotting this)
+----------------------------------------------------------------------
+r2244:  k | 2007-04-18 08:15:08 +0200
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/lib/CPAN/HandleConfig.pm
+
+ r2243@k75 (orig r1744):  k | 2007-04-18 08:14:52 +0200
+ bugfix: do not drop unknown config variables
+
+----------------------------------------------------------------------
+r2242:  k | 2007-04-18 08:12:40 +0200
+Changed paths:
+  A  /local/cpanpm/trunk/bin/mimfbsd.pl
+
+quick script to grow megainstall over the kilo
+----------------------------------------------------------------------
+r2241:  k | 2007-04-18 06:33:45 +0200
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/README
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/t/12cpan.t
+  M  /local/cpanpm/trunk/t/30shell.t
+
+ r2236@k75 (orig r1739):  k | 2007-04-17 08:55:48 +0200
+ prepare for a release; maybe today???
+ r2237@k75 (orig r1740):  k | 2007-04-17 09:01:08 +0200
+ oops
+ r2238@k75 (orig r1741):  k | 2007-04-17 09:03:12 +0200
+ prepare for a release
+ r2239@k75 (orig r1742):  k | 2007-04-17 14:57:00 +0200
+ gnumake vs. bsd make (spotted by Slaven Rezic)
+ r2240@k75 (orig r1743):  k | 2007-04-17 15:07:24 +0200
+ revert this hectic change
+
+----------------------------------------------------------------------
 r2234:  k | 2007-04-17 07:56:36 +0200
 Changed paths:
   M  /local/cpanpm/trunk/Makefile.PL
