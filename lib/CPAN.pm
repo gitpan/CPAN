@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.9102';
+$CPAN::VERSION = '1.91_51';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -58,7 +58,8 @@ unless (@CPAN::Defaultsites){
 # $CPAN::iCwd (i for initial) is going to be initialized during find_perl
 $CPAN::Perl ||= CPAN::find_perl();
 $CPAN::Defaultdocs ||= "http://search.cpan.org/perldoc?";
-$CPAN::Defaultrecent ||= "http://search.cpan.org/recent";
+$CPAN::Defaultrecent ||= "http://search.cpan.org/uploads.rdf";
+$CPAN::Defaultrecent ||= "http://cpan.uwinnipeg.ca/htdocs/cpan.xml";
 
 # our globals are getting a mess
 use vars qw(
@@ -66,7 +67,6 @@ use vars qw(
             $Be_Silent
             $CONFIG_DIRTY
             $Defaultdocs
-            $Defaultrecent
             $Echo_readline
             $Frontend
             $GOTOSHELL
@@ -112,6 +112,7 @@ $MAX_RECURSION = 32;
              recompile
              report
              shell
+             smoke
              test
              upgrade
 	    );
@@ -273,7 +274,23 @@ ReadLine support %s
                 require Carp;
                 Carp::cluck("Catching error: '$@'");
             }
-            if ($command =~ /^(make|test|install|ff?orce|notest|clean|report|upgrade)$/) {
+            if ($command =~ /^(
+                             # classic commands
+                             make
+                             |test
+                             |install
+                             |clean
+
+                             # pragmas for classic commands
+                             |ff?orce
+                             |notest
+
+                             # compounds
+                             |report
+                             |smoke
+                             |upgrade
+                            )$/x) {
+                # only commands that tell us something about failed distros
                 CPAN::Shell->failed($CPAN::CurrentCommandId,1);
             }
             soft_chdir_with_alternatives(\@cwd);
@@ -522,6 +539,7 @@ use strict;
                                     report
                                     reports
                                     scripts
+                                    smoke
                                     test
                                     upgrade
 );
@@ -2904,9 +2922,16 @@ sub print_ornamented {
             print "Term::ANSIColor rejects color[$ornament]: $@\n
 Please choose a different color (Hint: try 'o conf init /color/')\n";
         }
+        # GGOLDBACH/Test-GreaterVersion-0.008 broke wthout this
+        # $trailer construct. We want the newline be the last thing if
+        # there is a newline at the end ensuring that the next line is
+        # empty for other players
+        my $trailer = "";
+        $trailer = $1 if $swhat =~ s/([\r\n]+)\z//;
         print $color_on,
             $swhat,
-                Term::ANSIColor::color("reset");
+                Term::ANSIColor::color("reset"),
+                      $trailer;
     } else {
         print $swhat;
     }
@@ -3222,9 +3247,98 @@ to find objects with matching identifiers.
 #-> sub CPAN::Shell::recent ;
 sub recent {
   my($self) = @_;
+  if ($CPAN::META->has_inst("XML::LibXML")) {
+      my $url = $CPAN::Defaultrecent;
+      $CPAN::Frontend->myprint("Going to fetch '$url'\n");
+      unless ($CPAN::META->has_usable("LWP")) {
+          $CPAN::Frontend->mydie("LWP not installed; cannot continue");
+      }
+      CPAN::LWP::UserAgent->config;
+      my $Ua;
+      eval { $Ua = CPAN::LWP::UserAgent->new; };
+      if ($@) {
+          $CPAN::Frontend->mydie("CPAN::LWP::UserAgent->new dies with $@\n");
+      }
+      my $resp = $Ua->get($url);
+      unless ($resp->is_success) {
+          $CPAN::Frontend->mydie(sprintf "Could not download '%s': %s\n", $url, $resp->code);
+      }
+      $CPAN::Frontend->myprint("DONE\n\n");
+      my $xml = XML::LibXML->new->parse_string($resp->content);
+      if (0) {
+          my $s = $xml->serialize(2);
+          $s =~ s/\n\s*\n/\n/g;
+          $CPAN::Frontend->myprint($s);
+          return;
+      }
+      my @distros;
+      if ($url =~ /winnipeg/) {
+          my $pubdate = $xml->findvalue("/rss/channel/pubDate");
+          $CPAN::Frontend->myprint("    pubDate: $pubdate\n\n");
+          for my $eitem ($xml->findnodes("/rss/channel/item")) {
+              my $distro = $eitem->findvalue("enclosure/\@url");
+              $distro =~ s|.*?/authors/id/./../||;
+              my $size   = $eitem->findvalue("enclosure/\@length");
+              my $desc   = $eitem->findvalue("description");
+               $desc =~ s/.+? - //;
+              $CPAN::Frontend->myprint("$distro [$size b]\n    $desc\n");
+              push @distros, $distro;
+          }
+      } elsif ($url =~ /search.*uploads.rdf/) {
+          # xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          # xmlns="http://purl.org/rss/1.0/"
+          # xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+          # xmlns:dc="http://purl.org/dc/elements/1.1/"
+          # xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+          # xmlns:admin="http://webns.net/mvcb/"
 
-  CPAN::Distribution::_display_url( $self, $CPAN::Defaultrecent );
-  return;
+
+          my $dc_date = $xml->findvalue("//*[local-name(.) = 'RDF']/*[local-name(.) = 'channel']/*[local-name(.) = 'date']");
+          $CPAN::Frontend->myprint("    dc:date: $dc_date\n\n");
+          for my $eitem ($xml->findnodes("//*[local-name(.) = 'RDF']/*[local-name(.) = 'item']")) {
+              my $distro = $eitem->findvalue("\@rdf:about");
+              $distro =~ s|.*~||; # remove up to the tilde before the name
+              $distro =~ s|/$||; # remove trailing slash
+              $distro =~ s|([^/]+)|\U$1\E|; # upcase the name
+              my $author = uc $1 or die "distro[$distro] without author, cannot continue";
+              my $desc   = $eitem->findvalue("*[local-name(.) = 'description']");
+              my $i = 0;
+            SUBDIRTEST: while () {
+                  last SUBDIRTEST if ++$i >= 3;
+                  if (my @ret = $self->globls("$distro*")) {
+                      @ret = grep {$_->[2] !~ /meta/} @ret;
+                      @ret = grep {length $_->[2]} @ret;
+                      if (@ret) {
+                          $distro = "$author/$ret[0][2]";
+                          last SUBDIRTEST;
+                      }
+                  }
+                  $distro =~ s|/|/*/|; # allow it to reside in a subdirectory
+              }
+
+              $CPAN::Frontend->myprint("____$desc\n");
+              push @distros, $distro;
+          }
+      }
+      return \@distros;
+  } else {
+      # deprecated old version
+      $CPAN::Frontend->mydie("no XML::LibXML installed, cannot continue");
+  }
+}
+
+#-> sub CPAN::Shell::smoke ;
+sub smoke {
+    my($self) = @_;
+    my $distros = $self->recent;
+    for my $distro (@$distros) {
+        $CPAN::Frontend->myprint(sprintf "Going to download and test '$distro'\n");
+        for (0..9) {
+            $CPAN::Frontend->myprint(sprintf "\r%2d", 10-$_);
+            sleep 1;
+        }
+        $self->test($distro);
+    }
 }
 
 {
@@ -5364,9 +5478,11 @@ sub ls {
             $CPAN::Frontend->mydie("Text::Glob not installed, cannot proceed");
         }
     }
-    $CPAN::Frontend->myprint(join "", map {
-        sprintf("%8d %10s %s/%s\n", $_->[0], $_->[1], $id, $_->[2])
-    } sort { $a->[2] cmp $b->[2] } @dl);
+    unless ($silent >= 2) {
+        $CPAN::Frontend->myprint(join "", map {
+            sprintf("%8d %10s %s/%s\n", $_->[0], $_->[1], $id, $_->[2])
+        } sort { $a->[2] cmp $b->[2] } @dl);
+    }
     @dl;
 }
 
@@ -5490,6 +5606,7 @@ sub cpan_comment {
 sub undelay {
     my $self = shift;
     delete $self->{later};
+    delete $self->{configure_requires_later};
 }
 
 #-> CPAN::Distribution::is_dot_dist
@@ -5776,18 +5893,22 @@ sub get {
     }
     my $sub_wd = CPAN::anycwd(); # for cleaning up as good as possible
 
-    $self->get_file_onto_local_disk;
-    return if $CPAN::Signal;
-    $self->check_integrity;
-    return if $CPAN::Signal;
-    my($packagedir,$local_file) = $self->run_preps_on_packagedir;
-    $packagedir ||= $self->{build_dir};
+    my($local_file);
+    unless ($self->{build_dir} && -d $self->{build_dir}) {
+        $self->get_file_onto_local_disk;
+        return if $CPAN::Signal;
+        $self->check_integrity;
+        return if $CPAN::Signal;
+        (my $packagedir,$local_file) = $self->run_preps_on_packagedir;
+        $packagedir ||= $self->{build_dir};
+        $self->{build_dir} = $packagedir;
+    }
 
     if ($CPAN::Signal){
         $self->safe_chdir($sub_wd);
         return;
     }
-    return $self->run_MM_or_MB($local_file,$packagedir);
+    return $self->run_MM_or_MB($local_file);
 }
 
 #-> CPAN::Distribution::get_file_onto_local_disk
@@ -5981,23 +6102,82 @@ EOF
     return($packagedir,$local_file);
 }
 
-#-> sub CPAN::Distribution::run_MM_or_MB
+#-> sub CPAN::Distribution::parse_meta_yml ;
+sub parse_meta_yml {
+    my($self) = @_;
+    my $build_dir = $self->{build_dir} or die "PANIC: cannot parse yaml without a build_dir";
+    my $yaml = File::Spec->catfile($build_dir,"META.yml");
+    $self->debug("yaml[$yaml]") if $CPAN::DEBUG;
+    return unless -f $yaml;
+    my $early_yaml;
+    eval {
+        require Parse::Metayaml; # hypothetical
+        $early_yaml = Parse::Metayaml::LoadFile($yaml)->[0];
+    };
+    unless ($early_yaml) {
+        eval { $early_yaml = CPAN->_yaml_loadfile($yaml)->[0]; };
+    }
+    unless ($early_yaml) {
+        return;
+    }
+    return $early_yaml;
+}
+
+#-> sub CPAN::Distribution::satisfy_configure_requires ;
+sub satisfy_configure_requires {
+    my($self) = @_;
+    my $enable_configure_requires = 1;
+    if (!$enable_configure_requires) {
+        return 1;
+        # if we return 1 here, everything is as before we introduced
+        # configure_requires that means, things with
+        # configure_requires simply fail, all others succeed
+    }
+    my @prereq = $self->unsat_prereq("configure_requires") or return 1;
+    if ($self->{configure_requires_later}) {
+        # we must not come here a second time
+        $CPAN::Frontend->mydie("Panic: A prerequisite is not available, please investigate...");
+    }
+    if ($prereq[0][0] eq "perl") {
+        my $need = "requires perl '$prereq[0][1]'";
+        my $id = $self->pretty_id;
+        $CPAN::Frontend->mywarn("$id $need; you have only $]; giving up\n");
+        $self->{make} = CPAN::Distrostatus->new("NO $need");
+        $self->store_persistent_state;
+        return $self->goodbye("[prereq] -- NOT OK");
+    } else {
+        my $follow = eval {
+            $self->follow_prereqs("configure_requires_later", @prereq);
+        };
+        if (0) {
+        } elsif ($follow){
+            return;
+        } elsif ($@ && ref $@ && $@->isa("CPAN::Exception::RecursiveDependency")) {
+            $CPAN::Frontend->mywarn($@);
+            return $self->goodbye("[depend] -- NOT OK");
+        }
+    }
+    die "never reached";
+}
+
+#-> sub CPAN::Distribution::run_MM_or_MB ;
 sub run_MM_or_MB {
-    my($self,$local_file,$packagedir) = @_;
-    my($mpl) = File::Spec->catfile($packagedir,"Makefile.PL");
+    my($self,$local_file) = @_;
+    $self->satisfy_configure_requires() or return;
+    my($mpl) = File::Spec->catfile($self->{build_dir},"Makefile.PL");
     my($mpl_exists) = -f $mpl;
     unless ($mpl_exists) {
         # NFS has been reported to have racing problems after the
         # renaming of a directory in some environments.
         # This trick helps.
         $CPAN::Frontend->mysleep(1);
-        my $mpldh = DirHandle->new($packagedir)
-            or Carp::croak("Couldn't opendir $packagedir: $!");
+        my $mpldh = DirHandle->new($self->{build_dir})
+            or Carp::croak("Couldn't opendir $self->{build_dir}: $!");
         $mpl_exists = grep /^Makefile\.PL$/, $mpldh->read;
         $mpldh->close;
     }
     my $prefer_installer = "eumm"; # eumm|mb
-    if (-f File::Spec->catfile($packagedir,"Build.PL")) {
+    if (-f File::Spec->catfile($self->{build_dir},"Build.PL")) {
         if ($mpl_exists) { # they *can* choose
             if ($CPAN::META->has_inst("Module::Build")) {
                 $prefer_installer = CPAN::HandleConfig->prefs_lookup($self,
@@ -6016,7 +6196,7 @@ sub run_MM_or_MB {
         $CPAN::Frontend->mywarn("Refusing to handle this file: $why\n");
         $self->{writemakefile} = CPAN::Distrostatus->new("NO $why");
     } elsif (! $mpl_exists) {
-        $self->_edge_cases($mpl,$packagedir,$local_file);
+        $self->_edge_cases($mpl,$local_file);
     }
     if ($self->{build_dir}
         &&
@@ -6192,16 +6372,17 @@ sub _patch_p_parameter {
 #-> sub CPAN::Distribution::_edge_cases
 # with "configure" or "Makefile" or single file scripts
 sub _edge_cases {
-    my($self,$mpl,$packagedir,$local_file) = @_;
+    my($self,$mpl,$local_file) = @_;
     $self->debug(sprintf("makefilepl[%s]anycwd[%s]",
                          $mpl,
                          CPAN::anycwd(),
                         )) if $CPAN::DEBUG;
-    my($configure) = File::Spec->catfile($packagedir,"Configure");
+    my $build_dir = $self->{build_dir};
+    my($configure) = File::Spec->catfile($build_dir,"Configure");
     if (-f $configure) {
         # do we have anything to do?
         $self->{configure} = $configure;
-    } elsif (-f File::Spec->catfile($packagedir,"Makefile")) {
+    } elsif (-f File::Spec->catfile($build_dir,"Makefile")) {
         $CPAN::Frontend->mywarn(qq{
 Package comes with a Makefile and without a Makefile.PL.
 We\'ll try to build it with that Makefile then.
@@ -6227,7 +6408,7 @@ We\'ll try to build it with that Makefile then.
         my $script = "";
         if ($self->{archived} eq "maybe_pl") {
             my $fh = FileHandle->new;
-            my $script_file = File::Spec->catfile($packagedir,$local_file);
+            my $script_file = File::Spec->catfile($build_dir,$local_file);
             $fh->open($script_file)
                 or Carp::croak("Could not open script '$script_file': $!");
             local $/ = "\n";
@@ -6283,7 +6464,7 @@ $PREREQ_PM
                            },
 ";
             if ($name) {
-                my $to_file = File::Spec->catfile($packagedir, $name);
+                my $to_file = File::Spec->catfile($build_dir, $name);
                 rename $script_file, $to_file
                     or die "Can't rename $script_file to $to_file: $!";
             }
@@ -6931,6 +7112,9 @@ is part of the perl-%s distribution. To install that, you need to run
     }
     $CPAN::Frontend->myprint(sprintf "Running %s for %s\n", $make, $self->id);
     $self->get;
+    if ($self->{configure_requires_later}) {
+        return;
+    }
     local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
@@ -7003,9 +7187,12 @@ is part of the perl-%s distribution. To install that, you need to run
             }
         }
 
-        if ($self->{later}) { # see also undelay
-            if ($self->unsat_prereq) {
-                push @e, $self->{later};
+        if ($self->{later} || $self->{configure_requires_later}) { # see also undelay
+            if ($self->unsat_prereq("later")
+                ||
+                $self->unsat_prereq("configure_requires_later")
+               ) {
+                push @e, $self->{later} || $self->{configure_requires_later};
             }
         }
 
@@ -7134,7 +7321,7 @@ is part of the perl-%s distribution. To install that, you need to run
                     ->new("NO '$system' returned status $ret");
                 $CPAN::Frontend->mywarn("Warning: No success on command[$system]\n");
                 $self->store_persistent_state;
-                return $self->goodbye("$system -- NOT OK\n");
+                return $self->goodbye("$system -- NOT OK");
             }
 	}
 	if (-f "Makefile" || -f "Build") {
@@ -7149,23 +7336,23 @@ is part of the perl-%s distribution. To install that, you need to run
       delete $self->{force_update};
       return;
     }
-    if (my @prereq = $self->unsat_prereq){
+    if (my @prereq = $self->unsat_prereq("later")){
         if ($prereq[0][0] eq "perl") {
             my $need = "requires perl '$prereq[0][1]'";
             my $id = $self->pretty_id;
             $CPAN::Frontend->mywarn("$id $need; you have only $]; giving up\n");
             $self->{make} = CPAN::Distrostatus->new("NO $need");
             $self->store_persistent_state;
-            return $self->goodbye("[prereq] -- NOT OK\n");
+            return $self->goodbye("[prereq] -- NOT OK");
         } else {
-            my $follow = eval { $self->follow_prereqs(@prereq); };
+            my $follow = eval { $self->follow_prereqs("later",@prereq); };
             if (0) {
             } elsif ($follow){
                 # signal success to the queuerunner
                 return 1;
             } elsif ($@ && ref $@ && $@->isa("CPAN::Exception::RecursiveDependency")) {
                 $CPAN::Frontend->mywarn($@);
-                return $self->goodbye("[depend] -- NOT OK\n");
+                return $self->goodbye("[depend] -- NOT OK");
             }
         }
     }
@@ -7236,7 +7423,7 @@ is part of the perl-%s distribution. To install that, you need to run
 sub goodbye {
     my($self,$goodbye) = @_;
     my $id = $self->pretty_id;
-    $CPAN::Frontend->mywarn("  $id\n  $goodbye");
+    $CPAN::Frontend->mywarn("  $id\n  $goodbye\n");
     return;
 }
 
@@ -7602,6 +7789,7 @@ sub _make_command {
 #-> sub CPAN::Distribution::follow_prereqs ;
 sub follow_prereqs {
     my($self) = shift;
+    my($slot) = shift;
     my(@prereq_tuples) = grep {$_->[0] ne "perl"} @_;
     return unless @prereq_tuples;
     my @prereq = map { $_->[0] } @prereq_tuples;
@@ -7661,19 +7849,37 @@ of modules we are processing right now?", "yes");
         # queue them and re-queue yourself
         CPAN::Queue->jumpqueue([$id,$self->{reqtype}],
                                reverse @prereq_tuples);
-        $self->{later} = "Delayed until after prerequisites";
+        $self->{$slot} = "Delayed until after prerequisites";
         return 1; # signal success to the queuerunner
     }
+    return;
 }
 
 #-> sub CPAN::Distribution::unsat_prereq ;
 # return ([Foo=>1],[Bar=>1.2]) for normal modules
 # return ([perl=>5.008]) if we need a newer perl than we are running under
 sub unsat_prereq {
-    my($self) = @_;
-    my $prereq_pm = $self->prereq_pm or return;
+    my($self,$slot) = @_;
+    my(%merged,$prereq_pm);
+    my $prefs_depends = $self->prefs->{depends}||{};
+    if ($slot eq "configure_requires") {
+        my $meta_yml = $self->parse_meta_yml();
+        %merged = (%{$meta_yml->{configure_requires}||{}},
+                   %{$prefs_depends->{configure_requires}||{}});
+        $prereq_pm = {}; # all configure_requires are "b"
+    } elsif ($slot eq "later") {
+        my $prereq_pm_0 = $self->prereq_pm || {};
+        for my $reqtype (qw(requires build_requires)) {
+            $prereq_pm->{$reqtype} = {%{$prereq_pm_0->{$reqtype}||{}}}; # copy to not pollute it
+            for my $k (keys %{$prefs_depends->{$reqtype}||{}}) {
+                $prereq_pm->{$reqtype}{$k} = $prefs_depends->{$reqtype}{$k};
+            }
+        }
+        %merged = (%{$prereq_pm->{requires}||{}},%{$prereq_pm->{build_requires}||{}});
+    } else {
+        die "Panic: illegal slot '$slot'";
+    }
     my(@need);
-    my %merged = (%{$prereq_pm->{requires}||{}},%{$prereq_pm->{build_requires}||{}});
     my @merged = %merged;
     CPAN->debug("all merged_prereqs[@merged]") if $CPAN::DEBUG;
   NEED: while (my($need_module, $need_version) = each %merged) {
@@ -8013,16 +8219,6 @@ sub test {
 
     $CPAN::Frontend->myprint("Running $make test\n");
 
-#    if (my @prereq = $self->unsat_prereq){
-#        if ( $CPAN::DEBUG ) {
-#            require Data::Dumper;
-#            CPAN->debug(sprintf "unsat_prereq[%s]", Data::Dumper::Dumper(\@prereq));
-#        }
-#        unless ($prereq[0][0] eq "perl") {
-#            return 1 if $self->follow_prereqs(@prereq); # signal success to the queuerunner
-#        }
-#    }
-
   EXCUSE: {
 	my @e;
         if ($self->{make} or $self->{later}) {
@@ -8046,6 +8242,7 @@ sub test {
         }
 
         push @e, $self->{later} if $self->{later};
+        push @e, $self->{configure_requires_later} if $self->{configure_requires_later};
 
         if (exists $self->{build_dir}) {
             if (exists $self->{make_test}) {
@@ -8093,7 +8290,9 @@ sub test {
     }
 
     my $system;
-    if (my $commandline = $self->prefs->{test}{commandline}) {
+    my $prefs_test = $self->prefs->{test};
+    if (my $commandline
+        = exists $prefs_test->{commandline} ? $prefs_test->{commandline} : "") {
         $system = $commandline;
         $ENV{PERL} = $^X;
     } elsif ($self->{modulebuild}) {
@@ -8414,6 +8613,7 @@ sub install {
         }
 
         push @e, $self->{later} if $self->{later};
+        push @e, $self->{configure_requires_later} if $self->{configure_requires_later};
 
 	$CPAN::Frontend->myprint(join "", map {"  $_\n"} @e) and return if @e;
         unless (chdir $self->{build_dir}) {
@@ -8584,7 +8784,7 @@ sub _display_url {
       if $CPAN::DEBUG;
 
     # should we define it in the config instead?
-    my $html_converter = "html2text";
+    my $html_converter = "html2text.pl";
 
     my $web_browser = $CPAN::Config->{'lynx'} || undef;
     my $web_browser_out = $web_browser
@@ -9259,9 +9459,9 @@ sub dslip_status {
                                               object-oriented pragma
                                               hybrid none,;
     # public licence
-    @{$stat->{P}}{qw,p g l b a o d r n,} = qw,Standard-Perl
+    @{$stat->{P}}{qw,p g l b a 2 o d r n,} = qw,Standard-Perl
                                               GPL LGPL
-                                              BSD Artistic
+                                              BSD Artistic Artistic_2
                                               open-source
                                               distribution_allowed
                                               restricted_distribution
@@ -10043,6 +10243,16 @@ variable, then runs the C<force test> command with the given
 arguments. The C<force> pragma is used to re-run the tests and repeat
 every step that might have failed before.
 
+=head2 smoke ***EXPERIMENTAL COMMAND***
+
+B<*** WARNING: this command downloads and executes software from CPAN to
+*** your computer of completely unknown status. You should never do
+*** this with your normal account and better have a dedicated well
+*** separated and secured machine to do this.>
+
+The C<smoke> command downloads a list of recent uploads to CPAN and
+tests them all. This command currently requires XML::LibXML installed.
+
 =head2 upgrade [Module|/Regex/]...
 
 The C<upgrade> command first runs an C<r> command with the given
@@ -10469,6 +10679,10 @@ temporarily override assorted C<CPAN.pm> configuration variables
 
 =item
 
+specify dependencies that the original maintainer forgot to specify
+
+=item
+
 disable the installation of an object altogether
 
 =back
@@ -10581,6 +10795,14 @@ C<expect>.
   patches:
     - "ABCDE/Fedcba-3.14-ABCDE-01.patch"
 
+  depends:
+    configure_requires:
+      LWP: 5.8
+    build_requires:
+      Test::Exception: 0.25
+    requires:
+      Spiffy: 0.30
+
 
 =head2 Language Specs
 
@@ -10601,6 +10823,15 @@ Supported are: C<build_requires_install_policy>, C<check_sigs>,
 C<make>, C<make_install_make_command>, C<prefer_installer>,
 C<test_report>. Please report as a bug when you need another one
 supported.
+
+=item depends [hash] *** EXPERIMENTAL FEATURE ***
+
+All three types, namely C<configure_requires>, C<build_requires>, and
+C<requires> are supported in the way specified in the META.yml
+specification. The current implementation I<merges> the specified
+dependencies with those declared by the package maintainer. In a
+future implementation this may be changed to override the original
+declaration.
 
 =item disabled [boolean]
 
@@ -11196,6 +11427,7 @@ Where the 'DSLIP' characters have the following meanings:
           "GNU Library General Public License")
     b   - BSD: The BSD License
     a   - Artistic license alone
+    2   - Artistic license 2.0 or later
     o   - open source: appoved by www.opensource.org
     d   - allows distribution without restrictions
     r   - restricted distribtion

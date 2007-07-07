@@ -2,7 +2,7 @@ package CPAN::Version;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf "%.6f", substr(q$Rev: 1387 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 1917 $,4)/1000000 + 5.4;
 
 # CPAN::Version::vcmp courtesy Jost Krieger
 sub vcmp {
@@ -17,7 +17,7 @@ sub vcmp {
   }
   CPAN->debug("l[$l] r[$r]") if $CPAN::DEBUG;
   for ($l,$r) {
-      next unless tr/.// > 1;
+      next unless tr/.// > 1 || /^v/;
       s/^v?/v/;
       1 while s/\.0+(\d)/.$1/; # remove leading zeroes per group
   }

@@ -1,6 +1,6 @@
 ---
 match:
-  distribution: "^BRICAS/WWW-OpenSearch-\d"
+  distribution: "^CLACO/Class-Accessor-Grouped-\d"
 pl:
   eexpect:
     mode: anyorder
