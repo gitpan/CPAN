@@ -1,4 +1,11 @@
 ---
+comment: |
+
+  Users of Module::Install that share a pattern: we can install all
+  optional dependencies with a couple of simple "y\n". The ENVariables
+  seem to be needed to prevent infinite recursion under certain
+  unknown circumstances.
+
 match:
   distribution: |
     ^(?x:^ADAMK/Algorithm-Dependency-\d
@@ -28,6 +35,7 @@ match:
     |DMAKI/XML-RSS-LibXML-\d
     |DMAKI/XML-RSS-Liberal-
     |DSNOPEK/POE-Component-MessageQueue-\d
+    |ELLIOTJS/Task-Perl-Critic-\d
     |FOX/Bot-CPAN-\d
     |GAAL/Best-\d
     |GAAL/Class-Rebless-\d
@@ -37,6 +45,10 @@ match:
     |HANK/Catalyst-Plugin-Form-Processor-\d
     |HDP/KSx-IndexManager-\d
     |HIROSE/Net-SSL-ExpireDate-\d
+    |HOLOWAY/Catalyst-Action-REST-\d
+    |JAYK/Catalyst-Plugin-Authentication-Store-DBIx-Class-\d
+    |JAYK/Catalyst-Plugin-Authentication-\d
+    |JESSE/DBIx-SearchBuilder-\d
     |JCAMACHO/Catalyst-Controller-FormBuilder-\d
     |JROCKWAY/Task-Catalyst-Tutorial-\d
     |LBROCARD/Devel-ebug-HTTP-\d
@@ -46,7 +58,9 @@ match:
     |MSTROUT/DBIx-Class-\d
     |MSTROUT/Devel-REPL-\d
     |PERIGRIN/JSON-Any-\d
+    |REDTREE/PDF-API2-Simple-\d
     |RJBS/Rubric-\d
+    |SARTAK/Carp-REPL-\d
     |SMUELLER/Math-Approx-Symbolic-
     |SMUELLER/PAR-
     |SRI/Catalyst-Plugin-HTML-Widget-\d

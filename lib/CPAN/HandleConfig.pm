@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 1884 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2015 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -72,7 +72,9 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 1884 $,4)/1000000 + 5.4;
      "randomize_urllist",
      "scan_cache",
      "shell",
+     "show_unparsable_versions",
      "show_upload_date",
+     "show_zero_versions",
      "tar",
      "term_is_latin",
      "term_ornaments",
@@ -685,7 +687,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 1884 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 2015 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {

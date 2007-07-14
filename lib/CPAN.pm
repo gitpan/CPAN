@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.91_51';
+$CPAN::VERSION = '1.91_52';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -2391,7 +2391,8 @@ sub _u_r_common {
     my(@args) = @_;
     @args = '/./' unless @args;
     my(@result,$module,%seen,%need,$headerdone,
-       $version_undefs,$version_zeroes);
+       $version_undefs,$version_zeroes,
+       @version_undefs,@version_zeroes);
     $version_undefs = $version_zeroes = 0;
     my $sprintf = "%s%-25s%s %9s %9s  %s\n";
     my @expand = $self->expand('Module',@args);
@@ -2416,8 +2417,10 @@ sub _u_r_common {
 		local($^W) = 0;
 		if ($have eq "undef"){
 		    $version_undefs++;
-		} elsif ($have == 0){
+		    push @version_undefs, $module->as_glimpse;
+		} elsif (CPAN::Version->vcmp($have,0)==0){
 		    $version_zeroes++;
+		    push @version_zeroes, $module->as_glimpse;
 		}
 		next MODULE unless CPAN::Version->vgt($latest, $have);
 # to be pedantic we should probably say:
@@ -2492,11 +2495,29 @@ sub _u_r_common {
 	    my $s_has = $version_zeroes > 1 ? "s have" : " has";
 	    $CPAN::Frontend->myprint(qq{$version_zeroes installed module$s_has }.
 		qq{a version number of 0\n});
+            if ($CPAN::Config->{show_zero_versions}) {
+                local $" = "\t";
+                $CPAN::Frontend->myprint(qq{  they are\n\t@version_zeroes\n});
+                $CPAN::Frontend->myprint(qq{(use 'o conf show_zero_versions 0' }.
+                                         qq{to hide them)\n});
+            } else {
+                $CPAN::Frontend->myprint(qq{(use 'o conf show_zero_versions 1' }.
+                                         qq{to show them)\n});
+            }
 	}
 	if ($version_undefs) {
 	    my $s_has = $version_undefs > 1 ? "s have" : " has";
 	    $CPAN::Frontend->myprint(qq{$version_undefs installed module$s_has no }.
 		qq{parseable version number\n});
+            if ($CPAN::Config->{show_unparsable_versions}) {
+                local $" = "\t";
+                $CPAN::Frontend->myprint(qq{  they are\n\t@version_undefs\n});
+                $CPAN::Frontend->myprint(qq{(use 'o conf show_unparsable_versions 0' }.
+                                         qq{to hide them)\n});
+            } else {
+                $CPAN::Frontend->myprint(qq{(use 'o conf show_unparsable_versions 1' }.
+                                         qq{to show them)\n});
+            }
 	}
     }
     @result;
@@ -3205,7 +3226,9 @@ to find objects with matching identifiers.
                     qq{ID[$obj->{ID}]}) if $CPAN::DEBUG;
 
         push @qcopy, $obj;
-        if (! UNIVERSAL::can($obj,$meth)) {
+        if ($meth =~ /^(report)$/) { # they came here with a pragma?
+            $self->$meth($obj);
+        } elsif (! UNIVERSAL::can($obj,$meth)) {
             # Must never happen
             my $serialized = "";
             if (0) {
@@ -3295,7 +3318,9 @@ sub recent {
 
           my $dc_date = $xml->findvalue("//*[local-name(.) = 'RDF']/*[local-name(.) = 'channel']/*[local-name(.) = 'date']");
           $CPAN::Frontend->myprint("    dc:date: $dc_date\n\n");
-          for my $eitem ($xml->findnodes("//*[local-name(.) = 'RDF']/*[local-name(.) = 'item']")) {
+          my $finish_eitem = 0;
+          local $SIG{INT} = sub { $finish_eitem = 1 };
+        EITEM: for my $eitem ($xml->findnodes("//*[local-name(.) = 'RDF']/*[local-name(.) = 'item']")) {
               my $distro = $eitem->findvalue("\@rdf:about");
               $distro =~ s|.*~||; # remove up to the tilde before the name
               $distro =~ s|/$||; # remove trailing slash
@@ -3304,7 +3329,7 @@ sub recent {
               my $desc   = $eitem->findvalue("*[local-name(.) = 'description']");
               my $i = 0;
             SUBDIRTEST: while () {
-                  last SUBDIRTEST if ++$i >= 3;
+                  last SUBDIRTEST if ++$i >= 6; # half a dozen must do!
                   if (my @ret = $self->globls("$distro*")) {
                       @ret = grep {$_->[2] !~ /meta/} @ret;
                       @ret = grep {length $_->[2]} @ret;
@@ -3318,6 +3343,7 @@ sub recent {
 
               $CPAN::Frontend->myprint("____$desc\n");
               push @distros, $distro;
+              last EITEM if $finish_eitem;
           }
       }
       return \@distros;
@@ -3331,12 +3357,21 @@ sub recent {
 sub smoke {
     my($self) = @_;
     my $distros = $self->recent;
-    for my $distro (@$distros) {
+  DISTRO: for my $distro (@$distros) {
         $CPAN::Frontend->myprint(sprintf "Going to download and test '$distro'\n");
-        for (0..9) {
-            $CPAN::Frontend->myprint(sprintf "\r%2d", 10-$_);
-            sleep 1;
+        {
+            my $skip = 0;
+            local $SIG{INT} = sub { $skip = 1 };
+            for (0..9) {
+                $CPAN::Frontend->myprint(sprintf "\r%2d (Hit ^C to skip)", 10-$_);
+                sleep 1;
+                if ($skip) {
+                    $CPAN::Frontend->myprint(" skipped\n");
+                    next DISTRO;
+                }
+            }
         }
+        $CPAN::Frontend->myprint("\r  \n"); # leave the dirty line with a newline
         $self->test($distro);
     }
 }
@@ -3825,12 +3860,24 @@ sub localize {
     my(@levels);
     $Themethod ||= "";
     $self->debug("Themethod[$Themethod]reordered[@reordered]") if $CPAN::DEBUG;
+    my @all_levels = (
+                      ["dleasy",   "file"],
+                      ["dleasy"],
+                      ["dlhard"],
+                      ["dlhardest"],
+                      ["dleasy",   "http","defaultsites"],
+                      ["dlhard",   "http","defaultsites"],
+                      ["dleasy",   "ftp", "defaultsites"],
+                      ["dlhard",   "ftp", "defaultsites"],
+                      ["dlhardest","",    "defaultsites"],
+                     );
     if ($Themethod) {
-	@levels = ($Themethod, grep {$_ ne $Themethod} qw/easy hard hardest/);
+	@levels = grep {$_->[0] eq $Themethod} @all_levels;
+        push @levels, grep {$_->[0] ne $Themethod} @all_levels;
     } else {
-	@levels = qw/easy hard hardest/;
+	@levels = @all_levels;
     }
-    @levels = qw/easy/ if $^O eq 'MacOS';
+    @levels = qw/dleasy/ if $^O eq 'MacOS';
     my($levelno);
     local $ENV{FTP_PASSIVE} = 
         exists $CPAN::Config->{ftp_passive} ?
@@ -3838,13 +3885,16 @@ sub localize {
     my $ret;
     my $stats = $self->_new_stats($file);
   LEVEL: for $levelno (0..$#levels) {
-        my $level = $levels[$levelno];
-	my $method = "host$level";
-	my @host_seq = $level eq "easy" ?
-	    @reordered : 0..$last;  # reordered has CDROM up front
-        my @urllist = map { $ccurllist->[$_] } @host_seq;
-        for my $u (@CPAN::Defaultsites) {
-            push @urllist, $u unless grep { $_ eq $u } @urllist;
+        my $level_tuple = $levels[$levelno];
+        my($level,$scheme,$sitetag) = @$level_tuple;
+        my $defaultsites = $sitetag && $sitetag eq "defaultsites";
+        my @urllist;
+        if ($defaultsites) {
+            @urllist = @CPAN::Defaultsites;
+        } else {
+            my @host_seq = $level =~ /dleasy/ ?
+                @reordered : 0..$last;  # reordered has file and $Thesiteurl first
+            @urllist = map { $ccurllist->[$_] } @host_seq;
         }
         $self->debug("synth. urllist[@urllist]") if $CPAN::DEBUG;
         my $aslocal_tempfile = $aslocal . ".tmp" . $$;
@@ -3853,7 +3903,7 @@ sub localize {
             unshift @urllist, $recommend;
         }
         $self->debug("synth. urllist[@urllist]") if $CPAN::DEBUG;
-	$ret = $self->$method(\@urllist,$file,$aslocal_tempfile,$stats);
+	$ret = $self->hostdlxxx($level,$scheme,\@urllist,$file,$aslocal_tempfile,$stats);
 	if ($ret) {
             CPAN->debug("ret[$ret]aslocal[$aslocal]") if $CPAN::DEBUG;
             if ($ret eq $aslocal_tempfile) {
@@ -3911,6 +3961,16 @@ sub localize {
     return;
 }
 
+sub hostdlxxx {
+    my $self = shift;
+    my $level = shift;
+    my $scheme = shift;
+    my $h = shift;
+    $h = [ grep /^\Q$scheme\E:/, @$h ] if $scheme;
+    my $method = "host$level";
+    $self->$method($h, @_);
+}
+
 sub _set_attempt {
     my($self,$stats,$method,$url) = @_;
     push @{$stats->{attempts}}, {
@@ -3921,11 +3981,11 @@ sub _set_attempt {
 }
 
 # package CPAN::FTP;
-sub hosteasy {
+sub hostdleasy {
     my($self,$host_seq,$file,$aslocal,$stats) = @_;
     my($ro_url);
   HOSTEASY: for $ro_url (@$host_seq) {
-        $self->_set_attempt($stats,"easy",$ro_url);
+        $self->_set_attempt($stats,"dleasy",$ro_url);
 	my $url .= "$ro_url$file";
 	$self->debug("localizing perlish[$url]") if $CPAN::DEBUG;
 	if ($url =~ /^file:/) {
@@ -4056,7 +4116,7 @@ sub hosteasy {
            ){
             ##address #17973: default URLs should not try to override
             ##user-defined URLs just because LWP is not available
-            my $ret = $self->hosthard([$ro_url],$file,$aslocal,$stats);
+            my $ret = $self->hostdlhard([$ro_url],$file,$aslocal,$stats);
             return $ret if $ret;
         }
         return if $CPAN::Signal;
@@ -4064,7 +4124,7 @@ sub hosteasy {
 }
 
 # package CPAN::FTP;
-sub hosthard {
+sub hostdlhard {
   my($self,$host_seq,$file,$aslocal,$stats) = @_;
 
   # Came back if Net::FTP couldn't establish connection (or
@@ -4077,7 +4137,7 @@ sub hosthard {
   my($aslocal_dir) = File::Basename::dirname($aslocal);
   File::Path::mkpath($aslocal_dir);
   HOSTHARD: for $ro_url (@$host_seq) {
-        $self->_set_attempt($stats,"hard",$ro_url);
+        $self->_set_attempt($stats,"dlhard",$ro_url);
 	my $url = "$ro_url$file";
 	my($proto,$host,$dir,$getfile);
 
@@ -4142,7 +4202,7 @@ Trying with "$funkyftp$src_switch" to get
                                      <FH> };
                   if ($content =~ /^<.*(<title>[45]|Error [45])/si) {
                       $CPAN::Frontend->mywarn(qq{
-No success, the file that lynx has has downloaded looks like an error message:
+No success, the file that lynx has downloaded looks like an error message:
 $content
 });
                       $CPAN::Frontend->mysleep(1);
@@ -4150,7 +4210,7 @@ $content
                   }
               } else {
                   $CPAN::Frontend->myprint(qq{
-No success, the file that lynx has has downloaded is an empty file.
+No success, the file that lynx has downloaded is an empty file.
 });
                   next DLPRG;
               }
@@ -4215,7 +4275,7 @@ returned status $estatus (wstat $wstatus)$size
 }
 
 # package CPAN::FTP;
-sub hosthardest {
+sub hostdlhardest {
     my($self,$host_seq,$file,$aslocal,$stats) = @_;
 
     my($ro_url);
@@ -4241,7 +4301,7 @@ config variable with
 });
     $CPAN::Frontend->mysleep(2);
   HOSTHARDEST: for $ro_url (@$host_seq) {
-        $self->_set_attempt($stats,"hardest",$ro_url);
+        $self->_set_attempt($stats,"dlhardest",$ro_url);
 	my $url = "$ro_url$file";
 	$self->debug("localizing ftpwise[$url]") if $CPAN::DEBUG;
 	unless ($url =~ m|^ftp://(.*?)/(.*)/(.*)|) {
@@ -10217,6 +10277,21 @@ mkmyconfig() writes your own CPAN::MyConfig file into your ~/.cpan/
 directory so that you can save your own preferences instead of the
 system wide ones.
 
+=head2 recent ***EXPERIMENTAL COMMAND***
+
+The C<recent> command downloads a list of recent uploads to CPAN and
+displays them I<slowly>. While the command is running $SIG{INT} is
+defined to mean that the loop shall be left after having displayed the
+current item.
+
+B<Note>: This command requires XML::LibXML installed.
+
+B<Note>: This whole command currently is a bit klunky and will
+probably change in future versions of CPAN.pm but the general
+approach will likely stay.
+
+B<Note>: See also L<smoke>
+
 =head2 recompile
 
 recompile() is a very special command in that it takes no argument and
@@ -10250,8 +10325,16 @@ B<*** WARNING: this command downloads and executes software from CPAN to
 *** this with your normal account and better have a dedicated well
 *** separated and secured machine to do this.>
 
-The C<smoke> command downloads a list of recent uploads to CPAN and
-tests them all. This command currently requires XML::LibXML installed.
+The C<smoke> command takes the list of recent uploads to CPAN as
+provided by the C<recent> command and tests them all. While the
+command is running $SIG{INT} is defined to mean that the current item
+shall be skipped.
+
+B<Note>: This whole command currently is a bit klunky and will
+probably change in future versions of CPAN.pm but the general
+approach will likely stay.
+
+B<Note>: See also L<recent>
 
 =head2 upgrade [Module|/Regex/]...
 
@@ -10490,7 +10573,10 @@ defined:
   randomize_urllist  add some randomness to the sequence of the urllist
   scan_cache	     controls scanning of cache ('atstart' or 'never')
   shell              your favorite shell
+  show_unparsable_versions
+                     boolean if r command tells which modules are versionless
   show_upload_date   boolean if commands should try to determine upload date
+  show_zero_versions boolean if r command tells for which modules $version==0
   tar                location of external program tar
   term_is_latin      if true internal UTF-8 is translated to ISO-8859-1
                      (and nonsense for characters outside latin range)

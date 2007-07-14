@@ -212,6 +212,7 @@ ALL_PERLS = /usr/bin/perl \
 # not sorted because order matters
 MEGA_BASE = \
  Bundle::CPANxxl \
+ YVES/ExtUtils-Install-1.41_04.tar.gz \
  CPAN::DistnameInfo \
  DBD::SQLite \
  /home/src/perl/tk/SVN/. \
@@ -243,6 +244,12 @@ OKDIRS=CPAN|DIST|bin|blib|cover_db|\
 verify-no-subdir:
 	@$(PERL) -e 'my$$s=join",",grep{!/^($(OKDIRS))\z/x&&-d($$_)}glob"*";' \
 		-e 'die"unexpected dir:$$s"if$$s'
+
+kwalify-distroprefs:
+	$(PERL) -MKwalify -MYAML::Syck \
+	  -e 'my $$s = YAML::Syck::LoadFile("lib/CPAN/Kwalify/distroprefs.yml");my $$i=0;my $$notok=0;' \
+	  -e 'for (glob("distroprefs/*.yml")){ printf "%03d %-6s: %s\n", ++$$i, Kwalify::validate($$s,YAML::Syck::LoadFile("$$_"))?"OK":("NOT OK ".++$$notok),$$_ };' \
+	  -e 'print $$notok ? "$$notok broken\n" : "All OK\n";'
 
 setversion:
 	$(PERL) Makefile.PL --setversion
@@ -295,6 +302,7 @@ megainstall: logs/.exists
 			install(qw($(MEGA_BASE)), map {$$_->[0]} sort {$$a->[1]<=>$$b->[1]} map {[$$_,rand(1)]} @MEGA); \
 			CPAN::Shell->failed' >> logs/megainstall.$$DATE.out 2>&1; \
 		$(PERL) bin/colorout-to-dir-2.pl logs/megainstall.$$DATE.out; \
+		./bin/dir-to-jifty.pl logs; \
 	done
 
 # 16=Distribution; 32=Bundle; 32768=Queue

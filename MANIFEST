@@ -19,6 +19,7 @@ distroprefs/AUDREYT.PDF-FromHTML.yml
 distroprefs/AUDREYT.YAML-Syck.yml
 distroprefs/AVIF.Time-Duration.yml
 distroprefs/BINGOS.POE-Component-CPAN-YACSmoke.yml
+distroprefs/BINGOS.POE-Component-Server-SimpleHTTP.yml
 distroprefs/BLUEFEET.GIS-Distance.yml
 distroprefs/BRADFITZ.Danga-Socket.yml
 distroprefs/BRADFITZ.Perlbal.yml
@@ -30,12 +31,14 @@ distroprefs/BTROTT.XML-FOAF.yml
 distroprefs/BWARFIELD.GDGraph.yml
 distroprefs/BYRNE.SOAP-Lite.yml
 distroprefs/CAPTTOFU.DBD-mysql.yml
+distroprefs/CHANG-LIU.XML-Node.yml
 distroprefs/CLACO.Class-Accessor-Grouped.yml
 distroprefs/CLKAO.App-CLI.yml
 distroprefs/CLKAO.IO-Digest.yml
 distroprefs/CLKAO.SVN-Mirror.yml
 distroprefs/CMOORE.Archive-Any.yml
 distroprefs/CORION.Test-Without-Module.yml
+distroprefs/DAXIM.Yahoo-Photos.yml
 distroprefs/DBROBINS.Net-SSH-Perl.yml
 distroprefs/DCONWAY.Parse-RecDescent.yml
 distroprefs/DJKERNEN.Mail-IMAPClient.yml
@@ -49,6 +52,7 @@ distroprefs/DRTECH.Config-Loader.yml
 distroprefs/DSKOLL.MIME-tools.yml
 distroprefs/DSUGAL.Devel-Size.yml
 distroprefs/DURIST.WWW-Babelfish.yml
+distroprefs/DWHEELER.Params-CallbackRequest.yml
 distroprefs/EESTABROO.IMAP-Admin.yml
 distroprefs/ERYQ.Convert-BinHex.yml
 distroprefs/EWILHELM.Math-Vec.yml
@@ -96,6 +100,7 @@ distroprefs/KCLARK.SQL-Translator.yml
 distroprefs/KROW.DBIx-Password.yml
 distroprefs/KWILLIAMS.AI-Categorizer.yml
 distroprefs/KWILLIAMS.Module-Build.yml
+distroprefs/LDS.Crypt-CBC.yml
 distroprefs/LEAKIN.File-Rsync.yml
 distroprefs/LOCAL.trailing_dot_distros.yml
 distroprefs/LUKEC.Socialtext-Resting.yml
@@ -107,7 +112,9 @@ distroprefs/MAURICE.IPC-ShareLite.yml
 distroprefs/MBARBON.Alien-wxWidgets.yml
 distroprefs/METZZO.Java.yml
 distroprefs/MI.yml
+distroprefs/MInoinc.yml
 distroprefs/MIROD.XML-Twig.yml
+distroprefs/MIYAGAWA.Net-IDN-Nameprep.yml
 distroprefs/MIYAGAWA.Plagger.yml
 distroprefs/MIYAGAWA.XML-Atom.yml
 distroprefs/MJD.Devel-Trace.yml
@@ -115,7 +122,6 @@ distroprefs/MJD.Text-Template.yml
 distroprefs/MLEHMANN.AnyEvent.yml
 distroprefs/MLEHMANN.Coro.yml
 distroprefs/MLEHMANN.PApp.yml
-distroprefs/MRAMBERG.Catalyst-Plugin-Unicode.yml
 distroprefs/MRAMBERG.Catalyst-View-TT.yml
 distroprefs/MSERGEANT.AxKit.yml
 distroprefs/MSERGEANT.CDB_File.yml
@@ -126,12 +132,18 @@ distroprefs/MSERGEANT.XML-Parser.yml
 distroprefs/MTHURN.Tk-Wizard.yml
 distroprefs/NI-S.Tk.yml
 distroprefs/NIKIP.Authen-PAM.yml
+distroprefs/NODINE.Text-Restructured.yml
+distroprefs/NUFFIN.Catalyst-Plugin-Session.yml
 distroprefs/OLAF.Net-DNS.yml
 distroprefs/OVID.Class-Trait.yml
+distroprefs/OVID.Perl6-Caller.yml
 distroprefs/OVID.TAPx-Parser.yml
+distroprefs/OWEN.PDF-Labels.yml
 distroprefs/PCIMPRICH.XML-SAX-ExpatXS.yml
 distroprefs/PETDANCE.HTML-Tidy.yml
 distroprefs/PETDANCE.WWW-Mechanize.yml
+distroprefs/PIERS.sapnwrfc.yml
+distroprefs/QANTINS.BitTorrent.yml
 distroprefs/RCAPUTO.POE.yml
 distroprefs/RDF.Clone.yml
 distroprefs/RGIERSIG.Expect.dd
@@ -139,9 +151,9 @@ distroprefs/RGIERSIG.Expect.yml
 distroprefs/RHOOPER.HTTP-Lite.yml
 distroprefs/RJBS.Data-UUID.yml
 distroprefs/RJBS.Email-Send.yml
-distroprefs/RJOOP.X500-DN.yml
 distroprefs/RJRAY.RPC-XML.yml
 distroprefs/RMUHLE.classes.yml
+distroprefs/RONAN.Transform-Canvas.yml
 distroprefs/ROODE.Time-Format.yml
 distroprefs/RRA.PGP-Sign.yml
 distroprefs/RRWO.Graphics-ColorNames.yml

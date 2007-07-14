@@ -2,7 +2,7 @@ package CPAN::Version;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = sprintf "%.6f", substr(q$Rev: 1917 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2006 $,4)/1000000 + 5.4;
 
 # CPAN::Version::vcmp courtesy Jost Krieger
 sub vcmp {
@@ -82,6 +82,7 @@ sub float2vv {
         $ret .= ".".int($1);
     }
     # warn "n[$n]ret[$ret]";
+    $ret =~ s/(\.0)+/.0/; # v1.0.0 => v1.0
     $ret;
 }
 
