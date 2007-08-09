@@ -1,3 +1,36 @@
+2007-08-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 1.91_53:
+
+	* added CPAN Testers reporting for failures of *.PL or make/Build
+	if CPAN::Reporter version is at least 0.99 (David Golden)
+
+	* new config option tar_verbosity
+	
+	* added base_id() method to CPAN::Distribution; documented both
+	base_id() and pretty_id() (David Golden)
+
+	* bugfix: make install did not set the PERL5LIB environment
+
+	* bugfix: smoke command handles distros it can't find more graciously
+
+	* docfix: new FAQ entry about commit and auto_commit (bugged by Nicholas
+	Clark)
+
+	* refactoring of the Queue objects for better readability
+
+	* address #28438: wording of the dialog for keep_source_where (Martin
+	Thurn,Michael Schwern)
+
+	* address #28439: did not report missing file URL when LWP not installed
+	(Martin Thurn,Michael Schwern)
+
+	* new parameter fo eexpect: reuse (Slaven Rezic)
+
+	* bugfix 'reload cpan': make it less unintuitive (David Golden)
+
+	* bugfix in goto: did not formally say goodbye
+
 2007-07-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* release 1.91_52:
@@ -20,7 +53,8 @@
 
 	* changed CPAN::Version to treat sequences of more than on trailing ".0"
 	in version strings as insignificant. This was relevant for
-	ANDYA/Set-IntSpan-Fast-v1.0.tar.gz. Bugreport about version.pm pending.
+	ANDYA/Set-IntSpan-Fast-v1.0.tar.gz. Bugreport about version.pm is
+	https://rt.cpan.org/Ticket/Display.html?id=28206
 
 	* now with 175 distroprefs files covering over 200 distributions
 	

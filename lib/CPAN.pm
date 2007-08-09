@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.91_52';
+$CPAN::VERSION = '1.91_53';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -270,9 +270,14 @@ ReadLine support %s
 	    $CPAN::META->debug("line[".join("|",@line)."]") if $CPAN::DEBUG;
 	    my $command = shift @line;
 	    eval { CPAN::Shell->$command(@line) };
-	    if ($@ && "$@" =~ /\S/){
-                require Carp;
-                Carp::cluck("Catching error: '$@'");
+	    if ($@){
+                my $err = "$@";
+                if ($err =~ /\S/) {
+                    require Carp;
+                    require Dumpvalue;
+                    my $dv = Dumpvalue->new();
+                    Carp::cluck(sprintf "Catching error: %s", $dv->stringify($err));
+                }
             }
             if ($command =~ /^(
                              # classic commands
@@ -1249,6 +1254,10 @@ sub has_inst {
 	# it tries again. The second require is only a NOOP returning
 	# 1 if we had success, otherwise it's retrying
 
+        my $mtime = (stat $INC{$file})[9];
+        # privileged files loaded by has_inst; Note: we use $mtime
+        # as a proxy for a checksum.
+        $CPAN::Shell::reload->{$file} = $mtime;
         my $v = eval "\$$mod\::VERSION";
         $v = $v ? " (v$v)" : "";
 	$CPAN::Frontend->myprint("CPAN: $mod loaded ok$v\n");
@@ -2157,10 +2166,16 @@ sub _reload_this {
         return;
     }
     my $mtime = (stat $file)[9];
-    $reload->{$f} ||= $^T;
-    my $must_reload = $mtime > $reload->{$f};
+    if ($reload->{$f}) {
+    } elsif ($^T < $mtime) {
+        # since we started the file has changed, force it to be reloaded
+        $reload->{$f} = -1;
+    } else {
+        $reload->{$f} = $mtime;
+    }
+    my $must_reload = $mtime != $reload->{$f};
     $args ||= {};
-    $must_reload ||= $args->{reloforce};
+    $must_reload ||= $args->{reloforce}; # o conf defaults needs this
     if ($must_reload) {
         my $fh = FileHandle->new($file) or
             $CPAN::Frontend->mydie("Could not open $file: $!");
@@ -2176,7 +2191,7 @@ sub _reload_this {
             warn $@;
             return;
         }
-        $reload->{$f} = time;
+        $reload->{$f} = $mtime;
     } else {
         $CPAN::Frontend->myprint("__unchanged__");
     }
@@ -3086,7 +3101,9 @@ sub rematein {
     # enter the queue but not its copy. How do they get a sensible
     # test_count?
 
-    my $needs_recursion_protection = "make|test|install";
+    # With configure_requires, "get" is vulnerable in recursion.
+
+    my $needs_recursion_protection = "get|make|test|install";
 
     # construct the queue
     my($s,@s,@qcopy);
@@ -3132,7 +3149,7 @@ sub rematein {
                     }
                 }
             }
-            CPAN::Queue->new(qmod => $obj->id, reqtype => "c");
+            CPAN::Queue->queue_item(qmod => $obj->id, reqtype => "c");
             push @qcopy, $obj;
 	} elsif ($CPAN::META->exists('CPAN::Author',uc($s))) {
 	    $obj = $CPAN::META->instance('CPAN::Author',uc($s));
@@ -3341,6 +3358,7 @@ sub recent {
                   $distro =~ s|/|/*/|; # allow it to reside in a subdirectory
               }
 
+              next EITEM if $distro =~ m|\*|; # did not find the thing
               $CPAN::Frontend->myprint("____$desc\n");
               push @distros, $distro;
               last EITEM if $finish_eitem;
@@ -3349,7 +3367,7 @@ sub recent {
       return \@distros;
   } else {
       # deprecated old version
-      $CPAN::Frontend->mydie("no XML::LibXML installed, cannot continue");
+      $CPAN::Frontend->mydie("no XML::LibXML installed, cannot continue\n");
   }
 }
 
@@ -3807,12 +3825,7 @@ sub localize {
     }
 
     my($aslocal_dir) = File::Basename::dirname($aslocal);
-    File::Path::mkpath($aslocal_dir);
-    $CPAN::Frontend->mywarn(qq{Warning: You are not allowed to write into }.
-	qq{directory "$aslocal_dir".
-    I\'ll continue, but if you encounter problems, they may be due
-    to insufficient permissions.\n}) unless -w $aslocal_dir;
-
+    $self->mymkpath($aslocal_dir); # too early for file URLs / RT #28438
     # Inheritance is not easier to manage than a few if/else branches
     if ($CPAN::META->has_usable('LWP::UserAgent')) {
  	unless ($Ua) {
@@ -3961,6 +3974,15 @@ sub localize {
     return;
 }
 
+sub mymkpath {
+    my($self, $aslocal_dir) = @_;
+    File::Path::mkpath($aslocal_dir);
+    $CPAN::Frontend->mywarn(qq{Warning: You are not allowed to write into }.
+	qq{directory "$aslocal_dir".
+    I\'ll continue, but if you encounter problems, they may be due
+    to insufficient permissions.\n}) unless -w $aslocal_dir;
+}
+
 sub hostdlxxx {
     my $self = shift;
     my $level = shift;
@@ -4027,6 +4049,7 @@ sub hostdleasy {
 		    return $aslocal;
 		}
 	    }
+            $CPAN::Frontend->mywarn("Could not find '$l'\n");
 	}
 	$self->debug("it was not a file URL") if $CPAN::DEBUG;
         if ($CPAN::META->has_usable('LWP')) {
@@ -4805,7 +4828,15 @@ sub reanimate_build_dir {
             my $do
                 = $CPAN::META->{readwrite}{'CPAN::Distribution'}{$key}
                     = $c->{distribution};
-            for my $skipper (qw(badtestcnt notest force_update)) {
+            for my $skipper (qw(
+                                badtestcnt
+                                configure_requires_later
+                                force_update
+                                later
+                                notest
+                                should_report
+                                sponsored_mods
+                               )) {
                 delete $do->{$skipper};
             }
             # $DB::single = 1;
@@ -5774,6 +5805,15 @@ sub pretty_id {
     substr($id,5);
 }
 
+#-> sub CPAN::Distribution::base_id
+sub base_id {
+    my $self = shift;
+    my $id = $self->pretty_id();
+    my $base_id = File::Basename::basename($id);
+    $base_id =~ s{\.(?:tar\.(bz2|gz|Z)|t(?:gz|bz)|zip)$}{}i;
+    return $base_id;
+}
+
 # mark as dirty/clean for the sake of recursion detection. $color=1
 # means "in use", $color=0 means "not in use anymore". $color=2 means
 # we have determined prereqs now and thus insist on passing this
@@ -6193,10 +6233,13 @@ sub satisfy_configure_requires {
         # configure_requires that means, things with
         # configure_requires simply fail, all others succeed
     }
-    my @prereq = $self->unsat_prereq("configure_requires") or return 1;
+    my @prereq = $self->unsat_prereq("configure_requires_later") or return 1;
     if ($self->{configure_requires_later}) {
         # we must not come here a second time
-        $CPAN::Frontend->mydie("Panic: A prerequisite is not available, please investigate...");
+        $CPAN::Frontend->mywarn("Panic: Some prerequisites is not available, please investigate...");
+        require Data::Dumper;
+        $CPAN::Frontend->mydie( Data::Dumper->new([$self,\@prereq],
+                                                  [qw(self prereq)])->Indent(1)->Useqq(1)->Dump );
     }
     if ($prereq[0][0] eq "perl") {
         my $need = "requires perl '$prereq[0][1]'";
@@ -7247,12 +7290,10 @@ is part of the perl-%s distribution. To install that, you need to run
             }
         }
 
-        if ($self->{later} || $self->{configure_requires_later}) { # see also undelay
-            if ($self->unsat_prereq("later")
-                ||
-                $self->unsat_prereq("configure_requires_later")
-               ) {
-                push @e, $self->{later} || $self->{configure_requires_later};
+        my $later = $self->{later} || $self->{configure_requires_later};
+        if ($later) { # see also undelay
+            if ($later) {
+                push @e, $later;
             }
         }
 
@@ -7313,7 +7354,7 @@ is part of the perl-%s distribution. To install that, you need to run
     if (exists $self->{writemakefile}) {
     } else {
 	local($SIG{ALRM}) = sub { die "inactivity_timeout reached\n" };
-	my($ret,$pid);
+	my($ret,$pid,$output);
 	$@ = "";
         my $go_via_alarm;
 	if ($CPAN::Config->{inactivity_timeout}) {
@@ -7336,36 +7377,47 @@ is part of the perl-%s distribution. To install that, you need to run
             }
         }
         if ($go_via_alarm) {
-            eval {
-                alarm $CPAN::Config->{inactivity_timeout};
-                local $SIG{CHLD}; # = sub { wait };
-                if (defined($pid = fork)) {
-                    if ($pid) { #parent
-                        # wait;
-                        waitpid $pid, 0;
-                    } else {    #child
-                        # note, this exec isn't necessary if
-                        # inactivity_timeout is 0. On the Mac I'd
-                        # suggest, we set it always to 0.
-                        exec $system;
-                    }
-                } else {
-                    $CPAN::Frontend->myprint("Cannot fork: $!");
-                    return;
-                }
-            };
-            alarm 0;
-            if ($@){
-                kill 9, $pid;
-                waitpid $pid, 0;
-                my $err = "$@";
-                $CPAN::Frontend->myprint($err);
-                $self->{writemakefile} = CPAN::Distrostatus->new("NO $err");
-                $@ = "";
-                return;
-            }
+	    if ( $self->_should_report('pl') ) {
+		($output, $ret) = CPAN::Reporter::record_command(
+		    $system,
+		    $CPAN::Config->{inactivity_timeout},
+		);
+		CPAN::Reporter::grade_PL( $self, $system, $output, $ret );
+	    }
+	    else {
+		eval {
+		    alarm $CPAN::Config->{inactivity_timeout};
+		    local $SIG{CHLD}; # = sub { wait };
+		    if (defined($pid = fork)) {
+			if ($pid) { #parent
+			    # wait;
+			    waitpid $pid, 0;
+			} else {    #child
+			    # note, this exec isn't necessary if
+			    # inactivity_timeout is 0. On the Mac I'd
+			    # suggest, we set it always to 0.
+			    exec $system;
+			}
+		    } else {
+			$CPAN::Frontend->myprint("Cannot fork: $!");
+			return;
+		    }
+		};
+		alarm 0;
+		if ($@){
+		    kill 9, $pid;
+		    waitpid $pid, 0;
+		    my $err = "$@";
+		    $CPAN::Frontend->myprint($err);
+		    $self->{writemakefile} = CPAN::Distrostatus->new("NO $err");
+		    $@ = "";
+		    return;
+		}
+	    }
 	} else {
             if (my $expect_model = $self->_prefs_with_expect("pl")) {
+		# XXX probably want to check _should_report here and warn 
+		# about not being able to use CPAN::Reporter with expect
                 $ret = $self->_run_via_expect($system,$expect_model);
                 if (! defined $ret
                     && $self->{writemakefile}
@@ -7373,7 +7425,12 @@ is part of the perl-%s distribution. To install that, you need to run
                     # timeout
                     return;
                 }
-            } else {
+            } 
+	    elsif ( $self->_should_report('pl') ) {
+		($output, $ret) = CPAN::Reporter::record_command($system);
+		CPAN::Reporter::grade_PL( $self, $system, $output, $ret );
+	    }
+	    else {
                 $ret = system($system);
             }
             if ($ret != 0) {
@@ -7463,8 +7520,16 @@ is part of the perl-%s distribution. To install that, you need to run
     }
     my $system_ok;
     if ($want_expect) {
+	# XXX probably want to check _should_report here and 
+	# warn about not being able to use CPAN::Reporter with expect
         $system_ok = $self->_run_via_expect($system,$expect_model) == 0;
-    } else {
+    } 
+    elsif ( $self->_should_report('make') ) {
+	my ($output, $ret) = CPAN::Reporter::record_command($system);
+	CPAN::Reporter::grade_make( $self, $system, $output, $ret );
+	$system_ok = ! $ret;
+    }
+    else {
         $system_ok = system($system) == 0;
     }
     $self->introduce_myself;
@@ -7511,6 +7576,7 @@ sub _run_via_expect {
 sub _run_via_expect_anyorder {
     my($self,$expo,$expect_model) = @_;
     my $timeout = $expect_model->{timeout} || 5;
+    my $reuse = $expect_model->{reuse};
     my @expectacopy = @{$expect_model->{talk}}; # we trash it!
     my $but = "";
   EXPECT: while () {
@@ -7540,7 +7606,8 @@ sub _run_via_expect_anyorder {
                 if ($but =~ /$regex/) {
                     # warn "DEBUG: will send send[$send]";
                     $expo->send($send);
-                    splice @expectacopy, $i, 2; # never allow reusing an QA pair
+                    # never allow reusing an QA pair unless they told us
+                    splice @expectacopy, $i, 2 unless $reuse;
                     next EXPECT;
                 }
             }
@@ -7907,8 +7974,8 @@ of modules we are processing right now?", "yes");
             }
         }
         # queue them and re-queue yourself
-        CPAN::Queue->jumpqueue([$id,$self->{reqtype}],
-                               reverse @prereq_tuples);
+        CPAN::Queue->jumpqueue({qmod => $id, reqtype => $self->{reqtype}},
+                               map {+{qmod=>$_->[0],reqtype=>$_->[1]}} reverse @prereq_tuples);
         $self->{$slot} = "Delayed until after prerequisites";
         return 1; # signal success to the queuerunner
     }
@@ -7922,7 +7989,7 @@ sub unsat_prereq {
     my($self,$slot) = @_;
     my(%merged,$prereq_pm);
     my $prefs_depends = $self->prefs->{depends}||{};
-    if ($slot eq "configure_requires") {
+    if ($slot eq "configure_requires_later") {
         my $meta_yml = $self->parse_meta_yml();
         %merged = (%{$meta_yml->{configure_requires}||{}},
                    %{$prefs_depends->{configure_requires}||{}});
@@ -8012,6 +8079,8 @@ sub unsat_prereq {
         if ($need_module eq "perl") {
             return ["perl", $need_version];
         }
+        $self->{sponsored_mods}{$need_module} ||= 0;
+        CPAN->debug("need_module[$need_module]s/s/n[$self->{sponsored_mods}{$need_module}]") if $CPAN::DEBUG;
         if ($self->{sponsored_mods}{$need_module}++){
             # We have already sponsored it and for some reason it's still
             # not available. So we do ... what??
@@ -8388,46 +8457,14 @@ sub test {
                                     "testing without\n");
         }
     }
-    my $test_report = CPAN::HandleConfig->prefs_lookup($self,
-                                                       q{test_report});
-    my $want_report;
-    if ($test_report) {
-        my $can_report = $CPAN::META->has_inst("CPAN::Reporter");
-        if ($can_report) {
-            $want_report = 1;
-        } else {
-            $CPAN::Frontend->mywarn("CPAN::Reporter not installed, falling back to ".
-                                    "testing without\n");
-        }
-    }
-    my $ready_to_report = $want_report;
-    if ($ready_to_report
-        && $self->is_dot_dist
-       ) {
-        $CPAN::Frontend->mywarn("Reporting via CPAN::Reporter is disabled ".
-                                "for local directories\n");
-        $ready_to_report = 0;
-    }
-    if ($ready_to_report
-        &&
-        $self->prefs->{patches}
-        &&
-        @{$self->prefs->{patches}}
-        &&
-        $self->{patched}
-       ) {
-        $CPAN::Frontend->mywarn("Reporting via CPAN::Reporter is disabled ".
-                                "when the source has been patched\n");
-        $ready_to_report = 0;
-    }
     if ($want_expect) {
-        if ($ready_to_report) {
+        if ($self->_should_report('test')) {
             $CPAN::Frontend->mywarn("Reporting via CPAN::Reporter is currently ".
                                     "not supported when distroprefs specify ".
                                     "an interactive test\n");
         }
         $tests_ok = $self->_run_via_expect($system,$expect_model) == 0;
-    } elsif ( $ready_to_report ) {
+    } elsif ( $self->_should_report('test') ) {
         $tests_ok = CPAN::Reporter::test($self, $system);
     } else {
         $tests_ok = system($system) == 0;
@@ -8439,6 +8476,7 @@ sub test {
 
             # local $CPAN::DEBUG = 16; # Distribution
             for my $m (keys %{$self->{sponsored_mods}}) {
+                next unless $self->{sponsored_mods}{$m} > 0;
                 my $m_obj = CPAN::Shell->expand("Module",$m) or next;
                 # XXX we need available_version which reflects
                 # $ENV{PERL5LIB} so that already tested but not yet
@@ -8593,11 +8631,22 @@ sub clean {
 sub goto {
     my($self,$goto) = @_;
     $goto = $self->normalize($goto);
+    my $why = sprintf(
+                      "Goto '$goto' via prefs file '%s' doc %d",
+                      $self->{prefs_file},
+                      $self->{prefs_file_doc},
+                     );
+    $self->{unwrapped} = CPAN::Distrostatus->new("NO $why");
+    # 2007-07-16 akoenig : Better than NA would be if we could inherit
+    # the status of the $goto distro but given the exceptional nature
+    # of 'goto' I feel reluctant to implement it
+    my $goodbye_message = "[goto] -- NA $why";
+    $self->goodbye($goodbye_message);
 
     # inject into the queue
 
     CPAN::Queue->delete($self->id);
-    CPAN::Queue->jumpqueue([$goto,$self->{reqtype}]);
+    CPAN::Queue->jumpqueue({qmod => $goto, reqtype => $self->{reqtype}});
 
     # and run where we left off
 
@@ -8741,6 +8790,11 @@ sub install {
         delete $self->{force_update};
         return;
     }
+    local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
+                           ? $ENV{PERL5LIB}
+                           : ($ENV{PERLLIB} || "");
+
+    $CPAN::META->set_perl5lib;
     my($pipe) = FileHandle->new("$system $stderr |");
     my($makeout) = "";
     while (<$pipe>){
@@ -8997,7 +9051,7 @@ sub _getsave_url {
     }
 }
 
-# sub CPAN::Distribution::_build_command
+#-> sub CPAN::Distribution::_build_command
 sub _build_command {
     my($self) = @_;
     if ($^O eq "MSWin32") { # special code needed at least up to
@@ -9007,6 +9061,64 @@ sub _build_command {
         return "$perl ./Build";
     }
     return "./Build";
+}
+
+#-> sub CPAN::Distribution::_should_report
+sub _should_report {
+    my($self, $phase) = @_;
+    die "_should_report() requires a 'phase' argument"
+	if ! defined $phase;
+    
+    # configured
+    my $test_report = CPAN::HandleConfig->prefs_lookup($self,
+                                                       q{test_report});
+    return unless $test_report;
+
+    # don't repeat if we cached a result
+    return $self->{should_report} 
+	if exists $self->{should_report};
+
+    # available
+    if ( ! $CPAN::META->has_inst("CPAN::Reporter")) {
+	$CPAN::Frontend->mywarn(
+	    "CPAN::Reporter not installed, falling back to testing without\n"
+	);
+	return $self->{should_report} = 0;
+    }
+
+    # capable
+    if ( CPAN::Version->vlt( CPAN::Reporter->VERSION, 0.99 ) ) {
+	# don't cache $self->{should_report} -- need to check each phase
+	if ( $phase eq 'test' ) {
+	    return 1;
+	}
+	else {
+	    $CPAN::Frontend->mywarn(
+		"CPAN::Reporter too old to support the '$phase' phase. Please upgrade.\n"
+	    );
+	    return;
+	}
+    }
+
+    # appropriate
+    if ($self->is_dot_dist) {
+        $CPAN::Frontend->mywarn("Reporting via CPAN::Reporter is disabled ".
+                                "for local directories\n");
+	return $self->{should_report} = 0;
+    }
+    if ($self->prefs->{patches}
+        &&
+        @{$self->prefs->{patches}}
+        &&
+        $self->{patched}
+       ) {
+        $CPAN::Frontend->mywarn("Reporting via CPAN::Reporter is disabled ".
+                                "when the source has been patched\n");
+	return $self->{should_report} = 0;
+    }
+
+    # proceed and cache success
+    return $self->{should_report} = 1;
 }
 
 #-> sub CPAN::Distribution::reports
@@ -10578,6 +10690,7 @@ defined:
   show_upload_date   boolean if commands should try to determine upload date
   show_zero_versions boolean if r command tells for which modules $version==0
   tar                location of external program tar
+  tar_verbosity      verbosity level for the tar command
   term_is_latin      if true internal UTF-8 is translated to ISO-8859-1
                      (and nonsense for characters outside latin range)
   term_ornaments     boolean to turn ReadLine ornamenting on/off
@@ -11008,8 +11121,8 @@ used.
 
 =item eexpect [hash]
 
-Extended C<expect>. This is a hash reference with three allowed keys,
-C<mode>, C<timeout>, and C<talk>.
+Extended C<expect>. This is a hash reference with four allowed keys,
+C<mode>, C<timeout>, C<reuse>, and C<talk>.
 
 C<mode> may have the values C<deterministic> for the case where all
 questions come in the order written down and C<anyorder> for the case
@@ -11029,12 +11142,17 @@ Build.PL>, C<make>, etc.).
 
 In the case of C<mode=deterministic> the CPAN.pm will inject the
 according answer as soon as the stream matches the regular expression.
-In the case of C<mode=anyorder> the CPAN.pm will answer a question as
-soon as the timeout is reached for the next byte in the input stream.
-In the latter case it removes the according question/answer pair from
-the array, so if you want to answer the question C<Do you really want
-to do that> several times, then it must be included in the array at
-least as often as you want this answer to be given.
+
+In the case of C<mode=anyorder> CPAN.pm will answer a question as soon
+as the timeout is reached for the next byte in the input stream. In
+this mode you can use the C<reuse> parameter to decide what shall
+happen with a question-answer pair after it has been used. In the
+default case (reuse=0) it is removed from the array, so it cannot be
+used again accidentally. In this case, if you want to answer the
+question C<Do you really want to do that> several times, then it must
+be included in the array at least as often as you want this answer to
+be given. Setting the parameter C<reuse> to 1 makes this repetition
+unnecessary.
 
 =item env [hash]
 
@@ -11261,6 +11379,16 @@ Returns a multi-line description of the distribution
 
 Returns the CPAN::Author object of the maintainer who uploaded this
 distribution
+
+=item CPAN::Distribution::pretty_id()
+
+Returns a string of the form "AUTHORID/TARBALL", where AUTHORID is the
+author's PAUSE ID and TARBALL is the distribution filename.
+
+=item CPAN::Distribution::base_id()
+
+Returns the distribution filename without any archive suffix.  E.g
+"Foo-Bar-0.01"
 
 =item CPAN::Distribution::clean()
 
@@ -12174,6 +12302,15 @@ You decide which to try in which order.
 Henk P. Penning maintains a site that collects data about CPAN sites:
 
   http://www.cs.uu.nl/people/henkp/mirmon/cpan.html
+
+=item 16)
+
+Why do I get asked the same questions every time I start the shell?
+
+You can make your configuration changes permanent by calling the
+command C<o conf commit>. Alternatively set the C<auto_commit>
+variable to true by running C<o conf init auto_commit> and answering
+the following question with yes.
 
 =back
 

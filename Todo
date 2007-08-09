@@ -1,3 +1,465 @@
+2007-08-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* is the output of perl Makefile.PL in the yml file now?
+
+	* binary search requested by Steffen Schwigon
+
+----Program----
+eval q{use Term::ReadPassword 0.07};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../plli2XZ/perl-5.8.0@26454/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pzoOIYJ/perl-5.8.0@26465/bin/perl----
+N/A
+
+----EOF ($?='0')----
+Need a perl between 26454 and 26465
+(but 26455, 26456, 26457, 26458, 26459, 26460, 26461, 26462, 26463, 26464 could not successfully be used to build perl)
+No useable patch available between 26454 and 26465
+Patches 26455, 26456, 26457, 26458, 26459, 26460, 26461, 26462, 26463, 26464 could not successfully be used to build perl
+
+
+2007-08-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Feature wish: cleanup by age regardless size
+
+	* Todo: remove RECENT-48:00::00.yaml, let the loop-over-recent script
+	run with PERL_MM_USE_DEFAULT, see that 5.6.2 is integrated.
+
+2007-08-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Test::Reporter 1.32 came out and my patch against 1.30 is still
+	needed:-(
+
+	* http://cpandeps.cantrell.org.uk/ dependency graph with test results
+	combined
+
+2007-08-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Data::Dump::Streamer 2.03 still a weird place to go. Yesterday I
+	posted at http://rt.cpan.org/Ticket/Display.html?id=28270 a quite clear
+	solution to the installation bug but nobody reacts.
+
+	After that I could start doing binary searches but they broke again and
+	again and gave wrong results. Last result looks interesting
+
+----Program----
+eval q{use Data::Dump::Streamer 2.03};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pDzbqZK/perl-5.8.0@29359/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pHzMH4R/perl-5.8.0@29360/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	reganch heavily involved. Yes, this is it. See
+	http://rt.cpan.org/Ticket/Display.html?id=25574.
+
+	* long standing bug in configure_requires only visible in the logfiles
+
+	logs/megainstall.20070{727T0705,730T1247,803T0330}.out
+
+	Somebody injects Apache::Cookie and somebody injects Apache::Request.
+	libapreq is untarred, configure_require hits and before it can resolve
+	things correctly configure_require_later is incremented a second time
+	and we panic.
+
+2007-08-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* example perls for the various $]?
+
+installed-perls/perl/pItJUYG/perl-5.7.3@16603/bin/perl    5.007003
+installed-perls/perl/p0IId7q/perl-5.8.0@17639/bin/perl    5.008
+installed-perls/perl/pocR0se/perl-5.8.0@22312/bin/perl    5.009
+installed-perls/perl/pqwklWx/perl-5.8.0@22491/bin/perl    5.009001
+installed-perls/perl/pF3yxpB/perl-5.8.0@24139/bin/perl    5.009002
+installed-perls/perl/pztoXzt/perl-5.8.0@27002/bin/perl    5.009003
+installed-perls/perl/p0fQi13/perl-5.8.0@28966/bin/perl    5.009004
+
+installed-perls/maint-5.8/pAyq3oR/perl-5.8.0@18352/bin/perl    5.008
+installed-perls/maint-5.8/pet10ji/perl-5.8.0@20939/bin/perl    5.008001
+installed-perls/maint-5.8/p4wjLcy/perl-5.8.0@22552/bin/perl    5.008003
+installed-perls/maint-5.8/pKwJ8yG/perl-5.8.0@23004/bin/perl    5.008004
+installed-perls/maint-5.8/pOrDlAM/perl-5.8.0@23390/bin/perl    5.008005
+installed-perls/maint-5.8/prOuseq/perl-5.8.0@24448/bin/perl    5.008006
+installed-perls/maint-5.8/pybSSNM/perl-5.8.0@26876/bin/perl    5.008007
+installed-perls/maint-5.8/pdHcRny/perl-5.8.0@31223/bin/perl    5.008008
+
+2007-07-31  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* NUFFIN/Catalyst-Plugin-Session-State-Cookie-0.07.tar.gz started to
+	fail on 2007-07-17 between bleadperl@31618 and ...20. 20 is already
+	deleted but we can compare with 23.
+
+	When I go back to 18 and try to install it again as distro then I get
+	the same failure.
+
+	http://rt.cpan.org/Ticket/Display.html?id=28574
+
+2007-07-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* libxml2 upgrade broke XML::LibXML but in a minor way so we can write a
+	distropref that skips one test
+
+	https://rt.cpan.org/Ticket/Display.html?id=27659
+
+2007-07-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* libwww fails now with a different error than a few days ago.
+
+	* make test fails on 30shell! Does it maybe have to do with LWP missing?
+	No. Recent changes to _reload_this() broke it. FIXED.
+
+	* Todo: help x should provide specific help for x
+
+	* Todo: run with CPAN::SQLite
+
+2007-07-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* CPAN::Reporter refresh
+
+----Program----
+eval q{use CPAN::Reporter 0.46};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pYGQKvE/perl-5.8.0@30867/bin/perl----
+N/A
+
+----EOF ($?='0')----
+----Output of .../pCVcKvs/perl-5.8.0@30868/bin/perl----
+GXBOK
+
+----EOF ($?='0')----
+
+----Program----
+eval q{use CPAN::Reporter 0.46};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pKsPB4G/perl-5.8.0@29544/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../p7dQLd3/perl-5.8.0@29545/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	
+2007-07-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bugreport
+
+cpan[7]> install Handel
+
+Recursive dependency detected:
+    Handel (have: N/A; want: 1.00003)
+ => CLACO/Handel-1.00003.tar.gz
+ => Handel::Storage::RDBO (have: N/A; requires: 1.00001)
+ => CLACO/Handel-Storage-RDBO-1.00001.tar.gz
+ => Handel (have: N/A; requires: 1.00000).
+Cannot resolve.
+
+	http://rt.cpan.org/Ticket/Display.html?id=28461
+
+2007-07-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* CPAN::Reporter fails tests around 30688 but afaik not on current
+	bleadperl. Who's to blame?
+
+	* TAP::Parser needs a binary search. 30265 OK, 31008 fails 030-grammar;
+
+	binsearchaperl --bounds 23023-99999 --apcdir /home/src/perl/repoperls/APC --prefix /home/src/perl/repoperls/installed-perls --prog tests/has-TAP-Parser.pl --prep tests/prep-TAP-Parser.pl --verbose -build
+
+	30676 is from Mar 22, 02:53 and works. I fear I must remove it to see if
+	it still works when freshly compiled.
+
+	http://groups.google.com/group/perl.perl5.porters/browse_thread/thread/2968145308e42c67/bd05f62142673f32
+	
+2007-07-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* CPAN::Unwind: 20070423T0905 saw the first time C<Couldn't get tarball
+	for perl from CPAN at
+	/home/sand/.cpan/build/CPAN-Unwind-0.04-DG5lge/blib/lib/CPAN/Unwind.pm
+	line 173>
+
+	http://rt.cpan.org/Ticket/Display.html?id=28426
+
+2007-07-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Devel::EvalContext-0.08 is chasing me again and I see it working with
+	27002. But Data-Alias-1.0[56] do not compile with e.g. 29487. Is an
+	older Data::Alias at backpan? Where is backpan nowadays?
+
+ftp://ftp.funet.fi/pub/languages/perl/backpan
+http://ftp.funet.fi/pub/languages/perl/backpan
+rsync://nic.funet.fi/backpan
+
+	YES! HERE it is:
+
+	http://ftp.funet.fi/pub/languages/perl/backpan/authors/id/X/XM/XMATH/Data-Alias-1.04.tar.gz
+
+	Here I conclude that I should mirror this directory and put the mirror
+	second in the urllist and put the backpan last in the list.
+
+	Then I need to see under which patchlevel I need to try with 1.04 and
+	rewrite the prep script.
+
+	Patchlevel 28990 does not compile 1.05 nor 1.0[432] but 1.01 OK. And
+	with 1.01 we get Devel::EvalContext OK.
+
+	blead			Data::Alias		Devel::EvalContext
+	27002			1.05 OK				0.08 OK
+	28966			1.05 OK				0.08 OK
+	28990			1.01 OK				0.08 OK
+	29487			1.01 OK				0.08 OK
+	30019			1.03 OK				0.08 OK
+	30646			1.03 OK				0.08 OK
+	30969			1.03 OK				0.08 OK
+	31061			1.04 OK				0.08 OK
+	31157			1.05 OK				0.08 OK
+	31251			1.05 OK				0.08 OK
+	31252			1.06 OK				NOT OK
+
+	http://rt.cpan.org/Ticket/Display.html?id=28425
+
+	It's really not a bleadperl problem.
+
+	* jumpqueue takes as arguments short arrayreferences. We must put some
+	aiming_at argument there containing get/make/test/install. Because we
+	will see configure_require dependencies that must be treated accordingly
+	when they only said get or make.
+
+2007-07-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* SVG-Metadata needs a binary search. I suspect pseudo hashes. Very ugly
+	result:
+
+----Program----
+eval q{use SVG::Metadata 0.28};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../p0IId7q/perl-5.8.0@17639/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pINt5Dc/perl-5.8.0@17705/bin/perl----
+N/A
+
+----EOF ($?='0')----
+Need a perl between 17639 and 17705
+(but 17641, 17642, 17644, 17654, 17655, 17656, 17671, 17672, 17673, 17674, 17675, 17676, 17677, 17678, 17679, 17680, 17681, 17682, 17683, 17684, 17685, 17686, 17687, 17688, 17689, 17690, 17691, 17692, 17693, 17694, 17695, 17696, 17697, 17698, 17699, 17700, 17701, 17702, 17703, 17704 could not successfully be used to build perl)
+No useable patch available between 17639 and 17705
+Patches 17641, 17642, 17644, 17654, 17655, 17656, 17671, 17672, 17673, 17674, 17675, 17676, 17677, 17678, 17679, 17680, 17681, 17682, 17683, 17684, 17685, 17686, 17687, 17688, 17689, 17690, 17691, 17692, 17693, 17694, 17695, 17696, 17697, 17698, 17699, 17700, 17701, 17702, 17703, 17704 could not successfully be used to build perl
+
+	pseudo hashes were extinct, when? 17725!
+
+	So it isn't a pseudo hash thing? well, 17705 failed because XML::Twig
+	was not working then. But when I 'force notest install XML::Twig', then
+	SVG::Metadata passes its tests.
+
+	Next round of binsearch with the fixed 17705. And then I had to find out
+	that SVG::Metadata does not declare its dependency on HTML::Entities and
+	had to install that manually into some involved perls and finally I got:
+
+----Program----
+eval q{use SVG::Metadata 0.28};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pjEfwQE/perl-5.8.0@17724/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pg7Kp5D/perl-5.8.0@17725/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+
+	* Assertion: Environment is being set during perl {Build,Makefile}.PL?
+
+	iow: is set_perl5lib called from within get or its deputies? Yes, in
+	line 7193 within make
+
+	* Idea: new option to cleanup the build_dir not by size but by age.
+
+	* Todo: with the new sendmail configuration I should retry if mailtools
+	work now. Which perl is good for that? Stock 5.8.8 should do and note
+	there is a 2.00_xx! For install I can configure back to using sudo. But
+	all testing should be done by sand because there is the reporter DB. So
+	this time I want to disable prefs? No, k installs, sand tests.
+
+	Yes, even with Test::Reporter 1.27 the mail from Mail::Send seems to
+	have been accepted for delivery (RJBS/Test-BinaryData-0.003.tar.gz). Now
+	with Test::Reporter 1.30 I tried KWILLIAMS/Path-Class-0.16.tar.gz. And
+	finally with MARKOV/MailTools-2.00_01.tar.gz I try
+	JROCKWAY/Directory-Scratch-0.12.tar.gz
+
+	Mails went out through sendmail.
+
+	Mailq is empty. But the mails did not come back to me on the
+	subscription address. Nor to Google
+	http://groups.google.com/group/perl.cpan.testers/topics?lnk=srg
+
+	Let me compare the 3 mails above with the last mail before that. It was
+	about BPAN. A bad one with Mail::Send:
+
+# egrep 'l6L5ZkbD030283' /var/log/mail.info
+Jul 21 07:35:46 k75 sendmail[30283]: l6L5ZkbD030283: from=sand, size=5897, class=0, nrcpts=1, msgid=<200707210535.l6L5ZkbD030283@k75.linux.bogus>, relay=sand@localhost
+Jul 21 07:35:46 k75 sm-mta[30284]: l6L5Zk0d030284: from=<sand@k75.linux.bogus>, size=6121, class=0, nrcpts=1, msgid=<200707210535.l6L5ZkbD030283@k75.linux.bogus>, proto=ESMTP, daemon=MSA, relay=localhost.localdomain [127.0.0.1]
+Jul 21 07:35:46 k75 sendmail[30283]: l6L5ZkbD030283: to=cpan-testers@perl.org, ctladdr=sand (1005/1005), delay=00:00:00, xdelay=00:00:00, mailer=relay, pri=35897, relay=[127.0.0.1] [127.0.0.1], dsn=2.0.0, stat=Sent (l6L5Zk0d030284 Message accepted for delivery)
+Jul 21 07:35:59 k75 sm-mta[30286]: l6L5Zk0d030284: to=<cpan-testers@perl.org>, ctladdr=<sand@k75.linux.bogus> (1005/1005), delay=00:00:13, xdelay=00:00:13, mailer=esmtp, pri=126121, relay=mx.develooper.com. [63.251.223.176], dsn=2.0.0, stat=Sent (Queued! 1184996159 qp 27112 <200707210535.l6L5ZkbD030283@k75.linux.bogus>)
+
+	And a good one with Net::SMTP:
+
+# egrep 'l6L5MQN5027327' /var/log/mail.info
+Jul 21 07:22:26 k75 sm-mta[27327]: l6L5MQN5027327: from=<andreas.koenig.gmwojprw@franz.ak.mind.de>, size=4884, class=0, nrcpts=1, msgid=<200707210522.l6L5MQN5027327@franz.ak.mind.de>, proto=ESMTP, daemon=MTA, relay=localhost.localdomain [127.0.0.1]
+Jul 21 07:22:39 k75 sm-mta[27329]: l6L5MQN5027327: to=<cpan-testers@perl.org>, delay=00:00:13, xdelay=00:00:12, mailer=esmtp, pri=124884, relay=mx.develooper.com. [63.251.223.176], dsn=2.0.0, stat=Sent (Queued! 1184995359 qp 21633 <200707210522.l6L5MQN5027327@franz.ak.mind.de>)
+
+
+	Too obvious. CPAN::Reporter or Test::Reporter is unable to set the from
+	address when switching to Mail::Send.
+
+	Stepping through the debugger. Test::Reporter::_mail_send line 344 sets
+	the From correctly. Later Mail::Send passes itself over to Mail::Mailer
+
+  DB<14> n
+Mail::Send::open(/usr/local/perl-5.8.8/lib/site_perl/5.8.8/Mail/Send.pm:57):
+57:         Mail::Mailer->new(@_)->open($self);
+DB<14> x \@_
+0  ARRAY(0x85b1c74)
+     empty array
+DB<15> x $self
+0  Mail::Send=HASH(0xbe3ac30)
+   'From' => ARRAY(0xbe3c75c)
+      0  'andreas.koenig.gmwojprw@franz.ak.mind.de'
+   'Subject' => ARRAY(0xbe3c7d4)
+      0  'PASS WebService-Mogo2-0.01 i686-linux-64int 2.6.14'
+   'To' => ARRAY(0xbe3a9e4)
+      0  'cpan-testers@perl.org'
+   'X-Reported-Via' => ARRAY(0xbe3be14)
+      0  'Test::Reporter 1.30, via CPAN::Reporter 0.46'
+
+	Aha. I have sendmail installed and despite Mail::Send and Mail::Mailer
+	carefully keep the $sender and $hdr intact, Mail::Mailer::sendmail
+	throws it away because it cannot handle it.
+
+	The documentation of Test::Reporter tells me that I can use
+	$tr->mail_send_args(['smtp']); perhaps. So let's try. With MailTool
+	2.00_01 I must write a bugreport that there is a syntax error.
+	http://rt.cpan.org/Ticket/Display.html?id=28411
+	With current version 1.77 there is a failure:
+
+Sending test report with 'pass' to cpan-testers@perl.org
+        (in cleanup) Undefined subroutine &Mail::Mailer::smtp::close called at /usr/local/perl-5.8.8/lib/site_perl/5.8.8/Mail/Mailer.pm line 204.
+Catching error: 'Undefined subroutine &Mail::Mailer::smtp::close called at /usr/local/perl-5.8.8/lib/site_perl/5.8.8/Mail/Mailer.pm line 133.
+        (in cleanup) Undefined subroutine &Mail::Mailer::smtp::close called at /usr/local/perl-5.8.8/lib/site_perl/5.8.8/Mail/Mailer.pm line 204.
+' at lib/CPAN.pm line 275
+        CPAN::shell() called at -e line 1
+
+	So maybe the mail was sent but it certainly was a die() before the
+	bookkeeping was done:-( No, from the logfile it seems there was no mail
+	sent at all.
+
+	So I try again with 2.00_01 and insert an "or" before the return to fix
+	the syntax. This dies without an error message.
+
+	So I come to the conclusion that I must fix Test::Reporter for me.
+
+	IS this all I need?
+
+  - use constant FAKE_NO_MAIL_SEND => 0;  # for debugging only
+  + use constant FAKE_NO_MAIL_SEND => 1;  # for debugging only
+
+	YES!
+
+2007-07-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: 'fforce get STAS/libapreq-1.33.tar.gz' runs into an endless loop.
+	All the configure_requires stuff is only working for "install", often
+	not for get/make/test. The first get must keep a record that it has
+	already tried the other get so it won't repeat this step.
+
+	And I saw "Panic: ..." from
+
+    $CPAN::Frontend->mydie("Panic: A prerequisite is not available, please investigate...");
+
+	and this is presumably the spot where I should look into
+	sponsored_modules (sp?)
+
+2007-07-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* http://rt.cpan.org/Ticket/Display.html?id=28369 about
+	WRW/Barcode-Code128-2.01.tar.gz
+
+	* http://rt.cpan.org/Ticket/Display.html?id=28370 about
+	CHROMATIC/Crypt-CipherSaber-1.00.tar.gz
+
+2007-07-17  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 0 E. [17-Jul 229: David Golden        ] Re: FAIL Module-Mask-0.03 i686-linux 2.4.27-3-686
+	
+	* binarysearch for J/U:r
+
+	23023 YAML::Syck
+	26015 YAML, Jifty::DBI
+	27939 
+	28005 Params::Validate, DateTime (P:V 0.86 broke at 27942)
+	28513 DateTime::Format::Strptime
+	29023 DateTime::Format::Strptime
+	29527 
+	
+
+	OMG, I see all the UNIVERSAL::require errors and then an "ok" so it gets
+	installed just to prove my testing pointless:-(
+
+	
+	30019 YAML::Syck
+
+
+	* UNIVERSAL::require and Jifty have some broken relationship. Maybe we
+	could run a binary search with a very limited test? The testsuite of
+	UNIVERSAL-require-0.11 has no issues with bleadperl but Jifty uses U:r
+	it in a way that fails since day X. t/00-load.t would do for the binary
+	search. Let's disable CPAN::Reporter and add the test/args:
+	TEST_FILES=t/00-load.t to the distroprefs file. And
+	cpanconfig/test_report: 0.
+
+	Not possible because Jifty-DBI-0.41 fails with 23023. And PASS 94 : FAIL
+	68 is not encouraging to continue with this test. Since 2007-06-29T20:11
+	I haven't seen a PASS for Jifty::DBI.
+
+	t/10schema.t    7  1792   147    7  16 20 27 33 39 45 51
+
+	But Jifty::DBI from SVN works, so we can adjust everything to 
+
+2007-07-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* off topic: working on Module::Build for "the corridor". Trying to
+	determine the exact boundaries of the corridor. The lower end is not
+	that hard to determine because binarysearch finds its way through the
+	area. But the upper boundary is slow because for some reason questions
+	are being asked by, e.g. 25125. Ah, it is within the corridor. 26003 is
+	outside. First broken perl is 23190, last one is....25414.
+
+	And running make test in SVN rev. 9738 with my fixes:
+
+	% for p in /usr/local/perl-5.6.2/bin/perl /usr/local/perl-5.8.[01378]/bin/perl /usr/local/perl-m-5.8.0@31162/bin/perl /home/src/perl/repoperls/installed-perls/perl/p*/perl-5.*@{23190,24139,25125,25414,31614}/bin/perl ; do
+$p Build.PL&&./Build test || break
+done
+
 2007-07-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Todo: investigate version.pm and Module::Build in the 23000-25000
@@ -122,6 +584,8 @@ Set::IntSpan::Fast             v1.0  1.000000  ANDYA/Set-IntSpan-Fast-v1.0.tar.g
 v1.0.0
 
 	I adjusted CPAN::Version to trim trailing ".0" (but keep one).
+
+	http://rt.cpan.org/Ticket/Display.html?id=28206
 
 2007-07-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
@@ -5111,7 +5575,7 @@ Module id = Verilog::Language
 
 	Does ./installperl not overwrite perl.h??? It does overwrite it.
 
-	CCACHE to blame? No CCACHE_DISABLE makes no difference.
+	CCACHE to blame? No, CCACHE_DISABLE makes no difference.
 
 	Something within Verilog must be broken too. It's a preprocessor. It may
 	parse header files and draw conclusions.

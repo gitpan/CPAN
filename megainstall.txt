@@ -18,6 +18,7 @@ Apache::HeavyCGI
 Apache::Request
 Apache::Session
 Apache::Session::Counted
+Apache::Status::DBI
 App::Ack
 App::CLI
 App::Info::Lib::Iconv
@@ -34,9 +35,9 @@ BSD::Resource
 BerkeleyDB
 Bit::Vector::Minimal
 BitTorrent
-Bot::CPAN
 Bundle::Encode
 Bundle::POE::IRC
+Bundle::POE::Simple::TCPIP::Services
 Bundle::Pause
 Bundle::Perl6
 Bundle::PerlPoint
@@ -59,8 +60,13 @@ CGI::Application::Plugin::Forward
 CGI::Session
 CGI::Untaint
 CPAN
+CPAN::Cache
+CPAN::Dependency
 CPAN::Checksums
+CPAN::IndexPod
+CPAN::Mini
 CPAN::Unwind
+CPAN::Site
 CPAN::YACSmoke
 CSS
 CSS::SAC
@@ -89,9 +95,15 @@ Catalyst::View::TT
 Chart::Math::Axis
 Chatbot::Eliza
 Class::Accessor
+Class::Accessor::Assert
+Class::Accessor::Class
+Class::Accessor::Lvalue
+Class::Accessor::Named
+Class::Accessor::Ref
 Class::AutoClass
 Class::Base
 Class::C3
+Class::C3::XS
 Class::DBI::AbstractSearch
 Class::DBI::AsForm
 Class::DBI::Pager
@@ -102,6 +114,7 @@ Class::Date
 Class::Factory
 Class::Fields
 Class::Gomor
+Class::Implements
 Class::Inner
 Class::InsideOut
 Class::Loader
@@ -179,7 +192,6 @@ DBIx::CopyRecord
 DBIx::DBSchema
 DBIx::ORM::Declarative
 DBIx::Perlish
-DBIx::ReportBuilder
 DBIx::SearchBuilder
 DBIx::Simple
 DBIx::Timeout
@@ -219,9 +231,11 @@ Devel::Caller
 Devel::Command
 Devel::Cover
 Devel::Cycle
+Devel::DProfLB
 Devel::Dependencies
 Devel::EvalContext
 Devel::FastProf
+Devel::GC::Helper
 Devel::Hide
 Devel::LexAlias
 Devel::Modlist
@@ -240,6 +254,8 @@ Devel::ebug::HTTP
 Digest::BubbleBabble
 Digest::MD2
 Digest::MD5
+Digest::Tiger
+Directory::Scratch
 DocSet
 ETL::Pequel
 Email::Address
@@ -261,7 +277,7 @@ Encode::JavaScript::UCS
 Encode::MAB2table
 Encode::MIME::Header
 Encode::compat
-Ernno
+Errno
 Error
 Event::ExecFlow
 Event::Lib
@@ -316,6 +332,7 @@ GD::SecurityImage
 GD::Text
 GIS::Distance
 GSSAPI
+Games::Bingo
 Geo::ShapeFile
 Geography::Countries
 Getopt::ArgvFile
@@ -355,8 +372,10 @@ HTML::Template::Compiled
 HTML::Tidy
 HTML::TokeParser::Simple
 HTML::TreeBuilder
+HTML::TreeBuilder::XPath
 HTML::Widget
 HTML::WikiConverter
+HTTP::GHTTP
 HTTP::BrowserDetect
 HTTP::Response::Encoding
 HTTP::Server::Simple
@@ -463,6 +482,7 @@ Math::Bezier::Convert
 Math::BigInt::FastCalc
 Math::BigInt::GMP
 Math::BigRat
+Math::Cephes
 Math::GMP
 Math::Geometry::Planar::GPC
 Math::Geometry::Planar::Offset
@@ -549,7 +569,6 @@ PDF::Extract
 PDF::FDF::Simple
 PDF::FromHTML
 PDF::Labels
-PDF::Maki
 PDF::Report
 PDF::ReportWriter
 PDF::Reuse
@@ -600,6 +619,7 @@ Plagger
 Pod::Find
 Pod::HtmlPsPdf
 Pod::LaTeX
+Pod::Manual
 Pod::POM::Web
 Pod::ParseUtils
 Pod::Parser
@@ -607,6 +627,8 @@ Pod::Pdf
 Pod::PerlPoint
 Pod::Sdf
 Pod::Select
+Pod::WikiDoc
+Pod::XML
 Pod::Xhtml
 PostScript::CDCover
 PostScript::Columns
@@ -614,7 +636,7 @@ PostScript::Document
 PostScript::EPSF
 PostScript::File
 PostScript::Font
-PostScript::Graph
+PostScript::Graph::Bar
 PostScript::MailLabels
 PostScript::Simple
 PostScript::Simple::Table
@@ -697,6 +719,7 @@ String::Multibyte
 String::Random
 String::ShellQuote
 String::Similarity
+String::Truncate
 Sub::Exporter
 Sub::Install
 Sub::Name
@@ -704,6 +727,7 @@ Sub::Override
 Sub::Uplevel
 Sys::Hostname
 Sys::SigAction
+TAP::Parser
 Taint::Util
 Task::CVSMonitor
 Task::Catalyst::Tutorial
@@ -724,6 +748,7 @@ Term::Prompt
 Term::ReadKey
 Term::ReadLine::Gnu
 Term::ReadLine::Perl
+Term::ReadPassword
 Term::Size
 Term::Size::Perl
 Term::Spinner
@@ -765,6 +790,7 @@ Text::Query
 Text::Quoted
 Text::RecordParser
 Text::Reform
+Text::Restructured
 Text::Roman
 Text::Shellwords
 Text::Table
@@ -790,8 +816,8 @@ Time::HiRes::Value
 Time::Period
 Time::Piece
 Time::UTC
-Tk::Font::Dialog
 Tk::FontDialog
+Tk::ObjEditor
 Tk::Pod
 Tk::TableMatrix
 Tk::Tree
@@ -835,6 +861,7 @@ Voting::Condorcet::RankedPairs
 WWW::Live365
 WWW::Monitor
 WWW::OpenSearch
+WWW::REST
 WWW::Scraper::ISBN::Record
 WWW::Search
 WWW::Shorten
@@ -878,7 +905,7 @@ XML::Tiny
 XML::Twig
 XML::Validator::Schema
 XML::XPathEngine
-XML::Xpath
+XML::XPath
 XSLoader
 YAML
 YAML::LibYAML

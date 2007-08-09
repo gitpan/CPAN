@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION @ISA $BUGHUNTING);
 use CPAN::Debug;
 use File::Basename ();
-$VERSION = sprintf "%.6f", substr(q$Rev: 1717 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2096 $,4)/1000000 + 5.4;
 # module is internal to CPAN.pm
 
 @ISA = qw(CPAN::Debug);
@@ -220,6 +220,11 @@ CPAN.pm needs either the external programs tar, gzip and bzip2
 installed. Can't continue.
 });
   }
+  my $tar_verb = "v";
+  if (defined $CPAN::Config->{tar_verbosity}) {
+    $tar_verb = $CPAN::Config->{tar_verbosity} eq "none" ? "" :
+        $CPAN::Config->{tar_verbosity};
+  }
   if ($prefer==1) { # 1 => external gzip+tar
     my($system);
     my $is_compressed = $self->gtest();
@@ -227,9 +232,9 @@ installed. Can't continue.
     if ($is_compressed) {
       my $command = CPAN::HandleConfig->safe_quote($self->{UNGZIPPRG});
       $system = qq{$command -dc }.
-          qq{< "$file" | $tarcommand xvf -};
+          qq{< "$file" | $tarcommand x${tar_verb}f -};
     } else {
-      $system = qq{$tarcommand xvf "$file"};
+      $system = qq{$tarcommand x${tar_verb}f "$file"};
     }
     if (system($system) != 0) {
       # people find the most curious tar binaries that cannot handle
@@ -245,7 +250,7 @@ installed. Can't continue.
         }
         $file = $ungzf;
       }
-      $system = qq{$tarcommand xvf "$file"};
+      $system = qq{$tarcommand x${tar_verb}f "$file"};
       $CPAN::Frontend->myprint(qq{Using Tar:$system:\n});
       if (system($system)==0) {
         $CPAN::Frontend->myprint(qq{Untarred $file successfully\n});
@@ -285,7 +290,9 @@ installed. Can't continue.
           $CPAN::Frontend->mydie("ALERT: Archive contains ".
                                  "illegal member [$af]");
         }
-        $CPAN::Frontend->myprint("$af\n");
+        if ($tar_verb eq "v" || $tar_verb eq "vv") {
+          $CPAN::Frontend->myprint("$af\n");
+        }
         push @af, $af;
         return if $CPAN::Signal;
       }

@@ -19,7 +19,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec ();
 use vars qw($VERSION $urllist);
-$VERSION = sprintf "%.6f", substr(q$Rev: 2015 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2096 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -442,6 +442,12 @@ substitute. You can then revisit this dialog with
             $ans = prompt("What is your favorite shell?",$path);
             $CPAN::Config->{'shell'} = $ans;
         }
+    }
+
+    if (!$matcher or 'tar_verbosity' =~ /$matcher/) {
+        $CPAN::Frontend->myprint($prompts{tar_verbosity_intro});
+        my_prompt_loop(tar_verbosity => 'v', $matcher,
+                       'none|v|vv');
     }
 
     #
@@ -1072,9 +1078,9 @@ First of all, I\'d like to create this directory. Where?
 
 keep_source_where => qq{
 
-Unless you are accessing the CPAN via the filesystem directly CPAN.pm
-needs to keep the source files it downloads somewhere. Please supply a
-directory where the downloaded files are to be kept.},
+Unless you are accessing the CPAN on your filesystem via a file: URL,
+CPAN.pm needs to keep the source files it downloads somewhere. Please
+supply a directory where the downloaded files are to be kept.},
 
 build_cache_intro => qq{
 
@@ -1284,6 +1290,17 @@ the next generation installer Module::Build (MB) works with the
 Build.PL.
 
 },
+
+tar_verbosity_intro => qq{
+
+When CPAN.pm uses the tar command, which switch for the verbosity
+shall be used? Choose 'none' for quiet operation, 'v' for file
+name listing, 'vv' for full listing.
+
+},
+
+tar_verbosity =>
+qq{Tar command verbosity level (none or v or vv)?},
 
 prefer_installer =>
 qq{In case you could choose, which installer would you prefer (EUMM or MB)?},
