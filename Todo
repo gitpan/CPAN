@@ -1,3 +1,988 @@
+2007-09-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Strangely Tie::Cache fails on one bleadperl, 31854. Binary search
+	backwards is running. 31863 has it fixed again, maybe I need a binary
+	search forwards too.
+
+	----Program----
+	eval {require Tie::Cache};
+	print $@ ? "N/A" : "OK";
+	print "\n";
+
+	----Output of .../pOP4da9/perl-5.8.0@30730/bin/perl----
+	OK
+
+	----EOF ($?='0')----
+	----Output of .../p8QFKbX/perl-5.8.0@30740/bin/perl----
+	N/A
+
+	----EOF ($?='0')----
+	Need a perl between 30730 and 30740
+	No patch available between 30730 and 30740
+
+	----Program----
+	eval {require Tie::Cache};
+	print $@ ? "N/A" : "OK";
+	print "\n";
+
+	----Output of .../pz4RKIn/perl-5.8.0@31854/bin/perl----
+	N/A
+
+	----EOF ($?='0')----
+	----Output of .../pwjI8Em/perl-5.8.0@31855/bin/perl----
+	OK
+
+	----EOF ($?='0')----
+
+	30740 is sv_dup() and cache related but 31855 is NAN_COMPARE_BROKEN
+	related. Very strange.	
+
+2007-09-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* http://www.nntp.perl.org/group/perl.cpan.testers/
+
+	says that I tested 
+
+	PASS Acme-Pythonic-0.46 i686-linux-64int 2.6.16-2-k7 	1 message 	andreas.koenig.gmwojprw 	13:47
+
+	That seems to be the same as
+
+	23:00  * GumbyNET2 cpan.testers: PASS Acme-Pythonic-0.46 perl-5.6.2 
+          i686-linux-64int 2.6.16-2-k7 andreas.koenig.gmwojprw@franz.ak.mind.de
+
+	22060 22:47:11.7952 test PASS Acme-Pythonic-0.46 (perl-5.6.2) i686-linux-64int 2.6.16-2-k7
+
+	So we have 9 hours time shift.
+
+	* 23:16 <@klapperl> I see no showstopper in CPAN.pm.
+23:17 <@klapperl> I'll have a 1.91_54 by next weekend
+23:17 <@xdg> All high priority CPAN::Reporter features are in.  (E.g. duplicate 
+             report checks by phase)
+23:17 <@klapperl> and after a week we could roll 1.92
+23:17 <@xdg> Great!
+23:17 <@klapperl> great!
+
+	* tentative posting to Module::Build
+
+	Recently, on IRC (off the top of my head):
+
+	<klapperl>: so can you explain why the compatibility layer is broken?
+	<ewilhelm>: jeez, it is the *compatibility layer*
+
+	I think it's time that Module::Build considers another compatibility
+	layer in addition to the existing one. This is just a raw sketch to get
+	some talk going, I have not actually tried to work this out. So what
+	would people think of this:
+
+	Build.PL has a new option
+	    ...
+	    diplomatic_makefile_pl => 1,
+	    ...
+
+	generated Makefile.PL
+	    if (eval { require Module::Build; 1}){
+	      # if user has Module::Build installed we use it
+        system $^X, "Build.PL";
+	      write_diplomatic_makefile;
+	    } else {
+	      beg_user_to_install_module_build_asap();
+		    write_traditional_compat_makefile();
+	    }
+
+	the generated diplomatic Makefile would then contain:
+	    default:
+	      ./Build
+      test:
+	      ./Build test
+	    install
+	      ./Build install
+	    [...etc...]
+
+	Has this been tried? Does it have pitfalls? It seems so easy and
+	natural. Isn't anybody keen implementing it?
+
+	* switching back to EUMM for one smoke and then back to MB with the
+	distroprefs for MethodMaker which needs EUMM.
+
+2007-09-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* trying to summarize where Build.PL is inferior to Makefile.PL:
+
+	SCHWIGON/class-methodmaker/Class-MethodMaker-2.10.tar.gz
+	   (FLUFFY/Term-ProgressBar-2.09.tar.gz dependent)
+
+	Steffen seems to be the only one.
+
+	* ----Program----
+eval q{use autobox 1.10};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pAtHKhk/perl-5.8.0@25563/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pGuLryz/perl-5.8.0@25570/bin/perl----
+N/A
+
+----EOF ($?='0')----
+Need a perl between 25563 and 25570
+No patch available between 25563 and 25570
+
+
+	* the job with prefer_installer=MB has finished and this are the new fails:
+
+	new fails
+    ZOOLEIKA/RDF-Simple-0.3.tar.gz[64],
+	  SCHWIGON/class-methodmaker/Class-MethodMaker-2.10.tar.gz[170],
+	  FLORA/Net-SSLeay-1.32.tar.gz[376],
+	  SULLR/IO-Socket-SSL-1.08.tar.gz[377],
+	  AWESTHOLM/Net-SMTP-TLS-0.12.tar.gz[378],
+	  HIROSE/Net-SSL-ExpireDate-1.04.tar.gz[518],
+	  JASONK/Business-OnlinePayment-2.01.tar.gz[933],
+	  JESSE/GnuPG-Interface-0.36.tar.gz[949],
+	  SCHWIGON/pdf-fdf-simple/PDF-FDF-Simple-0.11.tar.gz[1058],
+	  JPEACOCK/SVN-Notify-Mirror-0.03603.tar.gz[1088],
+	  FLORA/Catalyst-View-Mason-0.13.tar.gz[1169],
+	  APOCAL/POE-Component-SSLify-0.08.tar.gz[1226],
+	  NUFFIN/Catalyst-Plugin-Session-State-Cookie-0.07.tar.gz[1263],
+	  DKAMHOLZ/Catalyst-Plugin-Authentication-Store-DBIC-0.07.tar.gz[1264],
+	  JROCKWAY/Task-Catalyst-Tutorial-0.03.tar.gz[1270],
+	  FLUFFY/Term-ProgressBar-2.09.tar.gz[1273],
+	  MARKOV/XML-Compile-0.53.tar.gz[1276],
+	  MWS/ResourcePool-1.0104.tar.gz[1282],
+	  CHROMATIC/Crypt-CipherSaber-1.00.tar.gz[1293]
+
+	Some problems of a different kind with these, they were either not
+	processed at all or the logfile parser did not find them:
+
+	gone
+    /home/src/perl/cpan-sql-stuff/CPAN-SQLite/.,
+	  ADAMK/Chart-Math-Axis-1.00.tar.gz,
+	  AGRUNDMA/Catalyst-Engine-Apache-1.11.tar.gz,
+	  ANDYA/Perl-Version-v1.000.tar.gz,
+	  BRICAS/Catalyst-Plugin-I18N-0.06.tar.gz,
+	  DKAMHOLZ/Authen-Htpasswd-0.16.tar.gz,
+	  DKAMHOLZ/Catalyst-Plugin-Authentication-Store-Htpasswd-0.02.tar.gz,
+	  DMAKI/DateTime-Util-Astro-0.08.tar.gz,
+	  DOWENS/JSON-DWIW-0.13.tar.gz,
+	  DROLSKY/HTML-Mason-1.36.tar.gz,
+	  ESSKAR/Catalyst-Plugin-Session-Store-File-0.10.tar.gz,
+	  FDALY/Test-Deep-0.097.tar.gz,
+	  GAAS/Array-RefElem-1.00.tar.gz,
+	  HOLOWAY/Catalyst-Log-Log4perl-1.00.tar.gz,
+	  JCAMACHO/Catalyst-Controller-FormBuilder-0.04.tar.gz,
+	  JDHEDDEN/Object-InsideOut-3.21.tar.gz,
+	  JURACH/FCGI-ProcManager-0.17.tar.gz,
+	  MARKOV/XML-Compile-0.52.tar.gz,
+	  MRAMBERG/Catalyst-Plugin-Prototype-1.33.tar.gz,
+	  MSCHWERN/Class-Fields-0.202.tar.gz,
+	  NODINE/Text-ASCIIMathML-0.3.tar.gz,
+	  NUFFIN/Catalyst-Controller-BindLex-0.03.tar.gz,
+	  NUFFIN/Catalyst-Plugin-Session-State-URI-0.07.tar.gz,
+	  NWIGER/CGI-FormBuilder-3.0501.tgz,
+	  SKIMO/FCGI-0.67.tar.gz
+
+
+2007-09-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* ooooops:
+
+   ----- The following addresses had permanent fatal errors -----
+<cpan-testers@perl.org>
+    (reason: 550 sorry, your envelope sender is in my badmailfrom list)
+
+	So my last 1842 reports have not been accepted by cpantesters:-(
+
+	* how do ~/.cpanreporter/history.db and ~/.cpanreporter/reports-sent.db sync?
+
+	* Todo/Bug: Alzabo-GUI-Mason runs into endless loops during its dialog with me.
+	Some directory doesn't exist, it says.
+
+2007-09-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* I just set prefer_installer=MB after @31806 finished. I promised that
+	on IRC#toolchain to ewilhelm, need to report after the next smoke.
+	Schwern made it a ticket:
+	http://rt.cpan.org/Ticket/Display.html?id=29235
+
+	* sorry for the German. This is a bugreport from Slaven decribing that
+	eexpect/anyorder is slower than necessary, sometimes annoyingly slow. I
+	confirm and we tried to hash out solutions.
+
+	>>>>> On 21 Jul 2007 16:01:21 +0200, Slaven Rezic <slaven@rezic.de> said:
+
+ >> > Lösungsvorschläge: der Output wird solange gesammelt, bis es einen
+ >> > Match gibt. Dann wird der Match ausgeführt und der bisherige Output
+ >> > weggeschmissen (aber was ist, wenn der Output auch schon was vom
+ >> > nächsten Match enthält?). Oder du baust aus allen Regexpes ein großes
+ >> > per "(" . join("|", grep { $i++%2==0 } @talk) . ")" und fütterst -re
+ >> > damit?
+ >> 
+ >> Noch gefaellt mir der Vorschlag nicht, aber ich glaube, wir kommen der
+ >> Sache naeher.
+
+  > Wieso eigentlich?
+
+Sorry, ich habe keinen wirklicher Grund, reines Bauchgefuehl, dass ich
+die Konsequenzen nicht ueberblicken kann.
+
+  > Der letzte Vorschlag könnte gut funktionieren, weil
+  > dadurch _run_via_expect_anyorder und _run_via_expect_deterministic
+  > ähnlicher werden: im ersten Fall gibt es einen Match gegen alle
+  > Patterns, im zweiten Fall einen Match gegen genau ein Pattern.
+
+Man sollte auch in Betracht ziehen, was einem Expect selbst fuer
+diesen Fall anbietet. Man kann ja alle Regexes gleichzeitig ins Rennen
+schmeissen. Irgendwie. So richtig habe ich es damals nicht verstanden,
+wie es geht.
+
+ >> Das muesste gehen: wir setzen das Timeout auf eine Viertel Sekunde
+ >> oder so. Wenn wir nicht matchen, geben wir erstmal *nicht* auf,
+ >> sondern kumulieren. Wenn wir eine gewisse Menge Timeout nichts mehr
+ >> erhalten haben und noch immer nicht matchen, geben wir auf. Ansonsten
+ >> wie bisher.
+ >> 
+ >> Irgendwie klingt das zu einfach, um wahr zu sein. Aber ich glaube, das
+ >> ist's, was wir beide wollen, und ich sehe keinen Nachteil.
+ >> 
+
+  > Ich werd's dann versuchen. Ich habe jetzt übrigens timeout:1 gesetzt,
+  > das macht die Sache einigermaßen erträglich.
+
+
+2007-09-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: somebody broke *.bs files with crap content recently. Leads to
+	tons of error messages with no (?) consequences but screen noise. I
+	removed all these broken *.bs files but now I have no idea where they
+	were coming from. Too much smoking produces too thick air.
+
+	Mark Overmeer just complained about the resulting smoke reports. When I
+	look into my mailq I find only two large mails waiting for delivery, all
+	others are fine. So how do I find out who wrote these files?
+
+	I first remove the crap in my mailq. Done, so we have only 235 mails in
+	the mqueue which look OK. For the record, the following are the latest
+	smokes (but their dependencies naturally missing). All times CEST. At
+	21:27 we had already a broken system.
+
+	Fri Sep  7 02:55:57 2007 JOHANL/Devel-PerlySense-0.01_11.tar.gz
+  Fri Sep  7 02:11:40 2007 LUKEC/Socialtext-Resting-RSS-0.01.tar.gz
+  Fri Sep  7 01:47:30 2007 JOHANL/Devel-PerlySense-0.01_10.tar.gz
+  Fri Sep  7 00:19:12 2007 JUERD/Unicode-Semantics-1.02.tar.gz
+  Thu Sep  6 23:48:44 2007 TOBY/Geo-Coordinates-OSGB-2.01.tar.gz
+  Thu Sep  6 23:48:32 2007 FDALY/Test-Deep-0.098.tar.gz
+  Thu Sep  6 23:38:13 2007 CORION/HTML-Display-0.38.tar.gz
+  Thu Sep  6 22:26:16 2007 REEDFISH/Net-FullAuto-0.03.tar.gz
+  Thu Sep  6 22:15:57 2007 EMORGAN/MyLibrary-3.0.4.tar.gz
+  Thu Sep  6 21:58:05 2007 SLANNING/Ogre-0.24.tar.gz
+  Thu Sep  6 21:43:59 2007 AGRUNDMA/POE-Filter-Slim-CLI-0.01.tar.gz
+  Thu Sep  6 21:27:22 2007 MARKOV/XML-Compile-0.53.tar.gz
+  Thu Sep  6 21:15:48 2007 ATOURBIN/rpm-build-perl-0.6.4.tar.gz
+  Thu Sep  6 20:13:56 2007 REEDFISH/Net-FullAuto-0.02.tar.gz
+  Thu Sep  6 18:38:06 2007 KEN/XML-XML2JSON-0.02.tar.gz
+  Thu Sep  6 18:32:48 2007 REEDFISH/Net-FullAuto-0.01.tar.gz
+  Thu Sep  6 18:28:47 2007 PERNST/Bio-Emboss-5.0.0.1.tar.gz
+  Thu Sep  6 18:23:26 2007 DROLSKY/HTML-Mason-1.37.tar.gz
+  Thu Sep  6 17:47:59 2007 PANGJ/IP-ChinaISP-0.02.tgz
+  Thu Sep  6 17:01:12 2007 CASIANO/GRID-Machine-0.077.tar.gz
+  Thu Sep  6 15:56:48 2007 JQUELIN/Tk-RotatingGauge-0.02.tar.gz
+  Thu Sep  6 13:04:21 2007 JQUELIN/Tk-RotatingGauge-0.01.tar.gz
+  Thu Sep  6 13:02:55 2007 ASH/WWW-Mechanize-TreeBuilder-1.00002.tar.gz
+  Thu Sep  6 12:51:19 2007 BINGOS/POE-Component-Server-DNS-0.12.tar.gz
+  Thu Sep  6 12:43:31 2007 LDS/Bio-Das-1.06.tar.gz
+  Thu Sep  6 12:25:40 2007 GCERRAI/Package-Data-Inheritable-0.02.tar.gz
+  Thu Sep  6 12:24:07 2007 LDS/Bio-Das-1.05.tar.gz
+  Thu Sep  6 12:10:02 2007 CASIANO/GRID-Machine-0.076.tar.gz
+  Thu Sep  6 11:44:38 2007 SMUELLER/Math-ConvexHull-1.02.tar.gz
+  Thu Sep  6 11:10:25 2007 CASIANO/GRID-Machine-0.075.tar.gz
+  Thu Sep  6 11:05:08 2007 GCERRAI/Package-Data-Inheritable-0.01.tar.gz
+  Thu Sep  6 10:56:06 2007 DESPAIR/Net-Whois-Raw-1.31.tar.gz
+  Thu Sep  6 10:13:05 2007 PJF/IPC-System-Simple-0.06.tar.gz
+  Thu Sep  6 08:46:02 2007 DESPAIR/Net-Domain-ExpireDate-0.80.tar.gz
+  Thu Sep  6 08:45:50 2007 DESPAIR/Net-Whois-Raw-1.30.tar.gz
+  Thu Sep  6 07:45:11 2007 CDOLAN/Net-IP-Match-Regexp-1.00.tar.gz
+  Thu Sep  6 06:14:23 2007 JMADLER/Acme-LeetSpeak-0.01.tar.gz
+  Thu Sep  6 06:05:20 2007 MKANAT/VCI-0.1.0_3.tar.gz
+  Thu Sep  6 04:39:33 2007 TURNERJW/Tk-TextHighlight-1.0.2.tar.gz
+  Thu Sep  6 03:12:29 2007 PANGJ/IP-ChinaISP.tgz
+  Thu Sep  6 02:42:05 2007 JOHANL/Devel-PerlySense-0.01_09.tar.gz
+  Thu Sep  6 02:16:41 2007 JOHANL/Devel-PerlySense-0.01_08.tar.gz
+  Thu Sep  6 00:48:24 2007 DAGOLDEN/CPAN-Reporter-0.99_07.tar.gz
+  Wed Sep  5 23:52:49 2007 DDICK/Net-DNS-DynDNS-0.95.tar.gz
+  Wed Sep  5 23:42:30 2007 CHRMUE/Socket-Class-1.1.0.tar.gz
+  Wed Sep  5 23:09:40 2007 PAJOUT/XML-Trivial-0.02.tar.gz
+  Wed Sep  5 23:08:13 2007 DAGOLDEN/CPAN-Reporter-0.99_06.tar.gz
+  Wed Sep  5 22:57:54 2007 DSNOPEK/POE-Component-MessageQueue-0.1.6.tar.gz
+  Wed Sep  5 21:33:13 2007 CORION/HTML-Display-0.37.tar.gz
+  Wed Sep  5 21:18:01 2007 KEN/XML-XML2JSON-0.01.tar.gz
+  Wed Sep  5 21:16:35 2007 GWYN/Text-Diff-Parser-0.07.tar.gz
+  Wed Sep  5 19:33:12 2007 BINGOS/POE-Component-Server-DNS-0.11.tar.gz
+  Wed Sep  5 19:15:18 2007 ALEXMASS/InSilicoSpectro-Databanks-0.0.21.tar.gz
+  Wed Sep  5 18:29:47 2007 BLBLACK/POE-Loop-Event_Lib-0.001_01.tar.gz
+  Wed Sep  5 17:27:54 2007 SMUELLER/Archive-Unzip-Burst-0.02_01.tar.gz
+  Wed Sep  5 17:17:35 2007 URKLE/DJabberd-VCard-LDAP-0.03.tar.gz
+  Wed Sep  5 17:07:16 2007 KARJALA/MyXML/XML-MyXML-0.0985.tar.gz
+  Wed Sep  5 16:10:25 2007 ISAAC/Business-PayPal-EWP-1.00.tar.gz
+  Wed Sep  5 16:03:54 2007 DGL/Net-CouchDb-0.01.tar.gz
+  Wed Sep  5 15:47:17 2007 JDHEDDEN/threads-shared-1.13.tar.gz
+  Wed Sep  5 15:38:10 2007 ISAAC/Business-PayPal-EWP-0.03.tar.gz
+  Wed Sep  5 15:22:47 2007 JDHEDDEN/threads-1.65.tar.gz
+  Wed Sep  5 15:18:46 2007 JSCHNEID/DBIx-ORM-Declarative-0.21.tar.gz
+  Wed Sep  5 14:55:53 2007 JSCHNEID/DBIx-ORM-Declarative-0.20.tar.gz
+  Wed Sep  5 14:48:06 2007 YAPPO/Class-Component-0.06.tar.gz
+  Wed Sep  5 14:25:13 2007 TBUSCH/Text-Scan-0.29.tar.gz
+
+
+	Here is still one of the broken bs file:
+
+-rw-rw-rw- 23942 sand sand 2217 Sep  6 22:09 /home/src/perl/repoperls/installed-perls/maint-5.8/pFrR8O4/perl-5.8.0@31223/lib/5.8.8/i686-linux-thread-multi-64int/auto/File/Glob/Glob.bs
+
+	And I find 163 identical *.bs files scattered all over the place with
+	the same timestamp. And they all start with
+
+/home/src/perl/repoperls/installed-perls/maint-5.8/p4wjLcy/perl-5.8.0@22552/lib/site_perl/5.8.3/i686-linux-thread-multi-64int/Data/Dump/Streamer.pm
+/home/src/perl/repoperls/installed-perls/maint-5.8/p4wjLcy/perl-5.8.0@22552/lib/site_perl/5.8.3/i686-linux-thread-multi-64int/Data/Dump/Streamer/_/Printers.pm
+/home/src/perl/repoperls/installed-perls/maint-5.8/p4wjLcy/perl-5.8.0@22552/lib/site_perl/5.8.3/i686-linux-thread-multi-64int/auto/Data/Dump/Streamer/Streamer.bs
+/home/src/perl/repoperls/installed-perls/maint-5.8/p4wjLcy/perl-5.8.0@22552/lib/site_perl/5.8.3/i686-linux-thread-multi-64int/auto/Data/Dump/Streamer/Streamer.so
+/home/src/perl/repoperls/installed-perls/maint-5.8/p4wjLcy/perl-5.8.0@22552/man/man3/Data::Dump::Streamer.3
+/home/src/perl/repoperls/installed-perls/maint-5.8/pFrR8O4/perl-5.8.0@31223/lib/site_perl/5.8.8/i686-linux-thread-multi-64int/Data/Dump/Streamer.pm
+/home/src/perl/repoperls/installed-perls/maint-5.8/pFrR8O4/perl-5.8.0@31223/lib/site_perl/5.8.8/i686-linux-thread-multi-64int/Data/Dump/Streamer/_/Printers.pm
+/home/src/perl/repoperls/installed-perls/maint-5.8/pFrR8O4/perl-5.8.0@31223/lib/site_perl/5.8.8/i686-linux-thread-multi-64int/auto/Data/Dump/Streamer/Streamer.bs
+/home/src/perl/repoperls/installed-perls/maint-5.8/pFrR8O4/perl-5.8.0@31223/lib/site_perl/5.8.8/i686-linux-thread-multi-64int/auto/Data/Dump/Streamer/Streamer.so
+[...]
+
+	What was smoking with 31223 at 22:09? I just searched for my reports on
+	rpm-build-perl on http://www.nntp.perl.org/group/perl.cpan.testers/ and
+	they seem to be fine.
+
+	In my eyes there is only one candidate at the moment: DDS.
+
+	In the meantime Max Maischain (CORION) complained as well.
+
+	Update 2007-09-08: I just discovered that not only the 10 perls were
+	broken that I'm using to smoke but many, many others as well. The
+	timestamp of the file is 2007-09-06T22:09, they have 2217 bytes and have
+	the same md5sum and although I have already deleted plenty of them I
+	still count 22049 of these files. Somebody was really busy.
+
+	Hrm. Now I have a suspect. My trimtrees is most likely to blame. These
+	files will have the same inode and somebody only changed one random
+	zero-byte file without unlinking it first and all this happened. Yes?
+	Indeed, the inode is 1855345.
+
+	So I'll have to fix trimtrees:-(
+	
+2007-09-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Something broke my parser for the output of the test runs.
+	residuum.yml are the unparsed lines. Ahhh, it's the new //hint// line.
+	FIXED.
+
+% ls -l logs/megainstall.200709*.d/residuum.yml
+-rw-rw-r-- 1 sand sand   86009 Sep  1 08:05 logs/megainstall.20070901T0114.d/residuum.yml
+-rw-rw-r-- 1 sand sand   84530 Sep  1 23:34 logs/megainstall.20070901T1206.d/residuum.yml
+-rw-rw-r-- 1 sand sand   71977 Sep  3 03:48 logs/megainstall.20070902T1240.d/residuum.yml
+-rw-rw-r-- 1 sand sand 4168125 Sep  5 13:18 logs/megainstall.20070905T0107.d/residuum.yml
+-rw-rw-r-- 1 sand sand 4307567 Sep  6 03:28 logs/megainstall.20070905T1716.d/residuum.yml
+
+2007-09-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug in Pod::XXX: when writing manpage for
+	TOBY/Geo-Coordinates-OSGB-2.00.tar.gz there is a pm file with 11 MB.
+	Some perls do that without hesitating but others (and they seem to be
+	the more recent ones) never seem to finish.
+
+2007-09-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: with a Makefile.PL that has a timestamp in the future, we cannot
+	proceed very far. Because the generated Makefile will be outdated.
+	Likewise with all other files in a distro.
+
+	* Todo: config option to enable code refs in YAML. (LoadCode)
+	        rafl: DONE
+
+2007-08-30  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* hashed out on the bus with anonymous, how the endless loop of RECENT
+	testing shall look like: one never dying job produces POE sessions that
+	shall test some distro with some perl. This queue is always keeping two
+	or three jobs active in parallel and watches stdout+stderr. If for more
+	than 10 minutes no output is produced the job gets a SIGSTOP and it is
+	moved to the unlimited(?) heap of hangers and the next job from the
+	queue is made active. Somebody provides us an interface to send stdin to
+	one of the hangers. As soon as this is done that job gets queued again
+	and is not considered a hanger anymore. The queuerunner will then send
+	it a SIGCONT to activate it. Somebody provides us an interface to list
+	all hangers, and one to show the output of one hanger.
+
+	http://gumbynet.org.uk/hackintro/
+	http://gumbynet.org.uk/hackathon/
+
+	* todo: commit bit for florian
+
+2007-08-29  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* bug from tina: new debian without gcc. Then install Bundle::CPAN and
+	it leads to the installation of a Compress::Zlib that does not work
+	because it was not compiled. (fakeroot/debootstrap?)
+
+2007-08-28  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* cpan-testers-discuss@perl.org list subscribe
+
+	* RECENT file: quartely/monthly/weekly/daily
+
+	* discussion list/bofs/david golden, foxson, barbie
+
+	* email headers/subject line ==> http upload ==> subscribe/unsubscribe
+	==> fail-safeness of email cannot be topped
+
+	* pita...
+
+	* BOF: Offline testing: Smoke needs a way to store the produced emails
+
+	* David Cantrell Feature request: every time I have no distroprefs and
+	have to answer some question, CPAN.pm should look over my sholder, record
+	the answers and write the according distroprefs file for me. Or
+	something.
+
+	* why did the tests not fail when windows 98 had no flock? Because
+	Expect was not installed, I think.
+
+	* off topic: get cable back from Ovid
+
+	* Todo: add FUSE stuff to megainstall.txt DONE
+
+2007-08-27  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* recap todos: 
+
+	jariaalto/28952: move gpg key import from Makefile.PL to FirstTime and
+	allow tight control over the gpg call itself.
+
+	adam kennedy: set XXX_VERSION
+
+	david cantrell: make verbosity controllable: $redef, myconfig, Lockfile,
+	PERL5LIB, DEL, scanning, scan_cache, ... This should probably be done
+	with some optprint method to make the call selfdocumenting. But that's
+	not the $Frontend's business. We must change
+	$CPAN::Frontend->myprint($what) to
+	CPAN::Shell->optprint(category,threshold,$what).
+
+	david cantrell: add a CPAN::API::HOWTO manpage DONE
+
+	Integrate cpan_home into the new FirstTime manpage.
+
+	differentiate what to download on which command: an 'a' or 'ls' needs
+	only authors index. see also "ttl".
+
+	RECENT file overhaul (see also bin/rsync-over-recentfile.pl)
+
+	demerphq wants time series on a regex analyzer. perl versions are in
+	regexec.filelog.gz (but they go back till perl @1; so I'll start with
+	27000 I presume), available perls are in
+	available-nonthr-debugging-perls.txt. DONE (still need to check the job
+	in into the tests repository)
+
+	cleanup build_dir by age regardless size and useable by non-interactive
+	users.
+
+	review Test::Reporter and see how the choice between Mail::Send and
+	Net::SMTP is implemented.
+
+	review CPAN::Reporter 0.4801.
+
+	BBC article about data::dump::streamer? No! Talk to Yves about it!
+
+2007-08-24  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* 24.8. 2 emails to answer about PAUSE and Adam Monsen.
+
+	* hr ================ no todos below this line ================ /hr
+
+	* hr ================ no todos below this line ================ /hr
+
+	* hr ================ no todos below this line ================ /hr
+
+	* it seems that make test fails on 30shell.t on bleadperl and succeeds
+	on maintperl and 5.8.6. :-(
+
+	It is about 'o conf init inactivity_timeout'. Test reproducble with
+	'make testshell-with-protocol'
+
+	5.8.6 on OSX succeeds
+	31162 (maint) succeeds
+	30481 fails
+	26727 (maint after installing Expect with sudo) fails somewhere else
+	26480 fails
+	23494 fails
+	23484 (maint after installing Expect with sudo) fails later (after 214)
+	20474 fails
+	17749 fails
+	16000 fails
+
+	I see: the test was expecting that histfile always sets histsize and
+	vice versa; this is no longer expected. Changing the test in 2148. FIXED
+
+	* demerphq writes (maybe same bug as RT 28915???):
+
+I was using the bleadperl version of cpan to install a module
+(B::Utils) and here is what I saw. The second ...... DONE line took a
+long time (more than a minute) to execute, makeing me wonder if it had
+crashed, but it finished eventually.
+
+Either File::Spec should be changed to not warn, or CPAN needs to be
+changed not to pass undef to File::Spec::Win32::catdir.
+
+Yves
+Ps: this output is what i see immediately after installing blead from
+rsync. I note that it doesnt require the CPAN config process that I
+would have expected.
+
+Yves
+
+cpan shell -- CPAN exploration and modules installation (v1.9102)
+ReadLine support available (maybe install Bundle::CPAN or Bundle::CPANxxl?)
+
+cpan[1]> install B::Utils
+CPAN: Storable loaded ok (v2.16)
+Going to read C:\perl\.cpan\Metadata
+  Database was generated on Thu, 01 Feb 2007 02:26:48 GMT
+Use of uninitialized value $_ in transliteration (tr///) at
+C:/perl/lib/File/Spec/Win32.pm line 141, <FIN> line 1.
+Use of uninitialized value $_ in pattern match (m//) at
+C:/perl/lib/File/Spec/Win32.pm line 143, <FIN> line 1.
+CPAN: Time::HiRes loaded ok (v1.9707)
+  LWP not available
+CPAN: Net::FTP loaded ok (v2.77)
+Fetching with Net::FTP:
+  ftp://cpan.etla.org/pub/CPAN/authors/01mailrc.txt.gz
+Going to read C:\perl\.cpan\sources\authors\01mailrc.txt.gz
+CPAN: Compress::Zlib loaded ok (v2.005)
+............................................................................DONE
+Use of uninitialized value $_ in transliteration (tr///) at
+C:/perl/lib/File/Spec/Win32.pm line 141.
+Use of uninitialized value $_ in pattern match (m//) at
+C:/perl/lib/File/Spec/Win32.pm line 143.
+  LWP not available
+Fetching with Net::FTP:
+  ftp://cpan.etla.org/pub/CPAN/modules/02packages.details.txt.gz
+Going to read C:\perl\.cpan\sources\modules\02packages.details.txt.gz
+  Database was generated on Thu, 23 Aug 2007 01:38:11 GMT
+  HTTP::Date not available
+............................................................................DONE
+Use of uninitialized value $_ in transliteration (tr///) at
+C:/perl/lib/File/Spec/Win32.pm line 141.
+Use of uninitialized value $_ in pattern match (m//) at
+C:/perl/lib/File/Spec/Win32.pm line 143.
+  LWP not available
+Fetching with Net::FTP:
+  ftp://cpan.etla.org/pub/CPAN/modules/03modlist.data.gz
+Going to read C:\perl\.cpan\sources\modules\03modlist.data.gz
+............................................................................DONE
+Going to write C:\perl\.cpan\Metadata
+Running install for module 'B::Utils'
+CPAN: Data::Dumper loaded ok (v2.121_14)
+'YAML' not installed, falling back to Data::Dumper and Storable to
+read prefs 'C:\perl\.cpan\prefs'
+Running make for J/JJ/JJORE/B-Utils-0.05.tar.gz
+  LWP not available
+Fetching with Net::FTP:
+  ftp://cpan.etla.org/pub/CPAN/authors/id/J/JJ/JJORE/B-Utils-0.05.tar.gz
+CPAN: Digest::SHA loaded ok (v5.45)
+  LWP not available
+Fetching with Net::FTP:
+  ftp://cpan.etla.org/pub/CPAN/authors/id/J/JJ/JJORE/CHECKSUMS
+Checksum for C:\perl\.cpan\sources\authors\id\J\JJ\JJORE\B-Utils-0.05.tar.gz ok
+Scanning cache C:\perl\.cpan\build for sizes
+............................................................................DONE
+B-Utils-0.05/
+B-Utils-0.05/MANIFEST
+B-Utils-0.05/META.yml
+B-Utils-0.05/t/
+B-Utils-0.05/t/02basic.t
+B-Utils-0.05/Changes
+B-Utils-0.05/README
+B-Utils-0.05/Makefile.PL
+B-Utils-0.05/lib/
+B-Utils-0.05/lib/B/
+B-Utils-0.05/lib/B/Utils.pm
+CPAN: File::Temp loaded ok (v0.18)
+Warning (usually harmless): 'YAML' not installed, will not store
+persistent state
+
+-- 
+perl -Mre=debug -e "/just|another|perl|hacker/"
+
+2007-08-23  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* JARIAALTO@cpan.org at http://rt.cpan.org/Ticket/Display.html?id=28952
+
+Consider this when installing the CPAN bundle:
+
+  Importing PAUSE public key into your GnuPG keychain... gpg: WARNING:
+using insecure memory!
+  gpg: please see http://www.gnupg.org/faq.html for more information
+  done!
+  (You may wish to trust it locally with 'gpg --lsign-key 450F89EC')
+  Checking if your kit is complete...
+  Looks good
+  Writing Makefile for CPAN
+
+SUGGESTION
+
+Not all people use one monolithing GPG keyring, so any automatic
+"imports" beyond user control is bad. Please don't automatically import
+any keys, but sugest the KEYID or present a gpg key fetch command to use.
+
+Here is an example of the typical use of multiple keyrings to separate
+keys according to their use:
+
+$ cat ~/.gnupg/gpg.conf
+keyring pubring-remailer.pgp
+keyring pubring-sw-development.pgp
+
+In this case the CPAN key would have been put into
+pubring-sw-development.pgp, but the CPAN installer script couldn't have
+known that.
+
+
+
+	* bartl writes in RT 28946:
+
+On Windows 98, with CPAN.pm 1.9102 (ActivePerl 5.8.8 build 822), the
+CPAN shell dies as soon as it's started up, with the error message:
+
+  flock() unimplemented on this platform at
+D:/programs/ActivePerl5.8/lib/CPAN.pm line 1015.
+
+That line looks like this:
+
+        while (!flock $fh, LOCK_EX|LOCK_NB) {
+
+(And there's another line pretty much like it on line 3397.)
+
+Ironically, before installing this version, I had done nmake test
+because I was expecting trouble, and all tests passed. So I don't think
+there is any test related to flock. (ActivePerl build 5.8.8 comes with
+this version of CPAN, I've had to downgrade because of this problem.)
+
+Among the versions that are still available on CPAN, the first version
+to contain flock calls is 1.90. The latest development release still has
+these same code lines in those areas, so I don't think the problem has
+been resolved yet.
+
+The problem does not exist on a more modern, NT based, version of
+Windows, like Windows XP.
+
+	* Schwern writes I should read RT 23735
+
+	summary: kane and adam have had discussions on some IRC channel about
+	how to cooperate and have decided on two environment variables that tell
+	the other process the rel2abs of the {Makefile,Build}.PL file and the
+	$VERSION. Where are the names? Something with _EXECUTING and _VERSION.
+
+	I downloaded CPANPLUS to see what's up. It seems it sets only
+	_EXECUTING. This is now also DONE for CPAN.pm.
+
+	* off topic: perlbuzz.com Skud and Andy
+
+2007-08-22  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* Todo: cleanup of the build directory must be possible from a
+	non-interactive command. Currently all batch jobs accumulate data in the
+	build directory and the first interactive user must then cleanup the
+	mess.
+
+	* RT 28915
+
+CPAN::HandleConfig::home does not handle a return of "undef" from
+File::HomeDir->my_data. In my particular network configuration this
+arises, causing CPAN to incorrectly ignore my ~/.cpan/CPAN/MyConfig.pm
+and try to run CPAN::FirstTime::init.  (I'm not sure why it does the
+latter, but that's not part of this bug report.)
+
+The details: CPAN is being invoked in a ssh session into an OS X box,
+which gets its user account information via NIS.  My account is
+"foreign" (i.e. not created on the Mac) and File::HomeDir->my_data()
+returns "undef" (which seems appropriate).
+
+Unfortunately, this causes CPAN::HandleConfig::load to ignore my
+existing ~/.cpan/CPAN/MyConfig.pm (as the path to it is now wrong) and
+to try to create a new one.  (It should be noted that
+CPAN::FirstTime::init uses a different algorithm to determine where the
+config file goes; it just uses $ENV{HOME}).
+
+The most obvious solution would be to check the return from
+File::HomeDir->my_data and if it is "undef" to fall back to using
+$ENV{HOME} or File::HomeDir->my_home.
+
+	* Bug: by adding 
+
+	CPAN::HandleConfig->load unless $CPAN::Config_loaded++;
+
+	in CPAN.pm line 1309 I break the whole test 30shell.t. Why? Recursion?
+
+	recurson protection added to load(). DONE.
+
+	* Todo: verbosity; tar_verbosity was a start and it had 'none', 'v', and
+	'vv' as options. load_module_verbosity could be 'none' or 'v'. I see no
+	sense in a 'vv' option. db_verbosity would cover too many things, maybe
+	load_index_verbosity?
+
+	We must give all kinds of noise a name and one or more verbosity levels.
+
+	That which is not our own noise must be delegated to the owner.
+
+	There is a very dirty spot in mydie: it mywarns and then die()s with
+	nothing but "\n" as argument.
+
+	This dirty spot shall not disturb us while working on verbosity. It is
+	not myprint's business at all.
+
+	See my mail to David Cantrell to understand what needs be done about
+	verbosity.
+
+cpan[1]> ls andk                                                                                                  
+Going to read /Users/k/.cpan/Metadata
+  Database was generated on Sat, 24 Mar 2007 07:10:12 GMT
+Going to read /Users/k/.cpan/build/
+............................................................................DONE
+Found 26 old builds, restored the state of 5
+  LWP not available
+Fetching with Net::FTP:
+  ftp://k75/pub/CPAN/authors/id/A/CHECKSUMS
+  Could not connect to host 'k75' with Net::FTP
+Fetching with Net::FTP
+  ftp://k75/pub/CPAN/authors/id/A/CHECKSUMS.gz
+  Could not connect to host 'k75' with Net::FTP
+
+Trying with "/usr/bin/curl -L -f -s -S --netrc-optional" to get
+    ftp://k75/pub/CPAN/authors/id/A/CHECKSUMS
+^C
+Trying with "/usr/bin/curl -L -f -s -S --netrc-optional" to get
+  ftp://k75/pub/CPAN/authors/id/A/CHECKSUMS.gz
+curl: (6) Couldn't resolve host 'k75'
+
+Trying with "/usr/bin/curl -L -f -s -S --netrc-optional" to get
+    ftp://k75/pub/CPAN/authors/id/A/CHECKSUMS
+curl: (6) Couldn't resolve host 'k75'
+
+Trying with "/usr/bin/curl -L -f -s -S --netrc-optional" to get
+  ftp://k75/pub/CPAN/authors/id/A/CHECKSUMS.gz
+curl: (6) Couldn't resolve host 'k75'
+^CCaught SIGINT, trying to continue
+
+As a last ressort we now switch to the external ftp command '/usr/bin/ftp'
+to get '/Users/k/.cpan/sources/authors/id/A/CHECKSUMS.tmp1178'.
+
+Doing so often leads to problems that are hard to diagnose.
+
+If you're victim of such problems, please consider unsetting the ftp
+config variable with
+
+    o conf ftp ""
+    o conf commit
+
+^CGot another SIGINT
+
+
+	* Todo: deprecate cvs_import.
+
+2007-08-21  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* Todo: From David Cantrell: Perfect, thanks!
+
+The only change to the code that I would ask for is that there be some
+way of turning off all the startup text and have it die() with a
+suitable message if something goes wrong, like ~/.cpan not being
+accessible.
+
+A HOWTO.pod with simple four or five line recipes showing how to write
+code for the basic functions should suffice as far as extra
+documentation goes.  I've attached the bare-bones of one.
+
+	=head1 NAME
+
+CPAN::API::HOWTO - a recipe book for programming with CPAN.pm
+
+=head1 RECIPES
+
+All of these recipes assume that you have put "use CPAN" at the top of
+your program.
+
+=head2 What distribution contains a particular module?
+
+    my $distribution = CPAN::Shell->expand(
+        "Module", "Data::UUID"
+    )->distribution()->pretty_id();
+
+This returns a string of the form "AUTHORID/TARBALL".  If you want the
+full path and filename to this distribution on a CPAN mirror, then it is
+C<.../authors/id/A/AU/AUTHORID/TARBALL>.
+
+=head2 What modules does a particular distribution contain?
+
+    CPAN::Index->reload();
+    my @modules = CPAN::Shell->expand(
+        "Distribution", "JHI/Graph-0.83.tar.gz"
+    )->containsmods();
+
+You may also refer to a distribution in the form A/AU/AUTHORID/TARBALL.
+
+=head1 SEE ALSO
+
+the main CPAN.pm documentation
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+blah blah blah
+
+=cut
+
+
+
+
+2007-08-18  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* Offline job?
+
+	CPAN::FirstTime manpage. DONE with one exception: cpan_home
+
+	help x. DONE
+
+	'o conf /slash/'. DONE
+
+	ask if we may try to connect to the internet DONE
+
+	differentiate what to download on which command.
+
+	'help TAB' should not start downloading index files. And should then not
+	offer all modules and Bundles. FIXED
+
+2007-08-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Test the recent file mechanism with very short timespans. See what
+	happens when the RECENT file contains no elements or one element. Maybe
+	one element must always be kept? Maybe we need a timestamp in the file?
+	Maybe the timestamp of the file must be taken into account?
+
+2007-08-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* I suspect that Net::FPing only works with threaded perls. Need to
+	investigate.
+
+2007-08-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* reminder about current operating center:
+
+	seconds:  perl ~k/sources/CPAN/SVK/trunk/bin/loop-over-recent.pl
+	   |                                     minutes:  tail -f ~sand/.cpanreporter/history.db
+     |                                        |          hours: watch -n 20 '~k/sources/CPAN/SVK/trunk/bin/recent.pl|head -n 23'
+     |                                        |                                        |
+     v                                        v                                        v
+
+	* long standing bug in configure_requires only visible in the logfiles
+
+	logs/megainstall.20070{727T0705,730T1247,803T0330,810T2248,812T0825}.out
+
+	Somebody injects Apache::Cookie and somebody injects Apache::Request.
+	Apache-DBI and Apache-Test have already been installed at this point.
+	libapreq is untarred, configure_require hits and before it can resolve
+	things correctly configure_require_later is incremented a second time
+	and we panic.
+
+	The number of modules installed before the bug happens is low:
+
+	perl -nle '$S{$1}++ if /Running make for ([\040-\177]+)/; END {
+   print map { "$_\n" } grep { $S{$_}==5 } keys %S;
+}' logs/megainstall.20070{727T0705,730T1247,803T0330,810T2248,812T0825}.out|wc -l
+50
+
+	Reading the list reveals nothing inspiring/obvious/spectacular. With
+	this tar command I can reproduce the state at the moment when the bug happened:
+
+	tar -xvz -C / -f ./installed-perls-perl-31701.tar.gz
+
+	But I need the command that reproduces it.
+
+	I thought of
+
+	rm -rf ~/.cpan/build/libapreq-1.33-* ~/.cpan/build/mod_perl-1.30-* ~/.cpan/build/Apache-*
+	rm -f /home/src/perl/repoperls/installed-perls/perl/pwRjjSU/perl-5.8.0@31701/lib/site_perl/5.9.5/Apache/DBI.pm /home/src/perl/repoperls/installed-perls/perl/pwRjjSU/perl-5.8.0@31701/lib/site_perl/5.9.5/i686-linux-64int/Apache/Test.pm
+
+	and then
+
+	cpan> install Apache::DBI Apache::Test Apache::Request
+
+	But this installs mod_perl just fine as it should.
+
+	With a variant of the one liner (bin/confreq_bug_logs.pl) we see more
+	clearly what's common to all these failing runs.
+
+2007-08-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* HTML::Parser 3.56 broken on my threaded maint perls due to failing threads
+	test. How come? Including debian perl. 3.55. tests OK.
+
+t/threads............Can't call method "join" on an undefined value at t/threads.t line 36.
+# Looks like your test died before it could output anything.
+t/threads............dubious                                                 
+        Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED test 1
+        Failed 1/1 tests, 0.00% okay
+
+	libwww mailing list is silent about this:-(
+
+	Hey, the same goes for DBI:
+
+t/05thrclone..............Can't call method "join" on an undefined value at t/05thrclone.t line 74.
+# Looks like you planned 43 tests but only ran 2.
+# Looks like your test died just after 2.
+dubious 
+        Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 3-43
+        Failed 41/43 tests, 4.65% okay
+
+	Trying to build threaded perl with maint@31223 FAILS!
+
+	Blead@31701 SAME!
+
+	Blead@28938 which I have built sometime in the past fails too.
+
+	Looks like '2007-07-24 20:09 libc6-i686.list' and that reboot mark an event.
+
+	I'll try gcc-3.4 next. Does not help
+
+	Google leads me to a posting of mine to cpantesters from May, 17 where
+	blead@31207 could not build DBI. Nothing that leads me to the real
+	cause.
+
+	Either I upgrade to libc6-2.6.1-1 or I ignore the issue. I ask apt-get
+	to upgrade and see very discouraging plans with lots of removals. So I
+	stop it. I ask aptitude to do it and it suggests to upgrade only these
+	four:
+
+	  libc6-xen libc6-i686 libc6-dev libc6 
+
+	without removing anything. This I prefer.
+
+	Without rebooting this doesn't help:
+
+t/op/getpid...................................................Thread creation fa
+iled: pthread_create returned 12 at op/getpid.t line 41.
+Can't call method "join" on an undefined value at op/getpid.t line 41.
+# Looks like you planned 3 tests but ran 1.
+FAILED--expected 3 tests, saw 1
+
+	It's probably a limit problem. root can run the test. But I changed
+	limits 4 months ago?! But you didn't leave any shell until recently.
+
+	What a stupidity. I set the stack to over a GB. Everything fixed now.
+	Unwind the stack now:)
+
 2007-08-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* is the output of perl Makefile.PL in the yml file now?
@@ -32,8 +1017,8 @@ Patches 26455, 26456, 26457, 26458, 26459, 26460, 26461, 26462, 26463, 26464 cou
 
 2007-08-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
-	* Test::Reporter 1.32 came out and my patch against 1.30 is still
-	needed:-(
+	* Test::Reporter 1.32 came out but switching between Mail::Send and
+	Net::SMTP is delayed till 1.34.
 
 	* http://cpandeps.cantrell.org.uk/ dependency graph with test results
 	combined
@@ -63,15 +1048,6 @@ N/A
 
 	reganch heavily involved. Yes, this is it. See
 	http://rt.cpan.org/Ticket/Display.html?id=25574.
-
-	* long standing bug in configure_requires only visible in the logfiles
-
-	logs/megainstall.20070{727T0705,730T1247,803T0330}.out
-
-	Somebody injects Apache::Cookie and somebody injects Apache::Request.
-	libapreq is untarred, configure_require hits and before it can resolve
-	things correctly configure_require_later is incremented a second time
-	and we panic.
 
 2007-08-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 

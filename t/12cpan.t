@@ -123,6 +123,57 @@ require CPAN::HandleConfig;
     }
 }
 
+{
+    my $this_block_count;
+    BEGIN { $count += $this_block_count = 8; }
+
+    eval { require YAML::Syck; };
+    if ($@ || (($YAML::Syck::VERSION||$YAML::Syck::VERSION||0) < 0.97)) { # silence 5.005_04
+        for (1..$this_block_count) {
+            ok(1);
+        }
+    } else {
+        my $yaml_file = _f('t/yaml_code.yml');
+
+        local $CPAN::Config->{yaml_module} = 'YAML::Syck';
+
+        {
+            my $data = CPAN->_yaml_loadfile($yaml_file)->[0];
+
+            local $::yaml_load_code_works = 0;
+
+            my $code = $data->{code};
+            is(ref $code, 'CODE', 'deserialisation returned CODE');
+            $code->();
+            is($::yaml_load_code_works, 0, 'running the code did the right thing');
+
+            my $obj = $data->{object};
+            isa_ok($obj, 'CPAN::DeferedCode');
+            local $^W;
+            my $dummy = "$obj";
+            is($::yaml_load_code_works, 0, 'stringifying the obj does nothing');
+        }
+
+        {
+            local $CPAN::Config->{yaml_load_code} = 1;
+
+            my $data = CPAN->_yaml_loadfile($yaml_file)->[0];
+
+            local $::yaml_load_code_works = 0;
+
+            my $code = $data->{code};
+            is(ref $code, 'CODE', 'deserialisation returned CODE');
+            $code->();
+            is($::yaml_load_code_works, 1, 'running the code did the right thing');
+
+            my $obj = $data->{object};
+            isa_ok($obj, 'CPAN::DeferedCode');
+            my $dummy = "$obj";
+            is($::yaml_load_code_works, 2, 'stringifying the obj ran the code');
+        }
+    }
+}
+
 BEGIN{plan tests => $count}
 
 # Local Variables:

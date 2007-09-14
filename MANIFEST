@@ -52,9 +52,11 @@ distroprefs/DBRIAN.XML-SimpleObject.yml
 distroprefs/DBROBINS.Net-SSH-Perl.yml
 distroprefs/DCONWAY.Parse-RecDescent.yml
 distroprefs/DDUMONT.Tk-ObjScanner.yml
+distroprefs/DISABLED.yml
 distroprefs/DJKERNEN.Mail-IMAPClient.yml
 distroprefs/DLAND.Crypt-SSLeay.yml
 distroprefs/DMAKI.DateTime-X.yml
+distroprefs/DMAKI.File-Extract.yml
 distroprefs/DMAKI.Xango.yml
 distroprefs/DOM.OpenGuides.yml
 distroprefs/DROLSKY.Alzabo.yml
@@ -104,6 +106,7 @@ distroprefs/JJORE.AI-Prolog.yml
 distroprefs/JJORE.Carp-Clan.yml
 distroprefs/JMASON.Mail-SpamAssassin.yml
 distroprefs/JMGDOC.OpenOffice-OODoc.yml
+distroprefs/JOHNL.DBD-Informix.yml
 distroprefs/JPEACOCK.SVN-Notify-Mirror.yml
 distroprefs/JPIERCE.IO-Pager.yml
 distroprefs/JPRIT.Event.yml
@@ -137,6 +140,7 @@ distroprefs/MIYAGAWA.Plagger.yml
 distroprefs/MIYAGAWA.XML-Atom.yml
 distroprefs/MJD.Devel-Trace.yml
 distroprefs/MJD.Text-Template.yml
+distroprefs/MJEVANS.DBD-ODBC.yml
 distroprefs/MLEHMANN.AnyEvent.yml
 distroprefs/MLEHMANN.Coro.yml
 distroprefs/MLEHMANN.IO-AIO.yml
@@ -198,6 +202,7 @@ distroprefs/SZABGAB.Spreadsheet-ParseExcel.yml
 distroprefs/TELS.Math-BigInt-GMP.yml
 distroprefs/TIMB.DBI.yml
 distroprefs/TKEEFER.Gantry.yml
+distroprefs/TODDR.Net-Jabber-Bot.yml
 distroprefs/TSCH.Cairo.yml
 distroprefs/TSCH.Gtk2.yml
 distroprefs/URI.File-Slurp.yml
@@ -214,7 +219,9 @@ inc/Test/Builder.pm
 inc/Test/More.pm
 lib/CPAN.pm
 lib/CPAN/Admin.pm
+lib/CPAN/API/HOWTO.pm
 lib/CPAN/Debug.pm
+lib/CPAN/DeferedCode.pm
 lib/CPAN/FirstTime.pm
 lib/CPAN/HandleConfig.pm
 lib/CPAN/Kwalify.pm
@@ -277,4 +284,5 @@ t/CPAN/TestConfig.pm
 t/CPAN/TestMirroredBy
 t/CPAN/TestPatch.txt
 t/local_utils.pm
+t/yaml_code.yml
 Todo

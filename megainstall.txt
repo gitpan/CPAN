@@ -12,7 +12,7 @@ AltaVista::BabelFish
 Alter
 Alzabo
 Apache
-Apache::AuthDBI
+Apache::DBI
 Apache::GuessCharset
 Apache::HeavyCGI
 Apache::Request
@@ -26,6 +26,7 @@ App::a2pdf
 AppConfig
 Archive::Zip
 Array::Iterator
+Array::Slice
 Audio::TagLib
 Authen::Simple
 AutoLoader
@@ -61,12 +62,12 @@ CGI::Session
 CGI::Untaint
 CPAN
 CPAN::Cache
-CPAN::Dependency
 CPAN::Checksums
+CPAN::Dependency
 CPAN::IndexPod
 CPAN::Mini
-CPAN::Unwind
 CPAN::Site
+CPAN::Unwind
 CPAN::YACSmoke
 CSS
 CSS::SAC
@@ -91,6 +92,7 @@ Catalyst::Plugin::Session
 Catalyst::Plugin::Static::Simple
 Catalyst::Plugin::Unicode
 Catalyst::Plugin::Unicode::Encoding
+Catalyst::View::Mason
 Catalyst::View::TT
 Chart::Math::Axis
 Chatbot::Eliza
@@ -185,6 +187,7 @@ DBD::Pg
 DBD::mysql
 DBI
 DBI::Shell
+DBIx::Admin::TableInfo
 DBIx::Class
 DBIx::Class::Indexed
 DBIx::Class::Validation
@@ -307,6 +310,7 @@ File::NFSLock
 File::Path
 File::Path::Expand
 File::Rsync
+File::RsyncP
 File::ShareDir
 File::Spec
 File::Spec::Functions
@@ -324,6 +328,7 @@ Font::TTF
 Font::TTFMetrics
 FormValidator::Simple
 FrameMaker::FromHTML
+Fuse
 GD
 GD::Barcode
 GD::Graph
@@ -332,6 +337,7 @@ GD::SecurityImage
 GD::Text
 GIS::Distance
 GSSAPI
+GTop
 Games::Bingo
 Geo::ShapeFile
 Geography::Countries
@@ -352,6 +358,7 @@ HTML::Clean
 HTML::Entities
 HTML::Entities::Numbered
 HTML::FillInForm
+HTML::FormFu
 HTML::FormatText
 HTML::Fraction
 HTML::FromText
@@ -375,8 +382,9 @@ HTML::TreeBuilder
 HTML::TreeBuilder::XPath
 HTML::Widget
 HTML::WikiConverter
-HTTP::GHTTP
 HTTP::BrowserDetect
+HTTP::GHTTP
+HTTP::RangeSaver
 HTTP::Response::Encoding
 HTTP::Server::Simple
 HTTP::Server::Simple::Mason
@@ -424,6 +432,7 @@ Jcode
 Jifty
 Kwiki
 LWP
+LWP::Authen::Negotiate
 LWP::Authen::Wsse
 LWP::Simple
 LWP::UserAgent
@@ -616,6 +625,7 @@ Perlbal
 Petal
 Petal::Utils
 Plagger
+Pod::Coverage::CountParents
 Pod::Find
 Pod::HtmlPsPdf
 Pod::LaTeX
@@ -651,8 +661,12 @@ RDF::Simple
 RPC::JSON
 RPC::XML
 RTF::HTMLConverter
+Regex::PreSuf
+Regexp::Assemble
+Regexp::List
 Regexp::Log
 Regexp::Shellish
+Regexp::Trie
 ResourcePool
 Return::Value
 Roman
@@ -730,6 +744,7 @@ Sys::SigAction
 TAP::Parser
 Taint::Util
 Task::CVSMonitor
+Task::Catalyst
 Task::Catalyst::Tutorial
 Task::Smoke
 Tcl
@@ -904,12 +919,13 @@ XML::Stream
 XML::Tiny
 XML::Twig
 XML::Validator::Schema
-XML::XPathEngine
 XML::XPath
+XML::XPathEngine
 XSLoader
 YAML
-YAML::LibYAML
+YAML::Syck
 YAML::Tiny
+YAML::XS
 Yahoo::Photos
 Yahoo::Search
 bignum
