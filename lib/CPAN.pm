@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.91_55';
+$CPAN::VERSION = '1.92';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -242,7 +242,7 @@ ReadLine support %s
         $_ = "$continuation$_" if $continuation;
         s/^\s+//;
         next SHELLCOMMAND if /^$/;
-        s/^\s*\?\s+/help /;
+        s/^\s*\?\s*/help /;
         if (/^(?:q(?:uit)?|bye|exit)$/i) {
             last SHELLCOMMAND;
         } elsif (s/\\$//s) {
@@ -4005,7 +4005,7 @@ I would like to connect to one of the following sites to get '%s':
                                          $file,
                                          join("",map { " ".$_->text."\n" } @CPAN::Defaultsites),
                                         );
-                my $answer = CPAN::Shell::colorable_makemaker_prompt("Is it OK to try to connect to the iternet?", "yes");
+                my $answer = CPAN::Shell::colorable_makemaker_prompt("Is it OK to try to connect to the Internet?", "yes");
                 if ($answer =~ /^y/i) {
                     $connect_to_internet_ok = 1;
                 } else {
@@ -12316,7 +12316,14 @@ You will most probably also want to configure something like this:
                     INSTALLSCRIPT=~/myperl/bin \
                     INSTALLBIN=~/myperl/bin"
 
-and then (oh joy) the equivalent command for Module::Build.
+and then (oh joy) the equivalent command for Module::Build. That would
+be
+
+  o conf mbuildpl_arg "--lib=~/myperl/lib \
+                    --installman1dir=~/myperl/man/man1 \
+                    --installman3dir=~/myperl/man/man3 \
+                    --installscript=~/myperl/bin \
+                    --installbin=~/myperl/bin"
 
 You can make this setting permanent like all C<o conf> settings with
 C<o conf commit> or by setting C<auto_commit> beforehand.
