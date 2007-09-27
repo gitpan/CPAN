@@ -1,14 +1,12 @@
 --- 
 comment: |
 
-    Currently does not work for me for cpantesters. For some reason
-    Test::Reporter does not set the From address when Mail::Send is
-    being used but does so when Net::SMTP is being used.
+  See ./DSKOLL.MIME-tools.yml for an explanation of the "depends" key.
 
-    update 2007-07-21: Found a way to disable Mail::Send in
-    Test::Reporter with a patch, so now I do not need to disable
-    MailTools anymore.
+  or http://rt.cpan.org/Ticket/Display.html?id=29598
 
 match:
-  distribution: "^MARKOV/MailTools-\d"
-# disabled: 1
+  distribution: "^MARKOV/MailTools-1\.\d"
+depends:
+  requires:
+    Date::Format: 0

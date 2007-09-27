@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92';
+$CPAN::VERSION = '1.9201';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -386,9 +386,11 @@ sub _flock {
     my($fh,$mode) = @_;
     if ($Config::Config{d_flock}) {
         return flock $fh, $mode;
-    } else {
+    } elsif (!$Have_warned->{"d_flock"}++) {
         $CPAN::Frontend->mywarn("Your OS does not support locking; continuing and ignoring all locking issues\n");
         $CPAN::Frontend->mysleep(5);
+        return 1;
+    } else {
         return 1;
     }
 }
@@ -2183,6 +2185,8 @@ sub reload {
                     "CPAN/HandleConfig.pm",
                     "CPAN/Kwalify.pm",
                     "CPAN/Queue.pm",
+                    "CPAN/Reporter/Config.pm",
+                    "CPAN/Reporter/History.pm",
                     "CPAN/Reporter.pm",
                     "CPAN/SQLite.pm",
                     "CPAN/Tarzip.pm",

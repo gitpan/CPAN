@@ -9,6 +9,7 @@ distroprefs/ABW.Template-Toolkit.dd
 distroprefs/ABW.Template-Toolkit.yml
 distroprefs/ACG.Scrabble-Dict.yml
 distroprefs/ADAMK.Chart-Math-Axis.yml
+distroprefs/ADAMK.Image-Delivery.yml
 distroprefs/ADAMK.Test-ClassAPI.yml
 distroprefs/ADAMK.Test-Inline.yml
 distroprefs/AMICHAUER.Unicode-Lite.yml
@@ -178,6 +179,7 @@ distroprefs/RDF.Clone.yml
 distroprefs/RGIERSIG.Expect.dd
 distroprefs/RGIERSIG.Expect.yml
 distroprefs/RHOOPER.HTTP-Lite.yml
+distroprefs/RIZEN.Config-JSON.yml
 distroprefs/RJBS.Data-UUID.yml
 distroprefs/RJBS.Email-Send.yml
 distroprefs/RJBS.MIME-Light.yml
@@ -201,9 +203,12 @@ distroprefs/STAS.libapreq.yml
 distroprefs/STEPANOV.IMDB-Film.yml
 distroprefs/STEVAN.Class-MOP.yml
 distroprefs/SZABGAB.Spreadsheet-ParseExcel.yml
+distroprefs/TBONE.HTTP-File.yml
 distroprefs/TELS.Math-BigInt-GMP.yml
+distroprefs/TIMB.Apache-Status-DBI.yml
 distroprefs/TIMB.DBI.yml
 distroprefs/TKEEFER.Gantry.yml
+distroprefs/TLOWERY.DBI-Shell.yml
 distroprefs/TODDR.Net-Jabber-Bot.yml
 distroprefs/TSCH.Cairo.yml
 distroprefs/TSCH.Gtk2.yml

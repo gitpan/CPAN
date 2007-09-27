@@ -414,6 +414,7 @@ IPC::Open2
 IPC::PubSub
 IPC::ShareLite
 Image::ANSI
+Image::Delivery
 Image::ExifTool
 Image::Info::SVG
 Image::Magick::Thumbnail
@@ -937,6 +938,7 @@ i18n
 interface
 mixin
 overload
+overload::eval
 re::engine::PCRE
 re::engine::POSIX
 re::engine::Plan9
