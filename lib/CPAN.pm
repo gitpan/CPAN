@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.9201';
+$CPAN::VERSION = '1.9202';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -7551,7 +7551,8 @@ is part of the perl-%s distribution. To install that, you need to run
                     $CPAN::Frontend->myprint($err);
                     $self->{writemakefile} = CPAN::Distrostatus->new("NO $err");
                     $@ = "";
-                    return;
+                    $self->store_persistent_state;
+                    return $self->goodbye("$system -- TIMED OUT");
                 }
             }
         } else {
@@ -7585,8 +7586,11 @@ is part of the perl-%s distribution. To install that, you need to run
             $self->{writemakefile} = CPAN::Distrostatus->new("YES");
             delete $self->{make_clean}; # if cleaned before, enable next
         } else {
+            my $makefile = $self->{modulebuild} ? "Build" : "Makefile";
             $self->{writemakefile} = CPAN::Distrostatus
-                ->new(qq{NO -- Unknown reason});
+                ->new(qq{NO -- No $makefile created});
+            $self->store_persistent_state;
+            return $self->goodbye("$system -- NO $makefile created");
         }
     }
     if ($CPAN::Signal) {
