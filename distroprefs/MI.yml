@@ -17,6 +17,7 @@ match:
     |AVAR/Bot-BB2-\d
     |AVAR/SMS-Send-IS-Vodafone-\d
     |AVIF/Time-Duration-\d
+    |AWWAIID/Continuity-\d
     |BLBLACK/Catalyst-Model-DBIC-Schema-\d
     |BLBLACK/Class-C3-\d
     |BLBLACK/DBIx-Class-Schema-Loader-\d
@@ -52,33 +53,39 @@ match:
     |DMAKI/XML-RSS-LibXML-\d
     |DMAKI/XML-RSS-Liberal-
     |DSNOPEK/POE-Component-MessageQueue-\d
-    |ELLIOTJS/Task-Perl-Critic-[v\d]
     |ELLIOTJS/Task-Perl-Critic-IncludingOptionalDepencencies-
+    |ELLIOTJS/Task-Perl-Critic-[v\d]
     |FLORA/Catalyst-View-Mason-\d
     |FOX/Bot-CPAN-\d
     |GAAL/Best-\d
     |GAAL/Class-Accessor-Ref-\d
     |GAAL/Class-Rebless-\d
+    |GAAL/Perl6-Take-\d
     |GAAL/Task-Smoke-\d
     |GRODITI/MooseX-Object-Pluggable-\d
     |GRUBER/IPC-Messaging-\d
+    |HANENKAMP/Bot-Net-\d
+    |HANENKAMP/Data-Remember-\d
+    |HANENKAMP/HTML-ParagraphSplit-\d
     |HANK/Catalyst-Plugin-Form-Processor-\d
     |HDP/KSx-IndexManager-\d
     |HIROSE/Net-SSL-ExpireDate-\d
     |HOLOWAY/Catalyst-Action-REST-\d
     |JAYK/Catalyst-Plugin-Authentication-Store-DBIx-Class-\d
     |JAYK/Catalyst-Plugin-Authentication-\d
+    |JCAMACHO/Catalyst-Controller-FormBuilder-\d
     |JESSE/Class-Accessor-Named-\d
     |JESSE/DBIx-SearchBuilder-\d
-    |JCAMACHO/Catalyst-Controller-FormBuilder-\d
     |JROCKWAY/Catalyst-Plugin-Unicode-\d
     |JROCKWAY/Directory-Scratch-\d
     |JROCKWAY/Task-Catalyst-Tutorial-\d
+    |JROCKWAY/Test-YAML-Valid
     |LBROCARD/Devel-ebug-HTTP-\d
     |LUKEC/Test-Mock-LWP-\d
     |LUKEC/Test-WWW-Selenium-\d
     |LUTETIUS/pod2book-\d
     |LYOKATO/FormValidator-Simple-\d
+    |LYOKATO/Pod-ProjectDocs-\d
     |MARKSTOS/Test-WWW-Selenium-CGIApp-\d
     |MITREHC/HoneyClient-Agent-\d
     |MITREHC/HoneyClient-Manager-\d
@@ -94,6 +101,7 @@ match:
     |MSTROUT/DBIx-Class-Cursor-Cached-\d
     |MSTROUT/DBIx-Class-\d
     |MSTROUT/Devel-REPL-\d
+    |NUFFIN/Catalyst-Plugin-Session-State-Cookie-\d
     |PERIGRIN/JSON-Any-\d
     |PHAYLON/namespace-clean-\d
     |REDTREE/PDF-API2-Simple-\d

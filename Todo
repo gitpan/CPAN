@@ -1,4 +1,1922 @@
+2007-11-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* what I want more than anything else before 5.10 is a list of all
+	modules that need patching or don't work.
+
+	A first approximation to the list that I really want would be a summary
+	of all BBC articles and the state they reached.
+
+	Shit, groups.google finds only 14 hits on "Bleadperl breaks CPAN" in a
+	narrow timeframe. So how do I find the older postings?
+
+	xray to the rescue: 373 hits on BBC. Now the list of affected modules.
+	"*" is for "not yet investigated". something else for "still relevant"
+	and "fixed"
+
+  Unsolved:
+    BRYCE/SVG-Metadata-0.28.tar.gz                    http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-07/msg00996.html
+    DMAKI/File-MMagic-XS-0.09002.tar.gz               http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-11/msg00025.html; only with threads and debugging; 
+    DOMIZIO/OOTools-2.21.tar.gz                       http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-07/msg00432.html
+    EDPRATOMO/Algorithm-Permute-0.06.tar.gz           http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-05/msg00297.html
+    HAYASHI/Term-ReadLine-Gnu-1.16.tar.gz             http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2006-11/msg00464.html
+    ILYAZ/modules/Math-Pari-2.010709.tar.gz           http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2006-10/msg00860.html
+    JJORE/B-Generate-1.10.tar.gz                      http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-08/msg00488.html
+    MARCEL/Exporter-Simple-1.10.tar.gz                http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-07/msg00710.html
+    MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz        http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-10/msg00811.html; only with threads; 
+    NAOYA/Hatena-Keyword-0.04.tar.gz                  http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-05/msg00210.html
+    PDCAWLEY/Class-Inner-0.1.tar.gz                   http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-07/msg00499.html
+    PHOENIX/Term-ReadPassword-0.07.tar.gz             http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-08/msg00183.html
+    PJCJ/Devel-Cover-0.61.tar.gz                      http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-05/msg00861.html
+    RCLAMP/Devel-Caller-0.11.tar.gz                   http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-10/msg00813.html; only with threads;
+    RMUHLE/classes-0.943.tar.gz                       http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-05/msg00351.html
+    ROODE/Readonly-XS-1.04.tar.gz                     http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-07/msg00437.html
+    SAMTREGAR/XML-Validator-Schema-1.08.tar.gz        http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-05/msg00137.html
+    SAVA/Encode-IMAPUTF7-1.00.tar.gz                  http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-06/msg00375.html
+    TANIGUCHI/Unicode-RecursiveDowngrade-0.03.tar.gz  http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-06/msg00498.html
+    VKON/Tcl-0.95.tar.gz                              http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-10/msg00822.html; only with debugging; 
+
+  Tested patches available
+    Text::Query                   0.07             http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-07/msg00434.html
+                                                   patch on CPAN: ANDK/patches/Text-Query-0.07-ROBIN-01.patch.gz               
+    Unicode::Lite                 0.12             http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-06/msg00012.html
+                                                   patch on CPAN: ANDK/Unicode-Lite-0.12-NWCLARK-01.patch.gz
+    XML::Parser                   2.34             http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-07/msg00662.html
+                                                   patch on CPAN: ANDK/patches/XML-Parser-2.34-ANDK-01.patch.gz
+
+  Authors fixed:                    broken           fixed
+    Class::Fields                 0.202            0.203
+    Class::MOP                    0.40             0.42
+    Clone                         0.25             0.28
+    DBI                           1.57             1.601
+    Data::Alias                   1.03             1.07
+    Devel::Size                   0.68             0.69
+    JSON                          1.12             1.14
+    PerlPoint::Parser             0.451            1.05
+    Regexp::Assemble              0.28             0.32
+    Rose::HTML::Object::Messages  0.549            0.550               https://rt.cpan.org/Ticket/Display.html?id=30021
+    ShiftJIS::X0213::MapUTF       0.30             0.31
+    TAP::Parser                   0.52             0.54
+
+  Bleadperl fixed:                  was broken
+    Acme::MetaSyntactic           0.99             fixed in bleadperl
+    Best.pm                       0.11             fixed in bleadperl
+    Class::Trait                  0.22             fixed in bleadperl
+    Contextual::Return           v0.2.1            fixed in bleadperl
+    Perl6::Attributes             0.04             fixed in bleadperl
+    SQL::Translator               0.08001          fixed in bleadperl
+    String::Multibyte             1.05             fixed in bleadperl
+    Test::MockObject              1.07             fixed in bleadperl
+    Text::WikiFormat              0.78             fixed in bleadperl
+    YAML                          0.66             fixed in bleadperl
+
+	* new fails
+    CHORNY/Apache-Session-1.84.tar.gz[545], RCLAMP/POE-Component-Server-HTTP-0.09.tar.gz[615], ADUITSIS/IPC-Mmap-0.14.tar.gz[767], ANDK/Apache-Session-Counted-1.118.tar.gz[793], DMAKI/DateTime-Calendar-Japanese-0.06001.tar.gz[930], TEVERETT/Class-Prototyped-1.10.tar.gz[1376], MERLYN/CGI-Prototype-0.9053.tar.gz[1377], MAURICE/IPC-ShareLite-0.09.tar.gz[1443]
+
+	I see that somebody has filled the messages and semaphore space and I
+	had to clean them up. Need to watch each of these beasts and write
+	Bugreports.
+
+	http://rt.cpan.org/Ticket/Display.html?id=30440
+
+2007-11-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* /tmp again:
+
+	30425 CatalystX-CRUD                  Cleaning up /tmp directory
+
+	* Today a new 32025 maintperl finished and it has many fails that I have
+	not noticed before. See 2007-11-01T02:38. This was due to the glitch
+	with disabling Sub-Uplevel. So this should not have caused harm because
+	no reports were sent out in such cases.
+
+2007-11-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Rethink the recent mail exchange with Barbie about timestamps in the future.
+
+	* Some distro removed the Config.pm of my testing perls so I lost 6 perl
+	installations. I removed them immediately and now let only one perl run.
+
+	From the history of sent test reports it seems that Perl-Dist is to blame.
+
+I'm starting cpan for bleadperl@32194 which has a working -V command so must have
+a Config.pm. Let me see it:
+
+			% ls -l /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/i686-linux-thread-multi-64int/Config.pm
+		-r--r--r-- 1 sand sand 3383 2007-10-26 06:17:43 /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/i686-linux-thread-multi-64int/Config.pm
+
+And copy it away:
+
+			cp /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/i686-linux-thread-multi-64int/Config.pm /tmp/Config.pm.32194
+
+Ah, I see Adam has uploaded a 0.29_02 in the meantime. No mention of an
+alert. So let's try it now.
+
+			cpan[6]> install ADAMK/Perl-Dist-0.29_02.tar.gz
+		Running make for A/AD/ADAMK/Perl-Dist-0.29_02.tar.gz
+
+			CPAN.pm: Going to build A/AD/ADAMK/Perl-Dist-0.29_02.tar.gz
+
+		CPAN: CPAN::Reporter loaded ok (v1.04)
+		Checking if your kit is complete...
+		Looks good
+		Warning: prerequisite Perl::Dist::Downloads 0.02 not found.
+		Writing Makefile for Perl::Dist
+		Looking for Inno Setup 5... Failed to find the Program Files directory
+
+		(/home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/bin/perl Makefile.PL exited with 0)
+		CPAN::Reporter: Makefile.PL result is 'pass', No errors.
+		---- Unsatisfied dependencies detected during ----
+		----      ADAMK/Perl-Dist-0.29_02.tar.gz      ----
+				Perl::Dist::Downloads [requires]
+		Running make test
+			Delayed until after prerequisites
+		Running make install
+			Delayed until after prerequisites
+		Running install for module 'Perl::Dist::Downloads'
+		Running make for A/AD/ADAMK/Perl-Dist-Downloads-0.03.tar.gz
+		Checksum for /home/ftp/pub/CPAN/authors/id/A/AD/ADAMK/Perl-Dist-Downloads-0.03.tar.gz ok
+
+			CPAN.pm: Going to build A/AD/ADAMK/Perl-Dist-Downloads-0.03.tar.gz
+
+		Checking if your kit is complete...
+		Looks good
+		Writing Makefile for Perl::Dist::Downloads
+		(/home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/bin/perl Makefile.PL exited with 0)
+		CPAN::Reporter: Makefile.PL result is 'pass', No errors.
+		Installing blib/lib/auto/Perl/Dist/Downloads/mingw-runtime-3.13.tar.gz
+		Installing blib/lib/auto/Perl/Dist/Downloads/gcc-g++-3.4.5-20060117-1.tar.gz
+		Installing blib/lib/auto/Perl/Dist/Downloads/dmake-4.8-20070327-SHAY.zip
+		Installing blib/lib/auto/Perl/Dist/Downloads/gcc-core-3.4.5-20060117-1.tar.gz
+		Installing blib/lib/auto/Perl/Dist/Downloads/w32api-3.10.tar.gz
+		Installing blib/lib/auto/Perl/Dist/Downloads/mingw32-make-3.81-2.tar.gz
+		Installing blib/lib/auto/Perl/Dist/Downloads/binutils-2.17.50-20060824-1.tar.gz
+		cp lib/Perl/Dist/Downloads.pm blib/lib/Perl/Dist/Downloads.pm
+		Manifying blib/man3/Perl::Dist::Downloads.3
+		(/usr/bin/make exited with 0)
+		CPAN::Reporter: make result is 'pass', No errors.
+			ADAMK/Perl-Dist-Downloads-0.03.tar.gz
+			/usr/bin/make -- OK
+		Running make test
+		PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t
+		t/01_compile....ok
+		t/02_main.......ok
+		t/98_pod........skipped
+						all skipped: Author tests not required for installation
+		t/99_pmv........skipped
+						all skipped: Author tests not required for installation
+		All tests successful, 2 tests skipped.
+		Files=4, Tests=9,  1 wallclock secs ( 0.21 cusr +  0.05 csys =  0.26 CPU)
+		(/usr/bin/make test exited with 0)
+		CPAN::Reporter: Test result is 'pass', All tests successful.
+		Preparing a CPAN Testers report for Perl-Dist-Downloads-0.03
+		Sending test report with 'pass' to cpan-testers@perl.org
+			ADAMK/Perl-Dist-Downloads-0.03.tar.gz
+			/usr/bin/make test -- OK
+		Running make install
+		Prepending /home/sand/.cpan/build/Perl-Dist-Downloads-0.03-QjvVtv/blib/arch /home/sand/.cpan/build/Perl-Dist-Downloads-0.03-QjvVtv/blib/lib to PERL5LIB for 'install'
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/Perl/Dist/Downloads.pm
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/auto/Perl/Dist/Downloads/mingw-runtime-3.13.tar.gz
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/auto/Perl/Dist/Downloads/gcc-g++-3.4.5-20060117-1.tar.gz
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/auto/Perl/Dist/Downloads/dmake-4.8-20070327-SHAY.zip
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/auto/Perl/Dist/Downloads/gcc-core-3.4.5-20060117-1.tar.gz
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/auto/Perl/Dist/Downloads/w32api-3.10.tar.gz
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/auto/Perl/Dist/Downloads/mingw32-make-3.81-2.tar.gz
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/auto/Perl/Dist/Downloads/binutils-2.17.50-20060824-1.tar.gz
+		Installing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/man/man3/Perl::Dist::Downloads.3
+		Writing /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/i686-linux-thread-multi-64int/auto/Perl/Dist/Downloads/.packlist
+		Appending installation info to /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/i686-linux-thread-multi-64int/perllocal.pod
+			ADAMK/Perl-Dist-Downloads-0.03.tar.gz
+			/usr/bin/make install UNINST=1 -- OK
+		Running make for A/AD/ADAMK/Perl-Dist-0.29_02.tar.gz
+			Has already been unwrapped into directory /home/sand/.cpan/build/Perl-Dist-0.29_02-uH5Hsi
+
+			CPAN.pm: Going to build A/AD/ADAMK/Perl-Dist-0.29_02.tar.gz
+
+		Installing blib/lib/auto/Perl/Dist/Config.pm
+		Installing blib/lib/auto/Perl/Dist/LICENSE.txt
+		Installing blib/lib/auto/Perl/Dist/README.w32api
+		Installing blib/lib/auto/Perl/Dist/Installed.pm
+		Installing blib/lib/auto/Perl/Dist/Packlist.pm
+		Installing blib/lib/auto/Perl/Dist/FinalConfig.pm
+		Installing blib/lib/auto/Perl/Dist/libnet.cfg
+		Installing blib/lib/auto/Perl/Dist/README
+		Installing blib/lib/auto/Perl/Dist/Install.pm
+		cp lib/Perl/Dist/Asset.pm blib/lib/Perl/Dist/Asset.pm
+		cp lib/Perl/Dist/Builder.pm blib/lib/Perl/Dist/Builder.pm
+		cp lib/Perl/Dist/Inno/Registry.pm blib/lib/Perl/Dist/Inno/Registry.pm
+		cp lib/Perl/Dist.pm blib/lib/Perl/Dist.pm
+		cp lib/Perl/Dist/Inno.pm blib/lib/Perl/Dist/Inno.pm
+		cp lib/Perl/Dist/Asset/Module.pm blib/lib/Perl/Dist/Asset/Module.pm
+		cp lib/Perl/Dist/Asset/Perl.pm blib/lib/Perl/Dist/Asset/Perl.pm
+		cp lib/Perl/Dist/Asset/Binary.pm blib/lib/Perl/Dist/Asset/Binary.pm
+		cp lib/Perl/Dist/Inno/File.pm blib/lib/Perl/Dist/Inno/File.pm
+		cp lib/Perl/Dist/Asset/File.pm blib/lib/Perl/Dist/Asset/File.pm
+		cp lib/Perl/Dist/Inno/Icon.pm blib/lib/Perl/Dist/Inno/Icon.pm
+		cp lib/Perl/Dist/Asset/Distribution.pm blib/lib/Perl/Dist/Asset/Distribution.pm
+		cp script/perldist blib/script/perldist
+		/home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/bin/perl "-Iinc" "-MExtUtils::MY" -e "MY->fixin(shift)" blib/script/perldist
+		Manifying blib/man3/Perl::Dist::Builder.3
+		Manifying blib/man3/Perl::Dist.3
+		(/usr/bin/make exited with 0)
+		CPAN::Reporter: make result is 'pass', No errors.
+			ADAMK/Perl-Dist-0.29_02.tar.gz
+			/usr/bin/make -- OK
+		Running make test
+		PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t
+		t/01_compile..........ok
+		t/03_inno_file........ok
+		t/04_inno_icon........ok
+		t/05_inno_registry....ok
+		t/06_inno.............skipped
+						all skipped: Not on Win32
+		t/07_asset_file.......ok
+		t/10_dist_new.........skipped
+						all skipped: Not on Win32
+		t/11_dist_run.........skipped
+						all skipped: Not on Win32
+		t/98_pod..............skipped
+						all skipped: Author tests not required for installation
+		t/99_pmv..............skipped
+						all skipped: Author tests not required for installation
+		All tests successful, 5 tests skipped.
+		Files=10, Tests=41,  8 wallclock secs ( 1.52 cusr +  0.14 csys =  1.66 CPU)
+		(/usr/bin/make test exited with 0)
+		CPAN::Reporter: Test result is 'pass', All tests successful.
+		Preparing a CPAN Testers report for Perl-Dist-0.29_02
+		Sending test report with 'pass' to cpan-testers@perl.org
+			ADAMK/Perl-Dist-0.29_02.tar.gz
+			/usr/bin/make test -- OK
+		Running make install
+		Prepending /home/sand/.cpan/build/Perl-Dist-0.29_02-uH5Hsi/blib/arch /home/sand/.cpan/build/Perl-Dist-0.29_02-uH5Hsi/blib/lib to PERL5LIB for 'install'
+		Can't locate Config.pm in @INC (@INC contains: inc /home/sand/.cpan/build/Perl-Dist-0.29_02-uH5Hsi/blib/arch /home/sand/.cpan/build/Perl-Dist-0.29_02-uH5Hsi/blib/lib /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/i686-linux-thread-multi-64int /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0 /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0/i686-linux-thread-multi-64int /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/site_perl/5.10.0 .) at /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/AutoSplit.pm line 4.
+		BEGIN failed--compilation aborted at /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/AutoSplit.pm line 4.
+		Compilation failed in require at /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/ExtUtils/Install.pm line 9.
+		BEGIN failed--compilation aborted at /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/ExtUtils/Install.pm line 9.
+		Compilation failed in require.
+		BEGIN failed--compilation aborted.
+		make: *** [pure_site_install] Fehler 2
+			ADAMK/Perl-Dist-0.29_02.tar.gz
+			/usr/bin/make install UNINST=1 -- NOT OK
+		Failed during this command:
+		 ADAMK/Perl-Dist-0.29_02.tar.gz               : install NO
+
+		cpan[7]> q
+		Warning: Configuration not saved.
+		Lockfile removed.
+		......>sand@k75:~/CPAN
+		>sand@k75:~/CPAN-SVN% ls -l /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/i686-linux-thread-multi-64int/Config.pm
+		ls: /home/src/perl/repoperls/installed-perls/perl/pICDJJz/perl-5.8.0@32194/lib/5.10.0/i686-linux-thread-multi-64int/Config.pm: Datei oder Verzeichnis nicht gefunden
+
+Which means in English: not found. So installing ADAMK/Perl-Dist-0.29_02.tar.gz removes the Config.pm if the installer is owner (which he usually is).
+
+	2007-11-01 akoenig : I have issued above text as a "security alert"
+	ticket on RT.cpan.org (#30404), informed the cpan-testers-discussion
+	mailing list and removed the two Perl-Dist-0.29_0[12].tar.gz files from
+	CPAN.
+
+	* Is it true that apache2 does not build with blead?
+
+2007-10-30  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Today I saw this ugly result:
+
+PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/perl/p6GHBr2/perl-5.8.0@27906/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01-sanity..............ok
+t/02-runthrough..........panic: free from wrong pool, <F> line 3.
+# Looks like your test died just after 13.
+t/02-runthrough..........dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+        after all the subtests completed successfully
+t/03-error...............panic: free from wrong pool.
+# Looks like your test died just after 3.
+t/03-error...............dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+        after all the subtests completed successfully
+t/99_pod-coverage........skipped
+        all skipped: Enable TEST_POD environment variable to test POD
+t/99_pod.................skipped
+        all skipped: Enable TEST_POD environment variable to test POD
+t/compat_01-selfcheck....panic: free from wrong pool.
+# Looks like your test died just after 2.
+t/compat_01-selfcheck....dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+        after all the subtests completed successfully
+t/compat_02-extmagic.....panic: free from wrong pool.
+# Looks like your test died just after 2.
+t/compat_02-extmagic.....dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+        after all the subtests completed successfully
+Failed Test             Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/02-runthrough.t        255 65280    13    0   0.00%  ??
+Failed Test             Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/03-error.t             255 65280     3    0   0.00%  ??
+Failed Test             Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/compat_01-selfcheck.t  255 65280     2    0   0.00%  ??
+Failed Test             Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/compat_02-extmagic.t   255 65280     2    0   0.00%  ??
+2 tests skipped.
+Failed 4/7 test scripts, 42.86% okay. 0/21 subtests failed, 100.00% okay.
+Files=7, Tests=21,  1 wallclock secs ( 0.76 cusr +  0.10 csys =  0.86 CPU)
+  DMAKI/File-MMagic-XS-0.09002.tar.gz
+  /usr/bin/make test -- OK
+
+	who wrote the result and who could not read it? Test::Harness 2.57_05
+	and CPAN::Reporter (not installed!), so it was me!
+
+	* Bug in File::Temp version checking code. A simple < is wrong, you must
+	use CPAN::Version!
+
+	* MLEHMANN/Gtk-Perl-0.7009.tar.gz fails because gtk-config not found or
+	something. Installed libgtk1.2-dev. More libraries missing in the next
+	round of trial and error.
+
+	* File-MMagic-XS failed on 32195, 32186 which is threaded and debugging.
+	I started to watch F:M:X with 31568 but we have one other
+	threaded+debugging perl since then: 32032. But yes, 32032 was not a
+	regular megainstall. So let's try DMAKI/File-MMagic-XS-0.09002.tar.gz
+	with 32032. And on a maintperl? Try 31223.
+
+	Yes, it fails with blead@32032 (panic free from wrong pool), it succeeds
+	with maint@31223.
+
+	And it fails for this:
+
+	  MMagic.xs:455: error: expected declaration specifiers	or '...' before '(' token'
+
+	with 27680, 27704, 27705, 27729, 27732, 27733, 27734
+	
+	It fails with the same panic free from wrong pool on 30953, 30952,
+	29353, 28507, 28106, 27906, 27806, 27755, 27741, 27735.
+
+	Next: According to the comment in 27735 we must go back in time before
+	27649 and I see a good place at 23232 which is 51 points from 23181
+	which is quite a good distance. 23240 would have been the better choice.
+	Oh well.
+
+----Program----
+eval q{use File::MMagic::XS 0.09002};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../p3g2zXo/perl-5.8.0@26177/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../p2IzPOM/perl-5.8.0@26178/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	This is no way possible. 26178 did nothing but remove comments. Ahhh,
+	there is an old 27177 from 2005 involved.
+
+----Output of .../pql0Vj4/perl-5.8.0@26176/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../p1BkiZu/perl-5.8.0@26177/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Yes, this is the real thing. BBC article posted to P5P.
+
+2007-10-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* watching /tmp is boring and I want to delay the next RT tickets until
+	after the next release of File::Temp.
+
+	* I wish I had an overview over all BBC articles and the status they are
+	in and links to the articles and the RT tickets and all postings that
+	preceded BBC saying something like "23456 breaks Term::ReadLine::Gnu".
+	This (at least the still open parts) should find its way into
+	perl5100delta.pod. Math::Pari and T:R:G being the most prominent
+	victims.
+
+	* Tcl maybe broke around 31941? We do not have the config of our perls
+	in the database, so SQL will not do it. We need to find all Tcl=OK for
+	perl=debugging. So some grep through all perl-V and all VKON! or so.
+
+	
+for d in logs/megainstall.2007{09,10}*.d; do
+grep -H " optimize" $d/perl-V.txt | perl -pe 's/\n//'
+grep ok= $d/VKON!Tcl-* |& perl -nle 'print /( ok=".+?")/'
+done
+[...]
+logs/megainstall.20070922T1716.d/perl-V.txt:    optimize='-g', ok="OK"
+logs/megainstall.20070923T1153.d/perl-V.txt:    optimize='-g', ok="NOT OK"
+
+
+	This means 31939-31941 and we need a config with optimize=-g. Nonono,
+	because 39 and 41 have long since been purged we need to order 40
+	directly, then the neighbor and then write the BBC (unless the neighbor
+	behaves differently from what we see in the database; which means 41
+	must fail).
+
+	31941 is easy peasy. The subject line says exactly what it is doing. But
+	is it correct to limit an assertion to debugging mode? Are the two
+	extensions doing stupid things? Let's examine the diagnostics. Tcl:
+
+t/call.........Assertion ((svtype)((_svi)->sv_flags & 0xff)) >= SVt_RV failed: file "Tcl.xs", line 647 at t/call.t line 38.
+dubious
+^ITest returned status 88 (wstat 22528, 0x5800)
+DIED. FAILED tests 9-10
+^IFailed 2/10 tests, 80.00% okay
+
+	And Coro? 4.13 does not work with 31940.
+
+	31847/31854 MLEHMANN/Coro-3.63.tar.gz from NA to OK
+	31682/31684 MLEHMANN/Coro-3.63.tar.gz from OK to NA
+
+	SEGV during test: 31613, 31021, 30019, 29743, 29619
+
+	PL_parser undeclared in State.xs:1111: 29023, 29503, 29537
+
+	As this PL_parser is dependent on 5.9.0 I do not expect that any older perl will now compile
+
+	Try older Coro: 4.11 no, 4.1 no, 4.03 SEGV
+
+	SEGV during test with 4.03: 29537, 28022, 27002, 25229, 24044
+
+	State.xs:263: error: too few arguments to function Perl_pad_push: 23023, 23494, 23768, 23973
+
+	This State.xs:263 thing is even in the oldest Coro, 3.63 and I'm not up
+	to searching backpan.
+
+	So I will now have a look at the gdb analysis and then check in maint perl.
+
+Failed to read a valid object file image from memory.
+Core was generated by `/home/src/perl/repoperls/installed-perls/perl/pm5CFa8/perl-5.8.0@32198/bin/perl'.
+Program terminated with signal 11, Segmentation fault.
+#0  coro_transfer (prev=Cannot access memory at address 0xfffffffc
+) at libcoro/coro.c:153
+153     }
+(gdb) bt
+#0  coro_transfer (prev=Cannot access memory at address 0xfffffffc
+) at libcoro/coro.c:153
+Cannot access memory at address 0x4
+
+	Well. And maintperl? Ahhh, same thing! Stock 5.8.8 has it. 5.8.1 is
+	simply too old to understand current Coro code. 22251(5.8.3) has the
+	SEGV too. So no BBC in here.
+	
+	* Bugreport to self: File::Temp needs a minimum of 0.14 if we use the
+	object interface. FIXED
+
+	* Devel-Caller poking around.
+
+	30955:
+
+t/Devel-Caller....ok 1/72
+#   Failed (TODO) test 'with lexical $foo'
+#   at t/Devel-Caller.t line 36.
+#          got: 'GLOB(0x8319b70)'
+#     expected: 'SCALAR(0x840c250)'
+
+#   Failed (TODO) test 'with lexical @foo'
+#   at t/Devel-Caller.t line 37.
+#          got: 'SCALAR(0x843b3a8)'
+#     expected: 'ARRAY(0x84417fc)'
+
+#   Failed (TODO) test 'with lexical %foo'
+#   at t/Devel-Caller.t line 38.
+#          got: 'GLOB(0x843b268)'
+#     expected: 'HASH(0x8441824)'
+Assertion ((svtype)((shplep)->sv_flags & 0xff)) == SVt_PVGV || ((svtype)((shplep)->sv_flags & 0xff)) == SVt_PVLV failed: file "lib/Devel/Caller.xs", line 49 at /home/sand/.cpan/build/Devel-Caller-0.11-JPp6H1/blib/lib/Devel/Caller.pm line 32.
+# Looks like you planned 72 tests but only ran 43.
+# Looks like your test died just after 43.
+t/Devel-Caller....dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 44-72
+        Failed 29/72 tests, 59.72% okay
+
+	32195:
+
+t/Devel-Caller....
+#   Failed (TODO) test 'with lexical $foo'
+#   at t/Devel-Caller.t line 36.
+#          got: 'GLOB(0x838b8d0)'
+#     expected: 'SCALAR(0x83a47b0)'
+
+#   Failed (TODO) test 'with lexical @foo'
+#   at t/Devel-Caller.t line 37.
+#          got: 'SCALAR(0x84af790)'
+#     expected: 'ARRAY(0x84b6690)'
+
+#   Failed (TODO) test 'with lexical %foo'
+#   at t/Devel-Caller.t line 38.
+#          got: 'GLOB(0x84af678)'
+#     expected: 'HASH(0x84b66b8)'
+dubious
+        Test returned status 0 (wstat 11, 0xb)
+DIED. FAILED tests 44-72
+        Failed 29/72 tests, 59.72% okay
+
+
+
+	Ah, das heisst doch coredump, oder?
+
+% gdb /home/src/perl/repoperls/installed-perls/perl/pbCbNp9/perl-5.8.0@32195/bin/perl core 
+GNU gdb 6.6.90.20070912-debian
+Copyright (C) 2007 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i486-linux-gnu"...
+Using host libthread_db library "/lib/i686/cmov/libthread_db.so.1".
+
+warning: Can't read pathname for load map: Input/output error.
+Reading symbols from /lib/i686/cmov/libnsl.so.1...done.
+Loaded symbols for /lib/i686/cmov/libnsl.so.1
+Reading symbols from /lib/i686/cmov/libdl.so.2...done.
+Loaded symbols for /lib/i686/cmov/libdl.so.2
+Reading symbols from /lib/i686/cmov/libm.so.6...done.
+Loaded symbols for /lib/i686/cmov/libm.so.6
+Reading symbols from /lib/i686/cmov/libcrypt.so.1...done.
+Loaded symbols for /lib/i686/cmov/libcrypt.so.1
+Reading symbols from /lib/i686/cmov/libutil.so.1...done.
+Loaded symbols for /lib/i686/cmov/libutil.so.1
+Reading symbols from /lib/i686/cmov/libpthread.so.0...done.
+Loaded symbols for /lib/i686/cmov/libpthread.so.0
+Reading symbols from /lib/i686/cmov/libc.so.6...done.
+Loaded symbols for /lib/i686/cmov/libc.so.6
+Reading symbols from /lib/ld-linux.so.2...done.
+Loaded symbols for /lib/ld-linux.so.2
+Reading symbols from /home/src/perl/repoperls/installed-perls/perl/pbCbNp9/perl-5.8.0@32195/lib/site_perl/5.10.0/i686-linux-thread-multi-64int/auto/PadWalker/PadWalker.so...done.
+Loaded symbols for /home/src/perl/repoperls/installed-perls/perl/pbCbNp9/perl-5.8.0@32195/lib/site_perl/5.10.0/i686-linux-thread-multi-64int/auto/PadWalker/PadWalker.so
+Reading symbols from /home/sand/.cpan/build/Devel-Caller-0.11-4u9D7a/blib/arch/auto/Devel/Caller/Caller.so...done.
+Loaded symbols for /home/sand/.cpan/build/Devel-Caller-0.11-4u9D7a/blib/arch/auto/Devel/Caller/Caller.so
+Failed to read a valid object file image from memory.
+Core was generated by `/home/src/perl/repoperls/installed-perls/perl/pbCbNp9/perl-5.8.0@32195/bin/perl'.
+Program terminated with signal 11, Segmentation fault.
+#0  0xb7f7b51c in glob_out (sigil=36 '$', op=0x84c2cc8, want_name=0)
+    at lib/Devel/Caller.xs:49
+49          case '$': ret = (SV*) GvSV(gv); break;
+
+
+	Hey, it even has debugging symbols. But what's that 'Failed to read a
+	valid object file image from memory.'?
+
+
+	27705:
+
+/home/src/perl/repoperls/installed-perls/perl/pBY7a0s/perl-5.8.0@27705/bin/perl Build --makefile_env_macros 1 test
+t/Devel-Caller....ok 1/72                                                    
+#   Failed (TODO) test 'with lexical $foo'
+#   in t/Devel-Caller.t at line 36.
+#          got: 'GLOB(0x82bac48)'
+#     expected: 'SCALAR(0x839aedc)'
+
+#   Failed (TODO) test 'with lexical @foo'
+#   in t/Devel-Caller.t at line 37.
+#          got: 'SCALAR(0x83f58c0)'
+#     expected: 'ARRAY(0x8401304)'
+
+#   Failed (TODO) test 'with lexical %foo'
+#   in t/Devel-Caller.t at line 38.
+#          got: 'GLOB(0x83f5758)'
+#     expected: 'HASH(0x840132c)'
+t/Devel-Caller....dubious                                                    
+        Test returned status 0 (wstat 11, 0xb)
+DIED. FAILED tests 44-72
+        Failed 29/72 tests, 59.72% okay
+
+
+	Core dump looks the same.
+
+	27048:
+
+	Same thing, core dump without symbols:
+
+(gdb) bt
+#0  0xb7f39941 in glob_out ()
+   from /home/sand/.cpan/build/Devel-Caller-0.11-K2jwTc/blib/arch/auto/Devel/Caller/Caller.so
+#1  0xb7f39eb4 in XS_Devel__Caller__called_with ()
+   from /home/sand/.cpan/build/Devel-Caller-0.11-K2jwTc/blib/arch/auto/Devel/Caller/Caller.so
+#2  0x080d090b in Perl_pp_entersub ()
+#3  0x080c85a9 in Perl_runops_standard ()
+#4  0x0806559b in perl_run ()
+#5  0x0806034d in main ()
+
+	16500:
+
+	Ahh, PadWalker 1.5 denies working with 5.7.3, demands minimum 5.8.2
+
+	19367:
+
+	Everything like in 27048 and the others above.
+
+	17706:
+
+	PadWalker 1.5 does not pass its own tests:
+
+t/test........FAILED tests 9, 15
+        Failed 2/15 tests, 86.67% okay
+t/tt..........FAILED tests 3-4
+        Failed 2/5 tests, 60.00% okay
+
+	I do a 'force install' on it. I then have to install Module::Build and
+	ExtUtils::CBuilder and then I can install Devel::Caller and it tests OK:
+
+cc -shared -L/usr/local/lib -o blib/arch/auto/Devel/Caller/Caller.so lib/Devel/Caller.o
+Manifying blib/lib/Devel/Caller.pm -> blib/libdoc/Devel::Caller.3
+  RCLAMP/Devel-Caller-0.11.tar.gz
+  /usr/bin/make -- OK
+Warning (usually harmless): 'YAML' not installed, will not store persistent state                                                                               
+Running make test
+/home/src/perl/repoperls/installed-perls/perl/pY6kBLf/perl-5.8.0@17706/bin/perl Build --makefile_env_macros 1 test
+t/Devel-Caller....ok
+        26/72 unexpectedly succeeded
+All tests successful (26 subtests UNEXPECTEDLY SUCCEEDED).
+Files=1, Tests=72,  0 wallclock secs ( 0.09 cusr +  0.01 csys =  0.10 CPU)
+  RCLAMP/Devel-Caller-0.11.tar.gz
+  /usr/bin/make test -- OK
+Warning (usually harmless): 'YAML' not installed, will not store persistent state                                                                               
+
+	A few minutes later I have installed several other modules for a
+	frictionless binary search and these programs then find a Devel::Caller
+	that does not pass its own test anymore. Why?
+
+	I remove the installation and reinstall with ./installperl from the
+	build directory. I install as above the three PadWalker, M:B and EU:CB
+
+	I see Devel::Caller working again. I make a backup or this tree. I
+	re-run './Build test' several times in the Devel-Caller-0.11-iL3qS5/
+	directory, always success.
+
+	Now I try to install the Bundle::CPANxxl piece by piece. YAML::Syck
+	fails. IO::Tty OK. Expect OK. YAML fails. Test::Harness OK.
+
+% ./Build test
+t/Devel-Caller....ok                                                         
+        26/72 unexpectedly succeeded
+TODO PASSED tests 12-14, 44-66
+
+All tests successful (26 subtests UNEXPECTEDLY SUCCEEDED).
+Passed TODO      Stat Wstat TODOs Pass  List of Passed
+-------------------------------------------------------------------------------
+t/Devel-Caller.t               26   26  12-14 44-66
+Files=1, Tests=72,  0 wallclock secs ( 0.07 cusr +  0.03 csys =  0.10 CPU)
+
+	Arrrrgrrrr, I misread this as a fail in my previous look at the terminal.
+
+	18554:
+
+	PadWalker passes its tests but D:C dumps core
+
+	18037:
+
+	PadWalker fails the two tests mentioned above and I force the install.
+	Devel::Caller passes its tests.
+
+	18300:
+
+	PadWalker is installed, so must have passed its test. D:C has its SEGV.
+
+	18150:
+
+	Padwalker fails as above. force install. D:C SEGV.
+
+	18078:
+	
+	Padwalker fails as above. force install. D:C SEGV.
+
+	18057:
+	
+	Padwalker fails as above. force install. D:C SEGV.
+
+	18048:
+
+	Padwalker fails as above. force install. D:C SEGV.
+
+	18047: no SEGV
+
+2007-10-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Net-Daemon's recent FAILS under threads seems to be due to the way the
+	old Thread.pm has now become a compatibility layer. Its t/thread.t tests
+
+if (!eval { require Thread; my $t = Thread->new(sub { }) }) {
+    print "1..0\n";
+    exit 0;
+}
+
+	The compat layer seems to have started working between 30910 and 32032:
+
+% for p in `binsearchaperl --show-cache  --bounds 27048-33000 --apcdir /home/src/perl/repoperls/APC --prefix /home/src/perl/repoperls/installed-perls --cachefilter tests/filter-threaded.pl `; do
+$p -MThread -e 'print substr($^X,64), ": ", eval{Thread->new(sub { })} ? "" : "not ", "ok\n"'
+done 2>/dev/null
+@27048/bin/perl: ok
+@29353/bin/perl: not ok
+@30910/bin/perl: not ok
+@31500/bin/perl: ok
+@32032/bin/perl: ok
+@32174/bin/perl: ok
+@32186/bin/perl: ok
+@32194/bin/perl: ok
+@32195/bin/perl: ok
+
+	but probably not good enough to run the whole code in t/thread.t.
+
+	I would guess that somewhere between 27048 and 29353 the compatibility
+	layer broke heavily and somewhere between 30910 and 31500 they
+	fixed it a bit. 30955 was the last change to Thread.pm. The fix for our
+	minimal testcase came a bit before that:
+
+----Program----
+require Thread;
+print eval{Thread->new(sub { })} ? "ok\n" : "not ok\n";
+
+----Output of .../pCY4xFO/perl-5.8.0@30952/bin/perl----
+not ok
+
+----EOF ($?='0')----
+----Output of .../pQ8RfLX/perl-5.8.0@30953/bin/perl----
+ok
+Perl exited with active threads:
+        1 running and unjoined
+        0 finished and unjoined
+        0 running and detached
+
+----EOF ($?='0')----
+
+----Program----
+require Thread;
+print eval{Thread->new(sub { })} ? "ok\n" : "not ok\n";
+
+----Output of .../ppYBvaY/perl-5.8.0@27704/bin/perl----
+ok
+A thread exited while 2 threads were running.
+
+----EOF ($?='0')----
+----Output of .../pBY7a0s/perl-5.8.0@27705/bin/perl----
+not ok
+
+----EOF ($?='0')----
+
+	Running a Net::Daemon 0.43 comare between 30952 and 53 shows the
+	equivalent result. Now let's see for Devel-Caller and Sub-Multi.
+	Devel-Caller needs a separate investigation (fails on both 3095[23]).
+	Now I discover the dependency chain of Sub-Multi. I see that
+	Devel::LexAlias depends on Devel-Caller. And Data::Bind depends on
+	Devel::LexAlias and Sub::Multi depends on Data::Bind. So Sub::Multi can
+	be dropped from further investigation.
+
+	Note that we have not yet looked which construct it is that breaks in
+	the test. So it might be interesting to look if 27704 was still ok. Yes,
+	it passes all tests and does not skip the t/thread.t.
+
+	BBC article is posted.
+
+	* /tmp again
+
+	30297 HTML-Display                            Cleaning up /tmp directory
+
+2007-10-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* mod_perl also broke recently. Between 32090 and 32101. And it suddenly
+	worked again in 32192 which was a nothreads nodebugging build without
+	relocatable inc. nothing obvious, of course.
+
+	I made a autobundle for 32085. And 32108. The diffs are huge.
+
+	/home/sand/.cpan/Bundle/Snapshot_2007_10_26_0[01].pm
+
+	Nono, that's something entirely different. The test server cannot be
+	started and nothing's there that would tell me an error message. I have
+	already cited the error message below but I repeat
+
+/home/src/www/apache/apache/apache_1.3.37/src/httpd -f `pwd`/t/conf/httpd.conf -X -d `pwd`/t &
+httpd listening on port 8529
+will write error_log to: t/logs/error_log
+letting apache warm up...\c
+[Sat Oct 27 13:24:44 2007] [error] Can't locate lib.pm in @INC (@INC contains: /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0/i686-linux-thread-multi-64int /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0 /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0/i686-linux-thread-multi-64int /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0 /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t/ /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t/lib/perl) at /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t//docs/startup.pl line 8.\nBEGIN failed--compilation aborted at /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t//docs/startup.pl line 8.\nCompilation failed in require at (eval 2) line 1.\n
+Syntax error on line 62 of /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t/conf/httpd.conf:
+Can't locate lib.pm in @INC (@INC contains: /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0/i686-linux-thread-multi-64int /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0 /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0/i686-linux-thread-multi-64int /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0 /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t/ /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t/lib/perl) at /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t//docs/startup.pl line 8.
+BEGIN failed--compilation aborted at /home/sand/.cpan/build/mod_perl-1.30-zALo0v/t//docs/startup.pl line 8.
+Compilation failed in require at (eval 2) line 1.
+
+done
+
+	I found the lib.pm that should be found at
+	/home/src/perl/repoperls/installed-perls/perl/pFAmPwI/perl-5.8.0@32085/lib/5.10.0/i686-linux-64int
+	and indeed this is missing in the above list.
+
+	Maybe it is because of relocateableinc? Not directly, of course, because
+	we have had it working for 32085 and do not have it working for 32085
+	now. So to compare autobundles we would first need a perl that currently
+	correctly builds and tests mod_perl.
+
+	32059 nowadays has the same problem. 32032 ditto. I untar the apache
+	tarball once again and retry with 32032. Same result. 32009 was built on
+	Oct 3 and I want to see the logs really, really exactly as they were.
+	And what do I find? The same results but at that time CPAN::Reporter
+	reported OK although so many tests were not run. A very interesting
+	discovery. Probably this is just thanks to Test::Harness 2.99 now
+	popping up?
+
+	I'll now skip back in time and visit 31824 (if possible). It was the
+	first perl I built with relocateableinc and it reported OK on mod_perl.
+	Of course it also has the same bug with mod_perl 1.30. CPAN::Reporter
+	reports (and reported on 2007-09-09) UNKNOWN in this case. But it got
+	installed and make install was OK, so I did not discover the bug.
+
+	Next stop in our time travel shall bring us to 31790 (2007-09-05T01:07).
+	It was the last perl without relocateableinc. And all tests run and
+	pass. Cheerio!
+
+	http://rt.cpan.org/Ticket/Display.html?id=30300
+
+	* 32194 came with change profile:
+
+new fails
+    PERIGRIN/JSON-Any-1.12.tar.gz[255], UNOBE/WWW-Facebook-API-v0.4.7.tar.gz[256], MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz[465], TBONE/Net-FTP-Common-6.0.tar.gz[756], MNOONING/PlRPC/PlRPC-0.2020.tar.gz[768], RCLAMP/Devel-Caller-0.11.tar.gz[787], RCLAMP/Devel-LexAlias-0.04.tar.gz[788], CLKAO/Data-Bind-0.28.tar.gz[789], CTHOM/Net-Twitter-1.06.tar.gz[808], MWS/ResourcePool-1.0104.tar.gz[856], RICKM/Net-Jaiku-0.0501.tgz[1089], CLKAO/Sub-Multi-0.003.tar.gz[1100], FGLOCK/v6-0.020.tar.gz[1102], RCAPUTO/Lexical-Persistence-0.97.tar.gz[1124], VPIT/Variable-Magic-0.04.tar.gz[1165], NUFFIN/Tie-RefHash-Weak-0.07.tar.gz[1168], NUFFIN/Devel-Events-Objects-0.03.tar.gz[1169], MSCHILLI/CPAN-Unwind-0.05.tar.gz[1207]
+gone
+    LARSLUND/PDF-Reuse-Barcode-0.05.tar.gz, RONAN/SVG-Template-Graph-0.13.tar.gz, WRW/Barcode-Code128-2.01.tar.gz
+
+	* possible todos:
+
+	- list all perlconfigs for the few succeeding Date-Simple
+
+	- pick any of the others in the contingency table summary and make a
+	filtered binary search into the past.
+
+2007-10-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: NOG/AFS-2.4.0 look how the indexer fails DONE
+
+	* Summary of recent builds only watching 8 pieces:
+	VKON/Tcl-0.95.tar.gz
+	MLEHMANN/Coro-4.{11,13}.tar.gz
+	MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz
+	RCLAMP/Devel-Caller-0.11.tar.gz
+	
+     useithreads                no threads
+	+--------------------------+--------------------------+
+	|  bleadperl@32186,32195   |  bleadperl@32181,32198   |
+	|  PASS                    |  PASS                    |
+	|                          |                          |
+	|                          |  Net-Daemon              |
+	|                          |  Devel-Caller            |
+-g|                          |                          |
+	|  FAIL                    |  FAIL                    |
+	|                          |                          |
+	|  Coro 4.13               |  Coro 4.11               |
+	|  Net-Daemon              |  Tcl                     |
+	|  Devel-Caller            |                          |
+	|  Tcl                     |                          |
+	|                          |                          |
+	+--------------------------+--------------------------+
+	|  bleadperl@32180,32194   |  bleadperl@32192,32193   |
+	|  PASS                    |  PASS                    |
+	|                          |                          |
+	|  Coro 4.11,4.13          |  Coro 4.13               |
+	|  Tcl                     |  Net-Daemon              |
+	|                          |  Devel-Caller            |
+no|                          |  Tcl                     |
+-g|                          |                          |
+	|  FAIL                    |  FAIL                    |
+	|                          |                          |
+	|  Net-Daemon              |                          |
+	|  Devel-Caller            |                          |
+  +--------------------------+--------------------------+
+	
+
+	* 32186 (threads+debugging) came with this change profile:
+
+new fails
+    BRADFITZ/Perlbal-1.60.tar.gz[311]
+	  DMAKI/File-MMagic-XS-0.09002.tar.gz[358]
+	  RCLAMP/Devel-Caller-0.11.tar.gz[400]
+	  RCLAMP/Devel-LexAlias-0.04.tar.gz[405]
+	  CLKAO/Data-Bind-0.28.tar.gz[406]
+	  CLKAO/Sub-Multi-0.003.tar.gz[716]
+	  FGLOCK/v6-0.020.tar.gz[717]
+	  MLEHMANN/Coro-4.13.tar.gz[725]
+	  MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz[790]
+	  MNOONING/PlRPC/PlRPC-0.2020.tar.gz[797]
+	  AVAR/re-engine-Plan9-0.14.tar.gz[862]
+	  MAURICE/IPC-ShareLite-0.09.tar.gz[889]
+	  MWS/ResourcePool-1.0104.tar.gz[942]
+	  RCAPUTO/Lexical-Persistence-0.97.tar.gz[944]
+	  DMAKI/File-Extract-0.06.tar.gz[956]
+	  SREZIC/Tk-Splash-0.14.tar.gz[1339]
+gone
+    BRADFITZ/Perlbal-1.59.tar.gz
+	  GAFFIE/ETL-Pequel-2.4-6b.tar.gz
+	  MARKOV/Mail-Box-2.075.tar.gz
+	  MLEHMANN/Coro-4.11.tar.gz
+	  REDTREE/PDF-API2-Simple-1.1.2.tar.gz
+	  TBONE/Net-FTP-Common-6.0.tar.gz
+
+		whereas 32192 (nothreads+nodebugging) had this:
+
+new fails
+    PETERW/SVG-Parser-1.01.tar.gz[33]
+	  RONAN/SVG-Template-Graph-0.13.tar.gz[36]
+	  PETDANCE/Test-WWW-Mechanize-1.14.tar.gz[182]
+	  CHROMATIC/Sub-Context-1.00.tar.gz[249]
+	  AUTRIJUS/Encode-compat-0.07.tar.gz[298]
+	  SCHWIGON/class-methodmaker/Class-MethodMaker-2.10.tar.gz[493]
+	  FLUFFY/Term-ProgressBar-2.09.tar.gz[494]
+	  AUTRIJUS/Lingua-ZH-HanDetect-0.04.tar.gz[635]
+	  CHROMATIC/Test-Kwalitee-0.30.tar.gz[728]
+	  DMAKI/POE-Component-StackedProcessor-0.05.tar.gz[766]
+	  SCHWIGON/pdf-fdf-simple/PDF-FDF-Simple-0.11.tar.gz[855]
+	  DBDPG/DBD-Pg-1.49.tar.gz[911]
+	  TBONE/Net-FTP-Common-6.0.tar.gz[929]
+	  SRSHAH/Test-Distribution-1.26.tar.gz[1103]
+	  SUNGO/POE-API-Peek-1.0802.tar.gz[1104]
+	  GWYN/POE-Component-Daemon-0.1006.tar.gz[1105]
+	  CHROMATIC/Crypt-CipherSaber-1.00.tar.gz[1107]
+	  AUTRIJUS/WWW-REST-0.01.tar.gz[1111]
+	  JESSE/GnuPG-Interface-0.36.tar.gz[1148]
+	  IMACAT/Locale-Maketext-Gettext-1.22.tar.gz[1171]
+	  LBROCARD/Test-WWW-Mechanize-Catalyst-0.41.tar.gz[1184]
+	  JROCKWAY/Catalyst-Plugin-Unicode-0.8.tar.gz[1185]
+	  RCLAMP/POE-Component-Server-HTTP-0.09.tar.gz[1238]
+	  SUNGO/POE-Component-DebugShell-1.0411.tar.gz[1406]
+gone
+    AUDREYT/Encode-IBM-0.06.tar.gz
+	  AVAR/re-engine-Plan9-0.14.tar.gz
+	  AWWAIID/Continuity-0.95.tar.gz
+	  CLKAO/Data-Bind-0.28.tar.gz
+	  CLKAO/Sub-Multi-0.003.tar.gz
+	  DAXIM/Yahoo-Photos-0.0.2.tar.gz
+	  DMAKI/File-Extract-0.06.tar.gz
+	  DMAKI/File-MMagic-XS-0.09002.tar.gz
+	  FGLOCK/v6-0.020.tar.gz
+	  GOZER/mod_perl-1.30.tar.gz
+	  LARSLUND/PDF-Reuse-Barcode-0.05.tar.gz
+	  MAURICE/IPC-ShareLite-0.09.tar.gz
+	  MIYAGAWA/Apache-GuessCharset-0.03.tar.gz
+	  MLEHMANN/Coro-4.13.tar.gz
+	  MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz
+	  MNOONING/PlRPC/PlRPC-0.2020.tar.gz
+	  MWS/ResourcePool-1.0104.tar.gz
+	  NUFFIN/Devel-Events-Objects-0.03.tar.gz
+	  NUFFIN/Tie-RefHash-Weak-0.07.tar.gz
+	  RCAPUTO/Lexical-Persistence-0.97.tar.gz
+	  RCLAMP/Devel-Caller-0.11.tar.gz
+	  RCLAMP/Devel-LexAlias-0.04.tar.gz
+	  SREZIC/Tk-Splash-0.14.tar.gz
+	  STAS/libapreq-1.33.tar.gz
+	  TIMB/Apache-Status-DBI-1.012.tar.gz
+	  VKON/Tcl-0.95.tar.gz
+	  VPIT/Variable-Magic-0.04.tar.gz
+	  WRW/Barcode-Code128-2.01.tar.gz
+
+	* Pugs needs some extralibs installed. Installed mtl
+
+	* /tmp dir again:
+
+	30255 SVG-Template-Graph                   Cleaning up /tmp directory; predictable tmp filename
+	30256 svg-svg2zinc                         Cleaning up /tmp directory; predictable tmp filenames
+
+2007-10-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* What exactly were the differences between 32173,32174,32180,32181?
+
+...32173 -Dinstallusrbinperl=n -Uversiononly -Doptimize=-g -des -Duse64bitint -Dusedevel
+...32174 -Dinstallusrbinperl=n -Uversiononly               -des               -Dusedevel -Dusethreads -Duserelocatableinc
+...32180 -Dinstallusrbinperl=n -Uversiononly               -des               -Dusedevel -Dusethreads -Duserelocatableinc
+...32181 -Dinstallusrbinperl=n -Uversiononly -Doptimize=-g -des -Duse64bitint -Dusedevel              -Duserelocatableinc
+
+	So for 86 I wish that we use
+
+...32186 -Dinstallusrbinperl=n -Uversiononly -Doptimize=-g -des -Duse64bitint -Dusedevel -Dusethreads -Duserelocatableinc
+...32192 -Dinstallusrbinperl=n -Uversiononly               -des -Duse64bitint -Dusedevel              -Duserelocatableinc
+
+	DONE.
+
+	* And 32181 is the first that is unthreaded again:
+
+new fails
+	  AWWAIID/Continuity-0.95.tar.gz[629],
+	  DAXIM/Yahoo-Photos-0.0.2.tar.gz[1429],
+	  MLEHMANN/Coro-4.11.tar.gz[628],
+	  REDTREE/PDF-API2-Simple-1.1.2.tar.gz[359],
+	  TBONE/Net-FTP-Common-6.0.tar.gz[756],
+	  TEEJAY/Maypole-2.121.tar.gz[1439]
+	  TMTM/CGI-Untaint-date-1.00.tar.gz[1435],
+	  VKON/Tcl-0.95.tar.gz[88],
+	  YVES/Date-Simple-3.02.tar.gz[567],
+gone
+	  CLKAO/Data-Bind-0.28.tar.gz,
+	  CLKAO/Sub-Multi-0.003.tar.gz,
+	  DMAKI/Xango-1.08.tar.gz,
+	  FGLOCK/v6-0.020.tar.gz,
+	  JROCKWAY/Catalyst-Plugin-Unicode-0.8.tar.gz,
+	  LBROCARD/Test-WWW-Mechanize-Catalyst-0.41.tar.gz,
+	  MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz,
+	  MNOONING/PlRPC/PlRPC-0.2020.tar.gz,
+	  PETDANCE/Test-WWW-Mechanize-1.14.tar.gz,
+	  RCAPUTO/Lexical-Persistence-0.97.tar.gz,
+	  RCAPUTO/POE-Component-Client-HTTP-0.82.tar.gz,
+	  RCLAMP/Devel-Caller-0.11.tar.gz,
+	  RCLAMP/Devel-LexAlias-0.04.tar.gz
+
+	Does that mean that we have N modules that work only on threaded or only on non threaded perls?
+
+	started to work on threaded+nondebugging and stopped to work on nonthreaded+debugging:
+	  [dep] AWWAIID/Continuity-0.95.tar.gz
+	  MLEHMANN/Coro-4.11.tar.gz
+	  [dep] TEEJAY/Maypole-2.121.tar.gz
+	  TMTM/CGI-Untaint-date-1.00.tar.gz
+	  VKON/Tcl-0.95.tar.gz
+	  YVES/Date-Simple-3.02.tar.gz
+
+	stopped to work on threaded+nondebugging and started to work on nonthreaded+debugging:
+	  [dep] CLKAO/Data-Bind-0.28.tar.gz
+	  CLKAO/Sub-Multi-0.003.tar.gz
+	  [dep] FGLOCK/v6-0.020.tar.gz
+	  JROCKWAY/Catalyst-Plugin-Unicode-0.8.tar.gz
+	  MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz
+	  [dep] MNOONING/PlRPC/PlRPC-0.2020.tar.gz
+	  [dep] RCAPUTO/Lexical-Persistence-0.97.tar.gz
+	  RCLAMP/Devel-Caller-0.11.tar.gz
+	  [dep] RCLAMP/Devel-LexAlias-0.04.tar.gz
+
+	works on threaded+debugging:
+	  CLKAO/Sub-Multi-0.003.tar.gz
+	  JROCKWAY/Catalyst-Plugin-Unicode-0.8.tar.gz (but never seems to work with optimize=O2 ???)
+
+	does not work on threaded+debugging:
+	  MLEHMANN/Coro-4.13.tar.gz
+	  VKON/Tcl-0.95.tar.gz
+	  YVES/Date-Simple-3.02.tar.gz
+	  MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz
+	  RCLAMP/Devel-Caller-0.11.tar.gz
+
+	always worked with O2:
+	  MLEHMANN/Coro-4.11.tar.gz
+	
+2007-10-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 32174 has broken Devel::Caller 0.11 and fixed quite a lot of others.
+	Maybe a threaded thing? Need to start book keeping. 32174 says:
+
+new fails
+	  CLKAO/Data-Bind-0.28.tar.gz[770],
+	  CLKAO/Sub-Multi-0.003.tar.gz[807],
+	  FGLOCK/v6-0.020.tar.gz[808],
+	  JPEACOCK/SVN-Notify-Mirror-0.03603.tar.gz[553],
+	  JROCKWAY/Catalyst-Plugin-Unicode-0.8.tar.gz[1230],
+	  LBROCARD/Test-WWW-Mechanize-Catalyst-0.41.tar.gz[1166],
+	  MIYAGAWA/Log-Dispatch-Config-1.02.tar.gz[939],
+	  MNOONING/Net-Daemon/Net-Daemon-0.43.tar.gz[709],
+	  MNOONING/PlRPC/PlRPC-0.2020.tar.gz[1355]
+	  MSERGEANT/POE-Component-Logger-1.00.tar.gz[940],
+	  PETDANCE/Test-WWW-Mechanize-1.14.tar.gz[438],
+	  RCAPUTO/Lexical-Persistence-0.97.tar.gz[92],
+	  RCLAMP/Devel-Caller-0.11.tar.gz[90],
+	  RCLAMP/Devel-LexAlias-0.04.tar.gz[91],
+gone
+    AWWAIID/Continuity-0.95.tar.gz,
+	  CLACO/Data-Currency-0.04002.tar.gz,
+	  CLACO/Finance-Currency-Convert-WebserviceX-0.06001.tar.gz,
+	  DAXIM/Yahoo-Photos-0.0.2.tar.gz,
+	  DCONWAY/Contextual-Return-v0.2.1.tar.gz,
+	  JROBINSON/SQL-Translator-0.08001.tar.gz,
+	  MLEHMANN/Coro-4.11.tar.gz,
+	  NIKIP/Authen-PAM-0.16.tar.gz,
+	  RCLAMP/POE-Component-Server-HTTP-0.09.tar.gz,
+	  TEEJAY/Maypole-2.121.tar.gz,
+	  TMTM/CGI-Untaint-date-1.00.tar.gz,
+	  VKON/Tcl-0.95.tar.gz,
+	  YVES/Date-Simple-3.02.tar.gz
+
+	and 32180 has no substantial change. 81 will be unthreaded again.
+
+	* spamassassin seems to have bugs in the test suite that then are
+	ignored. Seems to call out to the perl in the path which chokes on the
+	prototype "_".
+
+	* DWHEELER/Exception-Class-DBI-0.95.tar.gz failed for the first time
+	ever in 32154. It was with DBI 1.601 and I think it was the first to
+	encounter 1.601. Yes, when compiling with 32152 it was still DBI 1.59. 
+
+	http://rt.cpan.org/Ticket/Display.html?id=30230
+
+	* off topic AndyA has created coop google searches for perl and cpan:
+
+	http://google.com/coop/cse?cx=008709583689349882482%3Aw2_rnxeqmu0
+	http://google.com/coop/cse?cx=008709583689349882482%3Aj5fu_7cy8vu
+
+	* /tmp watching again:
+
+	30209 Apache-Session                   Cleaning up /tmp directory
+
+	* -rw-------  1 sand sand   2212 Oct 23 02:04 CyoWt00GDv
+
+	find . -depth -user sand -and -newer a0u4eNQ7UO -and -not -newer saoDrTlcuA -exec rm -rv {} \;
+
+2007-10-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 32154 fails with
+
+Failed 1 test out of 1430, 99.93% okay.
+        ../ext/threads/shared/t/waithires.t
+
+	on perl itself. 'make nok' sent. Seems to be because I tried a threaded
+	perl. Sorry, forgot to make a backup, reconstruct running...
+
+	It turns out that I see the same on 32174 and that it is load dependent.
+	And JDHEDDEN says this is not a bug and he is not willing to change the
+	timeouts. I wonder if this is related to threaded builds (321[57]4 were
+	threaded) or really only load driven.
+
+	* Yesterday I built my first jifty installation with current SVN and
+	bleadperl. 32147 was the patchnumber. Soon after this installation was
+	completed this perl was used to test Email-Send-2.191 and it failed
+	miserably with errors leading to something jifty:
+
+	http://www.nntp.perl.org/group/perl.cpan.testers/2007/10/msg702186.html
+
+	Retrying the tests with 32152 succeeds nicely and with 32147 I can
+	reproduce the bug. Resolution simple:
+
+	http://rt.cpan.org/Ticket/Display.html?id=30183
+
+2007-10-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Variable::Magic is a candidate for a BBC article but the binary search
+	is veiled by the fact that 28380/28381 is an important transition but
+	there is another important transition. 28381 fails all tests with glibc
+	noise but nowadays only one test fails. I need to find the transition
+	from glibc noise to code that at least runs.
+
+	The other end seems to be 28968 so that 28969 fixed the glibc thing. But
+	this is very surprising because that patch only "bumped version to
+	5.9.5". Maybe Variable::Magic uses the 4/5 somewhere.
+
+	Now running Variable::Magic tests with 28969:
+
+Failed Test  Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/31-array.t    2   512    21    2  20-21
+3 tests skipped.
+
+	But current bleadperl 32152 failes with
+
+Failed Test   Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/10-simple.t    0    11    14    4  13-14
+Failed 1/20 test scripts. 2/217 subtests failed.
+Files=20, Tests=217,  9 wallclock secs ( 4.43 cusr +  0.27 csys =  4.70 CPU)
+Failed 1/20 test programs. 2/217 subtests failed.
+
+
+	32015 is the first perl that breaks on 10-simple in this manner.
+
+	http://rt.cpan.org/Ticket/Display.html?id=30197
+
+2007-10-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 32138 break keepcool and pingomatic--why? The logfiles for them are
+	not being split out. In the original logfile I see
+
+Can't open perl script "/tmp/Ab5Z0NrlWf": No such file or directory
+Can't open perl script "/tmp/Ab5Z0NrlWf": No such file or directory
+
+	So it seems that I may have deleted a wrong /tmp file and actually
+	disturbed CPAN::Reporter and caused a false negative.
+
+	* more tempfiles and who they might come from:
+
+-rw-rw-r--  1 sand sand   6000 Oct 19 07:46 8l3WxFQ5ki
+-rw-rw-r-- 1 sand sand 1487 Oct 19 07:46 CPAN-Dependency-0.11-l5Lnci.yml
+
+	Test fails and is time consuming, running out of time.
+
+-rw-r--r--  1 sand sand   2048 Oct 19 07:02 sb-test.23308
+-rw-r--r--  1 sand sand   4096 Oct 19 07:03 sb-test.23332
+-rw-r--r--  1 sand sand   2048 Oct 19 07:03 sb-test.23338
+-rw-r--r--  1 sand sand   2048 Oct 19 07:03 sb-test.23534
+-rw-rw-r-- 1 sand sand 1563 Oct 19 07:02 DateTime-Format-ISO8601-0.06-dKW3or.yml
+
+	Nope, no connection observed.
+
+-rw-rw-r--  1 sand sand      9 Oct 19 05:26 4077fsCcIV
+-rw-rw-r-- 1 sand sand 1561 Oct 19 05:26 IO-Async-0.09-sZbY3R.yml
+
+	Yes, reported
+
+	30141 IO-Async          Cleaning up /tmp directory;
+
+	Also:
+
+	30142 KinoSearch        Cleaning up /tmp directory; predictable tmp filenames
+
+-rw-rw-r--  1 sand sand    452 Oct 19 04:53 petal_debug.26135.1192762409.dhcbshswxa
+-rw-rw-r--  1 sand sand    703 Oct 19 04:53 petal_debug.26189.1192762430.vasuxjjgrp
+-rw-rw-r--  1 sand sand   1633 Oct 19 04:53 petal_debug.26188.1192762430.rmjyjqrpmt
+-rw-rw-r--  1 sand sand   1431 Oct 19 04:53 petal_debug.26188.1192762430.nnmkfdmcol
+-rw-rw-r--  1 sand sand   1395 Oct 19 04:53 petal_debug.26188.1192762430.nczunhwpnl
+-rw-rw-r--  1 sand sand   1344 Oct 19 04:53 petal_debug.26188.1192762430.lcgnvwaewx
+-rw-rw-r--  1 sand sand    150 Oct 19 04:54 petal_cache_2.19_a58e7f5fd83c96c482a2699eec876a3f
+-rw-rw-r--  1 sand sand    154 Oct 19 04:54 petal_cache_2.19_472e5319343b8068fb59de8231ee9008
+-rw-rw-r--  1 sand sand    487 Oct 19 04:54 petal_cache_2.19_3976ac25dc4109849c1cfb097b337432
+-rw-rw-r--  1 sand sand    490 Oct 19 04:54 petal_cache_2.19_1630bf5852cd9f7bedd9c5c361f6d951
+-rw-rw-r--  1 sand sand   4484 Oct 19 04:54 petal_debug.26230.1192762445.ziottszpqa
+-rw-rw-r--  1 sand sand  22188 Oct 19 04:54 petal_cache_2.19_16a885a2aea7745dae5e0a0651edc4f3
+-rw-rw-r--  1 sand sand   8621 Oct 19 04:54 petal_cache_2.19_54b3f86dbf348e89c2ec2685e7c15073
+-rw-rw-r-- 1 sand sand 1523 Oct 19 04:54 Petal-2.19-77UZcA.yml
+
+	11 files come from this one and I have reported:
+
+	30143 Petal                Cleaning up /tmp directory
+	
+drwxrwxrwx  4 sand sand   4096 Oct 19 04:49 FileCache/
+-rw-rw-r-- 1 sand sand 1563 Oct 19 04:49 Pugs-Compiler-Rule-0.26-hUeyBl.yml
+
+-rw-------  1 sand sand     42 Oct 19 04:31 ZRcWZeunOs
+drwx------  2 sand sand   4096 Oct 19 04:31 QjqZAyxa0x/
+-rw-------  1 sand sand     40 Oct 19 04:31 E13wRFaSci
+drwx------  2 sand sand   4096 Oct 19 04:31 ozY6kh6pjY/
+drwx------  2 sand sand   4096 Oct 19 04:31 lZNsNEgqMo/
+drwx------  2 sand sand   4096 Oct 19 04:31 41RniDPWeh/
+drwx------  2 sand sand   4096 Oct 19 04:31 11IxvNWzvg/
+-rw-rw-r-- 1 sand sand 1259 Oct 19 04:42 parrot-0.4.16-0zNo5F.yml
+
+-rw-------  1 sand sand    125 Oct 20 05:07 0M1yjD09XK
+-rw-rw-r-- 1 sand sand 1601 Oct 20 05:07 Slay-Makefile-Gress-0.04-qkMixG.yml
+-rw-rw-r-- 1 sand sand 1792 Oct 20 05:07 Text-Restructured-0.003036-pgPGFU.yml
+
+-rw-rw-r--  1 sand sand 227803 Oct 20 04:22 NsghdoXHTf
+drwx------  2 sand sand   4096 Oct 20 04:23 midvhy07gr
+-rw-rw-r-- 1 sand sand 1703 Oct 20 04:22 Test-Warn-0.10-etCdoR.yml
+-rw-rw-r-- 1 sand sand 2318 Oct 20 04:24 DBM-Deep-1.0006-XnHLow.yml
+
+	* reported:
+
+	30113 HTTP-Server-Simple-Mason  Cleaning up /tmp directory; predictable tmp filenames
+
+2007-10-17  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* reported:
+
+	30051 Pod-Manual        Cleaning up /tmp directory; predictable tmp filenames
+
+	* If cpan really shouldn't be run as root, then CPAN should refuse to
+	run as root if sudo is available. --Alias in
+	http://use.perl.org/comments.pl?threshold=0&mode=nested&commentsort=0&op=Change&sid=37249
+
+2007-10-16  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* From the timestamps one of the three must write the Hello World tempfiles:
+
+-rw-rw-r-- 1 sand sand 1605 Oct 16 10:30 HTTP-Request-AsCGI-0.5-3yvbwD.yml
+-rw-rw-r-- 1 sand sand 1465 Oct 16 10:30 Text-SimpleTable-0.03-oRnFgA.yml
+-rw-rw-r-- 1 sand sand 1516 Oct 16 10:30 HTTP-Body-0.9-PO5l6r.yml
+
+	The latter.
+
+  30048 HTTP-Body         Cleaning up /tmp directory
+
+	* Yesterday on #p5p:
+
+23:51:48 <@rjbs> Hm.  Rose::HTML::Object::Messages breaks on 5.10
+23:51:48 <@rjbs> next  unless(defined *{$fq_sub}{'CODE'} && $name =~ 
+                 /^[A-Z0-9_]+$/);
+23:52:05 <@rjbs> $fq_sub is a string (symbolic ref)
+23:52:05 <@rjbs> Not a GLOB reference at lib/Rose/HTML/Object/Messages.pm line 
+                 168.
+
+2007-10-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: revisit 28915, it seems to have fallen off the edge of the
+	carpet. And dmq's related one. And possibly weigh in File::Spec rev 3.25_01!
+
+2007-10-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Going to report tmp directory. I already have reported:
+
+	26078 Config-JSON: Using predictable filenames in /tmp is a security
+	hazard and should be avoided even in test scripts. Besides if they
+	aren't cleaned up they lead to failing tests. Please use File::Temp
+	instead.
+
+	26951 Cache-FastMmap (resolved): Using predictable filenames in /tmp has
+	some security implications too, so should be avoided. In this case it
+	simply causes the test to fail because another user has occupied this
+	file or directory.
+
+	26538 HTML-Scrubber: The first bug is that the tmp file was not cleaned
+	up and left ove from a different user in /tmp/. Generally it is
+	considered a security issue to put predictable files into /tmp.
+	File::Temp should be used instead.
+
+	26536 Module-Refresh (resolved): The first bug is that the test script
+	does not clean up after itself. /tmp/FooBar.pm is still around from a
+	test by a different user. In general it is considered a security issue
+	to write predictable file names into /tmp. Better you use File::Temp
+	(and remove the files at the end nonetheless).
+
+	Today I find a DBM Deep file, one that starts with "use strict;\nuse
+	ExtUtils::MakeMaker;\nuse CPAN::Version;\n\n# read module and prereq
+	string from STDIN\nwhile ( <STDIN> ) {...", a directory with two
+	DBM-Deep files, about 40 "Hello world" perl programs, all at 23:45, a
+	catalyst logo in PNG format at 23:47 and many, many more
+
+	29969 CGI-Session: "Temporary files left over in /tmp"
+  30020 Log-Report					  Cleaning up /tmp directory
+  30019 SQL-DB							  Cleaning up /tmp directory; predictable tmp filenames	open
+  30018 PAR-Repository-Client Cleaning up /tmp directory	open
+
+2007-10-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Slaven sends a miserable FAIL with 5.6.2 and YAML 0.39.
+
+	* The failing tests on mod_perl, Archive-Any, and GIS-Distance are
+	repeatable with 32104 and Log-Dispatch-Config
+	(http://rt.cpan.org/Ticket/Display.html?id=30073) has joined them in
+	failing. I've stopped all running loops to look around in the /tmp
+	directory.
+
+	32090 had a working A:A. fforce test on it now fails with
+
+Running make test
+Bareword found where operator expected at /tmp/N0WH1MFuPP line 1, near "'/usr/bin/make test 'TEST_FILES"
+        (Missing operator before TEST_FILES?)
+Bareword found where operator expected at /tmp/N0WH1MFuPP line 1, near "00compile"
+        (Missing operator before compile?)
+Bareword found where operator expected at /tmp/N0WH1MFuPP line 3, near "'TEST_FILES=t/00compile.t t/Any.t t/fail.t t/perl-critic.t t/pod.t t/type.t' exited"
+        (Missing operator before exited?)
+syntax error at /tmp/N0WH1MFuPP line 1, near "'/usr/bin/make test 'TEST_FILES"
+Can't find string terminator "'" anywhere before EOF at /tmp/N0WH1MFuPP line 3.
+
+	And the tempfile is gone. Starting to cleanup my /tmp directory and
+	rerunning the A:A test again and again. AA itself leaves a testfile in
+	/tmp. Not every time?
+
+	Found something, not related to the tmp directory. I have
+
+test:
+  args:
+    - "TEST_FILES=t/00compile.t t/Any.t t/fail.t t/perl-critic.t t/pod.t t/type.t"
+
+	in the distroprefs file. If I remove it we succeed. Finding a new bug by
+	working around another. Who broke the distroprefs file? It is not
+	MakeMaker or Harness. If I issue 'make test TEST_F...' manually it is
+	fine. It's something coming earlier.
+
+	It's in CPAN::Reporter. If I turn reporting off it goes away.
+	Downgrading to 0.99_1[540] same problem. Downgrading to 99_05 nope,
+	99_01 nope. To 0.4801 good.
+
+	Ticks in a command. Patch sent to David.
+
+2007-10-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* BLUEFEET/GIS-Distance-0.01001.tar.gz also suddenly breaks with 32101:-(
+
+	And CMOORE/Archive-Any-0.093.tar.gz too. And something somehow connected
+	to the /tmp directory.
+
+	* mod_perl starts failing with 32101:
+
+[Fri Oct 12 01:50:59 2007] [error] Can't locate lib.pm in @INC (@INC contains: /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0/i686-linux-64int /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0 /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0/i686-linux-64int /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0 /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t/ /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t/lib/perl) at /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t//docs/startup.pl line 8.\nBEGIN failed--compilation aborted at /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t//docs/startup.pl line 8.\nCompilation failed in require at (eval 2) line 1.\n
+Syntax error on line 62 of /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t/conf/httpd.conf:
+Can't locate lib.pm in @INC (@INC contains: /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0/i686-linux-64int /home/src/www/apache/apache/apache_1.3.37/lib/5.10.0 /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0/i686-linux-64int /home/src/www/apache/apache/apache_1.3.37/lib/site_perl/5.10.0 /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t/ /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t/lib/perl) at /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t//docs/startup.pl line 8.
+BEGIN failed--compilation aborted at /home/sand/.cpan/build/mod_perl-1.30-0CO6Yi/t//docs/startup.pl line 8.
+Compilation failed in require at (eval 2) line 1.
+
+	Go figure. I want to see this repeated before I investigate.
+
+	* PAR::Filter et al. permanently broken since 31796 on blead, OK with
+	current maintperl
+
+2007-09-06T07:55 	perl 	31796 	391 	SMUELLER/PAR-Packer-0.976.tar.gz 	NOT OK
+2007-09-05T17:16 	perl 	31795 	588 	SMUELLER/PAR-Packer-0.976.tar.gz 	OK
+
+	Cannot be something with patch 31796, it's just a test fix.
+
+	I still have 31790 and 31824 around. The autobundle diff shows these
+	suspicious candidates:
+
+	- Archive::Unzip::Burst                # seems ok
+	* B
+	- Class::Component
+	- Class::MethodMaker
+	- Crypt::SipherSaber
+	* ExtUtils::Install    1.41_04/1.44    # seems ok
+	* File::Path                           # seems ok
+	+ Getopt::Attribute    1.42            # seems ok
+	* MRO::Compat                          # seems ok
+	* Module::Build                        # seems ok
+	- PAR::Filter
+	+ Set::Scalar
+	* Test::Deep
+	- Text::Diff::Parser
+	- Text::Scan
+	* XML::LibXML
+
+	/home/sand/.cpan/build/PAR-Packer-0.976-JePP61/blib/script/pp: Failed to extract a parl from 'PAR::StrippedPARL::Static' to file 'parltQZf2Gh' at /home/sand/.cpan/build/PAR-Packer-0.976-JePP61/blib/lib/PAR/Packer.pm line 1149, <DATA> line 1.
+
+	It's about extracting. This Archive::Unzip::Burst looks interesting. Why
+	do we not have it?
+
+	31790 compiles it and tests ok and has it installed.
+
+	31824 has an old CPAN but it compiles it and tests OK. PAR Packer takes
+	a long time to compile. It fails at compilation stage with
+
+./par -I../myldr/.. -I../blib/lib -I"/home/sand/.cpan/build/PAR-Packer-0.976-ZlXHYS/inc" -I"/home/sand/.cpan/build/Archive-Unzip-Burst-0.02-58kTmp/blib/arch" -I"/home/sand/.cpan/build/Archive-Unzip-Burst-0.02-58kTmp/blib/lib" -I"/home/src/perl/repoperls/installed-perls/perl/pSib5JX/perl-5.8.0@31824/lib/5.10.0/i686-linux-64int" -I"/home/src/perl/repoperls/installed-perls/perl/pSib5JX/perl-5.8.0@31824/lib/5.10.0" -I"/home/src/perl/repoperls/installed-perls/perl/pSib5JX/perl-5.8.0@31824/lib/site_perl/5.10.0/i686-linux-64int" -I"/home/src/perl/repoperls/installed-perls/perl/pSib5JX/perl-5.8.0@31824/lib/site_perl/5.10.0" -I"/home/sand/.cpan/build/PAR-Packer-0.976-ZlXHYS" -I"." -q -B -O../script/parldyn
+Usage: ./par [ -Alib.par ] [ -Idir ] [ -Mmodule ] [ src.par ] [ program.pl ]
+       ./par [ -B|-b ] [-Ooutfile] src.par
+
+	Maybe it has to do with option parsing? I mean, when I *install*
+	Archive::Unzip::Burst and then try PAR again from scratch, it fails with
+	the same error message. Getopt::ArgvFile is a prereq and has not changed.
+
+	31790 has Getopt::Attribute missing. I retry to fforce test it on 31790.
+	It compiles it. Running test ... (running out of time)
+
+	For 31824 I hide Getopt::Attribute now and fforce test PAR-Packer-0.976
+	here too. It fails again with the same error message.
+
+	For 31824 I downgrade Module::Build from 0.2808_01 to 0.2808 which 790
+	had. PAR-Parser still fails with the same error.
+
+	For 31824 I downgrade from E:I 1.44 to
+	YVES/ExtUtils-Install-1.41_04.tar.gz. I expect that if this has an
+	influence it would show in the installation of other modules and so do
+	not expect a change in behaviour. And so it gets confirmed.
+
+	For 31824 I find a File::Path 2.00_11 which is lower than the 2.01 in
+	31790.
+
+	Can I see the above par command once again for 31790?
+
+./par -I../myldr/.. -I../blib/lib -I"/home/sand/.cpan/build/PAR-Packer-0.976-slY0pI/inc" -I"/home/src/perl/repoperls/installed-perls/perl/pNaGaP6/perl-5.8.0@31790/lib/5.9.5/i686-linux-64int" -I"/home/src/perl/repoperls/installed-perls/perl/pNaGaP6/perl-5.8.0@31790/lib/5.9.5" -I"/home/src/perl/repoperls/installed-perls/perl/pNaGaP6/perl-5.8.0@31790/lib/site_perl/5.9.5/i686-linux-64int" -I"/home/src/perl/repoperls/installed-perls/perl/pNaGaP6/perl-5.8.0@31790/lib/site_perl/5.9.5" -I"/home/sand/.cpan/build/PAR-Packer-0.976-slY0pI" -I"." -q -B -O../script/parldyn
+
+	I realize that downgrading 31824 is more cumbersome than upgrading
+	31790. Just run r command and pick something and retry PAR-Parser. I
+	picked Set::Scalar and then realized that I'm hunting two bugs at once.
+	One is the above "./par" command that triggers a "Usage" error, the
+	other is a failing 20-pp test. And I see now that 31790 fails on test
+	20-pp. Unfortunately it is a very time consuming test and I must restart
+	me research to find explain each error separately.
+
+2007-10-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 5.6.2 can also have the corruption:
+
+*** glibc detected *** /usr/local/perl-5.6.2/bin/perl: double free or corruption (!prev): 0x08154f08 ***
+======= Backtrace: =========
+/lib/i686/cmov/libc.so.6[0xb7ea1cf5]
+/lib/i686/cmov/libc.so.6(cfree+0x90)[0xb7ea5790]
+/usr/local/perl-5.6.2/bin/perl(Perl_safefree+0x85)[0x80ae618]
+/usr/local/perl-5.6.2/bin/perl(Perl_mg_free+0x79)[0x80b5146]
+/usr/local/perl-5.6.2/bin/perl(Perl_sv_clear+0x510)[0x80d4af6]
+/usr/local/perl-5.6.2/bin/perl(Perl_sv_free+0x1d3)[0x80d5046]
+/usr/local/perl-5.6.2/bin/perl(Perl_sv_clear+0x6c0)[0x80d4ca6]
+/usr/local/perl-5.6.2/bin/perl(Perl_sv_free+0x1d3)[0x80d5046]
+/usr/local/perl-5.6.2/bin/perl(Perl_free_tmps+0x6f)[0x80f23c6]
+/usr/local/perl-5.6.2/bin/perl(Perl_pp_nextstate+0x64)[0x80c1780]
+/usr/local/perl-5.6.2/bin/perl(Perl_runops_debug+0x154)[0x80c135c]
+/usr/local/perl-5.6.2/bin/perl[0x805d69f]
+/usr/local/perl-5.6.2/bin/perl(perl_run+0xde)[0x805d247]
+/usr/local/perl-5.6.2/bin/perl(main+0x9f)[0x8059eb3]
+/lib/i686/cmov/libc.so.6(__libc_start_main+0xe0)[0xb7e4e050]
+/usr/local/perl-5.6.2/bin/perl[0x8059d91]
+======= Memory map: ========
+08048000-08146000 r-xp 00000000 03:02 57623      /usr/local/perl-5.6.2/bin/perl
+08146000-0814f000 rwxp 000fe000 03:02 57623      /usr/local/perl-5.6.2/bin/perl
+0814f000-08253000 rwxp 0814f000 00:00 0          [heap]
+b7c00000-b7c21000 rwxp b7c00000 00:00 0
+b7c21000-b7d00000 ---p b7c21000 00:00 0
+b7db4000-b7dbe000 r-xp 00000000 03:02 767731     /lib/libgcc_s.so.1
+b7dbe000-b7dbf000 rwxp 00009000 03:02 767731     /lib/libgcc_s.so.1
+b7dd4000-b7de7000 r-xp 00000000 03:02 767894     /lib/i686/cmov/libpthread-2.6.1.so
+b7de7000-b7de9000 rwxp 00013000 03:02 767894     /lib/i686/cmov/libpthread-2.6.1.so
+b7de9000-b7deb000 rwxp b7de9000 00:00 0
+b7deb000-b7e02000 r-xp 00000000 09:01 17550801   /home/sand/.cpan/build/Event-1.09-E0n7Zq/blib/arch/auto/Event/Event.so
+b7e02000-b7e03000 rwxp 00016000 09:01 17550801   /home/sand/.cpan/build/Event-1.09-E0n7Zq/blib/arch/auto/Event/Event.so
+b7e03000-b7e06000 rwxp b7e03000 00:00 0
+b7e06000-b7e08000 r-xp 00000000 03:02 768237     /lib/i686/cmov/libutil-2.6.1.so
+b7e08000-b7e0a000 rwxp 00001000 03:02 768237     /lib/i686/cmov/libutil-2.6.1.so
+b7e0a000-b7e0f000 r-xp 00000000 03:02 767161     /lib/i686/cmov/libcrypt-2.6.1.so
+b7e0f000-b7e11000 rwxp 00004000 03:02 767161     /lib/i686/cmov/libcrypt-2.6.1.so
+b7e11000-b7e38000 rwxp b7e11000 00:00 0
+b7e38000-b7f7a000 r-xp 00000000 03:02 767159     /lib/i686/cmov/libc-2.6.1.so
+b7f7a000-b7f7b000 r-xp 00142000 03:02 767159     /lib/i686/cmov/libc-2.6.1.so
+b7f7b000-b7f7d000 rwxp 00143000 03:02 767159     /lib/i686/cmov/libc-2.6.1.so
+b7f7d000-b7f80000 rwxp b7f7d000 00:00 0
+b7f80000-b7fa3000 r-xp 00000000 03:02 767163     /lib/i686/cmov/libm-2.6.1.so
+b7fa3000-b7fa5000 rwxp 00023000 03:02 767163     /lib/i686/cmov/libm-2.6.1.so
+b7fa5000-b7fa7000 r-xp 00000000 03:02 767162     /lib/i686/cmov/libdl-2.6.1.so
+b7fa7000-b7fa9000 rwxp 00001000 03:02 767162     /lib/i686/cmov/libdl-2.6.1.so
+b7fa9000-b7fbd000 r-xp 00000000 03:02 767552     /lib/i686/cmov/libnsl-2.6.1.so
+b7fbd000-b7fbf000 rwxp 00013000 03:02 767552     /lib/i686/cmov/libnsl-2.6.1.so
+b7fbf000-b7fc2000 rwxp b7fbf000 00:00 0
+b7fc2000-b7fc9000 r-xp 00000000 03:02 768225     /lib/i686/cmov/librt-2.6.1.so
+b7fc9000-b7fcb000 rwxp 00006000 03:02 768225     /lib/i686/cmov/librt-2.6.1.so
+b7fcb000-b7fd1000 r-xp 00000000 03:02 75923      /usr/local/perl-5.6.2/lib/site_perl/5.6.2/i686-linux-64int/auto/Time/HiRes/HiRes.so
+b7fd1000-b7fd2000 rwxp 00005000 03:02 75923      /usr/local/perl-5.6.2/lib/site_perl/5.6.2/i686-linux-64int/auto/Time/HiRes/HiRes.so
+b7fd2000-b7fd4000 r-xp 00000000 03:02 230196     /usr/local/perl-5.6.2/lib/5.6.2/i686-linux-64int/auto/attrs/attrs.so
+b7fd4000-b7fd5000 rwxp 00001000 03:02 230196     /usr/local/perl-5.6.2/lib/5.6.2/i686-linux-64int/auto/attrs/attrs.so
+b7fd6000-b7fd8000 rwxp b7fd6000 00:00 0
+b7fd8000-b7ff4000 r-xp 00000000 03:02 767854     /lib/ld-2.6.1.so
+b7ff4000-b7ff6000 rwxp 0001b000 03:02 767854     /lib/ld-2.6.1.so
+bfcad000-bfcf0000 rw-p bfcad000 00:00 0 
+
+	
+
+2007-10-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* harness 2.99_03? Where is the mailing list? tapx-dev@hexten.net
+
+	From: Elliot Shank <perl@galumph.com>
+	Subject: Confusing test results for Perl::Critic 1.079_001.
+	To: andreas.koenig@anima.de
+	CC: perlcritic <dev@perlcritic.tigris.org>
+	Date: Tue, 09 Oct 2007 14:19:45 -0500
+
+	All tests pass, yet the test run is reported as failing.
+
+	Do you have any idea what's going on?
+
+
+2007-10-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 5.005_05. Running out of the CPAN WC
+
+Warning: prerequisite File::Temp 0 not found at (eval 4) line 220.
+Warning: prerequisite Scalar::Util 0 not found at (eval 4) line 220.
+Warning: prerequisite Test::Harness 2.62 not found at (eval 4) line 220.
+Warning: prerequisite Test::More 0 not found at (eval 4) line 220.
+
+	1) install Test::Harness     # installs 2.64
+	2) install File::Temp        # installs Test::More but fails for File::Temp due Carp::Heavy
+	3) install TJENNESS/File-Temp-0.16.tar.gz  # works
+	4) install GBARR/Scalar-List-Utils-1.18.tar.gz # works
+	5) install CPAN::Reporter
+
+		Failed during this command:
+		 ARANDAL/Pod-Simple-3.05.tar.gz               : make_test NO
+		 RRA/podlators-2.0.5.tar.gz                   : make_test NO
+		 MSCHWERN/ExtUtils-MakeMaker-6.36.tar.gz      : make NO
+		 DAGOLDEN/File-pushd-1.00.tar.gz              : make_test NO
+		 DMUEY/File-Copy-Recursive-0.35.tar.gz        : make_test NO
+		 MAREKR/Pod-Parser-1.35.tar.gz                : make_test NO
+		 JV/Getopt-Long-2.37.tar.gz                   : make_test NO one dependency not OK (Pod::Usage)
+		 DAGOLDEN/CPAN-Reporter-0.4801.tar.gz         : make_test NO
+
+	6) install MAREKR/PodParser-1.23.tar.gz  # works
+	7) install Term::ANSIColor               # works
+	8) install RRA/podlators-1.27.tar.gz     # works
+	9) install MSCHWERN/ExtUtils-MakeMaker-6.36.tar.gz # works
+	10) install DAGOLDEN/File-pushd-1.00.tar.gz # works
+
+	Now I tried it with Bundle::CPANxxl and during YAML::Syck got:
+
+*** glibc detected *** /usr/local/perl-5.005_05/bin/perl: free(): invalid next size (fast): 0x0818f3a8 ***
+======= Backtrace: ========= 
+/lib/i686/cmov/libc.so.6[0xb7e24cf5]
+/lib/i686/cmov/libc.so.6(cfree+0x90)[0xb7e28790]
+/usr/local/perl-5.005_05/bin/perl(Perl_sv_clear+0x39f)[0x80937af]
+/usr/local/perl-5.005_05/bin/perl(Perl_sv_free+0x4b)[0x809397b]
+/usr/local/perl-5.005_05/bin/perl(Perl_free_tmps+0x4c)[0x80a795c]
+/usr/local/perl-5.005_05/bin/perl(Perl_pp_nextstate+0x4f)[0x808d73f]
+/usr/local/perl-5.005_05/bin/perl(Perl_runops_standard+0x18)[0x80c4618]
+/usr/local/perl-5.005_05/bin/perl(perl_call_sv+0x314)[0x8059864]
+/usr/local/perl-5.005_05/bin/perl(Perl_call_list+0x1dd)[0x8059ced]
+/usr/local/perl-5.005_05/bin/perl(Perl_newSUB+0x93d)[0x807aa2d]
+/usr/local/perl-5.005_05/bin/perl(Perl_yyparse+0xe9c)[0x8071bcc]
+/usr/local/perl-5.005_05/bin/perl[0x80aad21]
+/usr/local/perl-5.005_05/bin/perl(Perl_pp_require+0x4f9)[0x80abbf9]
+/usr/local/perl-5.005_05/bin/perl(Perl_runops_standard+0x18)[0x80c4618]
+/usr/local/perl-5.005_05/bin/perl(perl_call_sv+0x314)[0x8059864]
+/usr/local/perl-5.005_05/bin/perl(Perl_call_list+0x1dd)[0x8059ced]
+/usr/local/perl-5.005_05/bin/perl(Perl_newSUB+0x93d)[0x807aa2d]
+/usr/local/perl-5.005_05/bin/perl(Perl_utilize+0x25a)[0x807d3aa]
+/usr/local/perl-5.005_05/bin/perl(Perl_yyparse+0xf95)[0x8071cc5]
+/usr/local/perl-5.005_05/bin/perl[0x80aad21]
+/usr/local/perl-5.005_05/bin/perl(Perl_pp_require+0x4f9)[0x80abbf9]
+/usr/local/perl-5.005_05/bin/perl(Perl_runops_standard+0x18)[0x80c4618]
+/usr/local/perl-5.005_05/bin/perl(perl_call_sv+0x314)[0x8059864]
+/usr/local/perl-5.005_05/bin/perl(Perl_call_list+0x1dd)[0x8059ced]
+/usr/local/perl-5.005_05/bin/perl(Perl_newSUB+0x93d)[0x807aa2d]
+/usr/local/perl-5.005_05/bin/perl(Perl_utilize+0x25a)[0x807d3aa]
+/usr/local/perl-5.005_05/bin/perl(Perl_yyparse+0xf95)[0x8071cc5]
+/usr/local/perl-5.005_05/bin/perl(perl_parse+0x709)[0x805b019]
+/usr/local/perl-5.005_05/bin/perl(main+0x75)[0x8057705]
+/lib/i686/cmov/libc.so.6(__libc_start_main+0xe0)[0xb7dd1050]
+/usr/local/perl-5.005_05/bin/perl[0x8057621]
+
+	Failed during this command:
+	 AUDREYT/YAML-Syck-0.97.tar.gz                : writemakefile NO '/usr/local/perl-5.005_05/bin/perl Makefile.PL' returned status 6
+	 RGIERSIG/Expect-1.21.tar.gz                  : make_test NO
+	 INGY/YAML-0.66.tar.gz                        : writemakefile NO '/usr/local/perl-5.005_05/bin/perl Makefile.PL' returned status 7424
+	 KWILLIAMS/Module-Build-0.2808.tar.gz         : make_test NO
+	 TJENNESS/File-Temp-0.18.tar.gz               : make_test NO
+	 GBARR/Scalar-List-Utils-1.19.tar.gz          : writemakefile NO '/usr/local/perl-5.005_05/bin/perl Makefile.PL' returned status 6
+	 ILYAM/Data-Dumper-2.121.tar.gz               : make NO
+	 DMUEY/File-Copy-Recursive-0.35.tar.gz        : make_test NO
+	 DAGOLDEN/CPAN-Reporter-0.4801.tar.gz         : make_test NO
+	 GBARR/IO-1.2301.tar.gz                       : writemakefile NO '/usr/local/perl-5.005_05/bin/perl Makefile.PL' returned status 65280
+	 AUDREYT/Module-Signature-0.55.tar.gz         : make_test NO one dependency not OK (IO::Socket::INET)
+	 PMQS/IO-Compress-Zlib-2.006.tar.gz           : make_test NO
+	 PMQS/Compress-Zlib-2.007.tar.gz              : make_test NO
+	 ADAMK/Archive-Zip-1.20.tar.gz                : make_test NO
+	 TOMHUGHES/IO-Zlib-1.07.tar.gz                : make_test NO
+	 KANE/Archive-Tar-1.36.tar.gz                 : make_test NO
+	
+
+2007-10-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* [rt.cpan.org #29616] "couldn't find a hints file" error seems like a
+	step backwards
+
+2007-10-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Got a list of interesting Tk modules from Slaven
+
+	Tk::Axis Tk::Carp Tk::Clock Tk::CodeText Tk::CursorControl Tk::DateEntry
+	Tk::DatePick Tk::DiffText Tk::DirSelect Tk::ExecuteCommand
+	Tk::FastSplash (tricky!) Tk::FileDialog Tk::FireButton Tk::Gauge
+	Tk::Graph Tk::GraphItems Tk::HTML Tk::IconCanvas Tk::JBrowseEntry
+	Tk::JComboBox Tk::JFileDialog Tk::JListbox Tk::JPEG::Lite Tk::LCD
+	Tk::LockDisplay (interactive!) Tk::MDI Tk::MListbox Tk::RotCanvas
+	Tk::StayOnTop Tk::Stderr Tk::TableMatrix Tk::TextANSIColor
+	Tk::TextHighlight (interactive!) Tk::TIFF Tk::ToolBar (interactive!)
+	Tk::Wizard Tk::Zinc
+
+	didn't try those marked as interactive, all others had well behaving
+	tests with DISPLAY=:121 except
+
+	TURNERJW/Tk-JFileDialog-1.34.tar.gz 
+	RCS/Tk-MListbox-1.11.tar.gz
+
+2007-10-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* t/034-uncompfile........ok
+t/035-uncompreadline....ok
+t/040-memory............ok
+t/041-error.............Name "main::BZIP" used only once: possible typo at t/041-error.t line 11.
+
+	I had to disable ARJAY/Compress-Bzip2-2.09.tar.gz because of this.
+	Happened with 5.6.2. Should make this a bugreport.
+
+	http://rt.cpan.org/Ticket/Display.html?id=29787
+
+	* #29754 5.005_05 has a lockfile problem. RESOLVED
+
+	* Todo: more often change the perl config to have more variability;
+
+	* http://rt.cpan.org/Ticket/Display.html?id=29759 whines about Gtk2 not
+	finishing its build. Something to do with @32001 in the path.
+
+2007-10-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* what's up with IPC::PubSub breakage? Is it breaking because of its
+	dependency on DBM::Deep?
+
+pocpoc=> select * from distroes where name like '%DBM-Deep-%';
+  id  |              name
+------+--------------------------------
+  978 | RKINYON/DBM-Deep-1.0001.tar.gz
+ 1725 | RKINYON/DBM-Deep-1.0000.tar.gz
+ 1783 | RKINYON/DBM-Deep-0.983.tar.gz
+ 3811 | RKINYON/DBM-Deep-1.0004.tar.gz
+ 3858 | RKINYON/DBM-Deep-1.0006.tar.gz
+ 3760 | RKINYON/DBM-Deep-1.0002.tar.gz
+ 3785 | RKINYON/DBM-Deep-1.0003.tar.gz
+(7 Zeilen)
+
+pocpoc=> select distro,count(*) from testruns where distro in (978,1725,1783,3811,3858,3760,3785) and testresult='OK' group by distro;
+ distro | count 
+--------+-------
+   1783 |    80
+   3811 |     3
+    978 |   322
+   3858 |     2
+   3785 |     6
+   3760 |     4
+(6 Zeilen)
+
+	Or in one line:
+
+pocpoc=> select distroes.name,count(*) from testruns, distroes where testruns.distro=distroes.id and distroes.name like '%IPC-PubSub-%' and testresult='OK' group by distroes.name;
+              name              | count 
+--------------------------------+-------
+ JESSE/IPC-PubSub-0.24.tar.gz   |   221
+ AUDREYT/IPC-PubSub-0.23.tar.gz |    13
+ AUDREYT/IPC-PubSub-0.26.tar.gz |   156
+ AUDREYT/IPC-PubSub-0.22.tar.gz |    58
+(4 Zeilen)
+
+	Only time series can help here. It started failing with 32002, was green
+	up to 32001. And indeed this was the first day of DBM-Deep 1.0006
+
+    /home/sand/.cpan/Bundle/Snapshot_2007_10_03_00.pm 32002
+	  /home/sand/.cpan/Bundle/Snapshot_2007_10_03_01.pm 32001
+
+	This also marked the change from 64bitint=define zu undef and a non
+	debugging perl, CPAN::Reporter 0.99_1[34], lots of other differences.
+
+	But I upgraded 32001 to DBM::Deep 1.0006 and now tests of IPC::PubSub
+	fail. Downgrading to DBM::Deep 1.0005 is refused because tests fail. But
+	it was not 1.0005, it was 1.0004 that which IPC::PubSub worked with
+	flawlessly.
+
+	http://rt.cpan.org/Ticket/Display.html?id=29757
+
+	* bugreport to Jifty would circle on: current SVN tells me to install
+	IPC::PubSub, Email::Send, Test::WWW::Declare
+
+	- IPC::PubSub in megainstall but tests failing
+
+	- Email::Send missing in megainstall, added now but tests failing
+
+	- Test::WWW::Declare unknown on CPAN must come from repo (done)
+
+	* EDPRATOMO/Algorithm-Permute-0.06.tar.gz probably needs a binary
+	search, it fails to *compile* the XS code. Presumably it has compiled
+	once upon a time. 25532 fails; 20002 OK; 23023 OK; OOOPs, I have doen
+	this already and reported. See further below.
+
+2007-10-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* JROBINSON/SQL-Translator-0.08001.tar.gz is another BBC candidate.
+
+t/37-translator-graph......Can't locate object method "is_trivial_link" via package "GLOB" at /home/sand/.cpan/build/SQL-Translator-0.08001-oWjySe/blib/lib/SQL/Translator/Schema/Graph.pm line 46.
+# Looks like you planned 3 tests but only ran 2.
+# Looks like your test died just after 2.
+dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED test 3
+        Failed 1/3 tests, 66.67% okay
+
+	See 2007-07-03 where I said I cannot run a binary search against it. Now
+	I can at least with some manual intervention. 23023 OK. It's hard to run
+	this binary search correct because now some of these perls do not pass
+	YAML tests and subsequently cannot patch/install Module::Build without
+	intervention. 24439 OK. 24759 OK.
+
+	But 24759 depends on YAML and YAML has was not working for 24759 so
+	CPAN.pm didn't install it. We have all tests pass but no installation.
+	Need to force it. And YAML::XS is also tunneled.
+
+	So we have a very dark tunnel around 24759 with neither YAML nor
+	Module::Build. I have a patch for MB but not for YAML.
+
+	In any case 28539 still has the test 37 bug. 25532 OK; 27048 fails;
+	26369 (needs force install YAML) OK; 26695 (force install YAML) fails;
+	26465 OK; 26545 fails; 26480 OK; ... 496 fails; 488 fails; 484 OK
+
+----Program----
+eval q{use SQL::Translator 0.08001};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../psiUhc4/perl-5.8.0@26486/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pQD0dEL/perl-5.8.0@26487/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	http://groups.google.com/group/perl.perl5.porters/browse_thread/thread/a7b653fdb4b5fc34/be6f8546211987a0?lnk=gst&q=bbc+translator#be6f8546211987a0
+
+	http://rt.cpan.org/Ticket/Display.html?id=29940
+
+
+	* RCLAMP/POE-Component-Server-HTTP-0.09.tar.gz looks like a BBC
+	candidate 22245 OK. But it's shadowed by the depends on POE-API-Peek
+	which was broken by blead for a while around 27514.
+
+	I have the impression that POE::API::Peek started to work on 31051 and
+	that POE::Component::Server::HTTP now works too since I have added a
+	dependency on POE::API::Peek in my distroprefs file. Nope, the
+	dependency on POE::API::Peek is in the Makefile.PL of P:C:S:HTTP.
+
+	Apparently all's well. *Maybe* there's also a configure_requires on POE
+	needed somewhere, dunno.
+
+	* IFF Compress::Zlib 2.X does not work we can take
+	PMQS/Compress-Zlib-1.42.tar.gz as a replacement!
+
+	Would be nice to find a replacement for Scalar-List-Utils too. 1.19 does
+	not work with blead@23023, but 1.17 does.
+
+2007-10-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* off topic: try rob kinyon's bug with the next bleadperl which will
+	have no debugging and no int64bit.
+
+2007-09-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* digging into gtk. It always failed because somebody told the Gtk
+	self-configuration that something on my system was not sufficient. No
+	helpful diagnostics were ever provided.
+
+	Running through the debugger today reveals that it is due to pkg-config.
+
+	Asking pkg-config with the right options reveals a few things
+
+	# pkg-config --exists --print-errors 'gtk+-2.0'
+
+	I had to call it several times and to install libxmu-dev libxinerama-dev
+	libxinerama1 (who would have guessed?)
+
+	This does at least let the above command return true.
+
+	But there is still a version requirement in the Gtk2 package that says
+
+	gtk+-2.0 >= 2.0.0
+
+	And surprise, we now fulfill it.
+
+	I think the only bug is the --silence-errors option that I saw in the
+	debugger. It should be replaced with --print-errors. Otherwise the user
+	never sees an error and has to suffer.
+
+	http://rt.cpan.org/Ticket/Display.html?id=29758
+
+	* todo: add more Tk modules to megainstall. Which are missing?
+
+    4454 2001-05-05 SREZIC/Tk-Autoscroll-1.11.tar.gz         MISS OK
+    9563 2007-03-17 SREZIC/Tk-Canvas-Point-0.03.tar.gz       MISS FAIL0 OK1
+    8190 2002-08-08 SREZIC/Tk-CanvasFig-1.014.tar.gz         MISS FAIL0 HANG0
+    9673 2003-02-12 SREZIC/Tk-ContextHelp-0.10.tar.gz        MISS FAIL0 HANG0
+   19515 2007-09-28 SREZIC/Tk-Date-0.42_51.tar.gz            MISS FAIL0 OK1
+   10448 2004-07-02 SREZIC/Tk-DateEntry-1.38.tar.gz          MISS FAIL0 OK1
+    5193 2005-10-10 SREZIC/Tk-Enscript-1.08.tar.gz           MISS FAIL0 OK1
+   10380 2007-04-10 SREZIC/Tk-FontDialog-0.13.tar.gz         HAVE
+   25367 2006-05-23 SREZIC/Tk-GBARR-2.07.tar.gz (Tk::Cloth)  MISS FAIL0 OK1
+   22275 2005-05-03 SREZIC/Tk-Getopt-0.49.tar.gz             MISS FAIL0 OK1
+   10848 2007-02-02 SREZIC/Tk-HistEntry-0.43.tar.gz          HAVE
+   19328 2004-07-02 SREZIC/Tk-JPEG-Lite-2.01403.tar.gz       MISS FAIL0 OK1
+    8146 2004-09-04 SREZIC/Tk-PathEntry-2.23.tar.gz          MISS FAIL0 OK1
+   60117 2007-07-27 SREZIC/Tk-Pod-0.9935.tar.gz              HAVE
+    6803 2005-08-25 SREZIC/Tk-Splash-0.14.tar.gz             MISS FAIL0 OK1
+  166725 2007-05-11 SREZIC/Tk-TIFF-0.10.tar.gz               MISS FAIL0 OK1
+   12299 2007-09-23 SREZIC/Tk-WidgetDump-1.35.tar.gz         MISS FAIL0 OK1
+    6855 2004-03-20 SREZIC/Tk-WinPrint-0.05.tar.gz           MISS FAIL1
+   12873 2006-09-01 SREZIC/Tk-XMLViewer-0.18.tar.gz          MISS FAIL0 OK1
+
+	HAVE  ... already installed
+	MISS  ... not installed yet
+	FAIL0 ... fails without DISPLAY
+	FAIL1 ... fails compile
+	OK    ... OK without DISPLAY
+	OK1   ... OK after setting DISPLAY=:121
+	HANG0 ... hangs during test with DISPLAY=:121 but doesn't hang with BATCH=1
+	
+	* DMAKI/Gungho-0.08007.tar.gz
+
+t/03_live/twitter................skipped
+        all skipped: Enable GUNGHO_TWITTER_USERNAME and GUNGHO_TWITTER_PASSWORD to run these tests
+t/99_kwalitee....................skipped
+        all skipped: Enable TEST_KWALITEE to enable these tests
+t/99_pod-coverage................skipped
+        all skipped: Enable TEST_POD environment variable to test POD
+t/99_pod.........................skipped
+        all skipped: Enable TEST_POD environment variable to test POD
+t/engine/danga-socket/01_load....ok
+t/engine/danga-socket/04_dns.....
+
+	and hangs forever. I kill that test and get this summary:
+
+Failed Test                    Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/02_config.t                     1   256     2    1  2
+t/engine/danga-socket/04_dns.t    0    15    20   40  1-20
+5 tests skipped.
+Failed 2/14 test scripts. 21/100 subtests failed.
+
+	All that should be in the report.
+
+	Repeat with maint@31223, same result, this time without sent report
+	because it was not running from the CPAN shell. Same failure on danga
+	for 5.8.8 but 5.8.8 doesn't have the 02_config failure.
+
+	http://rt.cpan.org/Ticket/Display.html?id=29660
+
 2007-09-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* MSISK/HTML-TableExtract-2.10.tar.gz: I had already RTed months ago
+	that it is due to the HTML::TreeBuilder but did I write it into a
+	distroprefs file? Yes, Sir, I have:
+	distroprefs/MSISK.HTML-TableExtract.yml and that is why since then I
+	have ONLY fails.
+
+	Would be cool to offer a fix though.
+
+	But in the interest of sanity it would be better to write a distroprefs
+	file automatically that's based on some criterium like, say, no release
+	for over N months although since that many months nothing but fail
+	reports. This would also be interesting for CPANTS.
 
 	* Todo: write a history of used distroprefs docs so we can identify
 	which ones are never used and can be purged.
