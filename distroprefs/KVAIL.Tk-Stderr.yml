@@ -1,6 +1,0 @@
----
-match:
-  distribution: "KVAIL/Tk-Stderr-\d"
-test:
-  env:
-    DISPLAY: ":121"

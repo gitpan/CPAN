@@ -1,9 +1,0 @@
----
-comment: |
-
-  https://rt.cpan.org/Ticket/Display.html?id=26538
-
-match:
-  distribution: "PODMASTER/HTML-Scrubber-0.08.tar.gz"
-patches:
-  - "ANDK/patches/HTML-Scrubber-0.08-ANDK-01.patch.gz"

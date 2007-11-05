@@ -1,6 +1,0 @@
----
-match:
-  distribution: "MJCARMAN/(Tie-Tk-Text|Tk-DiffText)-\d"
-test:
-  env:
-    DISPLAY: ":121"

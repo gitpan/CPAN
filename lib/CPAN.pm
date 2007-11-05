@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_51';
+$CPAN::VERSION = '1.9204';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -154,44 +154,6 @@ sub soft_chdir_with_alternatives ($);
     }
 }
 
-{
-	open(SAVEOUT,">&STDOUT") or die "dup failed";
-	my $redir = 0;
-	sub _redirect(@) {
-		#die if $redir;
-		local $_;
-		push(@_,undef);
-		while(defined($_=shift)) {
-			if (s/^\s*>//){
-				my ($m) = s/^>// ? ">" : "";
-				s/\s+//;
-				$_=shift unless length;
-				die "no dest" unless defined;
-				open(STDOUT,">$m",$_) or die "open:$_:$!\n";
-				$redir=1;
-			} elsif ( s/^\s*\|\s*// ) {
-				my $pipe="| $_";
-				while(defined($_[0])){
-					$pipe .= ' ' . shift;
-				}
-				open(STDOUT,$pipe) or die "open:$pipe:$!\n";
-				$redir=1;
-			} else {
-				push(@_,$_);
-			}
-		}
-		return @_;
-	};
-	sub _unredirect {
-		return unless $redir;
-		$redir = 0;
-		## redirect: unredirect and propagate errors.  explicit close to wait for pipe.
-		close(STDOUT);
-		open(STDOUT,">&SAVEOUT");
-		die "$@" if "$@";
-		## redirect: done
-	};
-};
 #-> sub CPAN::shell ;
 sub shell {
     my($self) = @_;
@@ -309,12 +271,7 @@ ReadLine support %s
                 next SHELLCOMMAND unless @line;
             $CPAN::META->debug("line[".join("|",@line)."]") if $CPAN::DEBUG;
             my $command = shift @line;
-            eval {
-				local (*STDOUT)=*STDOUT;
-				@line = _redirect(@line);
-				CPAN::Shell->$command(@line)
-			};
-			_unredirect;
+            eval { CPAN::Shell->$command(@line) };
             if ($@) {
                 my $err = "$@";
                 if ($err =~ /\S/) {
@@ -1037,7 +994,7 @@ sub checklock {
                                     qq{
 There seems to be running another CPAN process (pid $otherpid).  Contacting...
 });
-            if (kill 0, $otherpid or $!{EPERM}) {
+            if (kill 0, $otherpid) {
                 $CPAN::Frontend->mywarn(qq{Other job is running.\n});
                 my($ans) =
                     CPAN::Shell::colorable_makemaker_prompt
