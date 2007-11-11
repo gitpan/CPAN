@@ -1,6 +1,0 @@
----
-match:
-  distribution: "RCLAMP/POE-Component-Server-HTTP-\d"
-depends:
-  requires:
-    POE::API::Peek: 0

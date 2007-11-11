@@ -1,5 +1,5 @@
 ---
-# $HeadURL: https://pause.perl.org:5460/svn/cpanpm/trunk/distroprefs/CORION.Test-Without-Module.yml $
+# $HeadURL: https://pause.perl.org:5460/svn/cpanpm/branches/1.92-maint/distroprefs/CORION.Test-Without-Module.yml $
 comment: "https://rt.cpan.org/Ticket/Display.html?id=24933"
 match:
   distribution: "^CORION/Test-Without-Module-0.09.tar.gz"

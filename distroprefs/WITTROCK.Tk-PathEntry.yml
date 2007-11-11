@@ -1,7 +1,0 @@
----
-comment: "Xvfb :121 must be started by somebody else"
-match:
-  distribution: "^WITTROCK/Tk-PathEntry-\d"
-test:
-  env:
-    DISPLAY: ":121"

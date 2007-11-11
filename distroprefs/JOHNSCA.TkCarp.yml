@@ -1,6 +1,0 @@
----
-match:
-  distribution: "JOHNSCA/TkCarp-\d"
-test:
-  env:
-    DISPLAY: ":121"

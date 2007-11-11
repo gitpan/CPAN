@@ -1,7 +1,0 @@
----
-match:
-  distribution: "RYBSKEJ/forks-\d"
-pl:
-  expect:
-    - "Would you like to create references to forks"
-    - "\n"
