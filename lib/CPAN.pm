@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.9204';
+$CPAN::VERSION = '1.92_52';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -12,7 +12,7 @@ use CPAN::Tarzip;
 use CPAN::DeferedCode;
 use Carp ();
 use Config ();
-use Cwd ();
+use Cwd qw(chdir);
 use DirHandle ();
 use Exporter ();
 use ExtUtils::MakeMaker qw(prompt); # for some unknown reason,
@@ -154,6 +154,46 @@ sub soft_chdir_with_alternatives ($);
     }
 }
 
+{
+    my $x = *SAVEOUT; # avoid warning
+    open($x,">&STDOUT") or die "dup failed";
+    my $redir = 0;
+    sub _redirect(@) {
+        #die if $redir;
+        local $_;
+        push(@_,undef);
+        while(defined($_=shift)) {
+            if (s/^\s*>//){
+                my ($m) = s/^>// ? ">" : "";
+                s/\s+//;
+                $_=shift unless length;
+                die "no dest" unless defined;
+                open(STDOUT,">$m$_") or die "open:$_:$!\n";
+                $redir=1;
+            } elsif ( s/^\s*\|\s*// ) {
+                my $pipe="| $_";
+                while(defined($_[0])){
+                    $pipe .= ' ' . shift;
+                }
+                open(STDOUT,$pipe) or die "open:$pipe:$!\n";
+                $redir=1;
+            } else {
+                push(@_,$_);
+            }
+        }
+        return @_;
+    }
+    sub _unredirect {
+        return unless $redir;
+        $redir = 0;
+        ## redirect: unredirect and propagate errors.  explicit close to wait for pipe.
+        close(STDOUT);
+        open(STDOUT,">&SAVEOUT");
+        die "$@" if "$@";
+        ## redirect: done
+    }
+}
+
 #-> sub CPAN::shell ;
 sub shell {
     my($self) = @_;
@@ -271,7 +311,12 @@ ReadLine support %s
                 next SHELLCOMMAND unless @line;
             $CPAN::META->debug("line[".join("|",@line)."]") if $CPAN::DEBUG;
             my $command = shift @line;
-            eval { CPAN::Shell->$command(@line) };
+            eval {
+				local (*STDOUT)=*STDOUT;
+				@line = _redirect(@line);
+				CPAN::Shell->$command(@line)
+			};
+			_unredirect;
             if ($@) {
                 my $err = "$@";
                 if ($err =~ /\S/) {
@@ -359,6 +404,7 @@ ReadLine support %s
     soft_chdir_with_alternatives(\@cwd);
 }
 
+#-> CPAN::soft_chdir_with_alternatives ;
 sub soft_chdir_with_alternatives ($) {
     my($cwd) = @_;
     unless (@$cwd) {
@@ -522,6 +568,7 @@ sub _init_sqlite () {
 package CPAN::CacheMgr;
 use strict;
 @CPAN::CacheMgr::ISA = qw(CPAN::InfoObj CPAN);
+use Cwd qw(chdir);
 use File::Find;
 
 package CPAN::FTP;
@@ -808,6 +855,7 @@ use vars qw(
             @ISA
            );
 @CPAN::Shell::ISA = qw(CPAN::Debug);
+use Cwd qw(chdir);
 $COLOR_REGISTERED ||= 0;
 $Help = {
          '?' => \"help",
@@ -994,7 +1042,7 @@ sub checklock {
                                     qq{
 There seems to be running another CPAN process (pid $otherpid).  Contacting...
 });
-            if (kill 0, $otherpid) {
+            if (kill 0, $otherpid or $!{EPERM}) {
                 $CPAN::Frontend->mywarn(qq{Other job is running.\n});
                 my($ans) =
                     CPAN::Shell::colorable_makemaker_prompt
@@ -1997,7 +2045,8 @@ sub o {
     $o_type ||= "";
     CPAN->debug("o_type[$o_type] o_what[".join(" | ",@o_what)."]\n");
     if ($o_type eq 'conf') {
-        my($cfilter) = $o_what[0] =~ m|^/(.*)/$| if @o_what;
+        my($cfilter);
+        ($cfilter) = $o_what[0] =~ m|^/(.*)/$| if @o_what;
         if (!@o_what or $cfilter) { # print all things, "o conf"
             $cfilter ||= "";
             my $qrfilter = eval 'qr/$cfilter/';
@@ -2959,7 +3008,7 @@ that may go away anytime.\n"
             push @m, $obj;
         }
     }
-	@m = sort {$a->id cmp $b->id} @m;
+    @m = sort {$a->id cmp $b->id} @m;
     if ( $CPAN::DEBUG ) {
         my $wantarray = wantarray;
         my $join_m = join ",", map {$_->id} @m;
@@ -5423,6 +5472,7 @@ sub read_metadata_cache {
 
 package CPAN::InfoObj;
 use strict;
+use Cwd qw(chdir);
 
 sub ro {
     my $self = shift;
@@ -5826,6 +5876,7 @@ Please file a bugreport if you need this.\n");
 
 package CPAN::Distribution;
 use strict;
+use Cwd qw(chdir);
 
 # Accessors
 sub cpan_comment {
@@ -8277,11 +8328,11 @@ sub unsat_prereq {
 
             my $do = $nmo->distribution;
             next NEED unless $do; # not on CPAN
-            if (CPAN::Version->vcmp($need_version, $nmo->{CPAN_VERSION}) > 0){
+            if (CPAN::Version->vcmp($need_version, $nmo->ro->{CPAN_VERSION}) > 0){
                 $CPAN::Frontend->mywarn("Warning: Prerequisite ".
                                         "'$need_module => $need_version' ".
                                         "for '$self->{ID}' seems ".
-                                        "not available according the the indexes\n"
+                                        "not available according to the indexes\n"
                                        );
                 next NEED;
             }
@@ -9772,21 +9823,21 @@ sub as_glimpse {
         $color_off = Term::ANSIColor::color("reset");
     }
     my $uptodateness = " ";
-	unless ($class eq "Bundle") {
-		my $u = $self->uptodate;
-		$uptodateness = $u ? "=" : "<" if defined $u;
-	};
-	my $id = do {
-		my $d = $self->distribution;
-		$d ? $d -> pretty_id : $self->cpan_userid;
-	};
+    unless ($class eq "Bundle") {
+        my $u = $self->uptodate;
+        $uptodateness = $u ? "=" : "<" if defined $u;
+    };
+    my $id = do {
+        my $d = $self->distribution;
+        $d ? $d -> pretty_id : $self->cpan_userid;
+    };
     push @m, sprintf("%-7s %1s %s%-22s%s (%s)\n",
                      $class,
                      $uptodateness,
                      $color_on,
                      $self->id,
                      $color_off,
-					 $id,
+                     $id,
                     );
     join "", @m;
 }
@@ -10135,20 +10186,22 @@ sub test   {
     # $self->{badtestcnt} ||= 0;
     $self->rematein('test',@_);
 }
+
 #-> sub CPAN::Module::uptodate ;
 sub uptodate {
-	my ($self) = @_;
-	local ($_);
-	my $inst = $self->inst_version or return undef;
-	my $cpan = $self->cpan_version;
-	local ($^W) = 0;
-	CPAN::Version->vgt($cpan,$inst) and return 0;
+    my ($self) = @_;
+    local ($_);
+    my $inst = $self->inst_version or return undef;
+    my $cpan = $self->cpan_version;
+    local ($^W) = 0;
+    CPAN::Version->vgt($cpan,$inst) and return 0;
     CPAN->debug(join("",
-		"returning uptodate. inst_file[",
-		$self->inst_file,
-        "cpan[$cpan] inst[$inst]")) if $CPAN::DEBUG;
-	return 1;
+                     "returning uptodate. inst_file[",
+                     $self->inst_file,
+                     "cpan[$cpan] inst[$inst]")) if $CPAN::DEBUG;
+    return 1;
 }
+
 #-> sub CPAN::Module::install ;
 sub install {
     my($self) = @_;
