@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.9205';
+$CPAN::VERSION = '1.92_53';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -12,7 +12,7 @@ use CPAN::Tarzip;
 use CPAN::DeferedCode;
 use Carp ();
 use Config ();
-use Cwd ();
+use Cwd qw(chdir);
 use DirHandle ();
 use Exporter ();
 use ExtUtils::MakeMaker qw(prompt); # for some unknown reason,
@@ -154,6 +154,46 @@ sub soft_chdir_with_alternatives ($);
     }
 }
 
+{
+    my $x = *SAVEOUT; # avoid warning
+    open($x,">&STDOUT") or die "dup failed";
+    my $redir = 0;
+    sub _redirect(@) {
+        #die if $redir;
+        local $_;
+        push(@_,undef);
+        while(defined($_=shift)) {
+            if (s/^\s*>//){
+                my ($m) = s/^>// ? ">" : "";
+                s/\s+//;
+                $_=shift unless length;
+                die "no dest" unless defined;
+                open(STDOUT,">$m$_") or die "open:$_:$!\n";
+                $redir=1;
+            } elsif ( s/^\s*\|\s*// ) {
+                my $pipe="| $_";
+                while(defined($_[0])){
+                    $pipe .= ' ' . shift;
+                }
+                open(STDOUT,$pipe) or die "open:$pipe:$!\n";
+                $redir=1;
+            } else {
+                push(@_,$_);
+            }
+        }
+        return @_;
+    }
+    sub _unredirect {
+        return unless $redir;
+        $redir = 0;
+        ## redirect: unredirect and propagate errors.  explicit close to wait for pipe.
+        close(STDOUT);
+        open(STDOUT,">&SAVEOUT");
+        die "$@" if "$@";
+        ## redirect: done
+    }
+}
+
 #-> sub CPAN::shell ;
 sub shell {
     my($self) = @_;
@@ -271,7 +311,12 @@ ReadLine support %s
                 next SHELLCOMMAND unless @line;
             $CPAN::META->debug("line[".join("|",@line)."]") if $CPAN::DEBUG;
             my $command = shift @line;
-            eval { CPAN::Shell->$command(@line) };
+            eval {
+                local (*STDOUT)=*STDOUT;
+                @line = _redirect(@line);
+                CPAN::Shell->$command(@line)
+              };
+            _unredirect;
             if ($@) {
                 my $err = "$@";
                 if ($err =~ /\S/) {
@@ -523,6 +568,7 @@ sub _init_sqlite () {
 package CPAN::CacheMgr;
 use strict;
 @CPAN::CacheMgr::ISA = qw(CPAN::InfoObj CPAN);
+use Cwd qw(chdir);
 use File::Find;
 
 package CPAN::FTP;
@@ -809,6 +855,7 @@ use vars qw(
             @ISA
            );
 @CPAN::Shell::ISA = qw(CPAN::Debug);
+use Cwd qw(chdir);
 $COLOR_REGISTERED ||= 0;
 $Help = {
          '?' => \"help",
@@ -995,7 +1042,7 @@ sub checklock {
                                     qq{
 There seems to be running another CPAN process (pid $otherpid).  Contacting...
 });
-            if (kill 0, $otherpid) {
+            if (kill 0, $otherpid or $!{EPERM}) {
                 $CPAN::Frontend->mywarn(qq{Other job is running.\n});
                 my($ans) =
                     CPAN::Shell::colorable_makemaker_prompt
@@ -4015,6 +4062,9 @@ sub localize {
         $CPAN::Config->{ftp_passive} : 1;
     my $ret;
     my $stats = $self->_new_stats($file);
+    for ($CPAN::Config->{connect_to_internet_ok}) {
+        $connect_to_internet_ok = $_ if not defined $connect_to_internet_ok and defined $_;
+    }
   LEVEL: for $levelno (0..$#levels) {
         my $level_tuple = $levels[$levelno];
         my($level,$scheme,$sitetag) = @$level_tuple;
@@ -5425,6 +5475,7 @@ sub read_metadata_cache {
 
 package CPAN::InfoObj;
 use strict;
+use Cwd qw(chdir);
 
 sub ro {
     my $self = shift;
@@ -5828,6 +5879,7 @@ Please file a bugreport if you need this.\n");
 
 package CPAN::Distribution;
 use strict;
+use Cwd qw(chdir);
 
 # Accessors
 sub cpan_comment {
@@ -7580,7 +7632,7 @@ is part of the perl-%s distribution. To install that, you need to run
             if (my $expect_model = $self->_prefs_with_expect("pl")) {
                 # XXX probably want to check _should_report here and warn
                 # about not being able to use CPAN::Reporter with expect
-                $ret = $self->_run_via_expect($system,$expect_model);
+                $ret = $self->_run_via_expect($system,'writemakefile',$expect_model);
                 if (! defined $ret
                     && $self->{writemakefile}
                     && $self->{writemakefile}->failed) {
@@ -7687,7 +7739,7 @@ is part of the perl-%s distribution. To install that, you need to run
     if ($want_expect) {
         # XXX probably want to check _should_report here and
         # warn about not being able to use CPAN::Reporter with expect
-        $system_ok = $self->_run_via_expect($system,$expect_model) == 0;
+        $system_ok = $self->_run_via_expect($system,'make',$expect_model) == 0;
     }
     elsif ( $self->_should_report('make') ) {
         my ($output, $ret) = CPAN::Reporter::record_command($system);
@@ -7719,16 +7771,16 @@ sub goodbye {
 
 # CPAN::Distribution::_run_via_expect ;
 sub _run_via_expect {
-    my($self,$system,$expect_model) = @_;
+    my($self,$system,$phase,$expect_model) = @_;
     CPAN->debug("system[$system]expect_model[$expect_model]") if $CPAN::DEBUG;
     if ($CPAN::META->has_inst("Expect")) {
         my $expo = Expect->new;  # expo Expect object;
         $expo->spawn($system);
         $expect_model->{mode} ||= "deterministic";
         if ($expect_model->{mode} eq "deterministic") {
-            return $self->_run_via_expect_deterministic($expo,$expect_model);
+            return $self->_run_via_expect_deterministic($expo,$phase,$expect_model);
         } elsif ($expect_model->{mode} eq "anyorder") {
-            return $self->_run_via_expect_anyorder($expo,$expect_model);
+            return $self->_run_via_expect_anyorder($expo,$phase,$expect_model);
         } else {
             die "Panic: Illegal expect mode: $expect_model->{mode}";
         }
@@ -7739,7 +7791,7 @@ sub _run_via_expect {
 }
 
 sub _run_via_expect_anyorder {
-    my($self,$expo,$expect_model) = @_;
+    my($self,$expo,$phase,$expect_model) = @_;
     my $timeout = $expect_model->{timeout} || 5;
     my $reuse = $expect_model->{reuse};
     my @expectacopy = @{$expect_model->{talk}}; # we trash it!
@@ -7778,15 +7830,15 @@ sub _run_via_expect_anyorder {
             }
             my $why = "could not answer a question during the dialog";
             $CPAN::Frontend->mywarn("Failing: $why\n");
-            $self->{writemakefile} =
+            $self->{$phase} =
                 CPAN::Distrostatus->new("NO $why");
-            return;
+            return 0;
         }
     }
 }
 
 sub _run_via_expect_deterministic {
-    my($self,$expo,$expect_model) = @_;
+    my($self,$expo,$phase,$expect_model) = @_;
     my $ran_into_timeout;
     my $timeout = $expect_model->{timeout} || 15; # currently unsettable
     my $expecta = $expect_model->{talk};
@@ -7810,9 +7862,9 @@ expected[$regex]\nbut[$but]\n\n");
                       -re => $regex);
         if ($ran_into_timeout) {
             # note that the caller expects 0 for success
-            $self->{writemakefile} =
+            $self->{$phase} =
                 CPAN::Distrostatus->new("NO timeout during expect dialog");
-            return;
+            return 0;
         }
         $expo->send($send);
     }
@@ -8584,12 +8636,18 @@ sub test {
     }
 
     if ($self->{modulebuild}) {
-        my $v = CPAN::Shell->expand("Module","Test::Harness")->inst_version;
+        my $thm = CPAN::Shell->expand("Module","Test::Harness");
+        my $v = $thm->inst_version;
         if (CPAN::Version->vlt($v,2.62)) {
-            $CPAN::Frontend->mywarn(qq{The version of your Test::Harness is only
+            # XXX Eric Wilhelm reported this as a bug: klapperl:
+            # Test::Harness 3.0 self-tests, so that should be 'unless
+            # installing Test::Harness'
+            unless ($self->id eq $thm->distribution->id) {
+               $CPAN::Frontend->mywarn(qq{The version of your Test::Harness is only
   '$v', you need at least '2.62'. Please upgrade your Test::Harness.\n});
-            $self->{make_test} = CPAN::Distrostatus->new("NO Test::Harness too old");
-            return;
+                $self->{make_test} = CPAN::Distrostatus->new("NO Test::Harness too old");
+                return;
+            }
         }
     }
 
@@ -8638,7 +8696,7 @@ sub test {
                                     "not supported when distroprefs specify ".
                                     "an interactive test\n");
         }
-        $tests_ok = $self->_run_via_expect($system,$expect_model) == 0;
+        $tests_ok = $self->_run_via_expect($system,'test',$expect_model) == 0;
     } elsif ( $self->_should_report('test') ) {
         $tests_ok = CPAN::Reporter::test($self, $system);
     } else {
@@ -10803,10 +10861,6 @@ defined:
                      only needed for building. yes|no|ask/yes|ask/no
   bzip2              path to external prg
   cache_metadata     use serializer to cache metadata
-  commands_quote     prefered character to use for quoting external
-                     commands when running them. Defaults to double
-                     quote on Windows, single tick everywhere else;
-                     can be set to space to disable quoting
   check_sigs         if signatures should be verified
   colorize_debug     Term::ANSIColor attributes for debugging output
   colorize_output    boolean if Term::ANSIColor should colorize output
@@ -10814,6 +10868,13 @@ defined:
   colorize_warn      Term::ANSIColor attributes for warnings
   commandnumber_in_prompt
                      boolean if you want to see current command number
+  commands_quote     prefered character to use for quoting external
+                     commands when running them. Defaults to double
+                     quote on Windows, single tick everywhere else;
+                     can be set to space to disable quoting
+  connect_to_internet_ok
+                     if we shall ask if opening a connection is ok before
+                     urllist is specified
   cpan_home          local directory reserved for this package
   curl               path to external prg
   dontload_hash      DEPRECATED

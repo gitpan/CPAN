@@ -10,18 +10,40 @@ BEGIN {
 
     CPAN::HandleConfig->load;
     my $yaml_module = CPAN::_yaml_module();
+    my $exit_message;
+    # local $CPAN::Be_Silent = 1; # not the official interface!!!
     if ($CPAN::META->has_inst($yaml_module)) {
         print "# yaml_module[$yaml_module] loadable\n";
     } else {
-        $|=1;
-        print "1..0 # Skip: no yaml module installed\n";
-        eval "require POSIX; 1" and POSIX::_exit(0);
+        $exit_message = "No yaml module installed";
     }
     if ($CPAN::META->has_inst("Module::Build")) {
         print "# Module::Build loadable\n";
     } else {
+        $exit_message = "Module::Build not installed";
+    }
+  TABU: for my $tabu (qw(
+                         CPAN::Test::Dummy::Perl5::Make
+                         CPAN::Test::Dummy::Perl5::Make::ConfReq
+                         CPAN::Test::Dummy::Perl5::Build::Fails
+                         CPAN::Test::Dummy::Perl5::Make::CircDepeOne
+                         CPAN::Test::Dummy::Perl5::Make::CircDepeTwo
+                         CPAN::Test::Dummy::Perl5::Make::CircDepeThree
+                         CPAN::Test::Dummy::Perl5::Make::UnsatPrereq
+                        )) {
+        if ($CPAN::META->has_inst($tabu)) {
+            $exit_message = "Found module '$tabu' installed. Cannot run this test.";
+            last TABU;
+        }
+    }
+    unless ($exit_message) {
+        if ($YAML::VERSION && $YAML::VERSION < 0.60) {
+            $exit_message = "YAML too old for this test";
+        }
+    }
+    if ($exit_message) {
         $|=1;
-        print "1..0 # Skip: Module::Build not installed\n";
+        print "1..0 # Skip: $exit_message\n";
         eval "require POSIX; 1" and POSIX::_exit(0);
     }
 }
@@ -137,7 +159,7 @@ our @SESSIONS =
       ]
      },
      {
-      name => "focussing test",
+      name => "focussing test circdepe",
       pairs =>
       [
        "dump \$::x=4*6+1" => "= 25;",
@@ -148,6 +170,21 @@ our @SESSIONS =
   CPAN::Test::Dummy::Perl5::Make::CircDepeTwo.+\\[requires\\].+
   CPAN::Test::Dummy::Perl5::Make::CircDepeOne.+\\[requires\\].+
   Recursive.dependency.detected
+)",
+      ],
+     },
+     {
+      name => "focussing test unsatprereq",
+      pairs =>
+      [
+       "dump \$::x=4*6+1" => "= 25;",
+       "test CPAN::Test::Dummy::Perl5::Make::UnsatPrereq" =>
+       "(?xs:
+  Warning:.+?
+  Prerequisite.+?
+  CPAN::Test::Dummy::Perl5::Make.+?
+  99999999.99.+?
+  not[ ]available[ ]according[ ]to[ ]the[ ]indexes
 )",
       ],
      },

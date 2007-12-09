@@ -1,4 +1,4 @@
-use strict;
+ use strict;
 
 # there's POD at the very end of this file
 
@@ -220,7 +220,7 @@ is($CPAN::Config->{histsize},100,"histsize is 100 before testing");
 
 my $prompt = "cpan>";
 my $prompt_re = "cpan[^>]*>"; # note: replicated in DATA!
-my $default_timeout = 120;
+my $default_timeout = 180;
 
 $|=1;
 if ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
@@ -824,6 +824,10 @@ __END__
 #E:Unknown
 ########
 #P:o conf ftp ""
+########
+#P:o conf build_dir_reuse 1
+#E:
+#R:YAML
 ########
 #P:m Fcntl
 #E:Found \d old builds?, restored the state of (?:\d|none)[\s\S]+?Defines fcntl

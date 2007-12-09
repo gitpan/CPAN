@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $loading $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 2212 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2448 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -31,6 +31,7 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 2212 $,4)/1000000 + 5.4;
      "colorize_warn",
      "commandnumber_in_prompt",
      "commands_quote",
+     "connect_to_internet_ok",
      "cpan_home",
      "curl",
      "dontload_hash", # deprecated after 1.83_68 (rev. 581)
@@ -690,7 +691,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 2212 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 2448 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {
