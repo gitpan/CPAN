@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $loading $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 2448 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2539 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -290,12 +290,13 @@ Please specify a filename where to save the configuration or try
     }
 
     my $msg;
+    my $home = home();
     $msg = <<EOF unless $configpm =~ /MyConfig/;
 
 # This is CPAN.pm's systemwide configuration file. This file provides
 # defaults for users, and the values can be changed in a per-user
 # configuration file. The user-config file is being looked for as
-# ~/.cpan/CPAN/MyConfig.pm.
+# $home/.cpan/CPAN/MyConfig.pm.
 
 EOF
     $msg ||= "\n";
@@ -691,7 +692,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 2448 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 2539 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {

@@ -14,6 +14,7 @@ Alzabo
 Angerwhale
 Apache
 Apache::ASP
+Apache::DB
 Apache::DBI
 Apache::GuessCharset
 Apache::GzipChain
@@ -29,11 +30,14 @@ App::CLI
 App::Info
 App::Info::Lib::Iconv
 App::a2pdf
+App::sync_cpantesters
 AppConfig
 Archive::Tar
 Archive::Zip
 Array::Iterator
 Array::Slice
+Astro::Flux
+Astro::MoonPhase
 Attribute::Types
 Audio::SndFile
 Audio::TagLib
@@ -47,6 +51,7 @@ B::Lint
 BFD
 BSD::Resource
 BerkeleyDB
+Biblio::Document::Parser
 Bit::Vector
 Bit::Vector::Minimal
 BitTorrent
@@ -92,6 +97,7 @@ Cache::FastMmap
 Cache::File
 Cache::Memcached
 Cache::Memcached::GetParserXS
+Cache::Memcached::Fast
 Cache::Memcached::XS
 Cache::Simple::TimedExpiry
 Cairo
@@ -257,6 +263,7 @@ Data::Properties
 Data::Random
 Data::Remember
 Data::ShowTable
+Data::Swap
 Data::Throttler
 Data::TreeDumper
 Data::Types
@@ -291,6 +298,10 @@ Devel::Events::Handler::ObjectTracker
 Devel::FastProf
 Devel::GC::Helper
 Devel::Hide
+Devel::Leak
+Devel::Leak::Object
+Devel::LeakTrace
+Devel::LeakTrace::Fast
 Devel::LexAlias
 Devel::Modlist
 Devel::Monitor
@@ -383,6 +394,7 @@ File::Spec::Functions
 File::Tail
 File::Temp
 File::Type
+FileHandle::Deluxe
 FileHandle::Unget
 Filesys::Df
 Filesys::Virtual
@@ -393,6 +405,7 @@ Flickr::API
 Font::AFM
 Font::TTF
 Font::TTFMetrics
+Form::Processor
 FormValidator::Simple
 FrameMaker::FromHTML
 Fuse
@@ -428,6 +441,7 @@ GraphViz
 Graphics::ColorNames
 Gtk
 Gtk2
+HOP::Lexer
 HTML::Clean
 HTML::Entities
 HTML::Entities::Numbered
@@ -727,7 +741,6 @@ POE::Component::Server::PreforkTCP
 POE::Component::StackedProcessor
 POE::Component::SubWrapper
 POE::Declarative::Mixin
-POE::Exceptions
 POE::Filter::IRCD
 POSIX
 PPI
@@ -933,6 +946,7 @@ Test::Differences
 Test::Exception
 Test::FormValidator
 Test::HTTP::Server::Simple
+Test::HTTPStatus
 Test::Harness
 Test::JSON
 Test::Kwalitee
@@ -991,6 +1005,7 @@ Tie::Cache::LRU
 Tie::Cycle
 Tie::DxHash
 Tie::EncryptedHash
+Tie::Sub
 Time::Duration
 Time::HiRes
 Time::HiRes::Value
@@ -1147,6 +1162,7 @@ YAML
 YAML::Syck
 YAML::Tiny
 YAML::XS
+Yada::Yada::Yada
 Yahoo::Photos
 Yahoo::Search
 bignum

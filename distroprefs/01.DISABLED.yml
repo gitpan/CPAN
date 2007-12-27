@@ -29,6 +29,7 @@ match:
     |BFREE/OpenGL-Image-\d
     |BFREE/OpenGL-\d
     |BKCHAPIN/DBIx-Perform-\d                # curses login (?)
+    |BSUGARS/IPC-Shareable-\d                # hangs on test 38ipchv and has already a ticket on that
     |CORION/WWW-Mechanize-Shell-0.46.tar.gz  # has caused a hang more than one time during t/13-command-au
     |CORLISS/CursesForms-\d
     |CORLISS/CursesWidgets-\d
@@ -49,5 +50,6 @@ match:
     |TOMZO/Quota-\d                          # 1.5.2 and 1.6.0 hang during test.pl
     |TTY/kurila-\d                           # asks too many questions
     |WYANT/Astro-SpaceTrack-\d               # asks for a username/passwd during tests
+    |YEWENBIN/PDE-                           # probably a broken Makefile.PL that tries to install Module::Build even if it is installed and calls CPAN recursively; in any case an endless loop
     )|
 disabled: 1

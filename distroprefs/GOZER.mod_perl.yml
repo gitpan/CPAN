@@ -1,6 +1,10 @@
 ---
+comment: |
+
+  http://svn.apache.org/viewvc?view=rev&revision=555908
+
 match:
-  distribution: "^(GOZER)/mod_perl-1"
+  distribution: "/mod_perl-1"
 pl:
   args:
     - EVERYTHING=1
@@ -13,6 +17,8 @@ pl:
 depends:
   build_requires:
     LWP::UserAgent: 0
+patches:
+  - "ANDK/mod_perl-1.30-SHAY-01.patch.gz"
 ---
 comment: "out of order --> TODO"
 match:

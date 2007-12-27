@@ -39,6 +39,7 @@ match:
     |CFRANKS/HTML-FormFu-\d
     |CFRANKS/HTML-Widget-\d
     |CFRANKS/DBIx-Class-HTML-FormFu-\d
+    |CFRANKS/Catalyst-Controller-HTML-FormFu-\d
     |CLACO/Class-Accessor-Grouped-\d
     |CLACO/DBIx-Class-UUIDColumns-\d
     |CLACO/DBIx-Class-Validation-\d
@@ -54,6 +55,7 @@ match:
     |DJERIUS/Shell-GetEnv-\d
     |DMAKI/Catalyst-Model-FormFu-\d
     |DMAKI/Danga-Socket-Callback-\d
+    |DMAKI/Event-Notify-\d
     |DMAKI/XML-RSS-LibXML-\d
     |DMAKI/XML-RSS-Liberal-
     |DSNOPEK/POE-Component-MessageQueue-\d
@@ -73,6 +75,7 @@ match:
     |HANENKAMP/HTML-ParagraphSplit-\d
     |HANENKAMP/POE-Declarative-\d
     |HANK/Catalyst-Plugin-Form-Processor-\d
+    |HANK/Form-Processor-\d
     |HDP/Data-Hive-\d
     |HDP/KSx-IndexManager-\d
     |HIROSE/Net-SSL-ExpireDate-\d
@@ -84,8 +87,8 @@ match:
     |JESSE/DBIx-SearchBuilder-\d
     |JESSE/Data-ICal-\d
     |JROCKWAY/Angerwhale-\d
-    |JROCKWAY/Catalyst-Plugin-Unicode-\d
     |JROCKWAY/Catalyst-Component-ACCEPT_CONTEXT-\d
+    |JROCKWAY/Catalyst-Plugin-Unicode-\d
     |JROCKWAY/Directory-Scratch-\d
     |JROCKWAY/File-Attributes-\d
     |JROCKWAY/Task-Catalyst-Tutorial-\d
@@ -96,6 +99,8 @@ match:
     |LUTETIUS/pod2book-\d
     |LYOKATO/FormValidator-Simple-\d
     |LYOKATO/Pod-ProjectDocs-\d
+    |MARCEL/App-sync_cpantesters-\d
+    |MARCEL/LWP-UserAgent-ProgressBar-\d
     |MARCEL/Test-Compile-\d
     |MARKSTOS/Test-WWW-Selenium-CGIApp-\d
     |MITREHC/HoneyClient-Agent-\d
