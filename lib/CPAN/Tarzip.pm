@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION @ISA $BUGHUNTING);
 use CPAN::Debug;
 use File::Basename qw(basename);
-$VERSION = sprintf "%.6f", substr(q$Rev: 2538 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2569 $,4)/1000000 + 5.4;
 # module is internal to CPAN.pm
 
 @ISA = qw(CPAN::Debug);
@@ -43,6 +43,9 @@ program.
 
 sub _my_which {
     my($what) = @_;
+    if ($CPAN::Config->{$what}) {
+        return $CPAN::Config->{$what};
+    }
     if ($CPAN::META->has_inst("File::Which")) {
         return File::Which::which($what);
     }

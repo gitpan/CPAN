@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_54';
+$CPAN::VERSION = '1.92_55';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -742,10 +742,13 @@ use overload '""' => "as_string";
 
 sub new {
     my($class,$module,$file,$during,$error) = @_;
+    # my $at = Carp::longmess(""); # XXX find something more beautiful
     bless { module => $module,
             file => $file,
             during => $during,
-            error => $error }, $class;
+            error => $error,
+            # at => $at,
+          }, $class;
 }
 
 sub as_string {
@@ -6854,7 +6857,8 @@ and run
 sub untar_me {
     my($self,$ct) = @_;
     $self->{archived} = "tar";
-    if ($ct->untar()) {
+    my $result = eval { $ct->untar() };
+    if ($result) {
         $self->{unwrapped} = CPAN::Distrostatus->new("YES");
     } else {
         $self->{unwrapped} = CPAN::Distrostatus->new("NO -- untar failed");
@@ -7941,9 +7945,22 @@ sub _find_prefs {
                 #CPAN->debug(sprintf "abs[%s]", $abs) if $CPAN::DEBUG;
                 my @distropref;
                 if ($thisexte eq "yml") {
-                    # need no eval because if we have no YAML we do not try to read *.yml
+                    # need eval because if YAML has a bug we should fail gracefully
                     #CPAN->debug(sprintf "before yaml load abs[%s]", $abs) if $CPAN::DEBUG;
-                    @distropref = @{CPAN->_yaml_loadfile($abs)};
+                    my $distropref = eval { CPAN->_yaml_loadfile($abs) };
+                    if ($@) {
+                        $CPAN::Frontend->mywarn("Error reading distroprefs file ".
+                                                "$_, skipping\: $@");
+                        $CPAN::Frontend->mysleep(1);
+                        next DIRENT;
+                    } elsif (!$distropref) {
+                        $CPAN::Frontend->mywarn("Unknown error reading distroprefs file ".
+                                                "$_, skipping.");
+                        $CPAN::Frontend->mysleep(1);
+                        next DIRENT;
+                    } else {
+                        @distropref = @$distropref;
+                    }
                     #CPAN->debug(sprintf "after yaml load abs[%s]", $abs) if $CPAN::DEBUG;
                 } elsif ($thisexte eq "dd") {
                     package CPAN::Eval;
@@ -8660,6 +8677,10 @@ sub test {
         $ENV{PERL} = CPAN::find_perl;
     } elsif ($self->{modulebuild}) {
         $system = sprintf "%s test", $self->_build_command();
+        unless (-e "Build") {
+            my $id = $self->pretty_id;
+            $CPAN::Frontend->mywarn("Alert: no 'Build' file found while trying to test '$id'");
+        }
     } else {
         $system = join " ", $self->_make_command(), "test";
     }
@@ -10956,7 +10977,7 @@ defined:
   username           your username if you CPAN server wants one
   wait_list          arrayref to a wait server to try (See CPAN::WAIT)
   wget               path to external prg
-  yaml_load_code     enable YAML code deserialisation
+  yaml_load_code     enable YAML code deserialisation via CPAN::DeferedCode
   yaml_module        which module to use to read/write YAML files
 
 You can set and query each of these options interactively in the cpan
