@@ -121,6 +121,9 @@ my $prereq_pm = {
                  'Test::More' => 0,   # MSCHWERN;
                                       # Test-Simple-0.62.tar.gz;
                 };
+if ($^O eq "darwin") {
+  $prereq_pm->{'File::HomeDir'} = 0.69;
+}
 
 if ($HAVE_FILE_SPEC) {
   # import PAUSE public key to user's keychain
@@ -215,7 +218,6 @@ MEGA_BASE = \
  DBD::SQLite \
  Test::Simple \
  /home/src/perl/tk/SVN/. \
- /home/src/perl/cpan-sql-stuff/CPAN-SQLite/. \
  /home/src/graphics/magick/ImageMagick-6.3.5/PerlMagick/. \
 
 
@@ -240,7 +242,7 @@ mega-validate: bin/colorout-to-dir.rng
 
 # the subdirs on MY OWN BOX are allowed here (only used for make dist!)
 OKDIRS=CPAN|DIST|bin|blib|cover_db|\
-       distroprefs|eg|gpw9-cpan-talk.d|inc|lib|logs|patches|perlbug|\
+       distroprefs|eg|inc|lib|logs|patches|perlbug|\
        protocols|related|release-lib|scripts|t|talks
 
 verify-no-subdir:

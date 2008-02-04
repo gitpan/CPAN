@@ -13,3 +13,6 @@ pl:
 make:
   env:
     PERL_AUTOINSTALL: --skip    
+depends:
+  build_requires:
+    Devel::Leak: 0

@@ -1,4 +1,584 @@
 ----------------------------------------------------------------------
+r4001:  k | 2008-02-04 22:47:53 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+prepare a new release
+----------------------------------------------------------------------
+r3995:  k | 2008-02-04 22:43:44 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+
+prepare a new release
+----------------------------------------------------------------------
+r3994:  k | 2008-02-04 22:36:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+
+make File::HomeDir prereq on OSX
+----------------------------------------------------------------------
+r3993:  k | 2008-02-04 22:35:48 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/ROBIN.Want.yml
+
+comment about second ticket
+----------------------------------------------------------------------
+r3992:  k | 2008-02-04 22:35:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+
+many new distroprefs
+----------------------------------------------------------------------
+r3991:  k | 2008-02-04 22:35:00 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN/FirstTime.pm
+
+inconsistent treatment of HOME, switching to File::HomeDir once again
+----------------------------------------------------------------------
+r3989:  k | 2008-02-04 06:58:50 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+  M  /local/cpanpm/trunk/distroprefs/ROBIN.Want.yml
+
+another JDHEDDEN patch to support
+----------------------------------------------------------------------
+r3987:  k | 2008-02-03 22:46:33 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+no questions!
+----------------------------------------------------------------------
+r3985:  k | 2008-02-03 22:42:04 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/Makefile.PL
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+no questions!
+----------------------------------------------------------------------
+r3983:  k | 2008-02-03 16:12:48 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/distroprefs/ROBIN.Want.yml
+  M  /local/cpanpm/trunk/lib/CPAN/FirstTime.pm
+
+Jerry is patching everything before I even discover the breakage
+----------------------------------------------------------------------
+r3981:  k | 2008-02-03 13:36:58 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+t/51pod complained about missing doc for trust_test_report_history
+----------------------------------------------------------------------
+r3978:  k | 2008-02-03 13:28:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+yet more eval protection of version operations to catch the next Safe.pm bug with more grace
+----------------------------------------------------------------------
+r3977:  k | 2008-02-03 13:23:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+
+story of a bugreport for Safe.pm
+----------------------------------------------------------------------
+r3975:  k | 2008-02-03 05:40:05 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/JROCKWAY.Chroniton.yml
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+Chroniton triggers my old friend MI recursion
+----------------------------------------------------------------------
+r3973:  k | 2008-02-03 04:58:27 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+  M  /local/cpanpm/trunk/megainstall.txt
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+a few new modules and MI users
+----------------------------------------------------------------------
+r3971:  k | 2008-02-02 18:32:07 +0100
+Changed paths:
+  D  /local/cpanpm/trunk/related/CPAN-ToDist/Todo
+  M  /local/cpanpm/trunk/related/CPAN-ToDist/Todo.txt (from /local/cpanpm/trunk/related/CPAN-ToDist/Todo:3924)
+
+Randy Kobes requested a rename so that windows users can check out both todo files
+----------------------------------------------------------------------
+r3969:  k | 2008-02-02 10:49:46 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/distroprefs/JOSEPHW.XML-Writer.yml
+
+new patch for 5.11
+----------------------------------------------------------------------
+r3967:  k | 2008-02-02 10:18:25 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/DROLSKY.Params-Validate.yml
+
+a new hanger
+----------------------------------------------------------------------
+r3965:  k | 2008-02-02 06:33:59 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/distroprefs/DROLSKY.Devel-StackTrace.yml
+  M  /local/cpanpm/trunk/distroprefs/DROLSKY.Params-Validate.yml
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+patches for 5.11
+----------------------------------------------------------------------
+r3963:  k | 2008-02-01 21:11:51 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+new modules always use MI?
+----------------------------------------------------------------------
+r3961:  k | 2008-02-01 08:26:45 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/megainstall.txt
+
+two more modules
+----------------------------------------------------------------------
+r3959:  k | 2008-02-01 08:17:25 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/megainstall.txt
+
+two interesting modules mentioned recently
+----------------------------------------------------------------------
+r3956:  k | 2008-01-30 03:57:57 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/distroprefs/ROBIN.PadWalker.yml
+
+PadWalker for 5.11
+----------------------------------------------------------------------
+r3955:  k | 2008-01-30 03:25:08 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+tiny notes
+----------------------------------------------------------------------
+r3950:  k | 2008-01-29 06:20:19 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+the rise and rise and rise of the Module::Install era
+----------------------------------------------------------------------
+r3949:  k | 2008-01-29 06:19:45 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/ILYAZ.Math-Pari.yml
+
+light at the end of the tunnel
+----------------------------------------------------------------------
+r3948:  k | 2008-01-29 06:19:14 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+a hanging distro
+----------------------------------------------------------------------
+r3947:  k | 2008-01-29 06:18:52 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+
+fix a rollover bug
+----------------------------------------------------------------------
+r3942:  k | 2008-01-28 22:25:28 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/ILYAZ.Math-Pari.yml
+
+about to binsect with a rafl patch
+----------------------------------------------------------------------
+r3941:  k | 2008-01-28 22:24:44 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+
+exclude the DOS ticket 17751 from all future trials to view a ticket
+----------------------------------------------------------------------
+r3940:  k | 2008-01-28 22:23:06 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/ls-build+tmp.pl
+
+removing all the crappy bugs to make way free for the KISS version
+----------------------------------------------------------------------
+r3939:  k | 2008-01-28 22:22:13 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+
+notesd
+----------------------------------------------------------------------
+r3937:  k | 2008-01-27 13:11:50 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/ls-build+tmp.pl
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/FDALY.Test-Deep.yml
+
+Test-Deep is now 5.11 compliant
+----------------------------------------------------------------------
+r3932:  k | 2008-01-27 10:48:11 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/megainstall.txt
+
+nice new module
+----------------------------------------------------------------------
+r3931:  k | 2008-01-27 10:47:51 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+Moxy hangs, disabling
+----------------------------------------------------------------------
+r3930:  k | 2008-01-27 10:47:18 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/bin/rtdatagaps.pl
+
+initial checkin
+----------------------------------------------------------------------
+r3929:  k | 2008-01-27 10:45:44 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+
+add a nonono option
+----------------------------------------------------------------------
+r3924:  k | 2008-01-26 22:12:22 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/Todo
+  M  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN/ToDist/Deb.pm
+
+notes about my encounter with ToDist
+----------------------------------------------------------------------
+r3923:  k | 2008-01-26 22:10:02 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.crumbs
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+notes for the talk at gpw 10
+----------------------------------------------------------------------
+r3922:  k | 2008-01-26 12:31:00 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+
+fix the unicode bugs
+----------------------------------------------------------------------
+r3921:  k | 2008-01-26 12:01:09 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/bin/rt-deleter.pl
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+first stab at it
+----------------------------------------------------------------------
+r3919:  k | 2008-01-25 23:33:52 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/EWILHELM.Math-Vec.yml
+
+another question I do not want to answer
+----------------------------------------------------------------------
+r3918:  k | 2008-01-25 05:39:42 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/lib/CPAN/FirstTime.pm
+  M  /local/cpanpm/trunk/lib/CPAN/HandleConfig.pm
+
+ r3917@k75 (orig r2615):  dagolden | 2008-01-24 19:07:48 +0100
+ - add 'trust_test_report_history' config to skip testing if reports are found
+
+----------------------------------------------------------------------
+r3915:  k | 2008-01-24 06:26:09 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+missing newline
+----------------------------------------------------------------------
+r3912:  k | 2008-01-24 06:24:47 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+disambiguate the diagnostic message when no Makefile has been built
+----------------------------------------------------------------------
+r3911:  k | 2008-01-24 05:57:48 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  A  /local/cpanpm/trunk/distroprefs/MSCHILLI.RRDTool-OO.yml
+
+a new questions being asked
+----------------------------------------------------------------------
+r3909:  k | 2008-01-21 05:30:56 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/distroprefs/BINGOS.POE-Component-Client-FTP.yml
+  A  /local/cpanpm/trunk/distroprefs/BINGOS.POE-Component-Client-NSCA.yml
+
+two new distros asking questions
+----------------------------------------------------------------------
+r3907:  k | 2008-01-20 16:16:32 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/lib/CPAN/HandleConfig.pm
+
+ r3904@k75 (orig r2608):  dagolden | 2008-01-19 05:41:55 +0100
+ suppress File::HomeDir loading messages entirely to avoid confusing behavior
+ when load_module_verbosity is actually turned off (chicken and egg problem)
+
+----------------------------------------------------------------------
+r3906:  k | 2008-01-20 16:15:55 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+ooops, too much disabling does harm on dependencies
+----------------------------------------------------------------------
+r3903:  k | 2008-01-19 20:23:27 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/query-rt-group-by-requestor.pl
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/AUDREYT.YAML-Syck.yml
+
+prevent starvation
+----------------------------------------------------------------------
+r3902:  k | 2008-01-17 21:08:40 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/README
+  A  /local/cpanpm/trunk/related/CPAN-ToDist
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/TODO
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN/ToDist
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN/ToDist.pm
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN/ToDist/Deb
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN/ToDist/Deb.pm
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN/ToDist/Deb/Template.pm
+  A  /local/cpanpm/trunk/related/CPAN-ToDist/lib/CPAN/ToDist/Template.pm
+
+ r3836@k75 (orig r2572):  k | 2007-12-30 16:13:08 +0100
+ autogen
+ r3900@k75 (orig r2606):  rafl | 2008-01-17 14:13:20 +0100
+ Add a first version of CPAN::ToDist.
+ 
+ It's still quite hackish and totally undocumented.
+ Use it like this:
+ 
+   CPAN::ToDist::Deb->new({
+       module      => CPAN::Shell->expand('Module', 'Data::UUID'),
+       destination => '/tmp',
+   })->run;
+ 
+ r3901@k75 (orig r2607):  rafl | 2008-01-17 16:07:29 +0100
+ Add CPAN::ToDist TODO.
+ 
+
+----------------------------------------------------------------------
+r3898:  k | 2008-01-17 06:20:20 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+MI again
+----------------------------------------------------------------------
+r3895:  k | 2008-01-16 08:37:28 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+another one to avoid
+----------------------------------------------------------------------
+r3894:  k | 2008-01-16 08:35:41 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/loop-over-recent.pl.otherperls
+  A  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.crumbs
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+first version of the talk to send to the committee
+----------------------------------------------------------------------
+r3892:  k | 2008-01-14 17:18:07 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+no SamFS
+----------------------------------------------------------------------
+r3890:  k | 2008-01-13 21:55:05 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/DROLSKY.Params-Validate.yml
+
+version 04 of the Params::Validate patch to get regexes into the inherent type system, DateTime::Format::Builder shook this out
+----------------------------------------------------------------------
+r3888:  k | 2008-01-13 19:11:48 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/DROLSKY.Params-Validate.yml
+
+looks good
+----------------------------------------------------------------------
+r3886:  k | 2008-01-13 19:03:32 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/DROLSKY.Params-Validate.yml
+
+it seems I integrated the patch from Steven
+----------------------------------------------------------------------
+r3884:  k | 2008-01-13 18:56:44 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/DROLSKY.Params-Validate.yml
+
+previous patch stopped working, trying how far we get with this variant
+----------------------------------------------------------------------
+r3882:  k | 2008-01-13 18:30:29 +0100
+Changed paths:
+  D  /local/cpanpm/trunk/distroprefs/AUDREYT.Jifty-DBI.yml
+  M  /local/cpanpm/trunk/distroprefs/AUDREYT.YAML-Syck.yml
+  D  /local/cpanpm/trunk/distroprefs/JESSE.Data-ICal.yml
+  M  /local/cpanpm/trunk/distroprefs/MIYAGAWA.Plagger.yml
+
+new patch against YAML::Syck and a few older disposed
+----------------------------------------------------------------------
+r3880:  k | 2008-01-12 17:52:49 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN/Tarzip.pm
+
+whitespace only variables where a path is expected have always had the meaning of "i dont exist", so we implement this bahaviour for gzip and tar
+----------------------------------------------------------------------
+r3878:  k | 2008-01-12 10:30:51 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+skip a hanger
+----------------------------------------------------------------------
+r3876:  k | 2008-01-08 00:19:28 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/AUDREYT.YAML-Syck.yml
+
+YAML::Syck again compatible with 5.11 but with various new fails with and without this patch
+----------------------------------------------------------------------
+r3874:  k | 2008-01-07 23:04:52 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/GAAS.Data-Dump.yml
+
+Data::Dump now compatible with 5.11 without an if
+----------------------------------------------------------------------
+r3871:  k | 2008-01-07 20:26:26 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+the usual distroprefs/megainstall maintenance
+----------------------------------------------------------------------
+r3870:  k | 2008-01-06 23:16:56 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/lib/CPAN/FirstTime.pm
+  M  /local/cpanpm/trunk/lib/CPAN/HandleConfig.pm
+
+another patch from Randy Kobes to improve the ppm support
+----------------------------------------------------------------------
+r3868:  k | 2008-01-06 12:16:27 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  A  /local/cpanpm/trunk/distroprefs/GAAS.Data-Dump.yml
+  A  /local/cpanpm/trunk/patches/Data-Dump-1.08-ANDK-01.patch
+
+got Data-Dump working with blead
+----------------------------------------------------------------------
+r3866:  k | 2008-01-05 17:17:59 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+a new hanger
+----------------------------------------------------------------------
+r3864:  k | 2008-01-05 13:15:40 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/megainstall.txt
+
+remove unknown modules from the megainstall
+----------------------------------------------------------------------
+r3862:  k | 2008-01-05 12:56:38 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/AUDREYT.YAML-Syck.yml
+
+YAML::Syck patched for 5.11
+----------------------------------------------------------------------
+r3858:  k | 2008-01-05 09:02:28 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/DROLSKY.Params-Validate.yml
+  M  /local/cpanpm/trunk/distroprefs/RDF.Clone.yml
+  M  /local/cpanpm/trunk/megainstall.txt
+
+new patches for Clone and Params::Validate
+----------------------------------------------------------------------
+r3857:  k | 2008-01-05 09:02:01 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/loop-over-recent.pl.otherperls
+
+add 5.10 and remove 5.9.5
+----------------------------------------------------------------------
+r3856:  k | 2008-01-05 09:01:20 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/loop-over-recent.pl
+
+do not trust most recent perls to be suited for mass testing
+----------------------------------------------------------------------
+r3854:  k | 2008-01-04 06:33:34 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN/HandleConfig.pm
+
+applied apatch by Randy Kobes to anable *_install_make_command for Win32: ppm can be used too instead of sudo
+----------------------------------------------------------------------
+r3852:  k | 2008-01-03 08:35:18 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+the usual distroprefs/megainstall maintenance
+----------------------------------------------------------------------
+r3850:  k | 2008-01-03 00:37:59 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/OLAF.Net-DNS.yml
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+another to disable
+----------------------------------------------------------------------
+r3846:  k | 2007-12-31 18:12:30 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/query-rt-group-by-requestor.pl
+
+after the first posting...
+----------------------------------------------------------------------
+r3845:  k | 2007-12-31 18:12:13 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/query-rt-group-by-requestor.pl
+
+after the first posting...
+----------------------------------------------------------------------
+r3844:  k | 2007-12-31 18:11:11 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  MM /local/cpanpm/trunk/bin/query-rt-group-by-requestor.pl
+
+after the first posting...
+----------------------------------------------------------------------
+r3842:  k | 2007-12-31 08:38:55 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Makefile.PL
+  M  /local/cpanpm/trunk/distroprefs/LOCAL.trailing_dot_distros.yml
+
+at home, use the released version of SQLite, the CVS seems stalled
+----------------------------------------------------------------------
+r3840:  k | 2007-12-31 07:40:08 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+the usual distroprefs/megainstall maintenance
+----------------------------------------------------------------------
+r3835:  k | 2007-12-31 00:14:51 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/FLORA.Net_SSLeay.yml
+  M  /local/cpanpm/trunk/distroprefs/JENDA.Mail-Sender.yml
+
+make the two distroprefs ready for YAML, we have no YAML::Syck in 5.11 atm
+----------------------------------------------------------------------
+r3834:  k | 2007-12-30 17:09:45 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/query-rt-group-by-requestor.pl
+
+this statistics script produced a nice top 40 included in the script itself
+----------------------------------------------------------------------
 r3832:  k | 2007-12-30 16:09:35 +0100
 Changed paths:
   M  /local/cpanpm/trunk/Changes

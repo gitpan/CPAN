@@ -48,6 +48,7 @@ Authen::Simple
 AutoLoader
 B::Deobfuscate
 B::Lint
+B::Size
 BFD
 BSD::Resource
 BerkeleyDB
@@ -69,7 +70,7 @@ Business::CreditCard
 Business::ISBN
 Business::OnlinePayment
 Business::ReportWriter
-C::Analyser
+C::Analyzer
 CAM::PDF
 CDB_File
 CGI
@@ -81,6 +82,7 @@ CGI::Application::Plugin::Forward
 CGI::Prototype
 CGI::Session
 CGI::Untaint
+CHI
 CPAN
 CPAN::Cache
 CPAN::Checksums
@@ -110,7 +112,6 @@ Carp::Source
 Catalyst
 Catalyst::Action::RenderView
 Catalyst::Devel
-Catalyst::Manual
 Catalyst::Plugin::Authentication
 Catalyst::Plugin::Authorization::Roles
 Catalyst::Plugin::ConfigLoader
@@ -122,13 +123,14 @@ Catalyst::Plugin::Unicode::Encoding
 Catalyst::View::Mason
 Catalyst::View::TT
 CharsetDetector
-Chart::Bars
 Chart::Math::Axis
 Chart::Mountain
 Chatbot::Eliza
+Chroniton
 Class::Accessor
 Class::Accessor::Assert
 Class::Accessor::Class
+Class::Accessor::FactoryTyped
 Class::Accessor::Lvalue
 Class::Accessor::Named
 Class::Accessor::Ref
@@ -311,6 +313,7 @@ Devel::Profile
 Devel::REPL
 Devel::Required
 Devel::SawAmpersand
+Devel::SearchINC
 Devel::Size
 Devel::SmallProf
 Devel::Symdump
@@ -465,7 +468,7 @@ HTML::SimpleParse
 HTML::StickyQuery
 HTML::TableExtract
 HTML::TagCloud
-HTML::TagCloud::Sorted
+HTML::TagCloud::Sortable
 HTML::Tagset
 HTML::Template
 HTML::Template::Compiled
@@ -486,6 +489,7 @@ Handel
 Hash::AsObject
 Heap
 Heap::Simple
+Hook::Scope
 I18N::Charset
 I18N::Collate
 I18N::LangTags
@@ -539,7 +543,6 @@ LWP::Authen::Wsse
 LWP::Simple
 LWP::UserAgent
 LWPx::ParanoidAgent
-Latex::Encode
 Lexical::Attributes
 Lexical::Persistence
 Lingua::AR::MacArabic
@@ -648,8 +651,6 @@ Net::FPing
 Net::FTP
 Net::FTP::Common
 Net::GrowlClient
-Net::IDN::Encode
-Net::IDN::Nameprep
 Net::IMAP::Simple
 Net::IPv4Addr
 Net::IPv6Addr
@@ -721,7 +722,6 @@ PGP::Sign
 POE
 POE::API::Peek
 POE::Component::CPAN::YACSmoke
-POE::Component::Child 
 POE::Component::Client::DNS
 POE::Component::Client::Ident
 POE::Component::Client::Keepalive
@@ -871,6 +871,7 @@ Set::ConsistentHash
 Set::Crontab
 Set::Infinite
 Set::IntSpan::Fast
+Set::Integer::Gapfillers
 ShiftJIS::CP932::Correct
 ShiftJIS::CP932::MapUTF
 ShiftJIS::Collate
@@ -1062,6 +1063,7 @@ Tk::Tree
 Tk::WidgetDump
 Tk::Wizard
 Tk::XMLViewer
+Touch
 Transform::Canvas
 UML::Sequence
 UNIVERSAL::isa

@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $loading $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 2539 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2615 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -82,6 +82,7 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 2539 $,4)/1000000 + 5.4;
      "term_is_latin",
      "term_ornaments",
      "test_report",
+     "trust_test_report_history",
      "unzip",
      "urllist",
      "use_sqlite",
@@ -101,21 +102,6 @@ my %prefssupport = map { $_ => 1 }
      "prefer_installer",
      "test_report",
     );
-
-if ($^O eq "MSWin32") {
-    for my $k (qw(
-                  mbuild_install_build_command
-                  make_install_make_command
-                 )) {
-        delete $keys{$k};
-        if (exists $CPAN::Config->{$k}) {
-            for ("deleting previously set config variable '$k' => '$CPAN::Config->{$k}'") {
-                $CPAN::Frontend ? $CPAN::Frontend->mywarn($_) : warn $_;
-            }
-            delete $CPAN::Config->{$k};
-        }
-    }
-}
 
 # returns true on successful action
 sub edit {
@@ -493,6 +479,12 @@ sub require_myconfig_or_config () {
 
 sub home () {
     my $home;
+    # Suppress load messages until we load the config and know whether
+    # load messages are desired.  Otherwise, it's unexpected and odd 
+    # why one load message pops up even when verbosity is turned off.
+    # This means File::HomeDir load messages are never seen, but I
+    # think that's probably OK -- DAGOLDEN
+    local $CPAN::Config->{load_module_verbosity} = q[none];
     if ($CPAN::META->has_usable("File::HomeDir")) {
         $home = File::HomeDir->my_data;
         unless (defined $home) {
@@ -588,7 +580,7 @@ sub missing_config_data {
          "makepl_arg",
          "mbuild_arg",
          "mbuild_install_arg",
-         "mbuild_install_build_command",
+         ($^O eq "MSWin32" ? "" : "mbuild_install_build_command"),
          "mbuildpl_arg",
          "no_proxy",
          #"pager",
@@ -692,7 +684,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 2539 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 2615 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {

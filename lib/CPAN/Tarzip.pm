@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION @ISA $BUGHUNTING);
 use CPAN::Debug;
 use File::Basename qw(basename);
-$VERSION = sprintf "%.6f", substr(q$Rev: 2569 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2596 $,4)/1000000 + 5.4;
 # module is internal to CPAN.pm
 
 @ISA = qw(CPAN::Debug);
@@ -220,7 +220,9 @@ sub untar {
     my($prefer) = 0;
 
     my $exttar = $self->{TARPRG};
+    $exttar = "" if $exttar =~ /^\s+$/; # user refuses to use it
     my $extgzip = $self->{UNGZIPPRG};
+    $extgzip = "" if $extgzip =~ /^\s+$/; # user refuses to use it
     if (0) { # makes changing order easier
     } elsif ($BUGHUNTING) {
         $prefer=2;
