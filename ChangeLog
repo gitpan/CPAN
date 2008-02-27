@@ -1,4 +1,460 @@
 ----------------------------------------------------------------------
+r4135:  k | 2008-02-27 05:44:38 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+
+fix manifest
+----------------------------------------------------------------------
+r4133:  k | 2008-02-27 05:43:31 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+prevent stack corruption with intelligent sorting on older perls
+----------------------------------------------------------------------
+r4129:  k | 2008-02-27 05:27:25 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+
+preparing a release
+----------------------------------------------------------------------
+r4128:  k | 2008-02-27 05:26:46 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/megainstall.txt
+
+usual maintainance
+----------------------------------------------------------------------
+r4127:  k | 2008-02-27 05:25:45 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+hanger
+----------------------------------------------------------------------
+r4125:  k | 2008-02-26 08:56:50 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/megainstall.txt
+
+new recommendations from use.perl.org
+----------------------------------------------------------------------
+r4123:  k | 2008-02-26 06:59:02 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  A  /local/cpanpm/trunk/distroprefs/MTHURN.I18N-Charset.yml
+
+new dependency discovered
+----------------------------------------------------------------------
+r4121:  k | 2008-02-26 06:00:57 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+Gungho demands MI
+----------------------------------------------------------------------
+r4119:  k | 2008-02-26 05:54:19 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+GunghoX::* demands MI
+----------------------------------------------------------------------
+r4117:  k | 2008-02-26 05:51:12 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+give GunghoX::* a chance again
+----------------------------------------------------------------------
+r4115:  k | 2008-02-26 05:19:29 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+endless loop
+----------------------------------------------------------------------
+r4113:  k | 2008-02-25 23:21:30 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/t/30shell.t
+
+try variations to possibly get coverage info out of my tests
+----------------------------------------------------------------------
+r4111:  k | 2008-02-24 21:27:24 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/megainstall.txt
+
+remove a dup
+----------------------------------------------------------------------
+r4107:  k | 2008-02-24 21:22:57 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/megainstall.txt
+
+new recommendations from cpan ratings
+----------------------------------------------------------------------
+r4106:  k | 2008-02-24 11:40:02 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/t/12cpan.t
+
+silence unini in test
+----------------------------------------------------------------------
+r4105:  k | 2008-02-24 10:30:04 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+give WWW::Mechanize::Shell a chance again
+----------------------------------------------------------------------
+r4103:  k | 2008-02-24 10:24:36 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/BRIANSKI.XML-Comma.yml
+
+give XML::Comma a chance again
+----------------------------------------------------------------------
+r4101:  k | 2008-02-24 10:05:44 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  A  /local/cpanpm/trunk/distroprefs/AGRUNDMA.POE-Loop-EV.yml
+
+chop one from 01.DISABLED
+----------------------------------------------------------------------
+r4098:  k | 2008-02-24 04:08:04 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+
+verify the answer coming from RT
+----------------------------------------------------------------------
+r4097:  k | 2008-02-24 04:01:45 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/ILYAZ.Math-Pari.yml
+
+switch back to unpatched Pari
+----------------------------------------------------------------------
+r4095:  k | 2008-02-24 02:39:14 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+some day I must spare tuits for the hangers
+----------------------------------------------------------------------
+r4092:  k | 2008-02-23 13:27:31 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/t/12cpan.t
+
+address #33505: allow empty passwords in the config and pass proxy data through to curl
+----------------------------------------------------------------------
+r4091:  k | 2008-02-23 13:26:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/megainstall.txt
+
+new recommendations in megainstall
+----------------------------------------------------------------------
+r4089:  k | 2008-02-21 08:39:13 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+some day I must spare tuits for the hangers
+----------------------------------------------------------------------
+r4087:  k | 2008-02-20 20:49:05 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+a new hanger
+----------------------------------------------------------------------
+r4085:  k | 2008-02-20 14:06:48 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+something_has_just_failed() did not cover the unini case
+----------------------------------------------------------------------
+r4080:  k | 2008-02-19 22:53:05 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/t/31sessions.t
+
+try to re-implement halt_on_failure differently; with test
+----------------------------------------------------------------------
+r4079:  k | 2008-02-19 22:50:51 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+make the recursion message even less alarming, prepare next dev release
+----------------------------------------------------------------------
+r4078:  k | 2008-02-19 22:46:28 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/megainstall.txt
+
+adding Getargs-Long
+----------------------------------------------------------------------
+r4077:  k | 2008-02-19 22:46:06 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+adding Getargs-Long
+----------------------------------------------------------------------
+r4076:  k | 2008-02-19 17:49:30 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/lib/CPAN/Tarzip.pm
+
+ r4070@k75 (orig r2695):  dagolden | 2008-02-18 03:17:23 +0100
+ prevent undefined warnings for unspecified external programs
+ r4071@k75 (orig r2696):  dagolden | 2008-02-18 14:55:09 +0100
+ add CPAN::Reporter::PrereqCheck to the reload list
+
+----------------------------------------------------------------------
+r4074:  k | 2008-02-19 07:41:03 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/PODMASTER.HTML-Scrubber.yml
+
+oops
+----------------------------------------------------------------------
+r4069:  k | 2008-02-18 17:13:07 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/PODMASTER.HTML-Scrubber.yml
+
+discovered another user of PREREQ_FATAL
+----------------------------------------------------------------------
+r4068:  k | 2008-02-18 17:12:43 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+  M  /local/cpanpm/trunk/distroprefs/PODMASTER.HTML-Scrubber.yml
+
+discovered another user of PREREQ_FATAL
+----------------------------------------------------------------------
+r4066:  k | 2008-02-17 21:03:02 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/rt-deleter.pl
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+a hanger
+----------------------------------------------------------------------
+r4064:  k | 2008-02-16 20:37:42 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+  M  /local/cpanpm/trunk/megainstall.txt
+
+bestpractical? want it
+----------------------------------------------------------------------
+r4062:  k | 2008-02-16 08:58:56 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+
+new MIs and a few things that went wrong the last days
+----------------------------------------------------------------------
+r4061:  k | 2008-02-16 08:55:26 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+  M  /local/cpanpm/trunk/megainstall.txt
+
+ r4060@k75 (orig r2691):  k | 2008-02-16 08:46:53 +0100
+ discovered during Erlangen perl workshop
+
+----------------------------------------------------------------------
+r4058:  k | 2008-02-15 00:33:54 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+applied a patch from Randy Kobes to update index before a query when CPAN::SQLite is active
+----------------------------------------------------------------------
+r4057:  k | 2008-02-15 00:32:38 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/bin/loop-over-recent.pl
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/lib/CPAN/Queue.pm
+  M  /local/cpanpm/trunk/megainstall.txt
+  A  /local/cpanpm/trunk/talks/Makefile
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.crumbs
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+  A  /local/cpanpm/trunk/talks/leftarrow.gif
+  A  /local/cpanpm/trunk/talks/rightarrow.gif
+  A  /local/cpanpm/trunk/talks/splithtml.pl
+  A  /local/cpanpm/trunk/talks/uparrow.gif
+
+ r4049@k75 (orig r2682):  dagolden | 2008-02-12 15:00:22 +0100
+ fixed halt_on_failure -- won't halt on delayed items
+ added a meaningful return to CPAN::Shell::rematein for cpan script
+ r4050@k75 (orig r2683):  k | 2008-02-12 22:58:02 +0100
+ state of the talk as of Hotel, Tuesday
+ r4051@k75 (orig r2684):  k | 2008-02-13 05:44:56 +0100
+ state of the talk as of Hotel, Wednesday early morning
+ r4052@k75 (orig r2685):  k | 2008-02-13 05:45:19 +0100
+ add smoker
+ r4053@k75 (orig r2686):  k | 2008-02-13 08:43:06 +0100
+ state of the talk as of Hotel, Wednesday about 9
+ r4054@k75 (orig r2687):  k | 2008-02-14 00:53:40 +0100
+ state of the talk as of Hotel, after the talk
+ r4055@k75 (orig r2688):  k | 2008-02-14 01:16:26 +0100
+ Jost Krieger lets me know that Solaris emulates flock via fcntl
+ r4056@k75 (orig r2689):  dagolden | 2008-02-14 14:14:49 +0100
+ for halt_on_failure, don't warn and nullify if queue has only one item
+
+----------------------------------------------------------------------
+r4048:  k | 2008-02-12 08:59:52 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/lib/CPAN/FirstTime.pm
+  M  /local/cpanpm/trunk/lib/CPAN/HandleConfig.pm
+  M  /local/cpanpm/trunk/scripts/cpan
+
+ r4046@k75 (orig r2680):  dagolden | 2008-02-12 05:02:59 +0100
+ added 'halt_on_failure' config option to halt queue processing 
+ after the first failure rather than processing all remaining times
+ r4047@k75 (orig r2681):  dagolden | 2008-02-12 05:10:46 +0100
+ Modify cpan script to respect 'halt_on_failure' config option
+
+----------------------------------------------------------------------
+r4044:  k | 2008-02-12 05:00:22 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+notes
+----------------------------------------------------------------------
+r4042:  k | 2008-02-10 14:35:17 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+address #32823
+----------------------------------------------------------------------
+r4040:  k | 2008-02-10 13:30:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+
+notes, just notes
+----------------------------------------------------------------------
+r4038:  k | 2008-02-10 12:00:34 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/DMAKI.File-Extract.yml
+
+somebody added new questions to File::Extract?
+----------------------------------------------------------------------
+r4036:  k | 2008-02-10 11:01:51 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+address 32525 with a different implementation
+----------------------------------------------------------------------
+r4032:  k | 2008-02-10 08:37:38 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+tone down the recursion alert; another spot where to use pretty_id instead of ID
+----------------------------------------------------------------------
+r4031:  k | 2008-02-10 08:36:50 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/bin/add-perl-meta.pl
+
+doc patch
+----------------------------------------------------------------------
+r4030:  k | 2008-02-10 08:35:59 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+
+typo
+----------------------------------------------------------------------
+r4028:  k | 2008-02-09 16:52:40 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Changes
+  M  /local/cpanpm/trunk/distroprefs/MLEHMANN.Coro.yml
+
+Coro was fixable once we knew the 33018 magic number
+----------------------------------------------------------------------
+r4026:  k | 2008-02-09 11:52:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  M  /local/cpanpm/trunk/t/14forkbomb.t
+
+make the recursion detection less aggressive
+----------------------------------------------------------------------
+r4024:  k | 2008-02-09 10:31:10 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/DCOPPIT.Mail-Mbox-MessageParser.yml
+
+fixed MessageParser
+----------------------------------------------------------------------
+r4022:  k | 2008-02-08 06:28:06 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+speed up eexpect/anyorder by reducing timeout to 1 second and retrying until full timeout reached. Added comment explaining how this *really* should be fixed
+----------------------------------------------------------------------
+r4020:  k | 2008-02-08 05:41:58 +0100
+Changed paths:
+  A  /local/cpanpm/trunk/distroprefs/DCOPPIT.Mail-Mbox-MessageParser.yml
+  M  /local/cpanpm/trunk/megainstall.txt
+
+M:M:Messageparser
+----------------------------------------------------------------------
+r4018:  k | 2008-02-08 05:26:06 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/ILYAZ.Math-Pari.yml
+  M  /local/cpanpm/trunk/distroprefs/RCLAMP.Devel-Caller.yml
+
+Devel-Caller patched for 5.11
+----------------------------------------------------------------------
+r4016:  k | 2008-02-07 08:18:21 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/MANIFEST
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/bin/ls-build+tmp.pl
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+  A  /local/cpanpm/trunk/t/14forkbomb.t
+
+alert user when CPAN.pm is being called recursively and protect other processes with extending sleeping periods
+----------------------------------------------------------------------
+r4013:  k | 2008-02-06 21:58:27 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/MI.yml
+  M  /local/cpanpm/trunk/talks/gpw10talk-cpantesters.pod
+
+blah
+----------------------------------------------------------------------
+r4012:  k | 2008-02-06 06:09:13 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+rename $comp to $compmt to make the Safe using spots better greppable
+----------------------------------------------------------------------
+r4010:  k | 2008-02-05 20:26:46 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/distroprefs/01.DISABLED.yml
+
+a new hanger
+----------------------------------------------------------------------
+r4008:  k | 2008-02-05 08:56:19 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/Todo
+  M  /local/cpanpm/trunk/distroprefs/OLAF.Net-DNS.yml
+
+simple fix to the Net-DNS thing
+----------------------------------------------------------------------
+r4006:  k | 2008-02-05 03:56:02 +0100
+Changed paths:
+  M  /local/cpanpm/trunk/lib/CPAN.pm
+
+address 32923: allow =head1 CONTENT without regard to case (David Wheeler)
+----------------------------------------------------------------------
+r4005:  k | 2008-02-04 22:56:38 +0100
+Changed paths:
+   M /local/cpanpm/trunk
+  M  /local/cpanpm/trunk/README
+
+ r4003@k75 (orig r2658):  k | 2008-02-04 22:48:25 +0100
+ autogen
+
+----------------------------------------------------------------------
 r4001:  k | 2008-02-04 22:47:53 +0100
 Changed paths:
   M  /local/cpanpm/trunk/lib/CPAN.pm

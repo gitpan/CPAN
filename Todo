@@ -1,6 +1,275 @@
+2008-02-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Test::Class 0.28 is a candidate to prove something between 33356 and 33358
+
+	Maybe Test::Simple, Test::More, Test::Builder? Yes.
+
+	http://rt.cpan.org/Ticket/Display.html?id=33574
+
+	Is there more to it?
+
+	new fails
+    ILYAZ/modules/Math-Pari-2.010709.tar.gz[42]        # the usual
+	  PDENIS/Test-Strict-0.09.tar.gz[244]                # Devel::Cover
+	  MIYAGAWA/Catalyst-View-JSON-0.23.tar.gz[329]       # broken dependency declaration
+	  MTHURN/I18N-Charset-1.388.tar.gz[630]              # random due to skip
+	  REDTREE/PDF-API2-Simple-1.1.4u.tar.gz[657]         # flaky ever since
+	  ADIE/Test-Class-0.28.tar.gz[847]                   # see above
+	  NEELY/Data-Serializer-0.43.tar.gz[939]             # random since months
+	  BBC/Email-MIME-CreateHTML-1.026.tar.gz[940]        # dep on Data::Serializer
+	  JAYK/Catalyst-Authentication-Store-DBIx-Class-0.104.tar.gz[1010]
+                                                       # not reproducable, flaky ever since
+	  MIYAGAWA/Apache-GuessCharset-0.03.tar.gz[1266]     # dep on I18N::Charset
+	  CHOCOLATE/Scalar-Util-Clone-0.10.tar.gz[1332]      # not bleadperl compat
+	  MSTROUT/Devel-REPL-1.002000.tar.gz[1513]           # dep on DDS
+
+2008-02-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Curious:
+
+----Program----
+eval q{use Devel::LeakTrace 0.05};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../p9aWFUh/perl-5.8.0@17967/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pUEVfU9/perl-5.8.0@17968/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Also in maint-5.8:
+
+----Program----
+eval q{use Devel::LeakTrace 0.05};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pcZcM34/perl-5.8.0@18079/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../piE8rWS/perl-5.8.0@18080/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Reported on P5P: http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2008-02/msg00717.html
+
+	And on RT: https://rt.cpan.org/Ticket/Display.html?id=33548
+
+	* Spending some tuits on 01.DISABLED.yml
+
+  CPAN.pm: Going to build A/AD/ADAMK/ThreatNet-IRC-0.01.tar.gz
+
+==> ExtUtils::AutoInstall 0.49 required. Install it from CPAN? [Y/n] n
+Undefined subroutine &ExtUtils::AutoInstall::_make_args called at inc/Module/Install/AutoInstall.pm - /usr/local/share/perl/5.8.4/Module/Install/AutoInstall.pm line 46, <STDIN> line 1.
+Warning: No success on command[/home/src/perl/repoperls/installed-perls/perl/pyIdwn2/perl-5.10.0@33356/bin/perl Makefile.PL]
+  ADAMK/ThreatNet-IRC-0.01.tar.gz
+  /home/src/perl/repoperls/installed-perls/perl/pyIdwn2/perl-5.10.0@33356/bin/perl Makefile.PL -- NOT OK
+Running make test
+  Make had some problems, won't test
+Failed during this command:
+ ADAMK/ThreatNet-IRC-0.01.tar.gz              : writemakefile NO '/home/src/perl/repoperls/installed-perls/perl/pyIdwn2/perl-5.10.0@33356/bin/perl Makefile.PL' returned status 2304
+
+	What for is ExtUtils::AutoInstall required? Where is it documented?
+
+
+2008-02-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* ARTURAZ/Net-Vypress-Chat-0.72.1.tar.bz2
+
+2008-02-12  Andreas Koenig  <k@k78.linux.bogus>
+
+	* Investigate new noise from a
+	Lingua-Stem-Snowball-0.941/5.11/Test-Harness-3.09/whatever combination.
+	Megabytes of warnings against uc(undef) apparently starting yesterday.
+
+	The error reads:
+
+	Use of uninitialized value $dir in uc at /home/src/perl/repoperls/installed-perls/perl/pvCr5Qs/perl-5.10.0@33278/lib/5.11.0/TAP/Parser/Grammar.pm line 371.
+
+	RT#33146
+
+2008-02-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 
+
+----Program----
+eval q{use Safe::World 0.14};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pGZP5H3/perl-5.9.2@24965/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pR6Z2HL/perl-5.9.2@24966/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	This was a SEGV at that time but in the meantime it is a 'Unknown
+	operator name "threadsv" at ....Safe/World/Compartement.pm line 95.'
+
+	This means that 24966 is of only marginal interest.
+
+2008-02-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* maybe still unreported: Safe::World, FreezeThaw, Devel::Size,
+	Data::Dump::Streamer, Authen-Htpasswd-0.16
+
+	* reported but unfixed: Devel::ebug, Storable, Tk
+
+2008-02-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Wrote a new entry into http://rt.cpan.org/Ticket/Display.html?id=30145
+	to nail down XML::RSS::LibXML which failed again today with
+
+t/items-are-0....................http://my.netscape.com/publish/formats/rss-0.91.dtd:1: parser error : Content error in the external subset
+<br />
+^
+Can't call method "getNamespaces" on an undefined value at /home/sand/.cpan/build/XML-RSS-LibXML-0.3002-NE3qqm/blib/lib/XML/RSS/LibXML.pm line 172.
+# Looks like you planned 502 tests but only ran 472.
+# Looks like your test died just after 472.
+ Dubious, test returned 255 (wstat 65280, 0xff00)
+ Failed 30/502 subtests 
+^I(less 23 skipped subtests: 449 okay)
+
+	* http://rt.cpan.org/Ticket/Display.html?id=32841 Would have to consider
+	all possible directories on a given system. Compare them if they are at
+	all different. Offer the user a chance to resolve things if they are
+	different.
+
+	Found more than one CPAN/MyConfig.pm files:
+
+	[1] .../...
+	[2] .../...
+	[3] .../...
+
+	Please tell me which one I shall use.
+
+	* http://rt.cpan.org/Ticket/Display.html?id=32525: sent me a nice patch
+	to make the listings prettier by using representative module names for
+	the distros that have one so instead of this:
+
+App::Prove                     3.07      3.08  ANDYA/Test-Harness-3.08.tar.gz
+DBD::Gofer::Transport::Base  0.010088  0.010377  TIMB/DBI-1.602.tar.gz
+
+	....we would see
+
+DBI                           1.601     1.602  TIMB/DBI-1.602.tar.gz
+Test::Harness                  3.07      3.08  ANDYA/Test-Harness-3.08.tar.gz
+
+	I rolled my own implementation of this idea today that needed less code
+	to change. It costs a bit more CPU to sort the raw list of modules and
+	the stupid thing is that we sort all, not only those that are being
+	displayed finally. But that was always our goal: to display while we go
+	so the user gets information as soon as possible. So now the list is
+	sorted by the boolean "representative module" and on second order
+	alphabetically. This means that after a first pass through the alphabet
+	there is a second as in:
+
+XML::SimpleObject::LibXML      0.53      0.60  DBRIAN/XML-SimpleObject-LibXML-0.60.tar.gz
+Catalyst::Model::Search::Item     undef      0.01  MRAMBERG/Catalyst-Model-Search-0.01.tar.gz
+
+
+2008-02-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Slaven suspects a misbehaviour of the new recursion detection. He
+	encountered it with Tcl.
+
+	* cpantesters website seems to have stalled. Reported to Robert.
+
+2008-02-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Frank asks me to investigate this based on program which is already in
+	rt.perl.org since Jan 8.
+
+	$p -Itests -MUnknownError
+
+31253:5.9.5::thr=:opt=-g
+Global symbol "$asd" requires explicit package name at tests/UnknownError.pm line 8.
+BEGIN not safe after errors--compilation aborted at tests/UnknownError.pm line 9.
+Compilation failed in require.
+BEGIN failed--compilation aborted.
+31384:5.9.5::thr=:opt=-g
+Unknown error
+Compilation failed in require.
+BEGIN failed--compilation aborted.
+
+	Wrote a call_UnknownError.pl. The UnknownError.pm was already there.
+	Apparently I was disturbed when running it the first time.
+
+----Program----
+my $out = `'$^X' -Itests -MUnknownError 2>&1`;
+$out =~ s/at .*$//mg;
+print $out;
+
+----Output of .../plx9DAz/perl-5.9.4@31254/bin/perl----
+Global symbol "$asd" requires explicit package name 
+BEGIN not safe after errors--compilation aborted 
+Compilation failed in require.
+BEGIN failed--compilation aborted.
+
+----EOF ($?='0')----
+----Output of .../pwiMCxf/perl-5.9.4@31255/bin/perl----
+Unknown error
+Compilation failed in require.
+BEGIN failed--compilation aborted.
+
+----EOF ($?='0')----
+
+	Reported to P5P
+
+	* inspired by RT#33004
+
+----Program----
+eval q{use Mail::Mbox::MessageParser 1.5};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../paCcXxw/perl-5.9.1@23470/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../prlkihB/perl-5.9.1@23471/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	There is a regex written with qr/.../ which is later used within a
+	pattern. The -m of the inner pattern was overruled by the outer /m until
+	23470 and not overruled in 23471. It's the pattern 'from_pattern' from
+	the Config.pm. Fixing this fixes one test, not all. Two more spots to
+	patch.
+
+	distroprefs/DCOPPIT.Mail-Mbox-MessageParser.yml
+
+	http://rt.cpan.org/Ticket/Display.html?id=33004
+
+2008-02-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* need to re-visit OLAF/Net-DNS-0.62.tar.gz, not in RT and not inspected
+	closely enough.
+
+	http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2008-01/msg01365.html
+
+	* need to find the autobox mail that said something	about
+	1.22?
+
+	http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-12/msg00809.html
+
+	No need to run binary search again. Now in RT:
+
+	http://rt.cpan.org/Ticket/Display.html?id=32928
+
 2008-02-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
-	* Frank Wigand tells me stories about a bug in AUTOLOAD, version, or
+	* Frank Wiegand tells me stories about a bug in AUTOLOAD, version, or
 	CPAN.pm.
 
 	http://perlmonks.org/?node_id=665058
@@ -70,8 +339,10 @@ print $traceinst;
 	* Could it be a way to increase responsibility consciousness among MI
 	users: report it as a bug when they distribute an old version? Makes
 	little sense in the absence of a good recent version. Ajj, but Chroniton
-	distributes 0.63 and that version seems to have not evan a check for
+	distributes 0.63 and that version seems to have not even a check for
 	PERL5_CPANPLUS_IS_RUNNING.
+
+	http://rt.cpan.org/Ticket/Display.html?id=32984
 
 	* A plan how we could protect the world from recursive usage. Inc the
 	counter in the environment, display it, display in which directory we
@@ -6583,7 +6854,7 @@ ending run
 
 t/32-selector.t  255 65280    38   72  3-38
 
-	Jets, this can be worked around with extremely ugly nonsensical code.
+	Yes, this can be worked around with extremely ugly nonsensical code.
 	But it may give way to something better.
 
 	For now I put the patch into the patches directory.

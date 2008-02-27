@@ -55,15 +55,19 @@ match:
     |CLKAO/SVK-v\d
     |DAXIM/Mediawiki-Blame-\d
     |DCOPPIT/Benchmark-Timer-\d
+    |DCOPPIT/Getargs-Long-\d
     |DJERIUS/Shell-GetEnv-\d
     |DMAKI/Catalyst-Model-FormFu-\d
     |DMAKI/Danga-Socket-Callback-\d
     |DMAKI/Event-Notify-\d
+    |DMAKI/Gungho-\d
+    |DMAKI/GunghoX-FollowLinks-\d
     |DMAKI/XML-RSS-LibXML-\d
     |DMAKI/XML-RSS-Liberal-
     |DSNOPEK/POE-Component-MessageQueue-\d
     |ELLIOTJS/Task-Perl-Critic-IncludingOptionalDepencencies-
     |ELLIOTJS/Task-Perl-Critic-[v\d]
+    |ERIC/OpenThought-\d
     |FLORA/Catalyst-View-Mason-\d
     |FOX/Bot-CPAN-\d
     |GAAL/Best-\d
@@ -83,19 +87,23 @@ match:
     |HDP/KSx-IndexManager-\d
     |HIROSE/Net-SSL-ExpireDate-\d
     |HOLOWAY/Catalyst-Action-REST-\d
+    |JAYK/Catalyst-Authentication-Store-DBIx-Class-\d
     |JAYK/Catalyst-Plugin-Authentication-Store-DBIx-Class-\d
     |JAYK/Catalyst-Plugin-Authentication-\d
     |JCAMACHO/Catalyst-Controller-FormBuilder-\d
     |JESSE/Class-Accessor-Named-\d
     |JESSE/DBIx-SearchBuilder-\d
     |JESSE/Data-ICal-\d
+    |JESSE/Shipwright-\d
     |JROBINSON/DBIx-Class-\d
+    |JROCKWAY/Algorithm-IncludeExclude-\d
     |JROCKWAY/Angerwhale-\d
     |JROCKWAY/Catalyst-Component-ACCEPT_CONTEXT-\d
     |JROCKWAY/Catalyst-Plugin-ConfigLoader-Environment-\d
     |JROCKWAY/Catalyst-Plugin-Unicode-\d
     |JROCKWAY/Directory-Scratch-\d
     |JROCKWAY/File-Attributes-\d
+    |JROCKWAY/File-Attributes-Recursive-\d
     |JROCKWAY/Task-Catalyst-Tutorial-\d
     |JROCKWAY/Test-YAML-Valid
     |JSWARTZ/CHI-\d
@@ -112,6 +120,7 @@ match:
     |MARCEL/LWP-UserAgent-ProgressBar-\d
     |MARCEL/Test-Compile-\d
     |MARKSTOS/Test-WWW-Selenium-CGIApp-\d
+    |MEMOWE/HTML-SBC-\d
     |MITREHC/HoneyClient-Agent-\d
     |MITREHC/HoneyClient-Manager-\d
     |MITREHC/HoneyClient-Util-\d

@@ -12,6 +12,7 @@ distroprefs/ADAMK.Chart-Math-Axis.yml
 distroprefs/ADAMK.Image-Delivery.yml
 distroprefs/ADAMK.Test-ClassAPI.yml
 distroprefs/ADAMK.Test-Inline.yml
+distroprefs/AGRUNDMA.POE-Loop-EV.yml
 distroprefs/AMICHAUER.Unicode-Lite.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Build-Fails.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Make-Expect.yml
@@ -60,6 +61,7 @@ distroprefs/DBRIAN.XML-SimpleObject.yml
 distroprefs/DBROBINS.Net-SSH-Perl.yml
 distroprefs/DCANTRELL.Devel-CheckOS.yml
 distroprefs/DCONWAY.Parse-RecDescent.yml
+distroprefs/DCOPPIT.Mail-Mbox-MessageParser.yml
 distroprefs/DDUMONT.Tk-ObjScanner.yml
 distroprefs/DHARRIS.DB_File-Lock.yml
 distroprefs/DJBERG.Tk-JListbox.yml
@@ -190,6 +192,7 @@ distroprefs/MSERGEANT.DBIx-AnyDBD.yml
 distroprefs/MSERGEANT.XML-Filter-XInclude.yml
 distroprefs/MSERGEANT.XML-Parser.yml
 distroprefs/MSISK.HTML-TableExtract.yml
+distroprefs/MTHURN.I18N-Charset.yml
 distroprefs/MTHURN.Tk-Wizard.yml
 distroprefs/NI-S.Tk-HTML.yml
 distroprefs/NI-S.Tk.yml
@@ -313,6 +316,7 @@ t/10version.t
 t/11mirroredby.t
 t/12cpan.t
 t/13tarzip.t
+t/14forkbomb.t
 t/30shell.coverage
 t/30shell.t
 t/31sessions.t

@@ -25,28 +25,29 @@ match:
     .^   # never matches, only purpose is to let things align nicely
     |.+/Win32(API)?-                         # I have only linux
     |ADAMK/Perl-Dist-\d                      # probably removed all my Config.pms (?)
-    |ADAMK/ThreatNet-IRC-\d                  # running sudo something, AAAAAAARRRRRRG!
-    |AGRUNDMA/POE-Loop-EV-                   # one test hangs
+    |ADAMK/ThreatNet-IRC-\d                  # RT 33544
     |APOCAL/Bundle-POE-All-1.02.tar.gz       # broken idea of what a bundle is
     |BFREE/OpenGL-Image-\d
     |BFREE/OpenGL-\d
     |BKCHAPIN/DBIx-Perform-\d                # curses login (?)
-    |BOWMANBS/Audio-Ecasound-\d              # hanges very early: RT 32101
-    |BRIANSKI/XML-Comma-\d                   # hangs in comma-create-config.pl
-    |BSUGARS/IPC-Shareable-\d                # hangs on test 38ipchv RT 19169
-    |CORION/WWW-Mechanize-Shell-0.46.tar.gz  # has caused a hang more than one time during t/13-command-au
+    |BOWMANBS/Audio-Ecasound-\d              # hangs very early: RT 32101
+    |CAIDAPERL/Chart-Graph-\d                # hangs Makefile.PL: RT 33541
     |CORLISS/CursesForms-\d
     |CORLISS/CursesWidgets-\d
     |DDUMONT/Tk-ObjEditor-2.004.tar.gz       # http://rt.cpan.org/Ticket/Display.html?id=29559
-    |DMAKI/GunghoX-FollowLinks-\d            # the danga socket test hangs again
     |DMAKI/Text-MeCab                        # hangs asking questions
     |ECALDER/Proc-PID-File-1.24.tar.gz       # hangs during test.pl
     |EIJABB/MARC-Errorchecks-1.13.tar.gz     # complicated interactivity in make test
+    |ERIC/OpenThought-\d                     # too old MI, 0.63 in 1.99.16, RT 33279
+    |GONERI/Ocsinventory-Agent-\d            # hanger
+    |GRICHTER/DBIx-Recordset-\d              # hangs
     |GRM/
     |GRODITI/POE-Component-DirWatch-\d       # the 03editedfile or so seems to take forever
+    |HORROCKS/PersistentPerl-\d              # hangs early
     |IMACAT/arclog-3.\d                      # one test (01-exhaust) hangs with several perls
     |JEZRA/Finance-TickerSymbols             # talks endlessly with some ticker sites
     |JJORE/Enbugger-                         # steps into the debugger
+    |KARMAN/Catalyst-Authentication-Store-LDAP-\d # hangs
     |KNORR/Net-MirrorDir                     # asks questions
     |KNORR/Net-                              # no questions during make test please
     |LUPE/Filesys-SamFS-\d                   # have no SamFS
@@ -56,6 +57,8 @@ match:
     |MSCHWERN/Test-Fork-0.01_01.tar.gz       # test hangs
     |MTHURN/Net-Address-Ethernet-\d          # interactive questions that we cannot answer as a bot
     |OALDERS/URI-ParseSearchString-More-0.04
+    |PMIC/parrot-0.5.3.tar.gz                # hangs after testing ctags 
+    |RONALDWS/LockFile-NetLock-0.31          # (fast) endless loop RT 33580
     |RYBSKEJ/forks-0.25
     |STSANDER/Device-Davis-\d                # asks me for a tty to use
     |TOKUHIROM/Moxy-\d                       # test hangs (maybe during a prereq?)
@@ -65,5 +68,9 @@ match:
     |WYANT/Astro-SpaceTrack-\d               # asks for a username/passwd during tests
     |WYANT/Astro-satpass-\d                  # asks during testing to download something
     |YEWENBIN/PDE-                           # probably a broken Makefile.PL that tries to install Module::Build even if it is installed and calls CPAN recursively; in any case an endless loop
+    |GONERI/Ocsinventory-Agent-0.0.8.tar.gz  # hangs
+    |TPABA/
+    |TURNERJW/
+    |KORTY/
     )|
 disabled: 1

@@ -80,6 +80,7 @@ CGI::Application::Plugin::AutoRunmode
 CGI::Application::Plugin::DevPopup
 CGI::Application::Plugin::Forward
 CGI::Prototype
+CGI::Scriptpaths
 CGI::Session
 CGI::Untaint
 CHI
@@ -90,6 +91,7 @@ CPAN::Dependency
 CPAN::Index::Loader
 CPAN::IndexPod
 CPAN::Mini
+CPAN::Reporter::Smoker
 CPAN::Site
 CPAN::Unwind
 CPAN::YACSmoke
@@ -99,8 +101,8 @@ CSS::SAC
 Cache::FastMmap
 Cache::File
 Cache::Memcached
-Cache::Memcached::GetParserXS
 Cache::Memcached::Fast
+Cache::Memcached::GetParserXS
 Cache::Memcached::XS
 Cache::Simple::TimedExpiry
 Cairo
@@ -167,6 +169,7 @@ Class::Rebless
 Class::ReturnValue
 Class::Singleton
 Class::Std
+Class::Std::Fast
 Class::Throwable
 Class::Trait
 Class::Virtual
@@ -203,6 +206,7 @@ Convert::Recode
 Convert::TNEF
 Convert::UUlib
 Coro
+Coro::Debug
 Crypt::Blowfish
 Crypt::CBC
 Crypt::CipherSaber
@@ -321,6 +325,7 @@ Devel::Trace
 Devel::TraceLoad
 Devel::TraceMethods
 Devel::TraceUse
+Devel::TrackObjects
 Devel::ebug
 Devel::ebug::HTTP
 Device::SerialPort
@@ -427,6 +432,7 @@ Geo::Cache
 Geo::Gpx
 Geo::ShapeFile
 Geography::Countries
+Getargs::Long
 Getopt::ArgvFile
 Getopt::Attribute
 Getopt::Compact
@@ -560,6 +566,7 @@ Lingua::ZH::MacChinese::Simplified
 Lingua::ZH::MacChinese::Traditional
 Lingua::ZH::TaBE
 List::Compare
+List::Maker
 List::MoreUtils
 List::Tuples
 List::Util
@@ -594,6 +601,7 @@ Mail::Header
 Mail::IMAPClient
 Mail::Internet
 Mail::Mailer
+Mail::Mbox::MessageParser
 Mail::RFC822::Address
 Mail::Send
 Mail::Sendmail
@@ -689,11 +697,13 @@ Number::WithError
 OLE::Storage_Lite
 OOPS
 Object::Accessor
+Object::Destroyer
 Object::Realize::Later
 Object::Signature
 Object::Tiny
 OpenOffice::OOBuilder
 OpenOffice::OODoc
+OpenThought
 P5NCI
 PAR
 PAR::Dist::FromCPAN
@@ -867,6 +877,8 @@ SWF::Search
 Safe::Hole
 Scalar::Defer
 Scalar::Util
+Scalar::Util::Clone
+Schedule::Cron
 Set::ConsistentHash
 Set::Crontab
 Set::Infinite
@@ -878,6 +890,7 @@ ShiftJIS::Collate
 ShiftJIS::Regexp
 ShiftJIS::X0213::MapUTF
 ShipIt
+Shipwright
 Smart::Comments
 Socket6
 Sort::ArbBiLex
@@ -1065,6 +1078,7 @@ Tk::Wizard
 Tk::XMLViewer
 Touch
 Transform::Canvas
+Tripletail
 UML::Sequence
 UNIVERSAL::isa
 UNIVERSAL::ref
@@ -1117,6 +1131,7 @@ WWW::Scraper::ISBN::Record
 WWW::Search
 WWW::Shorten
 WWW::Slides
+Waft
 Want
 Web::Scraper
 Workflow
@@ -1157,6 +1172,7 @@ XML::Simple
 XML::SimpleObject
 XML::Stream
 XML::Tiny
+XML::TreePP
 XML::Twig
 XML::Validator::Schema
 XML::Writer

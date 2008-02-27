@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_56';
+$CPAN::VERSION = '1.92_57';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -44,6 +44,35 @@ BEGIN {
 no lib ".";
 
 require Mac::BuildTools if $^O eq 'MacOS';
+if ($ENV{PERL5_CPAN_IS_RUNNING} && $$ != $ENV{PERL5_CPAN_IS_RUNNING}) {
+    $ENV{PERL5_CPAN_IS_RUNNING_IN_RECURSION} ||= $ENV{PERL5_CPAN_IS_RUNNING};
+    my $rec = $ENV{PERL5_CPAN_IS_RUNNING_IN_RECURSION} .= ",$$";
+    my @rec = split /,/, $rec;
+    # warn "# Note: Recursive call of CPAN.pm detected\n";
+    my $w = sprintf "# Note: CPAN.pm is running in process %d now", pop @rec;
+    my %sleep = (
+                 4 => 30,
+                 5 => 60,
+                 6 => 120,
+                );
+    my $sleep = @rec > 6 ? 300 : ($sleep{scalar @rec}||0);
+    my $verbose = @rec >= 3;
+    while (@rec) {
+        $w .= sprintf " which has been called by process %d", pop @rec;
+    }
+    if ($sleep) {
+        $w .= ".\n\n# Sleeping $sleep seconds to protect other processes\n";
+    }
+    if ($verbose) {
+        warn $w;
+    }
+    local $| = 1;
+    while ($sleep > 0) {
+        printf "\r#%5d", --$sleep;
+        sleep 1;
+    }
+    print "\n";
+}
 $ENV{PERL5_CPAN_IS_RUNNING}=$$;
 $ENV{PERL5_CPANPLUS_IS_RUNNING}=$$; # https://rt.cpan.org/Ticket/Display.html?id=23735
 
@@ -432,10 +461,10 @@ Trying to chdir to "$cwd->[1]" instead.
 
 sub _flock {
     my($fh,$mode) = @_;
-    if ($Config::Config{d_flock}) {
+    if ( $Config::Config{d_flock} || $Config::Config{d_fcntl_can_lock} ) {
         return flock $fh, $mode;
     } elsif (!$Have_warned->{"d_flock"}++) {
-        $CPAN::Frontend->mywarn("Your OS does not support locking; continuing and ignoring all locking issues\n");
+        $CPAN::Frontend->mywarn("Your OS does not seem to support locking; continuing and ignoring all locking issues\n");
         $CPAN::Frontend->mysleep(5);
         return 1;
     } else {
@@ -823,14 +852,23 @@ sub text {
 package CPAN::Distrostatus;
 use overload '""' => "as_string",
     fallback => 1;
+use vars qw($something_has_failed_at);
 sub new {
     my($class,$arg) = @_;
+    my $failed = substr($arg,0,2) eq "NO";
+    if ($failed) {
+        $something_has_failed_at = $CPAN::CurrentCommandId;
+    }
     bless {
            TEXT => $arg,
-           FAILED => substr($arg,0,2) eq "NO",
+           FAILED => $failed,
            COMMANDID => $CPAN::CurrentCommandId,
            TIME => time,
           }, $class;
+}
+sub something_has_just_failed () {
+    defined $something_has_failed_at &&
+        $something_has_failed_at == $CPAN::CurrentCommandId;
 }
 sub commandid { shift->{COMMANDID} }
 sub failed { shift->{FAILED} }
@@ -2256,6 +2294,7 @@ sub reload {
                     "CPAN/Queue.pm",
                     "CPAN/Reporter/Config.pm",
                     "CPAN/Reporter/History.pm",
+                    "CPAN/Reporter/PrereqCheck.pm",
                     "CPAN/Reporter.pm",
                     "CPAN/SQLite.pm",
                     "CPAN/Tarzip.pm",
@@ -2564,12 +2603,28 @@ sub _u_r_common {
     $version_undefs = $version_zeroes = 0;
     my $sprintf = "%s%-25s%s %9s %9s  %s\n";
     my @expand = $self->expand('Module',@args);
-    my $expand = scalar @expand;
-    if (0) { # Looks like noise to me, was very useful for debugging
+    if ($CPAN::DEBUG) { # Looks like noise to me, was very useful for debugging
              # for metadata cache
-        $CPAN::Frontend->myprint(sprintf "%d matches in the database\n", $expand);
+        my $expand = scalar @expand;
+        $CPAN::Frontend->myprint(sprintf "%d matches in the database, time[%d]\n", $expand, time);
     }
-  MODULE: for $module (@expand) {
+    my @sexpand;
+    if ($] < 5.008) {
+        # hard to believe that the more complex sorting can lead to
+        # stack curruptions on older perl
+        @sexpand = sort {$a->id cmp $b->id} @expand;
+    } else {
+        @sexpand = sort {
+            $b->_is_representative_module <=> $a->_is_representative_module
+                ||
+                    $a->id cmp $b->id
+                } @expand;
+    }
+    if ($CPAN::DEBUG) {
+        $CPAN::Frontend->myprint(sprintf "sorted at time[%d]\n", time);
+        sleep 1;
+    }
+  MODULE: for $module (@sexpand) {
         my $file  = $module->cpan_file;
         next MODULE unless defined $file; # ??
         $file =~ s!^./../!!;
@@ -2965,6 +3020,7 @@ sub expand_by_method {
                    ) if $CPAN::DEBUG;
         if (defined $regex) {
             if (CPAN::_sqlite_running) {
+                CPAN::Index->reload;
                 $CPAN::SQLite->search($class, $regex);
             }
             for $obj (
@@ -3037,7 +3093,8 @@ that may go away anytime.\n"
         my $wantarray = wantarray;
         my $join_m = join ",", map {$_->id} @m;
         # $self->debug("wantarray[$wantarray]join_m[$join_m]");
-        $self->debug("wantarray[$wantarray]");
+        my $count = scalar @m;
+        $self->debug("class[$class]wantarray[$wantarray]count m[$count]");
     }
     return wantarray ? @m : $m[0];
 }
@@ -3373,7 +3430,7 @@ to find objects with matching identifiers.
     # queuerunner (please be warned: when I started to change the
     # queue to hold objects instead of names, I made one or two
     # mistakes and never found which. I reverted back instead)
-    while (my $q = CPAN::Queue->first) {
+  QITEM: while (my $q = CPAN::Queue->first) {
         my $obj;
         my $s = $q->as_string;
         my $reqtype = $q->reqtype || "";
@@ -3386,7 +3443,7 @@ to find objects with matching identifiers.
                                     "to an object. Skipping.\n");
             $CPAN::Frontend->mysleep(5);
             CPAN::Queue->delete_first($s);
-            next;
+            next QITEM;
         }
         $obj->{reqtype} ||= "";
         {
@@ -3464,6 +3521,14 @@ to find objects with matching identifiers.
             if ($obj->can($unpragma)) {
                 $obj->$unpragma();
             }
+        }
+        if ($CPAN::Config->{halt_on_failure}
+                &&
+                    CPAN::Distrostatus::something_has_just_failed()
+              ) {
+            $CPAN::Frontend->mywarn("Stopping: '$meth' failed for '$s'.\n");
+            CPAN::Queue->nullify_queue;
+            last QITEM;
         }
         CPAN::Queue->delete_first($s);
     }
@@ -3639,10 +3704,9 @@ sub get_basic_credentials {
 sub get_proxy_credentials {
     my $self = shift;
     my ($user, $password);
-    if ( defined $CPAN::Config->{proxy_user} &&
-         defined $CPAN::Config->{proxy_pass}) {
+    if ( defined $CPAN::Config->{proxy_user} ) {
         $user = $CPAN::Config->{proxy_user};
-        $password = $CPAN::Config->{proxy_pass};
+        $password = $CPAN::Config->{proxy_pass} || "";
         return ($user, $password);
     }
     my $username_prompt = "\nProxy authentication needed!
@@ -3658,10 +3722,9 @@ sub get_proxy_credentials {
 sub get_non_proxy_credentials {
     my $self = shift;
     my ($user,$password);
-    if ( defined $CPAN::Config->{username} &&
-         defined $CPAN::Config->{password}) {
+    if ( defined $CPAN::Config->{username} ) {
         $user = $CPAN::Config->{username};
-        $password = $CPAN::Config->{password};
+        $password = $CPAN::Config->{password} || "";
         return ($user, $password);
     }
     my $username_prompt = "\nAuthentication needed!
@@ -4394,6 +4457,7 @@ sub hostdlhard {
 
         # Try the most capable first and leave ncftp* for last as it only
         # does FTP.
+        my $proxy_vars = $self->_proxy_vars($ro_url);
       DLPRG: for my $f (qw(curl wget lynx ncftpget ncftp)) {
             my $funkyftp = CPAN::HandleConfig->safe_quote($CPAN::Config->{$f});
             next unless defined $funkyftp;
@@ -4415,6 +4479,9 @@ sub hostdlhard {
                 $stdout_redir = "";
             } elsif ($f eq 'curl') {
                 $src_switch = ' -L -f -s -S --netrc-optional';
+                if ($proxy_vars->{http_proxy}) {
+                    $src_switch .= qq{ -U "$proxy_vars->{proxy_user}:$proxy_vars->{proxy_pass}" -x "$proxy_vars->{http_proxy}"};
+                }
             }
 
             if ($f eq "ncftpget") {
@@ -4509,6 +4576,39 @@ No success, the file that lynx has downloaded is an empty file.
             return if $CPAN::Signal;
         } # transfer programs
     } # host
+}
+
+#-> CPAN::FTP::_proxy_vars
+sub _proxy_vars {
+    my($self,$url) = @_;
+    my $ret = +{};
+    my $http_proxy = $CPAN::Config->{'http_proxy'} || $ENV{'http_proxy'};
+    if ($http_proxy) {
+        my($host) = $url =~ m|://([^/:]+)|;
+        my $want_proxy = 1;
+        my $noproxy = $CPAN::Config->{'no_proxy'} || $ENV{'no_proxy'} || "";
+        my @noproxy = split /\s*,\s*/, $noproxy;
+        if ($host) {
+          DOMAIN: for my $domain (@noproxy) {
+                if ($host =~ /\Q$domain\E$/) { # cf. LWP::UserAgent
+                    $want_proxy = 0;
+                    last DOMAIN;
+                }
+            }
+        } else {
+            $CPAN::Frontend->mywarn("  Could not determine host from http_proxy '$http_proxy'\n");
+        }
+        if ($want_proxy) {
+            my($user, $pass) =
+                &CPAN::LWP::UserAgent::get_proxy_credentials();
+            $ret = {
+                    proxy_user => $user,
+                    proxy_pass => $pass,
+                    http_proxy => $http_proxy
+                  };
+        }
+    }
+    return $ret;
 }
 
 # package CPAN::FTP;
@@ -5394,10 +5494,10 @@ sub rd_modlist {
     }
     push @eval2, q{CPAN::Modulelist->data;};
     local($^W) = 0;
-    my($comp) = Safe->new("CPAN::Safe1");
+    my($compmt) = Safe->new("CPAN::Safe1");
     my($eval2) = join("\n", @eval2);
     CPAN->debug(sprintf "length of eval2[%d]", length $eval2) if $CPAN::DEBUG;
-    my $ret = $comp->reval($eval2);
+    my $ret = $compmt->reval($eval2);
     Carp::confess($@) if $@;
     return if $CPAN::Signal;
     my $i = 0;
@@ -5861,8 +5961,8 @@ sub dir_listing {
         my $eval = <$fh>;
         $eval =~ s/\015?\012/\n/g;
         close $fh;
-        my($comp) = Safe->new();
-        $cksum = $comp->reval($eval);
+        my($compmt) = Safe->new();
+        $cksum = $compmt->reval($eval);
         if ($@) {
             rename $lc_file, "$lc_file.bad";
             Carp::confess($@) if $@;
@@ -7162,8 +7262,8 @@ sub CHECKSUM_check_file {
         my $eval = <$fh>;
         $eval =~ s/\015?\012/\n/g;
         close $fh;
-        my($comp) = Safe->new();
-        $cksum = $comp->reval($eval);
+        my($compmt) = Safe->new();
+        $cksum = $compmt->reval($eval);
         if ($@) {
             rename $chk_file, "$chk_file.bad";
             Carp::confess($@) if $@;
@@ -7577,7 +7677,7 @@ is part of the perl-%s distribution. To install that, you need to run
 #        $switch = "-MExtUtils::MakeMaker ".
 #            "-Mops=:default,:filesys_read,:filesys_open,require,chdir"
 #            if $] > 5.00310;
-        my $makepl_arg = $self->make_x_arg("pl");
+        my $makepl_arg = $self->_make_phase_arg("pl");
         $ENV{PERL5_CPAN_IS_EXECUTING} = File::Spec->catfile($self->{build_dir},
                                                             "Makefile.PL");
         $system = sprintf("%s%s Makefile.PL%s",
@@ -7739,7 +7839,7 @@ is part of the perl-%s distribution. To install that, you need to run
             $system = join " ", $self->_make_command(),  $CPAN::Config->{make_arg};
         }
         $system =~ s/\s+$//;
-        my $make_arg = $self->make_x_arg("make");
+        my $make_arg = $self->_make_phase_arg("make");
         $system = sprintf("%s%s",
                           $system,
                           $make_arg ? " $make_arg" : "",
@@ -7825,9 +7925,15 @@ sub _run_via_expect_anyorder {
     my $reuse = $expect_model->{reuse};
     my @expectacopy = @{$expect_model->{talk}}; # we trash it!
     my $but = "";
+    my $timeout_start = time;
   EXPECT: while () {
         my($eof,$ran_into_timeout);
-        my @match = $expo->expect($timeout,
+        # XXX not up to the full power of expect. one could certainly
+        # wrap all of the talk pairs into a single expect call and on
+        # success tweak it and step ahead to the next question. The
+        # current implementation unnecessarily limits itself to a
+        # single match.
+        my @match = $expo->expect(1,
                                   [ eof => sub {
                                         $eof++;
                                     } ],
@@ -7856,6 +7962,11 @@ sub _run_via_expect_anyorder {
                     splice @expectacopy, $i, 2 unless $reuse;
                     next EXPECT;
                 }
+            }
+            my $have_waited = time - $timeout_start;
+            if ($have_waited < $timeout) {
+                # warn "DEBUG: have_waited[$have_waited]timeout[$timeout]";
+                next EXPECT;
             }
             my $why = "could not answer a question during the dialog";
             $CPAN::Frontend->mywarn("Failing: $why\n");
@@ -8128,25 +8239,50 @@ $filler2 $bs $filler2
     return $self->{prefs} = +{};
 }
 
-# CPAN::Distribution::make_x_arg
-sub make_x_arg {
-    my($self, $whixh) = @_;
-    my $make_x_arg;
+# CPAN::Distribution::_make_phase_arg
+sub _make_phase_arg {
+    my($self, $phase) = @_;
+    my $_make_phase_arg;
     my $prefs = $self->prefs;
     if (
         $prefs
-        && exists $prefs->{$whixh}
-        && exists $prefs->{$whixh}{args}
-        && $prefs->{$whixh}{args}
+        && exists $prefs->{$phase}
+        && exists $prefs->{$phase}{args}
+        && $prefs->{$phase}{args}
        ) {
-        $make_x_arg = join(" ",
+        $_make_phase_arg = join(" ",
                            map {CPAN::HandleConfig
-                                 ->safe_quote($_)} @{$prefs->{$whixh}{args}},
+                                 ->safe_quote($_)} @{$prefs->{$phase}{args}},
                           );
     }
-    my $what = sprintf "make%s_arg", $whixh eq "make" ? "" : $whixh;
-    $make_x_arg ||= $CPAN::Config->{$what};
-    return $make_x_arg;
+
+# cpan[2]> o conf make[TAB]
+# make                       make_install_make_command
+# make_arg                   makepl_arg
+# make_install_arg
+# cpan[2]> o conf mbuild[TAB]
+# mbuild_arg                    mbuild_install_build_command
+# mbuild_install_arg            mbuildpl_arg
+
+    my $mantra; # must switch make/mbuild here
+    if ($self->{modulebuild}) {
+        $mantra = "mbuild";
+    } else {
+        $mantra = "make";
+    }
+    my %map = (
+               pl => "pl_arg",
+               make => "_arg",
+               test => "_test_arg", # does not really exist but maybe
+                                    # will some day and now protects
+                                    # us from unini warnings
+               install => "_install_arg",
+              );
+    my $phase_underscore_meshup = $map{$phase};
+    my $what = sprintf "%s%s", $mantra, $phase_underscore_meshup;
+
+    $_make_phase_arg ||= $CPAN::Config->{$what};
+    return $_make_phase_arg;
 }
 
 # CPAN::Distribution::_make_command
@@ -8391,6 +8527,8 @@ sub unsat_prereq {
                                     "make_clean",
                                    ) {
                 if ($do->{$nosayer}) {
+                    my $selfid = $self->pretty_id;
+                    my $did = $do->pretty_id;
                     if (UNIVERSAL::can($do->{$nosayer},"failed") ?
                         $do->{$nosayer}->failed :
                         $do->{$nosayer} =~ /^NO/) {
@@ -8402,8 +8540,8 @@ sub unsat_prereq {
                         }
                         $CPAN::Frontend->mywarn("Warning: Prerequisite ".
                                                 "'$need_module => $need_version' ".
-                                                "for '$self->{ID}' failed when ".
-                                                "processing '$do->{ID}' with ".
+                                                "for '$selfid' failed when ".
+                                                "processing '$did' with ".
                                                 "'$nosayer => $do->{$nosayer}'. Continuing, ".
                                                 "but chances to succeed are limited.\n"
                                                );
@@ -8415,7 +8553,7 @@ sub unsat_prereq {
                             # 2007-03
                             $CPAN::Frontend->mywarn("Warning: Prerequisite ".
                                                     "'$need_module => $need_version' ".
-                                                    "for '$self->{ID}' already installed ".
+                                                    "for '$selfid' already installed ".
                                                     "but installation looks suspicious. ".
                                                     "Skipping another installation attempt, ".
                                                     "to prevent looping endlessly.\n"
@@ -8732,7 +8870,7 @@ sub test {
     } else {
         $system = join " ", $self->_make_command(), "test";
     }
-    my $make_test_arg = $self->make_x_arg("test");
+    my $make_test_arg = $self->_make_phase_arg("test");
     $system = sprintf("%s%s",
                       $system,
                       $make_test_arg ? " $make_test_arg" : "",
@@ -9617,8 +9755,8 @@ sub contains {
     my $in_cont = 0;
     $self->debug("inst_file[$inst_file]") if $CPAN::DEBUG;
     while (<$fh>) {
-        $in_cont = m/^=(?!head1\s+CONTENTS)/ ? 0 :
-            m/^=head1\s+CONTENTS/ ? 1 : $in_cont;
+        $in_cont = m/^=(?!head1\s+(?i-xsm:CONTENTS))/ ? 0 :
+            m/^=head1\s+(?i-xsm:CONTENTS)/ ? 1 : $in_cont;
         next unless $in_cont;
         next if /^=/;
         s/\#.*//;
@@ -9816,6 +9954,21 @@ sub description {
 sub distribution {
     my($self) = @_;
     CPAN::Shell->expand("Distribution",$self->cpan_file);
+}
+
+#-> sub CPAN::Module::_is_representative_module
+sub _is_representative_module {
+    my($self) = @_;
+    return $self->{_is_representative_module} if defined $self->{_is_representative_module};
+    my $pm = $self->cpan_file or return $self->{_is_representative_module} = 0;
+    $pm =~ s|.+/||;
+    $pm =~ s{\.(?:tar\.(bz2|gz|Z)|t(?:gz|bz)|zip)$}{}i; # see base_id
+    $pm =~ s|-\d+\.\d+.+$||;
+    $pm =~ s|-[\d\.]+$||;
+    $pm =~ s/-/::/g;
+    $self->{_is_representative_module} = $pm eq $self->{ID} ? 1 : 0;
+    # warn "DEBUG: $pm eq $self->{ID} => $self->{_is_representative_module}";
+    $self->{_is_representative_module};
 }
 
 #-> sub CPAN::Module::undelay
@@ -10307,7 +10460,7 @@ sub install {
 });
         $CPAN::Frontend->mysleep(5);
     }
-    $self->rematein('install') if $doit;
+    return $doit ? $self->rematein('install') : 1;
 }
 #-> sub CPAN::Module::clean ;
 sub clean  { shift->rematein('clean') }
@@ -10969,6 +11122,8 @@ defined:
   getcwd             see below
   gpg                path to external prg
   gzip               location of external program gzip
+  halt_on_failure    stop processing after the first failure of queued
+                     items or dependencies
   histfile           file to maintain history between sessions
   histsize           maximum number of lines to keep in histfile
   http_proxy         proxy host for http requests

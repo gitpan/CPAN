@@ -19,7 +19,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec ();
 use vars qw($VERSION $urllist);
-$VERSION = sprintf "%.6f", substr(q$Rev: 2652 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2680 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -191,6 +191,14 @@ alternatives can be configured according to the following table:
     backtickcwd external command cwd
 
 Preferred method for determining the current working directory?
+
+=item halt_on_failure
+
+Normaly, CPAN.pm continues processing the full list of targets and
+dependencies, even if one of them fails.  However, you can specify 
+that CPAN should halt after the first failure. 
+
+Do you want to halt on failure (yes/no)?
 
 =item histfile
 
@@ -1002,6 +1010,13 @@ substitute. You can then revisit this dialog with
     #
 
     my_dflt_prompt(inactivity_timeout => 0, $matcher);
+
+    #
+    #== halt_on_failure
+    #
+    if (!$matcher or 'halt_on_failure' =~ /$matcher/) {
+        my_yn_prompt(halt_on_failure => 0, $matcher);
+    }
 
     #
     #= Proxies

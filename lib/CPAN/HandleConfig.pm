@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $loading $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 2615 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2680 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -14,6 +14,13 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 2615 $,4)/1000000 + 5.4;
 # Q: where is the "How do I add a new config option" HOWTO?
 # A1: svn diff -r 757:758 # where dagolden added test_report
 # A2: svn diff -r 985:986 # where andk added yaml_module
+# A3: 1. add new config option to %keys below
+#     2. add a Pod description in CPAN::FirstTime; it should include a
+#        prompt line; see others for examples
+#     3. add a "matcher" section in CPAN::FirstTime::init that includes
+#        a prompt function; see others for examples
+#     4. add config option to documentation section in CPAN.pm
+
 %keys = map { $_ => undef }
     (
      "applypatch",
@@ -42,6 +49,7 @@ $VERSION = sprintf "%.6f", substr(q$Rev: 2615 $,4)/1000000 + 5.4;
      "getcwd",
      "gpg",
      "gzip",
+     "halt_on_failure",
      "histfile",
      "histsize",
      "http_proxy",
@@ -684,7 +692,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 2615 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 2680 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {

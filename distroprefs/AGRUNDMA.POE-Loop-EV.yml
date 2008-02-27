@@ -1,15 +1,11 @@
 ---
 match:
-  distribution: "^DMAKI/File-Extract-\d"
+  distribution: "AGRUNDMA/POE-Loop-EV-\d"
 pl:
   eexpect:
     mode: anyorder
     talk:
-      - "\QKeep CAM::PDF in the dependency list?\E"
-      - "y\n"
-      - "\QKeep Spreadsheet::ParseExcel in the dependency list?\E"
-      - "y\n"
-      - "Auto-install"
+      - "\QWould you like to skip the network tests?\E"
       - "y\n"
   env:
     PERL_AUTOINSTALL: --skip    
