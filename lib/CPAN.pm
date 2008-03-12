@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_57';
+$CPAN::VERSION = '1.92_58';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -42,6 +42,7 @@ BEGIN {
     }
 }
 no lib ".";
+use CPAN::PERL5INC; # must come after absification
 
 require Mac::BuildTools if $^O eq 'MacOS';
 if ($ENV{PERL5_CPAN_IS_RUNNING} && $$ != $ENV{PERL5_CPAN_IS_RUNNING}) {
@@ -51,12 +52,12 @@ if ($ENV{PERL5_CPAN_IS_RUNNING} && $$ != $ENV{PERL5_CPAN_IS_RUNNING}) {
     # warn "# Note: Recursive call of CPAN.pm detected\n";
     my $w = sprintf "# Note: CPAN.pm is running in process %d now", pop @rec;
     my %sleep = (
-                 4 => 30,
-                 5 => 60,
-                 6 => 120,
+                 5 => 30,
+                 6 => 60,
+                 7 => 120,
                 );
-    my $sleep = @rec > 6 ? 300 : ($sleep{scalar @rec}||0);
-    my $verbose = @rec >= 3;
+    my $sleep = @rec > 7 ? 300 : ($sleep{scalar @rec}||0);
+    my $verbose = @rec >= 4;
     while (@rec) {
         $w .= sprintf " which has been called by process %d", pop @rec;
     }
@@ -106,6 +107,7 @@ use vars qw(
             $Have_warned
             $MAX_RECURSION
             $META
+            $Perl5lib_tempfile
             $RUN_DEGRADED
             $Signal
             $SQLite
@@ -1277,10 +1279,11 @@ sub backtickcwd {my $cwd = `cwd`; chomp $cwd; $cwd}
 #-> sub CPAN::find_perl ;
 sub find_perl () {
     my($perl) = File::Spec->file_name_is_absolute($^X) ? $^X : "";
-    my $pwd  = $CPAN::iCwd = CPAN::anycwd();
-    my $candidate = File::Spec->catfile($pwd,$^X);
-    $perl ||= $candidate if MM->maybe_command($candidate);
-
+    unless ($perl) {
+        my $pwd  = $CPAN::iCwd = CPAN::anycwd();
+        my $candidate = File::Spec->catfile($pwd,$^X);
+        $perl = $candidate if MM->maybe_command($candidate);
+    }
     unless ($perl) {
         my ($component,$perl_name);
       DIST_PERLNAME: foreach $perl_name ($^X, 'perl', 'perl5', "perl$]") {
@@ -1296,7 +1299,7 @@ sub find_perl () {
         }
     }
 
-    return $perl;
+    return $^X = $perl;
 }
 
 
@@ -1523,6 +1526,7 @@ sub cleanup {
   $META->savehist;
   close $META->{LOCKFH};
   unlink $META->{LOCK};
+  unlink $Perl5lib_tempfile if defined $Perl5lib_tempfile;
   # require Carp;
   # Carp::cluck("DEBUGGING");
   if ( $CPAN::CONFIG_DIRTY ) {
@@ -1596,6 +1600,8 @@ sub _list_sorted_descending_is_tested {
 }
 
 #-> sub CPAN::set_perl5lib
+{
+my $fh;
 sub set_perl5lib {
     my($self,$for) = @_;
     unless ($for) {
@@ -1607,13 +1613,29 @@ sub set_perl5lib {
     my $env = $ENV{PERL5LIB};
     $env = $ENV{PERLLIB} unless defined $env;
     my @env;
-    push @env, $env if defined $env and length $env;
+    push @env, split /\Q$Config::Config{path_sep}\E/, $env if defined $env and length $env;
     #my @dirs = map {("$_/blib/arch", "$_/blib/lib")} keys %{$self->{is_tested}};
     #$CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB.\n");
 
     my @dirs = map {("$_/blib/arch", "$_/blib/lib")} $self->_list_sorted_descending_is_tested;
+    return if !@env && !@dirs;
+    my $yaml_module = CPAN::_yaml_module;
+
+    if ($CPAN::META->has_inst($yaml_module) && $CPAN::META->has_usable("File::Temp")) {
+        unless (defined $fh) {
+            $fh =
+                File::Temp->new(
+                                dir      => File::Spec->tmpdir,
+                                template => 'cpan_perl5inc_XXXX',
+                                suffix   => '.txt',
+                                unlink   => 0,
+                               );
+            $Perl5lib_tempfile = $fh->filename;
+        }
+    }
     if (@dirs < 12) {
         $CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB for '$for'\n");
+        $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
     } elsif (@dirs < 24) {
         my @d = map {my $cp = $_;
                      $cp =~ s/^\Q$CPAN::Config->{build_dir}\E/%BUILDDIR%/;
@@ -1623,16 +1645,31 @@ sub set_perl5lib {
                                  "%BUILDDIR%=$CPAN::Config->{build_dir} ".
                                  "for '$for'\n"
                                 );
+        $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
+    } elsif ($Perl5lib_tempfile) {
+        my $cnt = keys %{$self->{is_tested}};
+        $CPAN::Frontend->myprint("Delegating blib/arch and blib/lib of ".
+                                 "$cnt build dirs to CPAN::PERL5LIB; ".
+                                 "for '$for'\n"
+                                );
+        my $inc = File::Basename::dirname(File::Basename::dirname($INC{"CPAN/PERL5INC.pm"}));
+        $ENV{PERL5OPT} .= " " if $ENV{PERL5OPT};
+        $ENV{PERL5OPT} .= "-I$inc -MCPAN::PERL5INC=yaml_module,$yaml_module -MCPAN::PERL5INC=tempfile,$Perl5lib_tempfile";
+        seek $fh, 0, 0;
+        truncate $fh, 0;
+        CPAN->_yaml_dumpfile($fh,{ inc => [@dirs,@env] });
     } else {
         my $cnt = keys %{$self->{is_tested}};
+        $CPAN::Frontend->mywarn("Your PERL5LIB is growing, installation ".
+                                "of a YAML module is recommended. See the manpage ".
+                                "of CPAN::PERL5INC for further information\n");
         $CPAN::Frontend->myprint("Prepending blib/arch and blib/lib of ".
                                  "$cnt build dirs to PERL5LIB; ".
                                  "for '$for'\n"
                                 );
+        $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
     }
-
-    $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
-}
+}}
 
 package CPAN::CacheMgr;
 use strict;
@@ -2614,11 +2651,17 @@ sub _u_r_common {
         # stack curruptions on older perl
         @sexpand = sort {$a->id cmp $b->id} @expand;
     } else {
-        @sexpand = sort {
-            $b->_is_representative_module <=> $a->_is_representative_module
-                ||
-                    $a->id cmp $b->id
-                } @expand;
+        @sexpand = map {
+            $_->[1]
+        } sort {
+            $b->[0] <=> $a->[0]
+            ||
+            $a->[1]{ID} cmp $b->[1]{ID},
+        } map {
+            [$_->_is_representative_module,
+             $_
+            ]
+        } @expand;
     }
     if ($CPAN::DEBUG) {
         $CPAN::Frontend->myprint(sprintf "sorted at time[%d]\n", time);
@@ -3575,7 +3618,7 @@ sub recent {
               $distro =~ s|.*?/authors/id/./../||;
               my $size   = $eitem->findvalue("enclosure/\@length");
               my $desc   = $eitem->findvalue("description");
-               $desc =~ s/.+? - //;
+              $desc =~ s/.+? - //;
               $CPAN::Frontend->myprint("$distro [$size b]\n    $desc\n");
               push @distros, $distro;
           }
@@ -3870,11 +3913,7 @@ sub _add_to_statistics {
     $self->debug("yaml_module[$yaml_module]") if $CPAN::DEBUG;
     if ($CPAN::META->has_inst($yaml_module)) {
         $stats->{thesiteurl} = $ThesiteURL;
-        if (CPAN->has_inst("Time::HiRes")) {
-            $stats->{end} = Time::HiRes::time();
-        } else {
-            $stats->{end} = time;
-        }
+        $stats->{end} = CPAN::FTP::_mytime();
         my $fh = FileHandle->new;
         my $time = time;
         my $sdebug = 0;
@@ -5114,11 +5153,21 @@ sub reanimate_build_dir {
     my $i = 0;
     my $painted = 0;
     my $restored = 0;
-    $CPAN::Frontend->myprint("Going to read $CPAN::Config->{build_dir}/\n");
     my @candidates = map { $_->[0] }
         sort { $b->[1] <=> $a->[1] }
             map { [ $_, -M File::Spec->catfile($d,$_) ] }
                 grep {/\.yml$/} readdir $dh;
+    unless (@candidates) {
+        $CPAN::Frontend->myprint("Build_dir empty, nothing to restore\n");
+        return;
+    }
+    $CPAN::Frontend->myprint
+        (sprintf("Going to read %d yaml file%s from %s/\n",
+                 scalar @candidates,
+                 @candidates==1 ? "" : "s",
+                 $CPAN::Config->{build_dir}
+                ));
+    my $start = CPAN::FTP::_mytime;
   DISTRO: for $i (0..$#candidates) {
         my $dirent = $candidates[$i];
         my $y = eval {CPAN->_yaml_loadfile(File::Spec->catfile($d,$dirent))};
@@ -5179,11 +5228,11 @@ sub reanimate_build_dir {
             $painted++;
         }
     }
+    my $took = CPAN::FTP::_mytime - $start;
     $CPAN::Frontend->myprint(sprintf(
-                                     "DONE\nFound %s old build%s, restored the state of %s\n",
-                                     @candidates ? sprintf("%d",scalar @candidates) : "no",
-                                     @candidates==1 ? "" : "s",
+                                     "DONE\nRestored the state of %s (in %.4f secs)\n",
                                      $restored || "none",
+                                     $took,
                                     ));
 }
 
@@ -6270,7 +6319,7 @@ sub get {
     local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
-
+    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
     $CPAN::META->set_perl5lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
@@ -6278,7 +6327,7 @@ sub get {
         my @e;
         my $goodbye_message;
         $self->debug("checking disabled id[$self->{ID}]") if $CPAN::DEBUG;
-        if ($self->prefs->{disabled}) {
+        if ($self->prefs->{disabled} && ! $self->{force_update}) {
             my $why = sprintf(
                               "Disabled via prefs file '%s' doc %d",
                               $self->{prefs_file},
@@ -7559,6 +7608,7 @@ is part of the perl-%s distribution. To install that, you need to run
     local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
+    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
     $CPAN::META->set_perl5lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
@@ -8750,6 +8800,7 @@ sub test {
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
 
+    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
     $CPAN::META->set_perl5lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
@@ -9241,6 +9292,7 @@ sub install {
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
 
+    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
     $CPAN::META->set_perl5lib;
     my($pipe) = FileHandle->new("$system $stderr |");
     my($makeout) = "";
@@ -11535,12 +11587,12 @@ uploaded that is better than the last released version.
 =item install [hash]
 
 Processing instructions for the C<make install> or C<./Build install>
-phase of the CPAN mantra. See below under I<Processiong Instructions>.
+phase of the CPAN mantra. See below under I<Processing Instructions>.
 
 =item make [hash]
 
 Processing instructions for the C<make> or C<./Build> phase of the
-CPAN mantra. See below under I<Processiong Instructions>.
+CPAN mantra. See below under I<Processing Instructions>.
 
 =item match [hash]
 
@@ -11560,7 +11612,7 @@ absolute path).
 
 The value associated with C<perlconfig> is itself a hashref that is
 matched against corresponding values in the C<%Config::Config> hash
-living in the C< Config.pm > module.
+living in the C<Config.pm> module.
 
 If more than one restriction of C<module>, C<distribution>, and
 C<perl> is specified, the results of the separately computed match
@@ -11584,13 +11636,13 @@ distribution.
 =item pl [hash]
 
 Processing instructions for the C<perl Makefile.PL> or C<perl
-Build.PL> phase of the CPAN mantra. See below under I<Processiong
+Build.PL> phase of the CPAN mantra. See below under I<Processing
 Instructions>.
 
 =item test [hash]
 
 Processing instructions for the C<make test> or C<./Build test> phase
-of the CPAN mantra. See below under I<Processiong Instructions>.
+of the CPAN mantra. See below under I<Processing Instructions>.
 
 =back
 
@@ -12820,6 +12872,26 @@ You can make your configuration changes permanent by calling the
 command C<o conf commit>. Alternatively set the C<auto_commit>
 variable to true by running C<o conf init auto_commit> and answering
 the following question with yes.
+
+=item 17)
+
+Older versions of CPAN.pm had the original root directory of all
+tarballs in the build directory. Now there are always random
+characters appended to these directory names. Why was this done?
+
+The random characters are provided by File::Temp and ensure that each
+module's individual build directory is unique. This makes running
+CPAN.pm in concurrent processes simultaneously safe.
+
+=item 18)
+
+Speaking of the build directory. Do I have to clean it up myself?
+
+You have the choice to set the config variable C<scan_cache> to
+C<never>. Then you must clean it up yourself. The other possible
+value, C<atstart> only cleans up the build directory when you start
+the CPAN shell. If you never start up the CPAN shell, you probably
+also have to clean up the build directory yourself.
 
 =back
 

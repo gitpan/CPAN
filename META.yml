@@ -1,11 +1,11 @@
 --- #YAML:1.0
 name:                CPAN
-version:             1.92_57
+version:             1.92_58
 abstract:            query, download and build perl modules from CPAN sites
 license:             perl
 author:              
     - Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>
-generated_by:        ExtUtils::MakeMaker version 6.42
+generated_by:        ExtUtils::MakeMaker version 6.44
 distribution_type:   module
 requires:     
     File::Spec:                    0

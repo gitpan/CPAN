@@ -2,7 +2,7 @@ package CPAN::HandleConfig;
 use strict;
 use vars qw(%can %keys $loading $VERSION);
 
-$VERSION = sprintf "%.6f", substr(q$Rev: 2680 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2742 $,4)/1000000 + 5.4;
 
 %can = (
         commit   => "Commit changes to disk",
@@ -118,7 +118,6 @@ sub edit {
     CPAN->debug("self[$self]args[".join(" | ",@args)."]");
     my($o,$str,$func,$args,$key_exists);
     $o = shift @args;
-    $DB::single = 1;
     if($can{$o}) {
         $self->$o(args => \@args); # o conf init => sub init => sub load
         return 1;
@@ -692,7 +691,7 @@ sub prefs_lookup {
 
     use strict;
     use vars qw($AUTOLOAD $VERSION);
-    $VERSION = sprintf "%.2f", substr(q$Rev: 2680 $,4)/100;
+    $VERSION = sprintf "%.2f", substr(q$Rev: 2742 $,4)/100;
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
     sub AUTOLOAD {

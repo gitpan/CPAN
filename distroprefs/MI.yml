@@ -6,12 +6,18 @@ comment: |
   seem to be needed to prevent infinite recursion under certain
   unknown circumstances.
 
+  The timeout must really be more, Net::Jifty for example didn't make
+  it in ten (once), OpenResty didn't make it in 20 (I took it out
+  then)
+
 match:
   distribution: |
     ^(?x:^ADAMK/Algorithm-Dependency-\d
     |ADAMK/HTML-Location-\d
     |ADAMK/PITA-XML-\d
     |ADAMK/URI-ToDisk-\d
+    |AGENT/Makefile-DOM-\d
+    |AGENT/Makefile-Parser-\d
     |AGRUNDMA/Catalyst-Plugin-Static-Simple-\d
     |AGRUNDMA/Catalyst-Plugin-UploadProgress-\d
     |ASH/DBIx-Class-\d
@@ -27,6 +33,8 @@ match:
     |BLBLACK/DBIx-Class-\d
     |BLBLACK/MRO-Compat-\d
     |BLBLACK/Term-Spinner-\d
+    |BRICAS/CGI-Application-PhotoGallery-\d
+    |BOBTFISH/Text-Markdown-\d
     |BRICAS/Catalyst-Plugin-ConfigLoader-\d
     |BRICAS/File-SAUCE-\d
     |BRICAS/Games-NES-Emulator-\d
@@ -75,6 +83,8 @@ match:
     |GAAL/Class-Rebless-\d
     |GAAL/Perl6-Take-\d
     |GAAL/Task-Smoke-\d
+    |GPHAT/Osgood-Client-\d
+    |GPHAT/Osgood-Server-\d
     |GRODITI/MooseX-Object-Pluggable-\d
     |GRUBER/IPC-Messaging-\d
     |HANENKAMP/Bot-Net-\d
@@ -87,7 +97,6 @@ match:
     |HDP/KSx-IndexManager-\d
     |HIROSE/Net-SSL-ExpireDate-\d
     |HOLOWAY/Catalyst-Action-REST-\d
-    |JAYK/Catalyst-Authentication-Store-DBIx-Class-\d
     |JAYK/Catalyst-Plugin-Authentication-Store-DBIx-Class-\d
     |JAYK/Catalyst-Plugin-Authentication-\d
     |JCAMACHO/Catalyst-Controller-FormBuilder-\d
@@ -106,6 +115,7 @@ match:
     |JROCKWAY/File-Attributes-Recursive-\d
     |JROCKWAY/Task-Catalyst-Tutorial-\d
     |JROCKWAY/Test-YAML-Valid
+    |JSMITH/RDF-Server-\d
     |JSWARTZ/CHI-\d
     |KARMAN/Catalyst-Plugin-Session-Store-File-\d
     |LBROCARD/Devel-ebug-HTTP-\d
@@ -116,8 +126,12 @@ match:
     |LYOKATO/Pod-ProjectDocs-\d
     |MARCEL/App-sync_cpantesters-\d
     |MARCEL/Class-Accessor-Complex-\d
+    |MARCEL/Class-Accessor-Constructor-\d
     |MARCEL/Class-Accessor-FactoryTyped-\d
+    |MARCEL/Class-Accessor-Installer-\d
+    |MARCEL/Class-Factory-Enhanced-\d
     |MARCEL/LWP-UserAgent-ProgressBar-\d
+    |MARCEL/Pod-Generated-\d
     |MARCEL/Test-Compile-\d
     |MARKSTOS/Test-WWW-Selenium-CGIApp-\d
     |MEMOWE/HTML-SBC-\d
@@ -138,10 +152,14 @@ match:
     |MSTROUT/Devel-REPL-\d
     |NUFFIN/Catalyst-Plugin-Session-State-Cookie-\d
     |PERIGRIN/JSON-Any-\d
+    |PERIGRIN/Regexp-Common-IRC-\d
+    |PHAYLON/MooseX-Types-\d
     |PHAYLON/namespace-clean-\d
     |REDTREE/PDF-API2-Simple-\d
     |RJBS/Rubric-\d
+    |RKITOVER/Catalyst-Plugin-RelativePaths-\d
     |SARTAK/Acme-Aspartame-\d
+    |SARTAK/App-Nopaste-\d
     |SARTAK/Carp-REPL-\d
     |SARTAK/Class-Method-Modifiers-\d
     |SARTAK/Jifty-DBI-\d
@@ -151,7 +169,10 @@ match:
     |SMUELLER/Math-Approx-Symbolic-
     |SMUELLER/PAR-
     |SRI/Catalyst-Plugin-HTML-Widget-\d
+    |STEVAN/FCGI-Engine-\d
+    |STEVAN/MooseX-Daemonize-\d
     |TELS/graph/Graph-
+    |THEPLER/MooseX-Types-Path-Class-\d
     |YARON/WWW-Monitor-\d
     |ZIGOROU/Catalyst-Helper-Model-MozRepl-\d
     |ZIGOROU/Catalyst-Model-MozRepl-\d
@@ -164,7 +185,7 @@ match:
 pl:
   eexpect:
     mode: anyorder
-    timeout: 10
+    timeout: 20
     reuse: 1
     talk:
       - "Auto-install"

@@ -30,8 +30,10 @@ match:
     |BFREE/OpenGL-Image-\d
     |BFREE/OpenGL-\d
     |BKCHAPIN/DBIx-Perform-\d                # curses login (?)
+    |BOOK/Net-Proxy-0.12                     # hangs quite often, not always
     |BOWMANBS/Audio-Ecasound-\d              # hangs very early: RT 32101
     |CAIDAPERL/Chart-Graph-\d                # hangs Makefile.PL: RT 33541
+    |CLACO/AxKit-XSP-                        # looped in a readline
     |CORLISS/CursesForms-\d
     |CORLISS/CursesWidgets-\d
     |DDUMONT/Tk-ObjEditor-2.004.tar.gz       # http://rt.cpan.org/Ticket/Display.html?id=29559
@@ -48,6 +50,7 @@ match:
     |JEZRA/Finance-TickerSymbols             # talks endlessly with some ticker sites
     |JJORE/Enbugger-                         # steps into the debugger
     |KARMAN/Catalyst-Authentication-Store-LDAP-\d # hangs
+    |KESTEB/POE-Component-Client-Stomp-0.05.tar.gz # hangs in t/02_basic.t with 5.10 proper
     |KNORR/Net-MirrorDir                     # asks questions
     |KNORR/Net-                              # no questions during make test please
     |LUPE/Filesys-SamFS-\d                   # have no SamFS
@@ -56,17 +59,22 @@ match:
     |MISHIKAL/Net-LDAPapi-\d                 # gives gooood advice and stops
     |MSCHWERN/Test-Fork-0.01_01.tar.gz       # test hangs
     |MTHURN/Net-Address-Ethernet-\d          # interactive questions that we cannot answer as a bot
+    |MTHURN/WWW-Search-Yahoo-\d              # hangs in t/china.t
     |OALDERS/URI-ParseSearchString-More-0.04
+    |PHILIPS/DBIx-MyParse-\d                 # too complicated to set up (mysql source etc.)
     |PMIC/parrot-0.5.3.tar.gz                # hangs after testing ctags 
-    |RONALDWS/LockFile-NetLock-0.31          # (fast) endless loop RT 33580
     |RYBSKEJ/forks-0.25
+    |SAPER/CPAN-Dependency-0.12              # hangs in t/02internals
     |STSANDER/Device-Davis-\d                # asks me for a tty to use
     |TOKUHIROM/Moxy-\d                       # test hangs (maybe during a prereq?)
     |TOMZO/Quota-\d                          # 1.5.2 and 1.6.0 hang during test.pl
     |TTY/kurila-\d                           # asks too many questions
     |TURNERMM/HTML-WikiConverter-DokuWikiFCK- # hangs very early
+    |VPIT/IPC-MorseSignals-\d                # hangs too often (see Todo)
+    |WONKO/CGI-Application-Dispatch          # endless loop
     |WYANT/Astro-SpaceTrack-\d               # asks for a username/passwd during tests
     |WYANT/Astro-satpass-\d                  # asks during testing to download something
+    |XERN/CGI-QuickApp-\d                    # hangs immediately
     |YEWENBIN/PDE-                           # probably a broken Makefile.PL that tries to install Module::Build even if it is installed and calls CPAN recursively; in any case an endless loop
     |GONERI/Ocsinventory-Agent-0.0.8.tar.gz  # hangs
     |TPABA/

@@ -12,6 +12,7 @@ distroprefs/ADAMK.Chart-Math-Axis.yml
 distroprefs/ADAMK.Image-Delivery.yml
 distroprefs/ADAMK.Test-ClassAPI.yml
 distroprefs/ADAMK.Test-Inline.yml
+distroprefs/AGENT.OpenResty.yml
 distroprefs/AGRUNDMA.POE-Loop-EV.yml
 distroprefs/AMICHAUER.Unicode-Lite.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Build-Fails.yml
@@ -55,6 +56,7 @@ distroprefs/CLKAO.IO-Digest.yml
 distroprefs/CLKAO.SVN-Mirror.yml
 distroprefs/CMOORE.Archive-Any.yml
 distroprefs/CORION.Test-Without-Module.yml
+distroprefs/CSOE.PDL.yml
 distroprefs/DAGOLDEN.CPAN-Reporter.yml
 distroprefs/DAXIM.Yahoo-Photos.yml
 distroprefs/DBRIAN.XML-SimpleObject.yml
@@ -93,6 +95,7 @@ distroprefs/FDALY.Test-Deep.yml
 distroprefs/FHOXH.Test-Reporter.yml
 distroprefs/FLORA.Net_SSLeay.yml
 distroprefs/FLUFFY.Class-MethodMaker.yml
+distroprefs/FOTANGO.Data-Structure-Util.yml
 distroprefs/GAAS.Data-Dump.yml
 distroprefs/GAAS.Font-AFM.yml
 distroprefs/GAAS.libwww.yml
@@ -114,11 +117,13 @@ distroprefs/HANJE.Syntax-Highlight-Engine-Kate.yml
 distroprefs/HAYASHI.Term-ReadLine-Gnu.yml
 distroprefs/HMBRAND.Spreadsheet-Read.yml
 distroprefs/HMBRAND.Tk-Clock.yml
+distroprefs/ILYAZ.FreezeThaw.yml
 distroprefs/ILYAZ.Math-Pari.yml
 distroprefs/ILYAZ.Term-ReadLine-Perl.yml
 distroprefs/INGY.Inline.yml
 distroprefs/INGY.YAML.yml
 distroprefs/ITYNDALL.Net-Amazon-Thumbnail.yml
+distroprefs/JAYK.Catalyst-Authen-S-D-C.yml
 distroprefs/JCRISTY.PerlMagick.yml
 distroprefs/JENDA.Mail-Sender.yml
 distroprefs/JESSE.HTTP-Server-Simple.yml
@@ -203,6 +208,7 @@ distroprefs/OLAF.Net-DNS.yml
 distroprefs/OVID.Class-Trait.yml
 distroprefs/OVID.Perl6-Caller.yml
 distroprefs/OVID.TAPx-Parser.yml
+distroprefs/OVID.Test-JSON.yml
 distroprefs/OWEN.PDF-Labels.yml
 distroprefs/PAJAS.XML-LibXML.yml
 distroprefs/PARDUS.File-MimeInfo.yml
@@ -213,6 +219,7 @@ distroprefs/PETDANCE.WWW-Mechanize.yml
 distroprefs/PETERW.SVG-Parser.yml
 distroprefs/PEVANS.IPC-PerlSSH.yml
 distroprefs/PHOENIX.Term-ReadPassword.yml
+distroprefs/PHRED.Apache-Reload.yml
 distroprefs/PIERS.sapnwrfc.yml
 distroprefs/PODMASTER.HTML-Scrubber.yml
 distroprefs/QANTINS.BitTorrent.yml
@@ -293,6 +300,7 @@ lib/CPAN/Kwalify.pm
 lib/CPAN/Kwalify/distroprefs.dd
 lib/CPAN/Kwalify/distroprefs.yml
 lib/CPAN/Nox.pm
+lib/CPAN/PERL5INC.pm
 lib/CPAN/Queue.pm
 lib/CPAN/Tarzip.pm
 lib/CPAN/Version.pm

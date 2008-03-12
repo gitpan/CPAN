@@ -1,3 +1,165 @@
+2008-03-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 
+
+----Program----
+eval q{use Hatena::Keyword 0.05};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pW6uQKQ/perl-5.9.1@24009/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pBwPNFp/perl-5.9.1@24010/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	thinnercache tells me that Unicode::RecursiveDowngrade broke at the same
+	patch
+	
+2008-03-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Some day Ken Williams made a few statements about what CPAN.pm is
+	considered to do in the face of a recommends or an optional_features.
+	Where is it?
+
+	* VPIT/IPC-MorseSignals-0.13 hangs during t/62-fork-storable.t under
+	maint-5.10@33443.
+
+	And it hangs on t/61-fork-utf8 under maint-5.10.0@33412
+
+	* AI::Prolog jumped into my eye:
+
+2007-12-20T21:07  perl  32674   584   JJORE/AI-Prolog-0.739.tar.gz  NOT OK
+2007-12-18T19:17  perl  32642   441   JJORE/AI-Prolog-0.739.tar.gz  OK
+
+	Red since then independent of the branch. Already reported in RT 31905,
+	it's the infamous Test::Simple fix.
+
+2008-03-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* ExtUtils::Command broken; suspect Test::Simple
+
+perl/pMDhhVO/perl-5.10.0@33370;5.11.0;thr=;opt=-O2;perl_patchlevel=              PASS 0.75
+perl/paM8WrN/perl-5.10.0@33387;5.11.0;thr=;opt=-O2;perl_patchlevel=              FAIL 0.77
+                         33390                                                   PASS
+perl/pXTMoRe/perl-5.10.0@33401;5.11.0;thr=;opt=-O2;perl_patchlevel=
+perl/pXZ43Pl/perl-5.10.0@33409;5.11.0;thr=;opt=-O2;perl_patchlevel=              FAIL
+perl/p5BztI8/perl-5.10.0@33411;5.11.0;thr=;opt=-O2;perl_patchlevel=              FAIL
+perl/paD9wDz/perl-5.10.0@33423;5.11.0;thr=;opt=-g;perl_patchlevel=33423
+perl/pRu8vDi/perl-5.10.0@33450;5.11.0;thr=define;opt=-O2;perl_patchlevel=33450
+perl/pq7Gob0/perl-5.10.0@33451;5.11.0;thr=;opt=-O2;perl_patchlevel=33451         FAIL
+perl/pPLJssF/perl-5.10.0@33452;5.11.0;thr=;opt=-O2;perl_patchlevel=33452         FAIL 0.78
+
+	http://rt.cpan.org/Ticket/Display.html?id=33926
+
+2008-03-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* This I get with maint-5.8@33449:
+
+WARNING: DBIx::Class::StartupCheck: This version of Perl is likely to exhibit
+extremely slow performance for certain critical operations.
+Please consider recompiling Perl.  For more information, see
+https://bugzilla.redhat.com/show_bug.cgi?id=196836 and/or
+http://lists.scsys.co.uk/pipermail/dbix-class/2007-October/005119.html.
+You can suppress this message by setting DBIC_NO_WARN_BAD_PERL=1 in your
+environment.
+
+	* Data::Structure::Util broke somewhere 24650..24661
+
+  CPAN.pm: Going to build F/FO/FOTANGO/Data-Structure-Util-0.12.tar.gz
+
+This module requires Module::Build to install itself.
+  Install Module::Build from CPAN? [y] 
+
+	Aha. This is a special Module::Build silliness that calls CPAN
+	recursively to install Module::Build::Compat. If you say no, it dies.
+
+2008-03-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* maybe still unreported: Safe::World, Data::Dump::Streamer,
+	Authen-Htpasswd-0.16
+
+	* reported but unfixed: Devel::ebug, Storable, Tk, Devel::Size
+
+	* reported and fixed: FreezeThaw, Test::Deep, Params::Validate
+
+2008-03-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* PIJLL/DateTime-Format-Epoch-0.11.tar.gz has both fails and passes. 64bitint?
+
+	33008 MIX  no64bitint -O2 nothreads
+	33409 PASS 64bitint -O2 nothreads
+	33411 PASS 64bitint -O2 nothreads
+	33423 MIX  no64bitint -g nothreads
+	33430 FAIL no64bitint threads
+
+	http://rt.cpan.org//Ticket/Display.html?id=33816
+
+2008-03-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* FreezeThaw is pure perl and is written such that the test goes
+	somewhere out of reach, out of memory, unlimited recursion or some such.
+	make testdb comes to the last test which is really a large eval and
+	there is gets lost. It's definitely only related to Regexp.
+
+ok 27
+# 'FrT;@1|/13|(?mi-xs:^abc)'
+
+ok 27
+# 'FrT;@1|/13|(?mi-xs:^abc)'
+# 'FrT;!0|{>0|$6|Regexp/13|(?mi-xs:^abc)})0|@1|@3|<0|<0|$2|11'
+
+	http://rt.cpan.org/Ticket/Display.html?id=33844
+
+	* what is my latest 5.10.1? It could be 33412 but it is 33288:5.10.0::thr=:opt=-g
+
+	* what is my latest 5.8.9? It could be 33424 but it is
+	pBxK9vV/perl-5.8.8@33243:5.8.8::thr=:opt=-O2
+
+	* POE-0.9999
+
+	make test TEST_FILES=t/90_regression/cfedde-filter-httpd.t
+
+	FAIL under Test::Simple 0.78 with perl@33409
+	PASS under Test::Simple 0.74 with perl@33409
+	PASS under Test::Simple 0.74 with perl@33390
+	FAIL under Test::Simple 0.78 with perl@33390
+	PASS under Test::Simple 0.74 with perl@32642 (5.10.0)
+	FAIL under Test::Simple 0.74 with perl@32642 (5.10.0)
+
+	http://rt.cpan.org/Ticket/Display.html?id=33768
+
+2008-03-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* SAPER/CPAN-Dependency-0.12 hangs:
+
+>sand@k75:~/CPAN-SVN% ps -A -o user,pid,ppid,start_time,cmd | grep '^sand'|grep 3533
+sand      3533  3527 12:26 /home/src/perl/repoperls/installed-perls/perl/pXTMoRe/perl-5.10.0@33401/bin/perl -w t/02internals.t
+sand      7509 27737 12:42 grep 3533
+>sand@k75:~/CPAN-SVN% strace -p 3533
+Process 3533 attached - interrupt to quit
+select(8, [4], NULL, NULL, {278, 608000} <unfinished ...>
+Process 3533 detached
+>sand@k75:~/CPAN-SVN% kill 3533     
+>sand@k75:~/CPAN-SVN% 
+
+	Or, it seems, it has very long timeouts and connects ftp without passive
+	or whatever.
+
+	RT 33726
+
+	* I need to keep a pointer to the last BBC articles and I should check
+	if all unresolved ones are in RT. Today somebody reported Readonly::XS
+	on RT. Should have been there already. Now as a reply in
+
+	http://rt.cpan.org/Ticket/Display.html?id=33711
+
+	Nowadays I think I always post BBCs immediately to RT which is the right
+	thing.
+
 2008-02-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Test::Class 0.28 is a candidate to prove something between 33356 and 33358
@@ -116,13 +278,6 @@ N/A
 	operator name "threadsv" at ....Safe/World/Compartement.pm line 95.'
 
 	This means that 24966 is of only marginal interest.
-
-2008-02-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
-
-	* maybe still unreported: Safe::World, FreezeThaw, Devel::Size,
-	Data::Dump::Streamer, Authen-Htpasswd-0.16
-
-	* reported but unfixed: Devel::ebug, Storable, Tk
 
 2008-02-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 

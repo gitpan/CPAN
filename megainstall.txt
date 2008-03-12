@@ -1,3 +1,4 @@
+AI::Categorizer
 AI::Prolog
 AMF::Perl
 ANDK/keepcool-0.344
@@ -53,6 +54,7 @@ BFD
 BSD::Resource
 BerkeleyDB
 Biblio::Document::Parser
+Bit::MorseSignals
 Bit::Vector
 Bit::Vector::Minimal
 BitTorrent
@@ -240,6 +242,7 @@ DBIx::Class::Validation
 DBIx::CopyRecord
 DBIx::DBSchema
 DBIx::HA
+DBIx::MyParse
 DBIx::ORM::Declarative
 DBIx::Perlish
 DBIx::SearchBuilder
@@ -270,6 +273,7 @@ Data::Properties
 Data::Random
 Data::Remember
 Data::ShowTable
+Data::Structure::Util
 Data::Swap
 Data::Throttler
 Data::TreeDumper
@@ -341,6 +345,7 @@ DocSet
 ETL::Pequel
 Email::Address
 Email::Date
+Email::Delete
 Email::Find
 Email::Folder
 Email::FolderType
@@ -365,6 +370,7 @@ Error
 Event
 Event::ExecFlow
 Event::Lib
+Event::Notify
 Excel::Template
 Expect
 Exporter
@@ -377,6 +383,7 @@ ExtUtils::MakeMaker
 ExtUtils::Manifest
 ExtUtils::ModuleMaker
 ExtUtils::PkgConfig
+FCGI::Engine
 FLV::Info
 Fcntl
 File::BOM
@@ -449,6 +456,7 @@ Graph::Easy::As_svg
 Graph::SocialMap
 GraphViz
 Graphics::ColorNames
+Graphics::ColorObject
 Gtk
 Gtk2
 HOP::Lexer
@@ -485,6 +493,7 @@ HTML::TreeBuilder::XPath
 HTML::Widget
 HTML::WikiConverter
 HTTP::BrowserDetect
+HTTP::CryptoCookie
 HTTP::GHTTP
 HTTP::Parser
 HTTP::RangeSaver
@@ -561,6 +570,7 @@ Lingua::JA::MacJapanese
 Lingua::KO::Hangul::Util
 Lingua::KO::MacKorean
 Lingua::RU::Charset
+Lingua::Stem::Es
 Lingua::StopWords
 Lingua::ZH::MacChinese::Simplified
 Lingua::ZH::MacChinese::Traditional
@@ -607,6 +617,8 @@ Mail::Send
 Mail::Sendmail
 Mail::Transport::Dbx
 Mail::Util
+Makefile::DOM
+Makefile::Parser
 Math::Approx::Symbolic
 Math::Base85
 Math::Bezier::Convert
@@ -614,6 +626,7 @@ Math::BigInt::FastCalc
 Math::BigInt::GMP
 Math::BigRat
 Math::Cephes
+Math::Combinatorics
 Math::GMP
 Math::Geometry::Planar::GPC
 Math::Geometry::Planar::Offset
@@ -643,6 +656,7 @@ Module::Pluggable
 Module::Pluggable::Fast
 Module::Refresh
 Module::Release
+Module::Starter
 Module::Versions::Report
 MogileFS::Class
 MojoMojo
@@ -659,6 +673,7 @@ Net::FPing
 Net::FTP
 Net::FTP::Common
 Net::GrowlClient
+Net::IMAP::Server
 Net::IMAP::Simple
 Net::IPv4Addr
 Net::IPv6Addr
@@ -690,15 +705,18 @@ Net::Twitter
 Net::UploadMirror
 Net::Write
 Net::XMPP
+Net::Z3950::ZOOM
 NetAddr::IP
 News::Article
 Number::Format
+Number::Range
 Number::WithError
 OLE::Storage_Lite
 OOPS
 Object::Accessor
 Object::Destroyer
 Object::Realize::Later
+Object::Relation
 Object::Signature
 Object::Tiny
 OpenOffice::OOBuilder
@@ -823,6 +841,7 @@ QDBM_File
 Quantum::Superpositions
 RDF::Core
 RDF::Simple
+RDF::Server
 RPC::JSON
 RPC::PlServer
 RPC::XML
@@ -830,6 +849,8 @@ RT::Client::REST
 RTF::HTMLConverter
 Regex::PreSuf
 Regexp::Assemble
+Regexp::Common::IRC
+Regexp::Copy
 Regexp::List
 Regexp::Log
 Regexp::Shellish
@@ -884,6 +905,7 @@ Set::Crontab
 Set::Infinite
 Set::IntSpan::Fast
 Set::Integer::Gapfillers
+Shell::Perl
 ShiftJIS::CP932::Correct
 ShiftJIS::CP932::MapUTF
 ShiftJIS::Collate
@@ -978,6 +1000,7 @@ Test::Prereq
 Test::Reporter
 Test::SubCalls
 Test::Tester
+Test::Unit::Runner::XML
 Test::WWW::Declare
 Test::WWW::Mechanize
 Test::WWW::Selenium
@@ -989,6 +1012,7 @@ Text::Aligner
 Text::Aspell
 Text::Autoformat
 Text::CSV_XS
+Text::Diff
 Text::FIGlet
 Text::Filter
 Text::Format
@@ -1161,6 +1185,7 @@ XML::Parser::Lite::Tree
 XML::Parser::PerlSAX
 XML::RSS
 XML::RSS::LibXML
+XML::RSS::FromHTML::Simple
 XML::RegExp
 XML::SAX
 XML::SAX2Perl
