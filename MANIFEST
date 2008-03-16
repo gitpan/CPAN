@@ -58,6 +58,7 @@ distroprefs/CMOORE.Archive-Any.yml
 distroprefs/CORION.Test-Without-Module.yml
 distroprefs/CSOE.PDL.yml
 distroprefs/DAGOLDEN.CPAN-Reporter.yml
+distroprefs/DAGOLDEN.Term-Title.yml
 distroprefs/DAXIM.Yahoo-Photos.yml
 distroprefs/DBRIAN.XML-SimpleObject.yml
 distroprefs/DBROBINS.Net-SSH-Perl.yml
@@ -76,6 +77,7 @@ distroprefs/DMAKI.Xango.yml
 distroprefs/DMUEY.File-Copy-Recursive.yml
 distroprefs/DOM.OpenGuides.yml
 distroprefs/DONEILL.MIME-tools.yml
+distroprefs/DOWENS.JSON-DWIW.yml
 distroprefs/DROLSKY.Alzabo.yml
 distroprefs/DROLSKY.DateTime-Locale.yml
 distroprefs/DROLSKY.Devel-StackTrace.yml
@@ -143,6 +145,7 @@ distroprefs/JPRIT.Event.yml
 distroprefs/JROBINSON.SQL-Translator.yml
 distroprefs/JROCKWAY.Chroniton.yml
 distroprefs/JSTENZEL.Getopt-ArgvFile.yml
+distroprefs/JV.Getopt-Long.yml
 distroprefs/KANE.CPANPLUS.yml
 distroprefs/KASEI.Class-Accessor.yml
 distroprefs/KAWASAKI.Lingua-JA-Romanize-Japanese.yml
@@ -291,7 +294,7 @@ inc/Test/Builder.pm
 inc/Test/More.pm
 lib/CPAN.pm
 lib/CPAN/Admin.pm
-lib/CPAN/API/HOWTO.pm
+lib/CPAN/API/HOWTO.pod
 lib/CPAN/Debug.pm
 lib/CPAN/DeferedCode.pm
 lib/CPAN/FirstTime.pm
@@ -347,6 +350,7 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircDepeTwo-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-ConfReq-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Expect-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.02.tar.gz
+t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.02.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.03.zip
 t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz

@@ -19,7 +19,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec ();
 use vars qw($VERSION $urllist);
-$VERSION = sprintf "%.6f", substr(q$Rev: 2680 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2792 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -997,7 +997,7 @@ substitute. You can then revisit this dialog with
     my_dflt_prompt(mbuild_arg => "", $matcher);
 
     if (exists $CPAN::HandleConfig::keys{mbuild_install_build_command}
-	and $^O ne "MSWin32") {
+        and $^O ne "MSWin32") {
         # as long as Windows needs $self->_build_command, we cannot
         # support sudo on windows :-)
         my_dflt_prompt(mbuild_install_build_command => "./Build", $matcher);

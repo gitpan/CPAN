@@ -1,7 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_58';
+$CPAN::VERSION = '1.92_59';
 $CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
 
 use CPAN::HandleConfig;
@@ -30,7 +30,9 @@ use Sys::Hostname qw(hostname);
 use Text::ParseWords ();
 use Text::Wrap ();
 
+# protect against "called too early"
 sub find_perl ();
+sub anycwd ();
 
 # we need to run chdir all over and we would get at wrong libraries
 # there
@@ -88,7 +90,8 @@ unless (@CPAN::Defaultsites) {
         "http://www.perl.org/CPAN/",
             "ftp://ftp.perl.org/pub/CPAN/";
 }
-# $CPAN::iCwd (i for initial) is going to be initialized during find_perl
+# $CPAN::iCwd (i for initial)
+$CPAN::iCwd ||= CPAN::anycwd();
 $CPAN::Perl ||= CPAN::find_perl();
 $CPAN::Defaultdocs ||= "http://search.cpan.org/perldoc?";
 $CPAN::Defaultrecent ||= "http://search.cpan.org/uploads.rdf";
@@ -1280,9 +1283,8 @@ sub backtickcwd {my $cwd = `cwd`; chomp $cwd; $cwd}
 sub find_perl () {
     my($perl) = File::Spec->file_name_is_absolute($^X) ? $^X : "";
     unless ($perl) {
-        my $pwd  = $CPAN::iCwd = CPAN::anycwd();
-        my $candidate = File::Spec->catfile($pwd,$^X);
-        $perl = $candidate if MM->maybe_command($candidate);
+        my $candidate = File::Spec->catfile($CPAN::iCwd,$^X);
+        $^X = $perl = $candidate if MM->maybe_command($candidate);
     }
     unless ($perl) {
         my ($component,$perl_name);
@@ -1292,14 +1294,13 @@ sub find_perl () {
                 next unless defined($component) && $component;
                 my($abs) = File::Spec->catfile($component,$perl_name);
                 if (MM->maybe_command($abs)) {
-                    $perl = $abs;
+                    $^X = $perl = $abs;
                     last DIST_PERLNAME;
                 }
             }
         }
     }
-
-    return $^X = $perl;
+    return $perl;
 }
 
 
@@ -1584,6 +1585,13 @@ sub is_tested {
     $self->{is_tested}{$what} = $when;
 }
 
+#-> sub CPAN::reset_tested
+# forget all distributions tested -- resets what gets included in PERL5LIB
+sub reset_tested {
+    my ($self) = @_;
+    $self->{is_tested} = {};
+}
+
 #-> sub CPAN::is_installed
 # unsets the is_tested flag: as soon as the thing is installed, it is
 # not needed in set_perl5lib anymore
@@ -1658,10 +1666,11 @@ sub set_perl5lib {
         seek $fh, 0, 0;
         truncate $fh, 0;
         CPAN->_yaml_dumpfile($fh,{ inc => [@dirs,@env] });
+        $fh->flush();
     } else {
         my $cnt = keys %{$self->{is_tested}};
-        $CPAN::Frontend->mywarn("Your PERL5LIB is growing, installation ".
-                                "of a YAML module is recommended. See the manpage ".
+        $CPAN::Frontend->mywarn("Your PERL5LIB is growing (now $cnt distros), installation ".
+                                "of a YAML module is highly recommended. See the manpage ".
                                 "of CPAN::PERL5INC for further information\n");
         $CPAN::Frontend->myprint("Prepending blib/arch and blib/lib of ".
                                  "$cnt build dirs to PERL5LIB; ".
@@ -4007,7 +4016,7 @@ sub ftp_get {
     my($class,$host,$dir,$file,$target) = @_;
     $class->debug(
                   qq[Going to fetch file [$file] from dir [$dir]
-	on host [$host] as local [$target]\n]
+        on host [$host] as local [$target]\n]
                  ) if $CPAN::DEBUG;
     my $ftp = Net::FTP->new($host);
     unless ($ftp) {
@@ -4040,8 +4049,8 @@ sub ftp_get {
 
 # If more accuracy is wanted/needed, Chris Leach sent me this patch...
 
- # > *** /install/perl/live/lib/CPAN.pm-	Wed Sep 24 13:08:48 1997
- # > --- /tmp/cp	Wed Sep 24 13:26:40 1997
+ # > *** /install/perl/live/lib/CPAN.pm- Wed Sep 24 13:08:48 1997
+ # > --- /tmp/cp Wed Sep 24 13:26:40 1997
  # > ***************
  # > *** 1562,1567 ****
  # > --- 1562,1580 ----
@@ -6319,7 +6328,7 @@ sub get {
     local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
-    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
+    local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
     $CPAN::META->set_perl5lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
@@ -7608,7 +7617,7 @@ is part of the perl-%s distribution. To install that, you need to run
     local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
-    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
+    local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
     $CPAN::META->set_perl5lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
@@ -8030,6 +8039,7 @@ sub _run_via_expect_anyorder {
 sub _run_via_expect_deterministic {
     my($self,$expo,$phase,$expect_model) = @_;
     my $ran_into_timeout;
+    my $ran_into_eof;
     my $timeout = $expect_model->{timeout} || 15; # currently unsettable
     my $expecta = $expect_model->{talk};
   EXPECT: for (my $i = 0; $i <= $#$expecta; $i+=2) {
@@ -8041,7 +8051,7 @@ sub _run_via_expect_deterministic {
                             my $but = $expo->clear_accum;
                             $CPAN::Frontend->mywarn("EOF (maybe harmless)
 expected[$regex]\nbut[$but]\n\n");
-                            last EXPECT;
+                            $ran_into_eof++;
                         } ],
                       [ timeout => sub {
                             my $but = $expo->clear_accum;
@@ -8055,6 +8065,8 @@ expected[$regex]\nbut[$but]\n\n");
             $self->{$phase} =
                 CPAN::Distrostatus->new("NO timeout during expect dialog");
             return 0;
+        } elsif ($ran_into_eof) {
+            last EXPECT;
         }
         $expo->send($send);
     }
@@ -8187,11 +8199,11 @@ sub _find_prefs {
                     # do not take the order of C<keys %$match> because
                     # "module" is by far the slowest
                     my $saw_valid_subkeys = 0;
-                    for my $sub_attribute (qw(distribution perl perlconfig module)) {
+                    for my $sub_attribute (qw(env distribution perl perlconfig module)) {
                         next unless exists $match->{$sub_attribute};
                         $saw_valid_subkeys++;
-                        my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
                         if ($sub_attribute eq "module") {
+                            my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
                             my $okm = 0;
                             #CPAN->debug(sprintf "distropref[%d]", scalar @distropref) if $CPAN::DEBUG;
                             my @modules = $self->containsmods;
@@ -8202,9 +8214,19 @@ sub _find_prefs {
                             }
                             $ok &&= $okm;
                         } elsif ($sub_attribute eq "distribution") {
+                            my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
                             my $okd = $distroid =~ /$qr/;
                             $ok &&= $okd;
+                        } elsif ($sub_attribute eq "env") {
+                            for my $envele (keys %{$match->{env}}) {
+                                my $envval = $ENV{$envele} || "";
+                                my $qr = eval "qr{$distropref->{match}{$sub_attribute}{$envele}}";
+                                my $oke = $envval =~ /$qr/;
+                                $ok &&= $oke;
+                                last if $ok == 0;
+                            }
                         } elsif ($sub_attribute eq "perl") {
+                            my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
                             my $okp = CPAN::find_perl =~ /$qr/;
                             $ok &&= $okp;
                         } elsif ($sub_attribute eq "perlconfig") {
@@ -8429,6 +8451,39 @@ of modules we are processing right now?", "yes");
     return;
 }
 
+sub _feature_depends {
+    my($self) = @_;
+    my $meta_yml = $self->parse_meta_yml();
+    my $optf = $meta_yml->{optional_features} or return;
+    if (!ref $optf or ref $optf ne "ARRAY"){
+        $CPAN::Frontend->mywarn("The content of optional_feature is not an ARRAY reference. Cannot use it.\n");
+        $optf = [];
+    }
+    my $wantf = $self->prefs->{features} or return;
+    if (!ref $wantf or ref $wantf ne "ARRAY"){
+        $CPAN::Frontend->mywarn("The content of 'features' is not an ARRAY reference. Cannot use it.\n");
+        $wantf = [];
+    }
+    my $dep = +{};
+    for my $wf (@$wantf) {
+        for my $of (@$optf) {
+            my $f = $of->{$wf} or next;
+            $CPAN::Frontend->myprint("Found the demanded feature '$wf' that ".
+                                     "is accompanied by this description:\n".
+                                     $f->{description}.
+                                     "\n\n"
+                                    );
+            for my $reqtype (qw(configure_requires build_requires requires)) {
+                my $reqhash = $f->{$reqtype} or next;
+                while (my($k,$v) = each %$reqhash) {
+                    $dep->{$reqtype}{$k} = $v;
+                }
+            }
+        }
+    }
+    $dep;
+}
+
 #-> sub CPAN::Distribution::unsat_prereq ;
 # return ([Foo=>1],[Bar=>1.2]) for normal modules
 # return ([perl=>5.008]) if we need a newer perl than we are running under
@@ -8436,17 +8491,27 @@ sub unsat_prereq {
     my($self,$slot) = @_;
     my(%merged,$prereq_pm);
     my $prefs_depends = $self->prefs->{depends}||{};
+    my $feature_depends = $self->_feature_depends();
     if ($slot eq "configure_requires_later") {
         my $meta_yml = $self->parse_meta_yml();
-        %merged = (%{$meta_yml->{configure_requires}||{}},
-                   %{$prefs_depends->{configure_requires}||{}});
+        if (defined $meta_yml && (! ref $meta_yml || ref $meta_yml ne "HASH")) {
+            $CPAN::Frontend->mywarn("The content of META.yml is defined but not a HASH reference. Cannot use it.\n");
+            $meta_yml = +{};
+        }
+        %merged = (
+                   %{$meta_yml->{configure_requires}||{}},
+                   %{$prefs_depends->{configure_requires}||{}},
+                   %{$feature_depends->{configure_requires}||{}},
+                  );
         $prereq_pm = {}; # configure_requires defined as "b"
     } elsif ($slot eq "later") {
         my $prereq_pm_0 = $self->prereq_pm || {};
         for my $reqtype (qw(requires build_requires)) {
             $prereq_pm->{$reqtype} = {%{$prereq_pm_0->{$reqtype}||{}}}; # copy to not pollute it
-            for my $k (keys %{$prefs_depends->{$reqtype}||{}}) {
-                $prereq_pm->{$reqtype}{$k} = $prefs_depends->{$reqtype}{$k};
+            for my $dep ($prefs_depends,$feature_depends) {
+                for my $k (keys %{$dep->{$reqtype}||{}}) {
+                    $prereq_pm->{$reqtype}{$k} = $dep->{$reqtype}{$k};
+                }
             }
         }
         %merged = (%{$prereq_pm->{requires}||{}},%{$prereq_pm->{build_requires}||{}});
@@ -8640,6 +8705,12 @@ sub read_yaml {
                                               # META.yml
     }
     # not "authoritative"
+    for ($self->{yaml_content}) {
+        if (defined $_ && (! ref $_ || ref $_ ne "HASH")) {
+            $CPAN::Frontend->mywarn("META.yml does not seem to be conforming, cannot use it.\n");
+            $self->{yaml_content} = +{};
+        }
+    }
     if (not exists $self->{yaml_content}{dynamic_config}
         or $self->{yaml_content}{dynamic_config}
        ) {
@@ -8800,7 +8871,7 @@ sub test {
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
 
-    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
+    local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
     $CPAN::META->set_perl5lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
@@ -9292,7 +9363,7 @@ sub install {
                            ? $ENV{PERL5LIB}
                            : ($ENV{PERLLIB} || "");
 
-    local $ENV{PERL5OPT} = $ENV{PERL5OPT};
+    local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
     $CPAN::META->set_perl5lib;
     my($pipe) = FileHandle->new("$system $stderr |");
     my($makeout) = "";
@@ -10284,6 +10355,13 @@ sub as_string {
                      $local_file || "(not installed)");
     push @m, sprintf($sprintf, 'INST_VERSION',
                      $self->inst_version) if $local_file;
+    if (%{$CPAN::META->{is_tested}||{}}) { # XXX needs to be methodified somehow
+        my $available_file = $self->available_file;
+        if ($available_file && $available_file ne $local_file) {
+            push @m, sprintf($sprintf, 'AVAILABLE_FILE', $available_file);
+            push @m, sprintf($sprintf, 'AVAILABLE_VERSION', $self->available_version);
+        }
+    }
     join "", @m, "\n";
 }
 
@@ -10530,7 +10608,12 @@ sub available_file {
     my $perllib = $ENV{PERL5LIB};
     $perllib = $ENV{PERLLIB} unless defined $perllib;
     my @perllib = split(/$sep/,$perllib) if defined $perllib;
-    $self->_file_in_path([@perllib,@INC]);
+    my @cpan_perl5inc;
+    if ($CPAN::Perl5lib_tempfile) {
+        my $yaml = CPAN->_yaml_loadfile($CPAN::Perl5lib_tempfile);
+        @cpan_perl5inc = @{$yaml->[0]{inc} || []};
+    }
+    $self->_file_in_path([@cpan_perl5inc,@perllib,@INC]);
 }
 
 #-> sub CPAN::Module::file_in_path ;
@@ -10590,7 +10673,8 @@ sub parse_version {
     if ($@) {
         $CPAN::Frontend->mywarn("Error while parsing version number in file '$parsefile'\n");
     }
-    $have = "undef" unless defined $have && length $have;
+    my $leastsanity = eval { defined $have && length $have; };
+    $have = "undef" unless $leastsanity;
     $have =~ s/^ //; # since the %vd hack these two lines here are needed
     $have =~ s/ $//; # trailing whitespace happens all the time
 
@@ -11491,6 +11575,8 @@ C<expect>.
     perl: "/usr/local/cariba-perl/bin/perl"
     perlconfig:
       archname: "freebsd"
+    env:
+      DANCING_FLOOR: "Shubiduh"
   disabled: 1
   cpanconfig:
     make: gmake
@@ -11577,6 +11663,11 @@ declaration.
 
 Specifies that this distribution shall not be processed at all.
 
+=item features [array]
+
+Experimental implementation (added in version 1.92_59). Shall deal with
+optional_features from META.yml.
+
 =item goto [string]
 
 The canonical name of a delegate distribution that shall be installed
@@ -11597,8 +11688,8 @@ CPAN mantra. See below under I<Processing Instructions>.
 =item match [hash]
 
 A hashref with one or more of the keys C<distribution>, C<modules>,
-C<perl>, and C<perlconfig> that specify if a document is targeted at a
-specific CPAN distribution or installation.
+C<perl>, C<perlconfig>, and C<env> that specify if a document is
+targeted at a specific CPAN distribution or installation.
 
 The corresponding values are interpreted as regular expressions. The
 C<distribution> related one will be matched against the canonical
@@ -11614,11 +11705,14 @@ The value associated with C<perlconfig> is itself a hashref that is
 matched against corresponding values in the C<%Config::Config> hash
 living in the C<Config.pm> module.
 
-If more than one restriction of C<module>, C<distribution>, and
-C<perl> is specified, the results of the separately computed match
-values must all match. If this is the case then the hashref
-represented by the YAML document is returned as the preference
-structure for the current distribution.
+The value associated with C<env> is itself a hashref that is
+matched against corresponding values in the C<%ENV> hash.
+
+If more than one restriction of C<module>, C<distribution>, etc. is
+specified, the results of the separately computed match values must
+all match. If this is the case then the hashref represented by the
+YAML document is returned as the preference structure for the current
+distribution.
 
 =item patches [array]
 
@@ -11998,11 +12092,6 @@ Returns 1 if this distribution file seems to be a perl distribution.
 Normally this is derived from the file name only, but the index from
 CPAN can contain a hint to achieve a return value of true for other
 filenames too.
-
-=item CPAN::Distribution::is_tested()
-
-List all the distributions that have been tested sucessfully but not
-yet installed. See also C<install_tested>.
 
 =item CPAN::Distribution::look()
 
