@@ -19,7 +19,7 @@ use File::Basename ();
 use File::Path ();
 use File::Spec ();
 use vars qw($VERSION $urllist);
-$VERSION = sprintf "%.6f", substr(q$Rev: 2792 $,4)/1000000 + 5.4;
+$VERSION = sprintf "%.6f", substr(q$Rev: 2871 $,4)/1000000 + 5.4;
 
 =head1 NAME
 
@@ -265,7 +265,7 @@ Verbosity level for loading modules (none or v)?
 
 Every Makefile.PL is run by perl in a separate process. Likewise we
 run 'make' and 'make install' in separate processes. If you have
-any parameters (e.g. PREFIX, LIB, UNINST or the like) you want to
+any parameters (e.g. PREFIX, UNINST or the like) you want to
 pass to the calls, please specify them here.
 
 If you don't understand this question, just press ENTER.
@@ -496,6 +496,21 @@ you will need to configure CPAN::Reporter before sending reports.
 
 Email test reports if CPAN::Reporter is installed (yes/no)?
 
+=item threshold_perl5lib_upto
+
+If you are using CPAN.pm to test a couple (or thousands) of modules,
+AND you want to do so *without* installing them, then you will
+appreciate support of the @INC extending variety. For details, see the
+mapage for CPAN::PERL5INC.
+
+To recap quickly: CPAN.pm supports an easy way to extend @INC (by
+stuffing all paths of tested but uninstalled modules into the
+environment variable PERL5LIB). And, for larger installations, a
+method that has PERL5OPT involved and the large @INC is written to
+disk. After how many distros shall we switch to the slower method?
+Recommended default is 24 which should be safe on all systems even
+with very long path components.
+
 =item trust_test_report_history
 
 When a distribution has already been tested by CPAN::Reporter on
@@ -660,6 +675,7 @@ sub init {
                        cpan_home
                        keep_source_where
                        prefs_dir
+                       threshold_perl5lib_upto
                       } =~ /$matcher/) {
         $CPAN::Frontend->myprint($prompts{config_intro});
 
@@ -743,6 +759,13 @@ Shall we use it as the general CPAN build and cache directory?
 
         if (!$matcher or 'build_dir_reuse' =~ /$matcher/) {
             my_yn_prompt(build_dir_reuse => 0, $matcher);
+        }
+
+        if (!$matcher or 'threshold_perl5lib_upto' =~ /$matcher/) {
+            my_dflt_prompt("threshold_perl5lib_upto",
+                           24,
+                           $matcher,
+                          );
         }
 
         if (!$matcher or 'prefs_dir' =~ /$matcher/) {
@@ -980,6 +1003,13 @@ substitute. You can then revisit this dialog with
     if (!$matcher or 'makepl_arg make_arg' =~ /$matcher/) {
         my_dflt_prompt(makepl_arg => "", $matcher);
         my_dflt_prompt(make_arg => "", $matcher);
+        if ( $CPAN::Config->{makepl_arg} =~ /LIBS=|INC=/ ) {
+            $CPAN::Frontend->mywarn( 
+                "Warning: Using LIBS or INC in makepl_arg will likely break distributions\n" . 
+                "that specify their own LIBS or INC options in Makefile.PL.\n"
+            );
+        }
+
     }
 
     require CPAN::HandleConfig;
@@ -1570,7 +1600,9 @@ config_intro => qq{
 The following questions are intended to help you with the
 configuration. The CPAN module needs a directory of its own to cache
 important index files and maybe keep a temporary mirror of CPAN files.
-This may be a site-wide or a personal directory.},
+This may be a site-wide or a personal directory.
+
+},
 
 # cpan_home => qq{ },
 

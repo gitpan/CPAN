@@ -1,15 +1,26 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_59';
-$CPAN::VERSION = eval $CPAN::VERSION if $CPAN::VERSION =~ /_/;
+$CPAN::VERSION = '1.92_60';
+$CPAN::VERSION =~ s/_//;
 
+# we need to run chdir all over and we would get at wrong libraries
+# there
+use File::Spec ();
+BEGIN {
+    if (File::Spec->can("rel2abs")) {
+        for my $inc (@INC) {
+            $inc = File::Spec->rel2abs($inc) unless ref $inc;
+        }
+    }
+}
 use CPAN::HandleConfig;
 use CPAN::Version;
 use CPAN::Debug;
 use CPAN::Queue;
 use CPAN::Tarzip;
 use CPAN::DeferedCode;
+use CPAN::PERL5INC; # must come after absification
 use Carp ();
 use Config ();
 use Cwd qw(chdir);
@@ -22,7 +33,6 @@ use File::Basename ();
 use File::Copy ();
 use File::Find;
 use File::Path ();
-use File::Spec ();
 use FileHandle ();
 use Fcntl qw(:flock);
 use Safe ();
@@ -34,17 +44,7 @@ use Text::Wrap ();
 sub find_perl ();
 sub anycwd ();
 
-# we need to run chdir all over and we would get at wrong libraries
-# there
-BEGIN {
-    if (File::Spec->can("rel2abs")) {
-        for my $inc (@INC) {
-            $inc = File::Spec->rel2abs($inc) unless ref $inc;
-        }
-    }
-}
 no lib ".";
-use CPAN::PERL5INC; # must come after absification
 
 require Mac::BuildTools if $^O eq 'MacOS';
 if ($ENV{PERL5_CPAN_IS_RUNNING} && $$ != $ENV{PERL5_CPAN_IS_RUNNING}) {
@@ -899,7 +899,26 @@ use vars qw(
             $autoload_recursion
             $reload
             @ISA
+            @relo
            );
+our @relo = (
+             "CPAN.pm",
+             "CPAN/Debug.pm",
+             "CPAN/FirstTime.pm",
+             "CPAN/HandleConfig.pm",
+             "CPAN/Kwalify.pm",
+             "CPAN/PERL5INC.pm",
+             "CPAN/Queue.pm",
+             "CPAN/Reporter/Config.pm",
+             "CPAN/Reporter/History.pm",
+             "CPAN/Reporter/PrereqCheck.pm",
+             "CPAN/Reporter.pm",
+             "CPAN/SQLite.pm",
+             "CPAN/Tarzip.pm",
+             "CPAN/Version.pm",
+            );
+# record the initial timestamp for reload.
+$reload = { map {$INC{$_} ? ($_,(stat $INC{$_})[9]) : ()} @relo };
 @CPAN::Shell::ISA = qw(CPAN::Debug);
 use Cwd qw(chdir);
 $COLOR_REGISTERED ||= 0;
@@ -1626,10 +1645,12 @@ sub set_perl5lib {
     #$CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB.\n");
 
     my @dirs = map {("$_/blib/arch", "$_/blib/lib")} $self->_list_sorted_descending_is_tested;
-    return if !@env && !@dirs;
+    return if !@dirs;
     my $yaml_module = CPAN::_yaml_module;
 
-    if ($CPAN::META->has_inst($yaml_module) && $CPAN::META->has_usable("File::Temp")) {
+    if ($CPAN::META->has_inst($yaml_module)
+        && $CPAN::META->has_usable("File::Temp")
+        && !$ENV{PERL5OPT}) {
         unless (defined $fh) {
             $fh =
                 File::Temp->new(
@@ -1641,10 +1662,11 @@ sub set_perl5lib {
             $Perl5lib_tempfile = $fh->filename;
         }
     }
-    if (@dirs < 12) {
+    my $cctpu = defined $CPAN::Config->{threshold_perl5lib_upto} ? $CPAN::Config->{threshold_perl5lib_upto} : 24;
+    if (@dirs < 12 && @dirs < $cctpu) {
         $CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB for '$for'\n");
         $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
-    } elsif (@dirs < 24) {
+    } elsif (@dirs < 24 && @dirs < $cctpu) {
         my @d = map {my $cp = $_;
                      $cp =~ s/^\Q$CPAN::Config->{build_dir}\E/%BUILDDIR%/;
                      $cp
@@ -1657,20 +1679,21 @@ sub set_perl5lib {
     } elsif ($Perl5lib_tempfile) {
         my $cnt = keys %{$self->{is_tested}};
         $CPAN::Frontend->myprint("Delegating blib/arch and blib/lib of ".
-                                 "$cnt build dirs to CPAN::PERL5LIB; ".
+                                 "$cnt build dirs to CPAN::PERL5INC via $Perl5lib_tempfile; ".
                                  "for '$for'\n"
                                 );
         my $inc = File::Basename::dirname(File::Basename::dirname($INC{"CPAN/PERL5INC.pm"}));
-        $ENV{PERL5OPT} .= " " if $ENV{PERL5OPT};
-        $ENV{PERL5OPT} .= "-I$inc -MCPAN::PERL5INC=yaml_module,$yaml_module -MCPAN::PERL5INC=tempfile,$Perl5lib_tempfile";
+        $ENV{PERL5LIB} = $inc;
+        $ENV{PERL5OPT} = "-MCPAN::PERL5INC=yaml_module,$yaml_module,tempfile,$Perl5lib_tempfile";
         seek $fh, 0, 0;
         truncate $fh, 0;
         CPAN->_yaml_dumpfile($fh,{ inc => [@dirs,@env] });
         $fh->flush();
     } else {
         my $cnt = keys %{$self->{is_tested}};
-        $CPAN::Frontend->mywarn("Your PERL5LIB is growing (now $cnt distros), installation ".
-                                "of a YAML module is highly recommended. See the manpage ".
+        $CPAN::Frontend->mywarn("Your PERL5LIB is growing (now $cnt distros) but we cannot ".
+                                "switch to the PERL5OPT method of extending \@INC; installation ".
+                                "of a YAML module is highly recommended; see the manpage ".
                                 "of CPAN::PERL5INC for further information\n");
         $CPAN::Frontend->myprint("Prepending blib/arch and blib/lib of ".
                                  "$cnt build dirs to PERL5LIB; ".
@@ -2322,6 +2345,7 @@ sub hosts {
     $CPAN::Frontend->myprint($R);
 }
 
+# here is where 'reload cpan' is done
 #-> sub CPAN::Shell::reload ;
 sub reload {
     my($self,$command,@arg) = @_;
@@ -2331,21 +2355,6 @@ sub reload {
         my $redef = 0;
         chdir $CPAN::iCwd if $CPAN::iCwd; # may fail
         my $failed;
-        my @relo = (
-                    "CPAN.pm",
-                    "CPAN/Debug.pm",
-                    "CPAN/FirstTime.pm",
-                    "CPAN/HandleConfig.pm",
-                    "CPAN/Kwalify.pm",
-                    "CPAN/Queue.pm",
-                    "CPAN/Reporter/Config.pm",
-                    "CPAN/Reporter/History.pm",
-                    "CPAN/Reporter/PrereqCheck.pm",
-                    "CPAN/Reporter.pm",
-                    "CPAN/SQLite.pm",
-                    "CPAN/Tarzip.pm",
-                    "CPAN/Version.pm",
-                   );
       MFILE: for my $f (@relo) {
             next unless exists $INC{$f};
             my $p = $f;
@@ -2404,13 +2413,7 @@ sub _reload_this {
         return;
     }
     my $mtime = (stat $file)[9];
-    if ($reload->{$f}) {
-    } elsif ($^T < $mtime) {
-        # since we started the file has changed, force it to be reloaded
-        $reload->{$f} = -1;
-    } else {
-        $reload->{$f} = $mtime;
-    }
+    $reload->{$f} ||= -1;
     my $must_reload = $mtime != $reload->{$f};
     $args ||= {};
     $must_reload ||= $args->{reloforce}; # o conf defaults needs this
@@ -7721,8 +7724,12 @@ is part of the perl-%s distribution. To install that, you need to run
     }
     local %ENV = %env;
     my $system;
-    if (my $commandline = $self->prefs->{pl}{commandline}) {
-        $system = $commandline;
+    my $pl_commandline;
+    if ($self->prefs->{pl}) {
+        $pl_commandline = $self->prefs->{pl}{commandline};
+    }
+    if ($pl_commandline) {
+        $system = $pl_commandline;
         $ENV{PERL} = $^X;
     } elsif ($self->{'configure'}) {
         $system = $self->{'configure'};
@@ -7745,9 +7752,13 @@ is part of the perl-%s distribution. To install that, you need to run
                           $makepl_arg ? " $makepl_arg" : "",
                          );
     }
-    if (my $env = $self->prefs->{pl}{env}) {
-        for my $e (keys %$env) {
-            $ENV{$e} = $env->{$e};
+    my $pl_env;
+    if ($self->prefs->{pl}) {
+        $pl_env = $self->prefs->{pl}{env};
+    }
+    if ($pl_env) {
+        for my $e (keys %$pl_env) {
+            $ENV{$e} = $pl_env->{$e};
         }
     }
     if (exists $self->{writemakefile}) {
@@ -7882,8 +7893,12 @@ is part of the perl-%s distribution. To install that, you need to run
         delete $self->{force_update};
         return;
     }
-    if (my $commandline = $self->prefs->{make}{commandline}) {
-        $system = $commandline;
+    my $make_commandline;
+    if ($self->prefs->{make}) {
+        $make_commandline = $self->prefs->{make}{commandline};
+    }
+    if ($make_commandline) {
+        $system = $make_commandline;
         $ENV{PERL} = CPAN::find_perl;
     } else {
         if ($self->{modulebuild}) {
@@ -7904,12 +7919,14 @@ is part of the perl-%s distribution. To install that, you need to run
                           $make_arg ? " $make_arg" : "",
                          );
     }
-    if (my $env = $self->prefs->{make}{env}) { # overriding the local
-                                               # ENV of PL, not the
-                                               # outer ENV, but
-                                               # unlikely to be a risk
-        for my $e (keys %$env) {
-            $ENV{$e} = $env->{$e};
+    my $make_env;
+    if ($self->prefs->{make}) {
+        $make_env = $self->prefs->{make}{env};
+    }
+    if ($make_env) { # overriding the local ENV of PL, not the outer
+                     # ENV, but unlikely to be a risk
+        for my $e (keys %$make_env) {
+            $ENV{$e} = $make_env->{$e};
         }
     }
     my $expect_model = $self->_prefs_with_expect("make");
@@ -9004,9 +9021,13 @@ sub test {
         $env{$k} = $v;
     }
     local %ENV = %env;
-    if (my $env = $self->prefs->{test}{env}) {
-        for my $e (keys %$env) {
-            $ENV{$e} = $env->{$e};
+    my $test_env;
+    if ($self->prefs->{test}) {
+        $test_env = $self->prefs->{test}{env};
+    }
+    if ($test_env) {
+        for my $e (keys %$test_env) {
+            $ENV{$e} = $test_env->{$e};
         }
     }
     my $expect_model = $self->_prefs_with_expect("test");
@@ -11316,6 +11337,8 @@ defined:
                      (and nonsense for characters outside latin range)
   term_ornaments     boolean to turn ReadLine ornamenting on/off
   test_report        email test reports (if CPAN::Reporter is installed)
+  threshold_perl5lib_upto
+                     threshold determining method to extend @INC at runtime
   trust_test_report_history
                      skip testing when previously tested ok (according to
                      CPAN::Reporter history)
@@ -11665,8 +11688,11 @@ Specifies that this distribution shall not be processed at all.
 
 =item features [array]
 
-Experimental implementation (added in version 1.92_59). Shall deal with
-optional_features from META.yml.
+B<ALERT: Not ready for use, will change in a future version>
+
+Experimental implementation (added in version 1.92_59). Shall deal
+with optional_features from META.yml once the specification has
+settled. At the moment the META.yml spec looks buggy.
 
 =item goto [string]
 

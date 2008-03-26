@@ -54,6 +54,7 @@ B::Lint
 B::Size
 B::TerseSize
 BFD
+BS::Event
 BSD::Resource
 BerkeleyDB
 Biblio::Document::Parser
@@ -61,6 +62,7 @@ Bit::MorseSignals
 Bit::Vector
 Bit::Vector::Minimal
 BitTorrent
+Bloom::Filter
 Brackup
 Bundle::Encode
 Bundle::POE::IRC
@@ -259,6 +261,7 @@ DB_File::Lock
 Daemon::Generic
 Danga::Socket
 Danga::Socket::Callback
+DashProfiler
 Data::Bind
 Data::Buffer
 Data::Dump
@@ -390,6 +393,7 @@ ExtUtils::MakeMaker
 ExtUtils::Manifest
 ExtUtils::ModuleMaker
 ExtUtils::PkgConfig
+ExtUtils::XSBuilder
 FCGI::Engine
 FLV::Info
 Fcntl
@@ -399,6 +403,7 @@ File::Basename
 File::Binary
 File::Copy
 File::CounterFile
+File::ExtAttr
 File::Extract
 File::Fetch
 File::Headerinfo::SWF
@@ -417,6 +422,7 @@ File::Spec::Functions
 File::Tail
 File::Temp
 File::Type
+File::Util
 FileHandle::Deluxe
 FileHandle::Unget
 Filesys::Df
@@ -439,6 +445,7 @@ GD::SVG
 GD::SecurityImage
 GD::Text
 GIS::Distance
+GPS::SpaceTrack
 GSSAPI
 GTop
 Games::Bingo
@@ -457,6 +464,8 @@ Getopt::Long
 Getopt::Lucid
 Getopt::Mixed
 GnuPG::Interface
+DBD::Gofer::Transport::http
+Google::Adwords
 Graph
 Graph::Easy
 Graph::Easy::As_svg
@@ -468,6 +477,7 @@ Gtk
 Gtk2
 HOP::Lexer
 HTML::Clean
+HTML::DOM
 HTML::Entities
 HTML::Entities::Numbered
 HTML::FillInForm
@@ -503,9 +513,11 @@ HTTP::BrowserDetect
 HTTP::CryptoCookie
 HTTP::GHTTP
 HTTP::Parser
+HTTP::Proxy
 HTTP::RangeSaver
 HTTP::Response::Encoding
 HTTP::Server::Simple
+HTTP::Server::Simple::Dispatched
 HTTP::Server::Simple::Mason
 Handel
 Hash::AsObject
@@ -520,6 +532,8 @@ IO
 IO::All
 IO::Async::Buffer
 IO::Compress::Base
+IO::Compress::Lzop
+IO::Compress::Zlib::Constants
 IO::Digest
 IO::File
 IO::Handle
@@ -535,6 +549,7 @@ IO::String
 IO::Stringy
 IO::Tee
 IO::Zlib
+IPC::Concurrency
 IPC::Mmap
 IPC::Open2
 IPC::PubSub
@@ -552,6 +567,9 @@ Image::Size
 Imager
 Imager::Graph
 Inline
+InlineX::CPP2XS
+InlineX::C2XS
+InlineX::XS
 Iterator
 JSON
 JSON::DWIW
@@ -635,6 +653,7 @@ Math::BigInt::GMP
 Math::BigRat
 Math::Cephes
 Math::Combinatorics
+Math::Expression
 Math::GMP
 Math::Geometry::Planar::GPC
 Math::Geometry::Planar::Offset
@@ -647,12 +666,14 @@ Math::Symbolic
 Math::SymbolicX::ParserExtensionFactory
 Math::Vec
 Maypole
+MediaWiki
 Metadata::ByInode
 Mixin::ExtraFields
 Module::Build
 Module::Build::Convert
 Module::Changes
 Module::Compile
+Module::Dependency::Info
 Module::ExtractUse
 Module::Faker
 Module::Find
@@ -671,6 +692,7 @@ MogileFS::Class
 MojoMojo
 Moose
 Moose::Autobox
+MooseX::Emulate::Class::Accessor::Fast
 Net::Analysis
 Net::CIDR
 Net::Cmd
@@ -683,10 +705,12 @@ Net::FPing
 Net::FTP
 Net::FTP::Common
 Net::GrowlClient
+Net::Hiveminder
 Net::IMAP::Server
 Net::IMAP::Simple
 Net::IPv4Addr
 Net::IPv6Addr
+Net::IRC3
 Net::Jaiku
 Net::Jifty
 Net::LDAP
@@ -715,6 +739,7 @@ Net::Twitter
 Net::UploadMirror
 Net::Write
 Net::XMPP
+Net::XMPP2
 Net::Z3950::ZOOM
 NetAddr::IP
 News::Article
@@ -732,6 +757,7 @@ Object::Tiny
 OpenOffice::OOBuilder
 OpenOffice::OODoc
 OpenThought
+Osgood::Client
 P5NCI
 PAR
 PAR::Dist::FromCPAN
@@ -856,6 +882,7 @@ RDF::Server
 RPC::JSON
 RPC::PlServer
 RPC::XML
+RRDTool::Creator
 RT::Client::REST
 RTF::HTMLConverter
 Regex::PreSuf
@@ -873,6 +900,7 @@ Rose::DateTime
 Rose::Object
 Rubric
 SGML::Parser::OpenSP
+SIOC
 SNMP
 SOAP::Lite
 SOAP::WSDL
@@ -910,12 +938,15 @@ Safe::Hole
 Scalar::Defer
 Scalar::Util
 Scalar::Util::Clone
+Scalar::Util::Numeric
 Schedule::Cron
+Scope::Guard
 Set::ConsistentHash
 Set::Crontab
 Set::Infinite
 Set::IntSpan::Fast
 Set::Integer::Gapfillers
+Shell::Autobox
 Shell::Perl
 ShiftJIS::CP932::Correct
 ShiftJIS::CP932::MapUTF
@@ -973,6 +1004,7 @@ Template
 Template::Alloy
 Template::Config
 Template::Extract
+Template::Parser::Greedy
 Template::Plugin::Class
 Template::Plugin::Number::Format
 Template::Provider::Encoding
@@ -1034,6 +1066,7 @@ Text::Filter
 Text::Format
 Text::Iconv
 Text::LevenshteinXS
+Text::Markdown
 Text::Metaphone
 Text::Ngram
 Text::PDF
@@ -1051,6 +1084,7 @@ Text::Template
 Text::Typography
 Text::Unidecode
 Text::VimColor
+Text::WikiCreole
 Text::WikiFormat
 Text::Wrap
 Text::Wrapper
@@ -1155,10 +1189,12 @@ Unicode::Wrap
 Unix::Syslog
 User
 User::Identity
+Util::Properties
 V
 VFSsimple
 Verilog::Parser
 Voting::Condorcet::RankedPairs
+WWW::Curl
 WWW::Facebook::API
 WWW::Live365
 WWW::Mechanize
@@ -1174,6 +1210,8 @@ WWW::Slides
 Waft
 Want
 Web::Scraper
+Web::Scraper::Config
+WordNet::SenseRelate::AllWords
 Workflow
 X500::DN
 XML::ApacheFOP
@@ -1219,6 +1257,7 @@ XML::Validator::Schema
 XML::Writer
 XML::XPath
 XML::XPathEngine
+XS::Writer
 XSLoader
 YAML
 YAML::Syck

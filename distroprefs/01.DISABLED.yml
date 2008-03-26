@@ -32,11 +32,13 @@ match:
     |BKCHAPIN/DBIx-Perform-\d                # curses login (?)
     |BOOK/Net-Proxy-0.12                     # hangs quite often, not always
     |BOWMANBS/Audio-Ecasound-\d              # hangs very early: RT 32101
+    |BSCHMAL/parrot-0.6.0.tar.gz             # hangs during configure with 5.10
     |CAIDAPERL/Chart-Graph-\d                # hangs Makefile.PL: RT 33541
     |CLACO/AxKit-XSP-                        # looped in a readline
     |CORLISS/CursesForms-\d
     |CORLISS/CursesWidgets-\d
     |DDUMONT/Tk-ObjEditor-2.004.tar.gz       # http://rt.cpan.org/Ticket/Display.html?id=29559
+    |EKAWAS/MOBY-                            # hangs
     |DMAKI/Text-MeCab                        # hangs asking questions
     |ECALDER/Proc-PID-File-1.24.tar.gz       # hangs during test.pl
     |EIJABB/MARC-Errorchecks-1.13.tar.gz     # complicated interactivity in make test
@@ -50,6 +52,7 @@ match:
     |JEZRA/Finance-TickerSymbols             # talks endlessly with some ticker sites
     |GONERI/Ocsinventory-Agent-0.0.8.tar.gz  # hangs
     |JJORE/Enbugger-                         # steps into the debugger
+    |JSTOWE/Term-Screen-\d                   # automated testing impossible
     |JMERELO/MP3-Podcast-0.06.tar.gz         # hangs in test
     |KARMAN/Catalyst-Authentication-Store-LDAP-\d # hangs
     |KESTEB/POE-Component-Client-Stomp-0.05.tar.gz # hangs in t/02_basic.t with 5.10 proper
@@ -60,13 +63,15 @@ match:
     |MCMAHON/WWW-Mechanize-Pluggable-1.03.tar.gz # killed the cpan shell with kill(); I don't understand how
     |MIKEM/Authen-TacacsPlus/Authen-TacacsPlus-0.17 # seems to hang
     |MISHIKAL/Net-LDAPapi-\d                 # gives gooood advice and stops
+    |MLEHMANN/Deliantra                      # looks complicated and not using CheckLib
     |MSCHWERN/Test-Fork-0.01_01.tar.gz       # test hangs
     |MTHURN/Net-Address-Ethernet-\d          # interactive questions that we cannot answer as a bot
     |MTHURN/WWW-Search-Yahoo-\d              # hangs in t/china.t
+    |NUFFIN/POE-Component-Supervisor-0.01.tar.gz # hangs during t/04_global_restart_policy.
     |OALDERS/URI-ParseSearchString-More-0.04
     |PHILIPS/DBIx-MyParse-\d                 # too complicated to set up (mysql source etc.)
     |PMIC/parrot-0.5.3.tar.gz                # hangs after testing ctags 
-    |ROHAN/Google-Adwords-v\d                # asks in the middle of the test suite(?)
+    |RURBAN/B-Debugger-0.01_03.tar.gz        # hangs with perl-5.8.8 at 33430 during test.pl
     |RYBSKEJ/forks-0.25
     |SAPER/CPAN-Dependency-0.12              # hangs in t/02internals
     |STSANDER/Device-Davis-\d                # asks me for a tty to use
@@ -78,8 +83,6 @@ match:
     |TURNERMM/HTML-WikiConverter-DokuWikiFCK- # hangs very early
     |VPIT/IPC-MorseSignals-\d                # hangs too often (see Todo)
     |WONKO/CGI-Application-Dispatch          # endless loop
-    |WYANT/Astro-SpaceTrack-\d               # asks for a username/passwd during tests
-    |WYANT/Astro-satpass-\d                  # asks during testing to download something
     |XERN/CGI-QuickApp-\d                    # hangs immediately
     |YEWENBIN/PDE-                           # probably a broken Makefile.PL that tries to install Module::Build even if it is installed and calls CPAN recursively; in any case an endless loop
     )|

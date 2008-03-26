@@ -1,7 +1,10 @@
 ---
-comment: "pure testing"
+comment: |
+
+  AUTOMATED_TESTING=1 disables testing
+
 match:
   distribution: "/Term-Title-\d"
+test:
   env:
-    DISABLE_TERM_TITLE: 1
-disabled: 1
+    AUTOMATED_TESTING: 1

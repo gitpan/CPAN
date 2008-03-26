@@ -42,6 +42,7 @@ match:
     |BRICAS/Games-NES-Emulator-\d
     |BRICAS/Games-NES-ROM-\d
     |BRICAS/HTML-TagCloud-Sortable-\d
+    |BRICAS/Template-Provider-FromDATA-\d
     |BRICAS/URI-Template-\d
     |BRICAS/WWW-OpenSearch-\d
     |BTROTT/Crypt-OpenPGP-\d
@@ -72,8 +73,10 @@ match:
     |DMAKI/Event-Notify-\d
     |DMAKI/Gungho-\d
     |DMAKI/GunghoX-FollowLinks-\d
+    |DMAKI/Web-Scraper-Config-\d
     |DMAKI/XML-RSS-LibXML-\d
     |DMAKI/XML-RSS-Liberal-
+    |DONEILL/MIME-tools-\d
     |DSNOPEK/POE-Component-MessageQueue-\d
     |EDENC/MooseX-Role-Cmd-\d
     |ELLIOTJS/Task-Perl-Critic-IncludingOptionalDependencies-
@@ -175,6 +178,7 @@ match:
     |SARTAK/Class-Method-Modifiers-\d
     |SARTAK/Jifty-DBI-\d
     |(?:JESSE|SARTAK)/Jifty-\d
+    |SARTAK/Net-Hiveminder-\d
     |SARTAK/Net-Jifty-\d
     |SHIBUYA/Debug-Smart-\d
     |SMUELLER/Math-Approx-Symbolic-
