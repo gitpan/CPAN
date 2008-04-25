@@ -1,7 +1,8 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
+# vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_60';
+$CPAN::VERSION = '1.92_61';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -901,9 +902,10 @@ use vars qw(
             @ISA
             @relo
            );
-our @relo = (
+@relo =     (
              "CPAN.pm",
              "CPAN/Debug.pm",
+             "CPAN/Distroprefs.pm",
              "CPAN/FirstTime.pm",
              "CPAN/HandleConfig.pm",
              "CPAN/Kwalify.pm",
@@ -1676,7 +1678,7 @@ sub set_perl5lib {
                                  "for '$for'\n"
                                 );
         $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
-    } elsif ($Perl5lib_tempfile) {
+    } elsif (@dirs >= $cctpu && $Perl5lib_tempfile) {
         my $cnt = keys %{$self->{is_tested}};
         $CPAN::Frontend->myprint("Delegating blib/arch and blib/lib of ".
                                  "$cnt build dirs to CPAN::PERL5INC via $Perl5lib_tempfile; ".
@@ -1691,10 +1693,10 @@ sub set_perl5lib {
         $fh->flush();
     } else {
         my $cnt = keys %{$self->{is_tested}};
-        $CPAN::Frontend->mywarn("Your PERL5LIB is growing (now $cnt distros) but we cannot ".
-                                "switch to the PERL5OPT method of extending \@INC; installation ".
-                                "of a YAML module is highly recommended; see the manpage ".
-                                "of CPAN::PERL5INC for further information\n");
+#        $CPAN::Frontend->mywarn("Your PERL5LIB is growing (now $cnt distros) but we cannot ".
+#                                "switch to the PERL5OPT method of extending \@INC; installation ".
+#                                "of a YAML module is highly recommended; see the manpage ".
+#                                "of CPAN::PERL5INC for further information\n");
         $CPAN::Frontend->myprint("Prepending blib/arch and blib/lib of ".
                                  "$cnt build dirs to PERL5LIB; ".
                                  "for '$for'\n"
@@ -3686,7 +3688,7 @@ sub smoke {
     my($self) = @_;
     my $distros = $self->recent;
   DISTRO: for my $distro (@$distros) {
-        next if $distro->id =~ m|/Bundle-|; # XXX crude heuristic to skip bundles
+        next if $distro =~ m|/Bundle-|; # XXX crude heuristic to skip bundles
         $CPAN::Frontend->myprint(sprintf "Going to download and test '$distro'\n");
         {
             my $skip = 0;
@@ -6067,6 +6069,7 @@ Please file a bugreport if you need this.\n");
 package CPAN::Distribution;
 use strict;
 use Cwd qw(chdir);
+use CPAN::Distroprefs;
 
 # Accessors
 sub cpan_comment {
@@ -8120,18 +8123,17 @@ sub _find_prefs {
         $CPAN::Frontend->mydie("Cannot create directory $prefs_dir");
     }
     my $yaml_module = CPAN::_yaml_module;
+    my $ext_map = {};
     my @extensions;
     if ($CPAN::META->has_inst($yaml_module)) {
-        push @extensions, "yml";
+        $ext_map->{yml} = 'CPAN';
     } else {
         my @fallbacks;
         if ($CPAN::META->has_inst("Data::Dumper")) {
-            push @extensions, "dd";
-            push @fallbacks, "Data::Dumper";
+            push @fallbacks, $ext_map->{dd} = 'Data::Dumper';
         }
         if ($CPAN::META->has_inst("Storable")) {
-            push @extensions, "st";
-            push @fallbacks, "Storable";
+            push @fallbacks, $ext_map->{st} = 'Storable';
         }
         if (@fallbacks) {
             local $" = " and ";
@@ -8146,141 +8148,55 @@ sub _find_prefs {
             }
         }
     }
-    if (@extensions) {
-        my $dh = DirHandle->new($prefs_dir)
-            or die Carp::croak("Couldn't open '$prefs_dir': $!");
-      DIRENT: for (sort $dh->read) {
-            next if $_ eq "." || $_ eq "..";
-            my $exte = join "|", @extensions;
-            next unless /\.($exte)$/;
-            my $thisexte = $1;
-            my $abs = File::Spec->catfile($prefs_dir, $_);
-            if (-f $abs) {
-                #CPAN->debug(sprintf "abs[%s]", $abs) if $CPAN::DEBUG;
-                my @distropref;
-                if ($thisexte eq "yml") {
-                    # need eval because if YAML has a bug we should fail gracefully
-                    #CPAN->debug(sprintf "before yaml load abs[%s]", $abs) if $CPAN::DEBUG;
-                    my $distropref = eval { CPAN->_yaml_loadfile($abs) };
-                    if ($@) {
-                        $CPAN::Frontend->mywarn("Error reading distroprefs file ".
-                                                "$_, skipping\: $@");
-                        $CPAN::Frontend->mysleep(1);
-                        next DIRENT;
-                    } elsif (!$distropref) {
-                        $CPAN::Frontend->mywarn("Unknown error reading distroprefs file ".
-                                                "$_, skipping.");
-                        $CPAN::Frontend->mysleep(1);
-                        next DIRENT;
-                    } else {
-                        @distropref = @$distropref;
-                    }
-                    #CPAN->debug(sprintf "after yaml load abs[%s]", $abs) if $CPAN::DEBUG;
-                } elsif ($thisexte eq "dd") {
-                    package CPAN::Eval;
-                    no strict;
-                    open FH, "<$abs" or $CPAN::Frontend->mydie("Could not open '$abs': $!");
-                    local $/;
-                    my $eval = <FH>;
-                    close FH;
-                    eval $eval;
-                    if ($@) {
-                        $CPAN::Frontend->mydie("Error in distroprefs file $_\: $@");
-                    }
-                    my $i = 1;
-                    while (${"VAR".$i}) {
-                        push @distropref, ${"VAR".$i};
-                        $i++;
-                    }
-                } elsif ($thisexte eq "st") {
-                    # eval because Storable is never forward compatible
-                    eval { @distropref = @{scalar Storable::retrieve($abs)}; };
-                    if ($@) {
-                        $CPAN::Frontend->mywarn("Error reading distroprefs file ".
-                                                "$_, skipping\: $@");
-                        $CPAN::Frontend->mysleep(4);
-                        next DIRENT;
-                    }
-                }
-                # $DB::single=1;
-                #CPAN->debug(sprintf "#distropref[%d]", scalar @distropref) if $CPAN::DEBUG;
-              ELEMENT: for my $y (0..$#distropref) {
-                    my $distropref = $distropref[$y];
-                    $self->_validate_distropref($distropref,$abs,$y);
-                    my $match = $distropref->{match};
-                    unless ($match) {
-                        #CPAN->debug("no 'match' in abs[$abs], skipping") if $CPAN::DEBUG;
-                        next ELEMENT;
-                    }
-                    my $ok = 1;
-                    # do not take the order of C<keys %$match> because
-                    # "module" is by far the slowest
-                    my $saw_valid_subkeys = 0;
-                    for my $sub_attribute (qw(env distribution perl perlconfig module)) {
-                        next unless exists $match->{$sub_attribute};
-                        $saw_valid_subkeys++;
-                        if ($sub_attribute eq "module") {
-                            my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
-                            my $okm = 0;
-                            #CPAN->debug(sprintf "distropref[%d]", scalar @distropref) if $CPAN::DEBUG;
-                            my @modules = $self->containsmods;
-                            #CPAN->debug(sprintf "modules[%s]", join(",",@modules)) if $CPAN::DEBUG;
-                          MODULE: for my $module (@modules) {
-                                $okm ||= $module =~ /$qr/;
-                                last MODULE if $okm;
-                            }
-                            $ok &&= $okm;
-                        } elsif ($sub_attribute eq "distribution") {
-                            my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
-                            my $okd = $distroid =~ /$qr/;
-                            $ok &&= $okd;
-                        } elsif ($sub_attribute eq "env") {
-                            for my $envele (keys %{$match->{env}}) {
-                                my $envval = $ENV{$envele} || "";
-                                my $qr = eval "qr{$distropref->{match}{$sub_attribute}{$envele}}";
-                                my $oke = $envval =~ /$qr/;
-                                $ok &&= $oke;
-                                last if $ok == 0;
-                            }
-                        } elsif ($sub_attribute eq "perl") {
-                            my $qr = eval "qr{$distropref->{match}{$sub_attribute}}";
-                            my $okp = CPAN::find_perl =~ /$qr/;
-                            $ok &&= $okp;
-                        } elsif ($sub_attribute eq "perlconfig") {
-                            for my $perlconfigkey (keys %{$match->{perlconfig}}) {
-                                my $perlconfigval = $match->{perlconfig}->{$perlconfigkey};
-                                # XXX should probably warn if Config does not exist
-                                my $okpc = $Config::Config{$perlconfigkey} =~ /$perlconfigval/;
-                                $ok &&= $okpc;
-                                last if $ok == 0;
-                            }
-                        } else {
-                            $CPAN::Frontend->mydie("Nonconforming .$thisexte file '$abs': ".
-                                                   "unknown sub_attribut '$sub_attribute'. ".
-                                                   "Please ".
-                                                   "remove, cannot continue.");
-                        }
-                        last if $ok == 0; # short circuit
-                    }
-                    unless ($saw_valid_subkeys) {
-                        $CPAN::Frontend->mydie("Nonconforming .$thisexte file '$abs': ".
-                                               "missing match/* subattribute. ".
-                                               "Please ".
-                                               "remove, cannot continue.");
-                    }
-                    #CPAN->debug(sprintf "ok[%d]", $ok) if $CPAN::DEBUG;
-                    if ($ok) {
-                        return {
-                                prefs => $distropref,
-                                prefs_file => $abs,
-                                prefs_file_doc => $y,
-                               };
-                    }
-
-                }
-            }
+    my $finder = CPAN::Distroprefs->find($prefs_dir, $ext_map);
+    DIRENT: while (my $result = $finder->next) {
+        if ($result->is_warning) {
+            $CPAN::Frontend->mywarn($result->as_string);
+            $CPAN::Frontend->mysleep(1);
+            next DIRENT;
+        } elsif ($result->is_fatal) {
+            $CPAN::Frontend->mydie($result->as_string);
         }
-        $dh->close;
+
+        my @prefs = @{ $result->prefs };
+
+      ELEMENT: for my $y (0..$#prefs) {
+            my $pref = $prefs[$y];
+            $self->_validate_distropref($pref->data, $result->abs, $y);
+
+            # I don't know why we silently skip when there's no match, but
+            # complain if there's an empty match hashref, and there's no
+            # comment explaining why -- hdp, 2008-03-18
+            unless ($pref->has_any_match) {
+                next ELEMENT;
+            }
+
+            unless ($pref->has_valid_subkeys) {
+                $CPAN::Frontend->mydie(sprintf
+                    "Nonconforming .%s file '%s': " .
+                    "missing match/* subattribute. " .
+                    "Please remove, cannot continue.",
+                    $result->ext, $result->abs,
+                );
+            }
+
+            my $arg = {
+                env          => \%ENV,
+                distribution => $distroid,
+                perl         => \&CPAN::find_perl,
+                perlconfig   => \%Config::Config,
+                module       => sub { [ $self->containsmods ] },
+            };
+
+            if ($pref->matches($arg)) {
+                return {
+                    prefs => $pref->data,
+                    prefs_file => $result->abs,
+                    prefs_file_doc => $y,
+                };
+            }
+
+        }
     }
     return;
 }
@@ -8404,7 +8320,12 @@ sub follow_prereqs {
     my($slot) = shift;
     my(@prereq_tuples) = grep {$_->[0] ne "perl"} @_;
     return unless @prereq_tuples;
-    my @prereq = map { $_->[0] } @prereq_tuples;
+    my(@good_prereq_tuples);
+    for my $p (@prereq_tuples) {
+        # XXX watch out for foul ones
+        # $DB::single++;
+        push @good_prereq_tuples, $p;
+    }
     my $pretty_id = $self->pretty_id;
     my %map = (
                b => "build_requires",
@@ -8412,7 +8333,6 @@ sub follow_prereqs {
                c => "commandline",
               );
     my($filler1,$filler2,$filler3,$filler4);
-    # $DB::single=1;
     my $unsat = "Unsatisfied dependencies detected during";
     my $w = length($unsat) > length($pretty_id) ? length($unsat) : length($pretty_id);
     {
@@ -8430,7 +8350,7 @@ sub follow_prereqs {
     $CPAN::Frontend->
         myprint("$filler1 $unsat $filler2".
                 "$filler3 $pretty_id $filler4".
-                join("", map {"    $_->[0] \[$map{$_->[1]}]\n"} @prereq_tuples),
+                join("", map {"    $_->[0] \[$map{$_->[1]}]\n"} @good_prereq_tuples),
                );
     my $follow = 0;
     if ($CPAN::Config->{prerequisites_policy} eq "follow") {
@@ -8441,6 +8361,7 @@ sub follow_prereqs {
 of modules we are processing right now?", "yes");
         $follow = $answer =~ /^\s*y/i;
     } else {
+        my @prereq = map { $_=>[0] } @good_prereq_tuples;
         local($") = ", ";
         $CPAN::Frontend->
             myprint("  Ignoring dependencies on modules @prereq\n");
@@ -8448,8 +8369,9 @@ of modules we are processing right now?", "yes");
     if ($follow) {
         my $id = $self->id;
         # color them as dirty
-        for my $p (@prereq) {
+        for my $gp (@good_prereq_tuples) {
             # warn "calling color_cmd_tmps(0,1)";
+            my $p = $gp->[0];
             my $any = CPAN::Shell->expandany($p);
             $self->{$slot . "_for"}{$any->id}++;
             if ($any) {
@@ -8461,7 +8383,7 @@ of modules we are processing right now?", "yes");
         }
         # queue them and re-queue yourself
         CPAN::Queue->jumpqueue({qmod => $id, reqtype => $self->{reqtype}},
-                               map {+{qmod=>$_->[0],reqtype=>$_->[1]}} reverse @prereq_tuples);
+                               map {+{qmod=>$_->[0],reqtype=>$_->[1]}} reverse @good_prereq_tuples);
         $self->{$slot} = "Delayed until after prerequisites";
         return 1; # signal success to the queuerunner
     }
@@ -8472,9 +8394,9 @@ sub _feature_depends {
     my($self) = @_;
     my $meta_yml = $self->parse_meta_yml();
     my $optf = $meta_yml->{optional_features} or return;
-    if (!ref $optf or ref $optf ne "ARRAY"){
-        $CPAN::Frontend->mywarn("The content of optional_feature is not an ARRAY reference. Cannot use it.\n");
-        $optf = [];
+    if (!ref $optf or ref $optf ne "HASH"){
+        $CPAN::Frontend->mywarn("The content of optional_feature is not a HASH reference. Cannot use it.\n");
+        $optf = {};
     }
     my $wantf = $self->prefs->{features} or return;
     if (!ref $wantf or ref $wantf ne "ARRAY"){
@@ -8483,27 +8405,33 @@ sub _feature_depends {
     }
     my $dep = +{};
     for my $wf (@$wantf) {
-        for my $of (@$optf) {
-            my $f = $of->{$wf} or next;
+        if (my $f = $optf->{$wf}) {
             $CPAN::Frontend->myprint("Found the demanded feature '$wf' that ".
                                      "is accompanied by this description:\n".
                                      $f->{description}.
                                      "\n\n"
                                     );
+            # configure_requires currently not in the spec, unlikely to be useful anyway
             for my $reqtype (qw(configure_requires build_requires requires)) {
                 my $reqhash = $f->{$reqtype} or next;
                 while (my($k,$v) = each %$reqhash) {
                     $dep->{$reqtype}{$k} = $v;
                 }
             }
+        } else {
+            $CPAN::Frontend->mywarn("The demanded feature '$wf' was not ".
+                                    "found in the META.yml file".
+                                    "\n\n"
+                                   );
         }
     }
     $dep;
 }
 
 #-> sub CPAN::Distribution::unsat_prereq ;
-# return ([Foo=>1],[Bar=>1.2]) for normal modules
+# return ([Foo,"r"],[Bar,"b"]) for normal modules
 # return ([perl=>5.008]) if we need a newer perl than we are running under
+# (sorry for the inconsistency, it was an accident)
 sub unsat_prereq {
     my($self,$slot) = @_;
     my(%merged,$prereq_pm);
@@ -8565,44 +8493,9 @@ sub unsat_prereq {
         # or if the installed version is too old. We cannot omit this
         # check, because if 'force' is in effect, nobody else will check.
         if (defined $available_file) {
-            my(@all_requirements) = split /\s*,\s*/, $need_version;
-            local($^W) = 0;
-            my $ok = 0;
-          RQ: for my $rq (@all_requirements) {
-                if ($rq =~ s|>=\s*||) {
-                } elsif ($rq =~ s|>\s*||) {
-                    # 2005-12: one user
-                    if (CPAN::Version->vgt($available_version,$rq)) {
-                        $ok++;
-                    }
-                    next RQ;
-                } elsif ($rq =~ s|!=\s*||) {
-                    # 2005-12: no user
-                    if (CPAN::Version->vcmp($available_version,$rq)) {
-                        $ok++;
-                        next RQ;
-                    } else {
-                        last RQ;
-                    }
-                } elsif ($rq =~ m|<=?\s*|) {
-                    # 2005-12: no user
-                    $CPAN::Frontend->mywarn("Downgrading not supported (rq[$rq])\n");
-                    $ok++;
-                    next RQ;
-                }
-                if (! CPAN::Version->vgt($rq, $available_version)) {
-                    $ok++;
-                }
-                CPAN->debug(sprintf("need_module[%s]available_file[%s]".
-                                    "available_version[%s]rq[%s]ok[%d]",
-                                    $need_module,
-                                    $available_file,
-                                    $available_version,
-                                    CPAN::Version->readable($rq),
-                                    $ok,
-                                   )) if $CPAN::DEBUG;
-            }
-            next NEED if $ok == @all_requirements;
+            my $fulfills_all_version_rqs = $self->_fulfills_all_version_rqs
+                ($need_module,$available_file,$available_version,$need_version);
+            next NEED if $fulfills_all_version_rqs;
         }
 
         if ($need_module eq "perl") {
@@ -8610,7 +8503,7 @@ sub unsat_prereq {
         }
         $self->{sponsored_mods}{$need_module} ||= 0;
         CPAN->debug("need_module[$need_module]s/s/n[$self->{sponsored_mods}{$need_module}]") if $CPAN::DEBUG;
-        if ($self->{sponsored_mods}{$need_module}++) {
+        if (my $sponsoring = $self->{sponsored_mods}{$need_module}++) {
             # We have already sponsored it and for some reason it's still
             # not available. So we do ... what??
 
@@ -8677,16 +8570,18 @@ sub unsat_prereq {
                                                 "'$nosayer => $do->{$nosayer}'. Continuing, ".
                                                 "but chances to succeed are limited.\n"
                                                );
+                        $CPAN::Frontend->mysleep($sponsoring/10);
                         next NEED;
                     } else { # the other guy succeeded
-                        if ($nosayer eq "install") {
+                        if ($nosayer =~ /^(install|make_test)$/) {
                             # we had this with
                             # DMAKI/DateTime-Calendar-Chinese-0.05.tar.gz
-                            # 2007-03
+                            # in 2007-03 for 'make install'
+                            # and 2008-04: #30464 (for 'make test')
                             $CPAN::Frontend->mywarn("Warning: Prerequisite ".
                                                     "'$need_module => $need_version' ".
                                                     "for '$selfid' already installed ".
-                                                    "but installation looks suspicious. ".
+                                                    "but the result looks suspicious. ".
                                                     "Skipping another installation attempt, ".
                                                     "to prevent looping endlessly.\n"
                                                    );
@@ -8702,6 +8597,48 @@ sub unsat_prereq {
     my @unfolded = map { "[".join(",",@$_)."]" } @need;
     CPAN->debug("returning from unsat_prereq[@unfolded]") if $CPAN::DEBUG;
     @need;
+}
+
+sub _fulfills_all_version_rqs {
+    my($self,$need_module,$available_file,$available_version,$need_version) = @_;
+    my(@all_requirements) = split /\s*,\s*/, $need_version;
+    local($^W) = 0;
+    my $ok = 0;
+  RQ: for my $rq (@all_requirements) {
+        if ($rq =~ s|>=\s*||) {
+        } elsif ($rq =~ s|>\s*||) {
+            # 2005-12: one user
+            if (CPAN::Version->vgt($available_version,$rq)) {
+                $ok++;
+            }
+            next RQ;
+        } elsif ($rq =~ s|!=\s*||) {
+            # 2005-12: no user
+            if (CPAN::Version->vcmp($available_version,$rq)) {
+                $ok++;
+                next RQ;
+            } else {
+                last RQ;
+            }
+        } elsif ($rq =~ m|<=?\s*|) {
+            # 2005-12: no user
+            $CPAN::Frontend->mywarn("Downgrading not supported (rq[$rq])\n");
+            $ok++;
+            next RQ;
+        }
+        if (! CPAN::Version->vgt($rq, $available_version)) {
+            $ok++;
+        }
+        CPAN->debug(sprintf("need_module[%s]available_file[%s]".
+                            "available_version[%s]rq[%s]ok[%d]",
+                            $need_module,
+                            $available_file,
+                            $available_version,
+                            CPAN::Version->readable($rq),
+                            $ok,
+                           )) if $CPAN::DEBUG;
+    }
+    return $ok == @all_requirements;
 }
 
 #-> sub CPAN::Distribution::read_yaml ;
@@ -11686,13 +11623,12 @@ declaration.
 
 Specifies that this distribution shall not be processed at all.
 
-=item features [array]
+=item features [array] *** EXPERIMENTAL FEATURE ***
 
-B<ALERT: Not ready for use, will change in a future version>
-
-Experimental implementation (added in version 1.92_59). Shall deal
-with optional_features from META.yml once the specification has
-settled. At the moment the META.yml spec looks buggy.
+Experimental implementation to deal with optional_features from
+META.yml. Still needs coordination with installer software and
+currently only works for META.yml declaring C<dynamic_config=0>. Use
+with caution.
 
 =item goto [string]
 

@@ -22,6 +22,7 @@ match:
     |AGRUNDMA/Catalyst-Plugin-Static-Simple-\d
     |AGRUNDMA/Catalyst-Plugin-UploadProgress-\d
     |ASH/DBIx-Class-\d
+    |ASHLEY/Catalyst-Authentication-Credential-OpenID-\d
     |AUDREYT/Scalar-Defer-\d
     |AVAR/Bot-BB2-\d
     |AVAR/SMS-Send-IS-Vodafone-\d
@@ -126,6 +127,7 @@ match:
     |JSWARTZ/CHI-\d
     |KARMAN/Catalyst-Plugin-Session-Store-File-\d
     |LBROCARD/Devel-ebug-HTTP-\d
+    |LUKEC/Blikistan-\d
     |LUKEC/Test-Mock-LWP-\d
     |LUKEC/Test-WWW-Selenium-\d
     |LUTETIUS/pod2book-\d
@@ -137,17 +139,25 @@ match:
     |MARCEL/Class-Accessor-FactoryTyped-\d
     |MARCEL/Class-Accessor-Installer-\d
     |MARCEL/Class-Factory-Enhanced-\d
+    |MARCEL/Class-Scaffold-\d
+    |MARCEL/Class-Value-\d
+    |MARCEL/Data-Conveyor-\d
+    |MARCEL/Data-Storage-\d
+    |MARCEL/Google-Chart-\d
     |MARCEL/LWP-UserAgent-ProgressBar-\d
     |MARCEL/Pod-Generated-\d
     |MARCEL/Test-Compile-\d
     |MARKSTOS/Test-WWW-Selenium-CGIApp-\d
+    |MDXI/Curses-UI-\d
     |MEMOWE/HTML-SBC-\d
     |MITREHC/HoneyClient-Agent-\d
     |MITREHC/HoneyClient-Manager-\d
     |MITREHC/HoneyClient-Util-\d
     |MIYAGAWA/XML-Atom-\d
     |MIZZY/Parse-Apache-ServerStatus-Extended-\d
+    |MLAWREN/MySpam-\d
     |MRAMBERG/Catalyst-Action-RenderView-\d
+    |MRAMBERG/Catalyst-Devel-\d
     |MRAMBERG/Catalyst-Plugin-Authentication-Store-DBIC-\d
     |MRAMBERG/Catalyst-Plugin-Compress-Bzip2
     |MRAMBERG/Catalyst-Plugin-Compress-Zlib
@@ -177,6 +187,7 @@ match:
     |SARTAK/Carp-REPL-\d
     |SARTAK/Class-Method-Modifiers-\d
     |SARTAK/Jifty-DBI-\d
+    |SARTAK/Jifty-Plugin-OAuth-\d
     |(?:JESSE|SARTAK)/Jifty-\d
     |SARTAK/Net-Hiveminder-\d
     |SARTAK/Net-Jifty-\d
@@ -184,6 +195,7 @@ match:
     |SMUELLER/Math-Approx-Symbolic-
     |SMUELLER/PAR-
     |SRI/Catalyst-Plugin-HTML-Widget-\d
+    |SRI/HTML-Declare-\d
     |STEVAN/FCGI-Engine-\d
     |STEVAN/MooseX-Daemonize-\d
     |STEVAN/MooseX-Storage-\d
@@ -209,9 +221,9 @@ pl:
       - "Auto-install"
       - "y\n"
   env:
-    PERL_AUTOINSTALL: --skip    
+    PERL_AUTOINSTALL: --skip
     PERL_EXTUTILS_AUTOINSTALL: --skip
 make:
   env:
-    PERL_AUTOINSTALL: --skip    
+    PERL_AUTOINSTALL: --skip
     PERL_EXTUTILS_AUTOINSTALL: --skip

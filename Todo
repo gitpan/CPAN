@@ -1,3 +1,419 @@
+2008-04-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* IPC::Run fails today with any perl I try even with perls that have
+	installed it successfully in the past and recent days. Either a
+	dependency on a module has got a new version or something on that system
+	(semaphores?). Interesting is http://rt.cpan.org/Ticket/Display.html?id=28150
+
+2008-04-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Event::Lib seems to need a binarysearch. Might be a Test::Harness issue.
+
+	Ok, came to the conclusion it is Test::Harness 3.0 related.
+
+	* JSON::XS 2.2 is accused to need a binary search but I find it working
+	under many bleadperls and indeed failing with a very old bleedperl
+	(30953).
+
+	cpantesters currently count Pass 65 : Fail 3, so this seems to be a
+	bogus report.
+
+2008-04-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* apc-overview says/should say
+
+maint-5.10                   5.10.1   32695  33660 ( 116) [have 33642]
+maint-5.8                     5.8.9   27041  33694 ( 982) [have 33638]
+perl                         5.11.0   32643  33714 ( 810) [have 33714]
+
+	missing number of patches since last build
+
+2008-04-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Coming back to Data::Serializer. The trick was to do what in the
+	debugger?
+
+	make testdb TEST_FILE=t/05-Encryption.t
+
+	b 53 "JSON" eq $serializer
+	s
+	c 340
+	s
+	c 738
+	s
+	c 642
+
+	Ahja, now we can reconstruct.
+
+	use Crypt::CBC;
+	my $secret = "test";
+	my $cipher = "Blowfish";
+	my $digest = qq{deadbeef};
+	$digest .= chr(256); chop $digest;
+	my $cipher_obj = Crypt::CBC->new($secret,$cipher);
+	print length $cipher_obj->encrypt($digest)==32 ? "ok\n" : "not ok\n";
+
+	http://rt.cpan.org/Ticket/Display.html?id=35239
+
+	And a perlbug
+
+	Bitops on strings when UTF8 flag is set
+
+2008-04-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* would like to get DJHD/Speech-Recognizer-SPX-0.09.tar.gz running on
+	debian but it needs more work:
+
+Package pocketsphinx was not found in the pkg-config search path.
+Perhaps you should add the directory containing `pocketsphinx.pc'
+to the PKG_CONFIG_PATH environment variable
+No package 'pocketsphinx' found
+Unable to locate PocketSphinx using pkg-config.  Please make sure that
+you have installed pkg-config and PocketSphinx on your system, and
+that PKG_CONFIG_PATH is set correctly.
+
+
+2008-04-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* would like to get JavaScript to compile. Needs work on Debian. The
+	$lib/$libs thing is broken, fixing it was easy but then the compilation
+	and the tests still failed.
+
+	* refresh investigations Data::Serializer
+
+	The string that is brought from JSON via Data::Serializer to Crypt::CBC::encrypt is this:
+
+  DB<10> Devel::Peek::Dump $data
+SV = PVMG(0x8a9e908) at 0x87e1964
+  REFCNT = 2
+  FLAGS = (PADMY,POK,pPOK,UTF8)
+  IV = 0
+  NV = 0
+  PV = 0x8b32198 "6cbcecd11182ea942e597f5a5b77b2883885cceccff88f6b08e025db66316c96=[\"one\",\"two\",\"three\"]"\0 [UTF8 "6cbcecd11182ea942e597f5a5b77b2883885cceccff88f6b08e025db66316c96=["one","two","three"]"]
+  CUR = 86
+  LEN = 221
+  MAGIC = 0x85c4148
+    MG_VIRTUAL = &PL_vtbl_utf8
+    MG_TYPE = PERL_MAGIC_utf8(w)
+    MG_LEN = 86
+
+	So far no difference between 2396[56] in Crypt::CBC::crypt.
+
+	The difference comes after 
+
+	my @blocks = unpack("a$bs "x(int(length($self->{'buffer'})/$bs)) . "a*", $self->{'buffer'});
+
+	These blocks are UTF8 since 23966 and were not so in 23965. Even with
+	identical 7bit content this makes a difference later.
+
+2008-04-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* may be a bug in Distroprefs.pm the $abs in line 122. Seen with some DD
+	only perl.
+
+	* OOTools:
+
+----Program----
+eval q{use Class::Error 2.21};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pBnR154/perl-5.9.2@24659/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pWYtCAP/perl-5.9.2@24660/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+
+2008-04-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* CharsetDetector
+
+----Program----
+eval q{use CharsetDetector 1.0};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pdVMYpV/perl-5.9.2@25178/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../p1Kjy6j/perl-5.9.2@25179/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+
+	* There are some perls on my system that cannot compile current Expect!
+
+	Which are that? At the moment just 25185. 25180 and 25194 both have it,
+	so the gap must be pretty small.	
+
+2008-04-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Data-Serializer:
+
+----Program----
+eval q{use Data::Serializer 0.44; use JSON 2.07};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../p691lTk/perl-5.9.1@23965/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pSMD0sR/perl-5.9.1@23966/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+
+2008-04-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Ricardo Signes suggested to discuss PAUSE issues on some list and I
+	suggested reviving cpan-workers. Now I am not sure that I'm subscribed
+	there. Google suggests the address is cpan-workers@perl.org
+
+	http://www.nntp.perl.org/group/perl.cpan.workers/
+
+	has the last posting from 2005. I'll now retry to send a message.
+
+	update 2008-04-03 akoenig : seems to be disabled. But perl.cpan.discuss
+	is in the slow lists and alive and I'm probably not subscribed.
+
+	* Both Barbie and David Golden agreed to my plan to refuse the make
+	phase when we are in the make(1) domain AND some files have a future
+	timestamp. Slaven is opposed to the idea but has no better suggestion.
+	Details in the thread on cpan-testers-discuss starting on 2008-03-28.
+
+	* To understand #34582 I need a perl without Glib, ExtUtils::Depends,
+	and ExtUtils::PkgConfig. Then I should issue a 'test Glib'
+
+	No, better would be a perl with ExtUtils::Depends < 0.300 and/or
+	ExtUtils::PkgConfig < 1.00 to see if they can pick up the right one.
+
+	See also David Golden Message-ID:
+	<5d4beb40803052058w7f774a8u3a72891b1aba9803@mail.gmail.com> on
+	cpan-testers-discuss
+
+2008-03-30  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* No useable patch available between 17639 and 17672
+
+	This is where we lost JSON.
+
+----Program----
+eval q{use JSON 2.07};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../p0IId7q/perl-5.8.0@17639/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../p957hf5/perl-5.8.0@17672/bin/perl----
+N/A
+
+----EOF ($?='0')----
+Need a perl between 17639 and 17672
+(but 17642, 17654, 17656 could not successfully be used to build perl)
+
+	For some reason -Ui_db does not seem to work with these? No it seems the
+	-Ui_db was lost or forgotten.
+
+	So I retried after deleting much remainings from the previous binary
+	search and finally found a straight patch threshold:
+
+----Program----
+eval q{use JSON 2.07};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pfB6YBj/perl-5.8.0@17656/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../pgWUpay/perl-5.8.0@17671/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	So it is 17671. And as expected it has (pretty certainly) to do with the
+	change of the PERL_VERSION in patchlevel.h from 8 to 9.
+
+	http://rt.cpan.org/Ticket/Display.html?id=34599 reports/fixes JSON
+	
+	* distname vs modulename: david golden recently seemed to have suggested
+	a solution to the distname trap that everybody so far had been ignoring.
+	Where is a link?
+
+	The thread was Subject: RFC: URI::cpan on the module-authors@perl.org
+	mailing list.
+
+	* No useable patch available between 17639 and 17836
+
+	-Ui_db as described further down
+
+2008-03-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* timestamps in the future:
+
+>  I'm going beyond that: toss the entire _make_ unless they say
+>  "allow_future_timestamps". Then CPAN::Reporter could refuse to send
+>  reports when they actually do set "allow_future_timestamp".
+
+I think that's a very reasonable way to go.
+
+	This needs to be done soonish.
+
+	* Crypt-CBC-2.27 seems to not declare prereq Crypt-Rijndael but fail
+	without it? Seen with 25418. Reported in
+	http://rt.cpan.org/Ticket/Display.html?id=34521
+
+2008-03-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Data::Serializer: I stopped a binary search because of Math::Pari
+
+	Then I restarted it and it ended with the impossible resolution:
+
+----Program----
+eval q{use Data::Serializer 0.44};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of ...pVDHwBj/perl-5.10.0@33153/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of ...pyNdNAp/perl-5.10.0@33154/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Crap because 33154 is a patch of just a test.
+
+-optimize='-g';
++optimize='-O2';
+
+-archname='i686-linux-64int';
++archname='i686-linux';
+
+	Let's remove 33154. Next iteration ends here:
+
+----Program----
+eval q{use Data::Serializer 0.44};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of ...pyQ307v/perl-5.10.0@33550/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of ...p0PdUk4/perl-5.10.0@33551/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	with only configdiff:
+
+-d_builtin_expect='define';
++d_builtin_expect='undef';
+
+	Stepping through the debugger reaches a point:
+
+643:      return $cipher_obj->encrypt($digest);
+  DB<42> x $digest
+0  '6cbcecd11182ea942e597f5a5b77b2883885cceccff88f6b08e025db66316c96=["one","two","three"]'
+  DB<43> x $cipher_obj
+0  Crypt::CBC=HASH(0x90d1b74)
+   'blocksize' => 8
+   'cipher' => 'Crypt::Blowfish'
+   'header_mode' => 'salt'
+   'iv' => undef
+   'key' => undef
+   'keysize' => 56
+   'legacy_hack' => undef
+   'literal_key' => ''
+   'make_random_iv' => 1
+   'make_random_salt' => 1
+   'padding' => CODE(0x8aa745c)
+      -> &Crypt::CBC::_standard_padding in /home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/Crypt/CBC.pm:461-476
+   'passphrase' => 'test'
+   'pcbc' => undef
+   'salt' => undef
+  DB<44> s
+Crypt::CBC::encrypt(/home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/Crypt/CBC.pm:173):
+173:        my ($self,$data) = @_;
+  DB<44> n
+Crypt::CBC::encrypt(/home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/Crypt/CBC.pm:174):
+174:        $self->start('encrypting');
+  DB<44> 
+Crypt::CBC::encrypt(/home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/Crypt/CBC.pm:175):
+175:        my $result = $self->crypt($data);
+  DB<44> 
+input must be 8 bytes long at /home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/i686-linux-64int/Crypt/Blowfish.pm line 56.
+ at /home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/i686-linux-64int/Crypt/Blowfish.pm line 56
+        Crypt::Blowfish::encrypt('Crypt::Blowfish=HASH(0x90cc684)', 'u¿&µ[²k') called at /home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/Crypt/CBC.pm line 250
+        Crypt::CBC::crypt('Crypt::CBC=HASH(0x90d1b74)', '6cbcecd11182ea942e597f5a5b77b2883885cceccff88f6b08e025db66316...') called at /home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/Crypt/CBC.pm line 175
+        Crypt::CBC::encrypt('Crypt::CBC=HASH(0x90d1b74)', '6cbcecd11182ea942e597f5a5b77b2883885cceccff88f6b08e025db66316...') called at blib/lib/Data/Serializer.pm line 643
+        Data::Serializer::_encrypt('Data::Serializer=SCALAR(0x909efac)', '["one","two","three"]', 'Blowfish', 'SHA-256') called at blib/lib/Data/Serializer.pm line 738
+        Data::Serializer::serialize(undef, 'ARRAY(0x8510aac)') called at ./t/serializer-testlib line 340
+        main::run_test('ExtUtils::TBone=HASH(0x85122ac)', 'JSON', 'simplearray', 'encryption') called at t/05-Encryption.t line 53
+
+
+	Retrying
+
+  DB<47> 
+Crypt::CBC::crypt(/home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/Crypt/CBC.pm:245):
+245:        foreach my $block (@blocks) {
+  DB<47> x \@blocks
+0  ARRAY(0x8a93128)
+   0  '6cbcecd1'
+   1  '1182ea94'
+   2  '2e597f5a'
+   3  '5b77b288'
+   4  '3885ccec'
+   5  'cff88f6b'
+   6  '08e025db'
+   7  '66316c96'
+   8  '=["one",'
+   9  '"two","t'
+  DB<48> l
+245==>      foreach my $block (@blocks) {
+246:          if ($d) { # decrypting
+247:            $result .= $iv = $iv ^ $self->{'crypt'}->decrypt($block);
+248:            $iv = $block unless $self->{pcbc};
+249           } else { # encrypting
+250:            $result .= $iv = $self->{'crypt'}->encrypt($iv ^ $block);
+251           }
+252:          $iv = $iv ^ $block if $self->{pcbc};
+253         }
+254:        $self->{'civ'} = $iv;               # remember the iv
+  DB<48> c 254
+input must be 8 bytes long at /home/src/perl/repoperls/installed-perls/perl/prFWwqr/perl-5.10.0@33580/lib/site_perl/5.11.0/i686-linux-64int/Crypt/Blowfish.pm line 56.
+
+
+	After some more stepping down into the debugger I discover that somebody
+	passes in an 8 character string to Blowfish and as it is UTF8 it is not
+	8 bytes and Blowfish correctly dies. Seems to be JSON 2.07 related.
+	33550 has no JSON installed. Is it that? Yes, maybe. But if I add JSON
+	into the prereq mix I need to go much further back in history. 5.8.8 is
+	OK, 24518 isn't and for perls before patch 25000 several things fall
+	apart for different reasons.
+
+	19173 cannot have JSON and subsequently Data::Serializer succeeds. So
+	the test scripts must add JSON as explicit requirement.
+
+	Now I find out that JSON does not run on 17968 either. So where did JSON
+	2.07 stop? 17639 was the beginning of 5.9.0 the day after 5.8.0. And
+	JSON 2.07 still did work with 17637.
+
+	* Math::Pari: a perlmonks posting leads to success but later perls broke
+	it again
+
 2008-03-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* maybe still unreported: Safe::World, Data::Dump::Streamer,

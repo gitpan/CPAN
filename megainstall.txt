@@ -1,4 +1,4 @@
-AI::Categorizer
+I::Categorizer
 AI::Prolog
 AMF::Perl
 ANDK/keepcool-0.344
@@ -62,6 +62,7 @@ Bit::MorseSignals
 Bit::Vector
 Bit::Vector::Minimal
 BitTorrent
+Blikistan
 Bloom::Filter
 Brackup
 Bundle::Encode
@@ -90,6 +91,7 @@ CGI::Prototype
 CGI::Scriptpaths
 CGI::Session
 CGI::Untaint
+CGI::Wiki
 CHI
 CPAN
 CPAN::Cache
@@ -159,6 +161,7 @@ Class::DBI::Plugin::Type
 Class::Data::Accessor
 Class::Data::Inheritable
 Class::Date
+Class::Error
 Class::Factory
 Class::Fields
 Class::Gomor
@@ -185,6 +188,7 @@ Class::Trait
 Class::Virtual
 Class::Workflow
 Class::XPath
+Class::XSAccessor
 Class::constr
 Clone
 Code::Splice
@@ -236,7 +240,9 @@ Crypt::Random
 Crypt::Rijndael
 Crypt::SSLeay
 Curses
+Curses::UI
 Cwd
+DBD::Gofer::Transport::http
 DBD::Mock
 DBD::Pg
 DBD::SQLite
@@ -246,6 +252,7 @@ DBI::Shell
 DBIx::Admin::TableInfo
 DBIx::Class
 DBIx::Class::Indexed
+DBIx::Class::Schema::Loader
 DBIx::Class::Validation
 DBIx::CopyRecord
 DBIx::DBSchema
@@ -253,17 +260,20 @@ DBIx::HA
 DBIx::MyParse
 DBIx::ORM::Declarative
 DBIx::Perlish
+DBIx::RetryOverDisconnects
 DBIx::SearchBuilder
 DBIx::Simple
 DBIx::Timeout
 DB_File
 DB_File::Lock
+DTS::Assignment
 Daemon::Generic
 Danga::Socket
 Danga::Socket::Callback
 DashProfiler
 Data::Bind
 Data::Buffer
+Data::Conveyor
 Data::Dump
 Data::Dump::Streamer
 Data::Dumper
@@ -278,9 +288,11 @@ Data::ICal
 Data::ICal::TimeZone
 Data::Lazy
 Data::OptList
+Data::Phrasebook
 Data::Properties
 Data::Random
 Data::Remember
+Data::SExpression
 Data::ShowTable
 Data::Structure::Util
 Data::Swap
@@ -312,6 +324,7 @@ Devel::Cycle
 Devel::DProfLB
 Devel::Declare
 Devel::Dependencies
+Devel::Deprecate
 Devel::EvalContext
 Devel::Events
 Devel::Events::Handler::ObjectTracker
@@ -349,6 +362,7 @@ Digest::MD2
 Digest::MD5
 Digest::SHA
 Digest::SHA1
+Digest::SHA::PurePerl
 Digest::Tiger
 Directory::Scratch
 DocSet
@@ -371,6 +385,7 @@ Email::Send
 Email::Simple
 Email::Simple::Creator
 Encode
+Encode::Base32::Crockford
 Encode::JavaScript::UCS
 Encode::MAB2table
 Encode::MIME::Header
@@ -430,6 +445,7 @@ Filesys::Virtual
 Filter::Simple
 Filter::Util::Call
 FindBin
+FindBin::libs
 Flickr::API
 Font::AFM
 Font::TTF
@@ -451,6 +467,8 @@ GTop
 Games::Bingo
 Geo::Cache
 Geo::Gpx
+Geo::Raster
+Geo::Proj::Japan
 Geo::ShapeFile
 Geography::Countries
 Getargs::Long
@@ -464,11 +482,13 @@ Getopt::Long
 Getopt::Lucid
 Getopt::Mixed
 GnuPG::Interface
-DBD::Gofer::Transport::http
+Goo
 Google::Adwords
+Google::Chart
 Graph
 Graph::Easy
 Graph::Easy::As_svg
+Graph::Maker
 Graph::SocialMap
 GraphViz
 Graphics::ColorNames
@@ -512,6 +532,7 @@ HTML::WikiConverter
 HTTP::BrowserDetect
 HTTP::CryptoCookie
 HTTP::GHTTP
+HTTP::MobileAttribute::Plugin::Default::AirHPhone
 HTTP::Parser
 HTTP::Proxy
 HTTP::RangeSaver
@@ -524,6 +545,7 @@ Hash::AsObject
 Heap
 Heap::Simple
 Hook::Scope
+Hyper::Application
 I18N::Charset
 I18N::Collate
 I18N::LangTags
@@ -550,6 +572,7 @@ IO::Stringy
 IO::Tee
 IO::Zlib
 IPC::Concurrency
+IPC::Filter
 IPC::Mmap
 IPC::Open2
 IPC::PubSub
@@ -567,8 +590,8 @@ Image::Size
 Imager
 Imager::Graph
 Inline
-InlineX::CPP2XS
 InlineX::C2XS
+InlineX::CPP2XS
 InlineX::XS
 Iterator
 JSON
@@ -576,6 +599,7 @@ JSON::DWIW
 JSON::XS
 Jcode
 Jifty
+KindaPerl6
 Kwiki
 LWP
 LWP::Authen::Negotiate
@@ -601,6 +625,7 @@ Lingua::ZH::MacChinese::Simplified
 Lingua::ZH::MacChinese::Traditional
 Lingua::ZH::TaBE
 Linux::Inotify2
+Linux::SysInfo
 List::Compare
 List::Maker
 List::MoreUtils
@@ -654,12 +679,14 @@ Math::BigRat
 Math::Cephes
 Math::Combinatorics
 Math::Expression
+Math::Expression::Evaluator
 Math::GMP
 Math::Geometry::Planar::GPC
 Math::Geometry::Planar::Offset
 Math::Pari
 Math::Polygon
 Math::Polynom
+Math::Prime::XS
 Math::Random
 Math::Round::Var
 Math::Symbolic
@@ -693,10 +720,12 @@ MojoMojo
 Moose
 Moose::Autobox
 MooseX::Emulate::Class::Accessor::Fast
+Net::Amazon
 Net::Analysis
 Net::CIDR
 Net::Cmd
 Net::DNS
+Net::DRI
 Net::Daemon
 Net::Domain
 Net::Domain::TLD
@@ -704,6 +733,7 @@ Net::DownloadMirror
 Net::FPing
 Net::FTP
 Net::FTP::Common
+Net::Frame::Dump
 Net::GrowlClient
 Net::Hiveminder
 Net::IMAP::Server
@@ -715,6 +745,7 @@ Net::Jaiku
 Net::Jifty
 Net::LDAP
 Net::Libdnet
+Net::MRIM
 Net::MirrorDir
 Net::NNTP
 Net::Netmask
@@ -726,6 +757,7 @@ Net::Packet
 Net::Pcap
 Net::Ping
 Net::Proxy
+Net::SIP
 Net::SMTP
 Net::SNMP
 Net::SSH
@@ -754,6 +786,7 @@ Object::Realize::Later
 Object::Relation
 Object::Signature
 Object::Tiny
+Ogre::SceneManager
 OpenOffice::OOBuilder
 OpenOffice::OODoc
 OpenThought
@@ -763,6 +796,8 @@ PAR
 PAR::Dist::FromCPAN
 PAR::Packer
 PApp
+Package::Builder
+PBS::Build
 PDF
 PDF::API2
 PDF::API2::Simple
@@ -808,6 +843,7 @@ POE::Component::SubWrapper
 POE::Declarative::Mixin
 POE::Filter::IRCD
 POSIX
+POSIX::Regex
 PPI
 PTools::SDF
 Package::Constants
@@ -815,8 +851,10 @@ PadWalker
 Params::CallbackRequest
 Params::Smart
 Params::Validate
+Paranoid
 Parrot::Interpreter
 Parse::BACKPAN::Packages
+Parse::Marpa
 Parse::RecDescent
 Parse::Yapp
 Path::Class
@@ -868,6 +906,7 @@ PostScript::Graph::Bar
 PostScript::MailLabels
 PostScript::Simple
 PostScript::Simple::Table
+Prima
 Proc::ProcessTable
 Proc::Simple
 ProgressMonitor::AbstractConfiguration
@@ -877,8 +916,8 @@ Pushmi
 QDBM_File
 Quantum::Superpositions
 RDF::Core
-RDF::Simple
 RDF::Server
+RDF::Simple
 RPC::JSON
 RPC::PlServer
 RPC::XML
@@ -897,6 +936,7 @@ ResourcePool
 Return::Value
 Roman
 Rose::DateTime
+Rose::HTML::Objects
 Rose::Object
 Rubric
 SGML::Parser::OpenSP
@@ -961,11 +1001,13 @@ Sort::ArbBiLex
 Sort::Key::Radix
 Spiffy
 Spoon
+Spreadsheet::Engine
 Spreadsheet::ParseExcel
 Spreadsheet::Read
 Spreadsheet::WriteExcel
 Spreadsheet::WriteExcelXML
 Statistics::Distributions
+Statistics::Regression
 Storable
 String::Approx
 String::CRC32
@@ -991,11 +1033,13 @@ Sys::Hostname
 Sys::Mmap
 Sys::SigAction
 Sys::Virt
+SystemC::Vregs
 TAP::Parser
 Taint::Util
 Task::CVSMonitor
 Task::Catalyst
 Task::Catalyst::Tutorial
+Task::Email::PEP::All
 Task::Moose
 Task::Smoke
 Tcl
@@ -1034,6 +1078,7 @@ Test::FormValidator
 Test::HTTP::Server::Simple
 Test::HTTPStatus
 Test::Harness
+Test::A8N
 Test::JSON
 Test::Kwalitee
 Test::LongString
@@ -1068,6 +1113,7 @@ Text::Iconv
 Text::LevenshteinXS
 Text::Markdown
 Text::Metaphone
+Text::NSP
 Text::Ngram
 Text::PDF
 Text::Query
@@ -1102,6 +1148,7 @@ Time::HiRes
 Time::HiRes::Value
 Time::Period
 Time::Piece
+Time::Progress
 Time::Timezone
 Time::UTC
 Tk::Autoscroll
@@ -1154,9 +1201,11 @@ Touch
 Transform::Canvas
 Tripletail
 UML::Sequence
+UMMF
 UNIVERSAL::isa
 UNIVERSAL::ref
 URI
+URI::Escape::JavaScript
 URI::Fetch
 URI::Find
 URI::Template
@@ -1192,6 +1241,7 @@ User::Identity
 Util::Properties
 V
 VFSsimple
+VS::Chart
 Verilog::Parser
 Voting::Condorcet::RankedPairs
 WWW::Curl
@@ -1200,6 +1250,7 @@ WWW::Live365
 WWW::Mechanize
 WWW::Mechanize::Shell
 WWW::Monitor
+WWW::Ohloh::API
 WWW::OpenSearch
 WWW::REST
 WWW::RobotRules::Parser
@@ -1211,6 +1262,8 @@ Waft
 Want
 Web::Scraper
 Web::Scraper::Config
+WebService::ISBNDB
+WebService::Validator::HTML::W3C
 WordNet::SenseRelate::AllWords
 Workflow
 X500::DN
@@ -1238,8 +1291,8 @@ XML::Parser
 XML::Parser::Lite::Tree
 XML::Parser::PerlSAX
 XML::RSS
-XML::RSS::LibXML
 XML::RSS::FromHTML::Simple
+XML::RSS::LibXML
 XML::RegExp
 XML::SAX
 XML::SAX2Perl
