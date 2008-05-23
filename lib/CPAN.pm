@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_61';
+$CPAN::VERSION = '1.92_62';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -513,8 +513,7 @@ sub _yaml_loadfile {
         # temporarly enable yaml code deserialisation
         no strict 'refs';
         # 5.6.2 could not do the local() with the reference
-        local $YAML::LoadCode;
-        local $YAML::Syck::LoadCode;
+        local ${"$yaml_module\::LoadCode"};
         ${ "$yaml_module\::LoadCode" } = $CPAN::Config->{yaml_load_code} || 0;
 
         my $code;
@@ -1543,12 +1542,13 @@ sub cleanup {
         $subroutine eq '(eval)';
   }
   return if $ineval && !$CPAN::End;
+  # Perl5lib_tempfile is not a global file, so cleanup regardless of lock
+  unlink $Perl5lib_tempfile if defined $Perl5lib_tempfile;
   return unless defined $META->{LOCK};
   return unless -f $META->{LOCK};
   $META->savehist;
   close $META->{LOCKFH};
   unlink $META->{LOCK};
-  unlink $Perl5lib_tempfile if defined $Perl5lib_tempfile;
   # require Carp;
   # Carp::cluck("DEBUGGING");
   if ( $CPAN::CONFIG_DIRTY ) {
@@ -1561,7 +1561,7 @@ sub cleanup {
 sub readhist {
     my($self,$term,$histfile) = @_;
     my($fh) = FileHandle->new;
-    open $fh, "<$histfile" or last;
+    open $fh, "<$histfile" or return;
     local $/ = "\n";
     while (<$fh>) {
         chomp;
@@ -5216,6 +5216,8 @@ sub reanimate_build_dir {
                                 notest
                                 should_report
                                 sponsored_mods
+                                prefs
+                                negative_prefs_cache
                                )) {
                 delete $do->{$skipper};
             }
@@ -6399,7 +6401,7 @@ sub get {
         $self->safe_chdir($sub_wd);
         return;
     }
-    return $self->run_MM_or_MB($local_file);
+    return $self->choose_MM_or_MB($local_file);
 }
 
 #-> CPAN::Distribution::get_file_onto_local_disk
@@ -6614,6 +6616,31 @@ sub parse_meta_yml {
     return $early_yaml;
 }
 
+#-> sub CPAN::Distribution::satisfy_requires ;
+sub satisfy_requires {
+    my ($self) = @_;
+    if (my @prereq = $self->unsat_prereq("later")) {
+        if ($prereq[0][0] eq "perl") {
+            my $need = "requires perl '$prereq[0][1]'";
+            my $id = $self->pretty_id;
+            $CPAN::Frontend->mywarn("$id $need; you have only $]; giving up\n");
+            $self->{make} = CPAN::Distrostatus->new("NO $need");
+            $self->store_persistent_state;
+            die "[prereq] -- NOT OK\n";
+        } else {
+            my $follow = eval { $self->follow_prereqs("later",@prereq); };
+            if (0) {
+            } elsif ($follow) {
+                # signal success to the queuerunner
+                return 1;
+            } elsif ($@ && ref $@ && $@->isa("CPAN::Exception::RecursiveDependency")) {
+                $CPAN::Frontend->mywarn($@);
+                die "[depend] -- NOT OK\n";
+            }
+        }
+    }
+}
+
 #-> sub CPAN::Distribution::satisfy_configure_requires ;
 sub satisfy_configure_requires {
     my($self) = @_;
@@ -6661,8 +6688,8 @@ sub satisfy_configure_requires {
     die "never reached";
 }
 
-#-> sub CPAN::Distribution::run_MM_or_MB ;
-sub run_MM_or_MB {
+#-> sub CPAN::Distribution::choose_MM_or_MB ;
+sub choose_MM_or_MB {
     my($self,$local_file) = @_;
     $self->satisfy_configure_requires() or return;
     my($mpl) = File::Spec->catfile($self->{build_dir},"Makefile.PL");
@@ -7616,7 +7643,8 @@ is part of the perl-%s distribution. To install that, you need to run
         }
     }
     $CPAN::Frontend->myprint(sprintf "Running %s for %s\n", $make, $self->id);
-    $self->get;
+    $self->get; 
+    return if $self->prefs->{disabled} && ! $self->{force_update};
     if ($self->{configure_requires_later}) {
         return;
     }
@@ -7690,6 +7718,9 @@ is part of the perl-%s distribution. To install that, you need to run
                 }
             } else {
                 push @e, "Has already been made";
+                my $wait_for_prereqs = eval { $self->satisfy_requires };
+                return 1 if $wait_for_prereqs;   # tells queuerunner to continue
+                return $self->goodbye($@) if $@; # tells queuerunner to stop
             }
         }
 
@@ -7872,26 +7903,9 @@ is part of the perl-%s distribution. To install that, you need to run
         delete $self->{force_update};
         return;
     }
-    if (my @prereq = $self->unsat_prereq("later")) {
-        if ($prereq[0][0] eq "perl") {
-            my $need = "requires perl '$prereq[0][1]'";
-            my $id = $self->pretty_id;
-            $CPAN::Frontend->mywarn("$id $need; you have only $]; giving up\n");
-            $self->{make} = CPAN::Distrostatus->new("NO $need");
-            $self->store_persistent_state;
-            return $self->goodbye("[prereq] -- NOT OK");
-        } else {
-            my $follow = eval { $self->follow_prereqs("later",@prereq); };
-            if (0) {
-            } elsif ($follow) {
-                # signal success to the queuerunner
-                return 1;
-            } elsif ($@ && ref $@ && $@->isa("CPAN::Exception::RecursiveDependency")) {
-                $CPAN::Frontend->mywarn($@);
-                return $self->goodbye("[depend] -- NOT OK");
-            }
-        }
-    }
+    my $wait_for_prereqs = eval { $self->satisfy_requires };
+    return 1 if $wait_for_prereqs;   # tells queuerunner to continue
+    return $self->goodbye($@) if $@; # tells queuerunner to stop
     if ($CPAN::Signal) {
         delete $self->{force_update};
         return;
@@ -8580,9 +8594,9 @@ sub unsat_prereq {
                             # and 2008-04: #30464 (for 'make test')
                             $CPAN::Frontend->mywarn("Warning: Prerequisite ".
                                                     "'$need_module => $need_version' ".
-                                                    "for '$selfid' already installed ".
+                                                    "for '$selfid' already built ".
                                                     "but the result looks suspicious. ".
-                                                    "Skipping another installation attempt, ".
+                                                    "Skipping another build attempt, ".
                                                     "to prevent looping endlessly.\n"
                                                    );
                             next NEED;
@@ -8809,6 +8823,7 @@ sub test {
         return $self->goto($goto);
     }
     $self->make;
+    return if $self->prefs->{disabled} && ! $self->{force_update};
     if ($CPAN::Signal) {
       delete $self->{force_update};
       return;
@@ -9323,7 +9338,8 @@ sub install {
 
     local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
     $CPAN::META->set_perl5lib;
-    my($pipe) = FileHandle->new("$system $stderr |");
+    my($pipe) = FileHandle->new("$system $stderr |") || Carp::croak
+("Can't execute $system: $!");
     my($makeout) = "";
     while (<$pipe>) {
         print $_; # intentionally NOT use Frontend->myprint because it

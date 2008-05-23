@@ -3,13 +3,28 @@ use strict;
 use Test::More;
 use Config;
 use CPAN::Distroprefs;
+use File::Spec;
 
 eval "require YAML; 1" or plan skip_all => "YAML required";
-plan tests => 4;
+plan tests => 5;
 
 my %ext = (
   yml => 'YAML',
 );
+
+my $finder = CPAN::Distroprefs->find(
+  './distroprefs', \%ext,
+);
+
+my $last = '0';
+my @errors;
+while (my $next = $finder->next) {
+  if ( $next->file lt $last ) {
+      push @errors, $next->file . " lt $last\n";
+  }
+  $last = $next->file;
+}
+is(scalar @errors, 0, "finder traversed alphabetically") or diag @errors;
 
 sub find_ok {
   my ($arg, $expect, $label) = @_;
@@ -52,7 +67,7 @@ find_ok(
   },
   {
     prefs => YAML::LoadFile('distroprefs/HDP.Perl-Version.yml'),
-    prefs_file => 'distroprefs/HDP.Perl-Version.yml',
+    prefs_file => File::Spec->catfile(qw/distroprefs HDP.Perl-Version.yml/),
   },
   'match .yml',
 );
@@ -66,7 +81,7 @@ find_ok(
   },
   {
     prefs => do 'distroprefs/INGY.YAML.dd',
-    prefs_file => 'distroprefs/INGY.YAML.dd',
+    prefs_file => File::Spec->catfile(qw/distroprefs INGY.YAML.dd/),
   },
   'match .dd',
 );

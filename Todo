@@ -1,15 +1,147 @@
+2008-05-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Games::RolePlay::MapGen puzzling fails may need autobundle diffs.
+
+	/home/sand/.cpan/Bundle/Snapshot_2008_05_21_00.pm
+
+2008-05-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* David did some refactoring and now we see that satisfy_requires and
+	satisfy_configure_requires are similar but not foldable into one thing.
+	Is this intentional or are there bugs lurking?
+
+	* "later_for" seems an unused variable, David said. Dispensable or lost
+	in transition? Not lost in transition, rather introduced without a clear
+	mission.
+
+	* bleedperl between 33832 and 33845 broke CPAN::Reporter?
+
+t/51_test_report_fail..................
+#   Failed test 't-MultipleMatch: 'make test' grade explanation correct'
+#   at t/51_test_report_fail.t line 105.
+#          got: ''make test' error detected.'
+#     expected: 'One or more tests failed.'
+# Looks like you failed 1 test of 102.
+ Dubious, test returned 1 (wstat 256, 0x100)
+ Failed 1/102 subtests
+
+	This is in the logfile but I cannot reproduce it.
+
+2008-05-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Kwiki::Test and 5.10.1 tobe have a problem. 33787 is my maint-5.10,
+	33788 my blead. Autobundles in
+
+	    /home/sand/.cpan/Bundle/Snapshot_2008_05_10_0[01].pm
+
+	First suspect File::Path 2.04 vs 2.06?
+
+	http://rt.cpan.org//Ticket/Display.html?id=35761
+
+2008-05-04  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Devel::Profiler
+
+	http://rt.cpan.org/Ticket/Display.html?id=35620
+
+	* new bug in Module::Install? MooseX::Storage declares the dependency
+	"Best" on feature "YAML". Then I set my usual environment variables for
+	Module::Install and nobody asks a question and Best is not being
+	installed. Who's doing wrong?
+
+	To find out, we need a perl without Best.pm. 33711
+
+	Trying on the commandline both
+
+	/home/src/perl/repoperls/installed-perls/perl/pw3p8BE/perl-5.10.0@33711/bin/perl Build.PL
+	and
+	/home/src/perl/repoperls/installed-perls/perl/pw3p8BE/perl-5.10.0@33711/bin/perl Makefile.PL
+
+	ask the right questions, But setting either PERL_AUTOINSTALL=--skip or
+	PERL_EXTUTILS_AUTOINSTALL=--skip leads to no questions asked.
+
+	This is contrary to my expectations but as I'm not sure how
+	Module::Install intends to behave I cannot really tell what's up.
+
+	I filed a ticket against Module::Install to please provide some docs.
+
+	https://rt.cpan.org/Ticket/Display.html?id=35619
+
+2008-05-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* SOAP-WSDL fails sometimes with Can't locate object method "new" via
+	package "SOAP::WSDL::Transport::HTTP"
+
+	Stepping through the debugger reveals it may have to do with the fact
+	that I have Test::Without::Module installed. Because otherwise he skips
+	tests silently.
+
+	http://rt.cpan.org/Ticket/Display.html?id=35610
+
+	* Catalyst-View-Jemplate 0.06 had a few fails recently, the first on May
+	1.
+
+	Jemplate 0.22 seems to break it
+
+    CPAN_FILE    R/RK/RKRIMEN/Jemplate-0.22.tar.gz
+    UPLOAD_DATE  2008-04-29
+
+	There is no older version in the RKRIMEN directory. Previous maintainer
+	was INGY. Downgrading to INGY/Jemplate-0.21? Does not fix it. 0.20 fixes
+	this.
+
+	http://rt.cpan.org//Ticket/Display.html?id=35609
+
+	* DROLSKY/Log-Dispatch-2.21.tar.gz has its first fail ever yesterday.
+
+	Looks like a Params::Validate issue
+
+	k75 33755 0.89 PASS
+	k75 33755 0.90 FAIL
+	k81 32642 0.89 PASS
+	k81 32642 0.90 FAIL
+	k78 5.8.8 0.89 PASS
+	k78 5.8.8 0.90 FAIL
+
+	http://rt.cpan.org/Ticket/Display.html?id=35608
+
+	* SHA256-0.01b has some 64bit issue. All FAILs are systems that have
+	use64bitint set.
+
+	http://rt.cpan.org/Ticket/Display.html?id=33944
+
+2008-04-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* XML::SAX::RTF needs an emergency release
+
+	* Bug in new distroprefs: sorting has been lost
+
+2008-04-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* get-reports: when we get no clue from whatever we try we would like to
+	have an automaton that tests for every possible dependency, calculates a
+	regression and lists them. POE::API::Peek is such a case but also
+	List-Sliding-Changes might be analyzable that way.
+
+	L:S:C is fixed and get-reports did not help. Would have needed more
+	insights into tests but most reports do not provide that especially not
+	when it is a PASS.
+
 2008-04-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* IPC::Run fails today with any perl I try even with perls that have
 	installed it successfully in the past and recent days. Either a
 	dependency on a module has got a new version or something on that system
 	(semaphores?). Interesting is http://rt.cpan.org/Ticket/Display.html?id=28150
+	Locale! distropref written.
 
 2008-04-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Event::Lib seems to need a binarysearch. Might be a Test::Harness issue.
 
 	Ok, came to the conclusion it is Test::Harness 3.0 related.
+
+	http://rt.cpan.org/Ticket/Display.html?id=35355
 
 	* JSON::XS 2.2 is accused to need a binary search but I find it working
 	under many bleadperls and indeed failing with a very old bleedperl
@@ -4460,7 +4592,7 @@ No patch available between 25563 and 25570
 	Schwern made it a ticket:
 	http://rt.cpan.org/Ticket/Display.html?id=29235
 
-	* sorry for the German. This is a bugreport from Slaven decribing that
+	* sorry for the German. This is a bugreport from Slaven describing that
 	eexpect/anyorder is slower than necessary, sometimes annoyingly slow. I
 	confirm and we tried to hash out solutions.
 
