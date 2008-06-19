@@ -1,13 +1,26 @@
 ---
 comment: |
 
-  something is slow during the PL phase
+  something was slow during the PL phase, so it was disabled for a while
+  http://rt.cpan.org//Ticket/Display.html?id=33982 resolved
 
-  http://rt.cpan.org//Ticket/Display.html?id=33982
+  But then I got
+
+  Failing: could not answer a question during the dialog
+  No 'Makefile' created  AGENT/OpenResty-0.3.1.tar.gz
+
+  But no sign of a question visible after 120 seconds.
+
+  But when I call 'perl Makefile.PL' directly then I do see the
+  question:
+
+  "Auto-install the 4 mandatory module(s) from CPAN". Yes, the bundled
+  Module::Install is 0.68.
+  http://rt.cpan.org//Ticket/Display.html?id=36389
 
 match:
   distribution: "AGENT/OpenResty-\d"
-disabled: 1
+disabled: 0
 pl:
   eexpect:
     mode: anyorder

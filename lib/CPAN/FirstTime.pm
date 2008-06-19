@@ -496,20 +496,13 @@ you will need to configure CPAN::Reporter before sending reports.
 
 Email test reports if CPAN::Reporter is installed (yes/no)?
 
-=item threshold_perl5lib_upto
+=item perl5lib_verbosity
 
-If you are using CPAN.pm to test a couple (or thousands) of modules,
-AND you want to do so *without* installing them, then you will
-appreciate support of the @INC extending variety. For details, see the
-mapage for CPAN::PERL5INC.
+When CPAN.pm extends @INC via PERL5LIB, it prints a list of
+directories added (or a summary of how many directories are
+added).  Choose 'v' to get this message, 'none' to suppress it.
 
-To recap quickly: CPAN.pm supports an easy way to extend @INC (by
-stuffing all paths of tested but uninstalled modules into the
-environment variable PERL5LIB). And, for larger installations, a
-method that has PERL5OPT involved and the large @INC is written to
-disk. After how many distros shall we switch to the slower method?
-Recommended default is 24 which should be safe on all systems even
-with very long path components.
+Verbosity level for PERL5LIB changes (none or v)?
 
 =item trust_test_report_history
 
@@ -675,7 +668,6 @@ sub init {
                        cpan_home
                        keep_source_where
                        prefs_dir
-                       threshold_perl5lib_upto
                       } =~ /$matcher/) {
         $CPAN::Frontend->myprint($prompts{config_intro});
 
@@ -759,13 +751,6 @@ Shall we use it as the general CPAN build and cache directory?
 
         if (!$matcher or 'build_dir_reuse' =~ /$matcher/) {
             my_yn_prompt(build_dir_reuse => 0, $matcher);
-        }
-
-        if (!$matcher or 'threshold_perl5lib_upto' =~ /$matcher/) {
-            my_dflt_prompt("threshold_perl5lib_upto",
-                           24,
-                           $matcher,
-                          );
         }
 
         if (!$matcher or 'prefs_dir' =~ /$matcher/) {
@@ -987,6 +972,11 @@ substitute. You can then revisit this dialog with
 
     if (!$matcher or 'load_module_verbosity' =~ /$matcher/) {
         my_prompt_loop(load_module_verbosity => 'v', $matcher,
+                       'none|v');
+    }
+
+    if (!$matcher or 'perl5lib_verbosity' =~ /$matcher/) {
+        my_prompt_loop(perl5lib_verbosity => 'v', $matcher,
                        'none|v');
     }
 

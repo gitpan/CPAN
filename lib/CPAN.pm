@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_62';
+$CPAN::VERSION = '1.92_63';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -21,7 +21,6 @@ use CPAN::Debug;
 use CPAN::Queue;
 use CPAN::Tarzip;
 use CPAN::DeferedCode;
-use CPAN::PERL5INC; # must come after absification
 use Carp ();
 use Config ();
 use Cwd qw(chdir);
@@ -111,7 +110,6 @@ use vars qw(
             $Have_warned
             $MAX_RECURSION
             $META
-            $Perl5lib_tempfile
             $RUN_DEGRADED
             $Signal
             $SQLite
@@ -513,31 +511,30 @@ sub _yaml_loadfile {
         # temporarly enable yaml code deserialisation
         no strict 'refs';
         # 5.6.2 could not do the local() with the reference
-        local ${"$yaml_module\::LoadCode"};
+        # so we do it manually instead
+        my $old_loadcode = ${"$yaml_module\::LoadCode"};
         ${ "$yaml_module\::LoadCode" } = $CPAN::Config->{yaml_load_code} || 0;
 
-        my $code;
+        my ($code, @yaml);
         if ($code = UNIVERSAL::can($yaml_module, "LoadFile")) {
-            my @yaml;
             eval { @yaml = $code->($local_file); };
             if ($@) {
                 # this shall not be done by the frontend
                 die CPAN::Exception::yaml_process_error->new($yaml_module,$local_file,"parse",$@);
             }
-            return \@yaml;
         } elsif ($code = UNIVERSAL::can($yaml_module, "Load")) {
             local *FH;
             open FH, $local_file or die "Could not open '$local_file': $!";
             local $/;
             my $ystream = <FH>;
-            my @yaml;
             eval { @yaml = $code->($ystream); };
             if ($@) {
                 # this shall not be done by the frontend
                 die CPAN::Exception::yaml_process_error->new($yaml_module,$local_file,"parse",$@);
             }
-            return \@yaml;
         }
+        ${"$yaml_module\::LoadCode"} = $old_loadcode;
+        return \@yaml;
     } else {
         # this shall not be done by the frontend
         die CPAN::Exception::yaml_not_installed->new($yaml_module, $local_file, "parse");
@@ -908,7 +905,6 @@ use vars qw(
              "CPAN/FirstTime.pm",
              "CPAN/HandleConfig.pm",
              "CPAN/Kwalify.pm",
-             "CPAN/PERL5INC.pm",
              "CPAN/Queue.pm",
              "CPAN/Reporter/Config.pm",
              "CPAN/Reporter/History.pm",
@@ -1542,8 +1538,6 @@ sub cleanup {
         $subroutine eq '(eval)';
   }
   return if $ineval && !$CPAN::End;
-  # Perl5lib_tempfile is not a global file, so cleanup regardless of lock
-  unlink $Perl5lib_tempfile if defined $Perl5lib_tempfile;
   return unless defined $META->{LOCK};
   return unless -f $META->{LOCK};
   $META->savehist;
@@ -1629,6 +1623,8 @@ sub _list_sorted_descending_is_tested {
 }
 
 #-> sub CPAN::set_perl5lib
+# Notes on max environment variable length:
+#   - Win32 : XP or later, 8191; Win2000 or NT4, 2047
 {
 my $fh;
 sub set_perl5lib {
@@ -1648,56 +1644,23 @@ sub set_perl5lib {
 
     my @dirs = map {("$_/blib/arch", "$_/blib/lib")} $self->_list_sorted_descending_is_tested;
     return if !@dirs;
-    my $yaml_module = CPAN::_yaml_module;
 
-    if ($CPAN::META->has_inst($yaml_module)
-        && $CPAN::META->has_usable("File::Temp")
-        && !$ENV{PERL5OPT}) {
-        unless (defined $fh) {
-            $fh =
-                File::Temp->new(
-                                dir      => File::Spec->tmpdir,
-                                template => 'cpan_perl5inc_XXXX',
-                                suffix   => '.txt',
-                                unlink   => 0,
-                               );
-            $Perl5lib_tempfile = $fh->filename;
-        }
-    }
-    my $cctpu = defined $CPAN::Config->{threshold_perl5lib_upto} ? $CPAN::Config->{threshold_perl5lib_upto} : 24;
-    if (@dirs < 12 && @dirs < $cctpu) {
-        $CPAN::Frontend->myprint("Prepending @dirs to PERL5LIB for '$for'\n");
+    if (@dirs < 12) {
+        $CPAN::Frontend->optprint('perl5lib', "Prepending @dirs to PERL5LIB for '$for'\n");
         $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
-    } elsif (@dirs < 24 && @dirs < $cctpu) {
+    } elsif (@dirs < 24 ) {
         my @d = map {my $cp = $_;
                      $cp =~ s/^\Q$CPAN::Config->{build_dir}\E/%BUILDDIR%/;
                      $cp
                  } @dirs;
-        $CPAN::Frontend->myprint("Prepending @d to PERL5LIB; ".
+        $CPAN::Frontend->optprint('perl5lib', "Prepending @d to PERL5LIB; ".
                                  "%BUILDDIR%=$CPAN::Config->{build_dir} ".
                                  "for '$for'\n"
                                 );
         $ENV{PERL5LIB} = join $Config::Config{path_sep}, @dirs, @env;
-    } elsif (@dirs >= $cctpu && $Perl5lib_tempfile) {
-        my $cnt = keys %{$self->{is_tested}};
-        $CPAN::Frontend->myprint("Delegating blib/arch and blib/lib of ".
-                                 "$cnt build dirs to CPAN::PERL5INC via $Perl5lib_tempfile; ".
-                                 "for '$for'\n"
-                                );
-        my $inc = File::Basename::dirname(File::Basename::dirname($INC{"CPAN/PERL5INC.pm"}));
-        $ENV{PERL5LIB} = $inc;
-        $ENV{PERL5OPT} = "-MCPAN::PERL5INC=yaml_module,$yaml_module,tempfile,$Perl5lib_tempfile";
-        seek $fh, 0, 0;
-        truncate $fh, 0;
-        CPAN->_yaml_dumpfile($fh,{ inc => [@dirs,@env] });
-        $fh->flush();
     } else {
         my $cnt = keys %{$self->{is_tested}};
-#        $CPAN::Frontend->mywarn("Your PERL5LIB is growing (now $cnt distros) but we cannot ".
-#                                "switch to the PERL5OPT method of extending \@INC; installation ".
-#                                "of a YAML module is highly recommended; see the manpage ".
-#                                "of CPAN::PERL5INC for further information\n");
-        $CPAN::Frontend->myprint("Prepending blib/arch and blib/lib of ".
+        $CPAN::Frontend->optprint('perl5lib', "Prepending blib/arch and blib/lib of ".
                                  "$cnt build dirs to PERL5LIB; ".
                                  "for '$for'\n"
                                 );
@@ -3205,7 +3168,7 @@ sub format_result {
 # to turn colordebugging on, write
 # cpan> o conf colorize_output 1
 
-#-> sub CPAN::Shell::print_ornamented ;
+#-> sub CPAN::Shell::colorize_output ;
 {
     my $print_ornamented_have_warned = 0;
     sub colorize_output {
@@ -3250,7 +3213,7 @@ sub print_ornamented {
             print "Term::ANSIColor rejects color[$ornament]: $@\n
 Please choose a different color (Hint: try 'o conf init /color/')\n";
         }
-        # GGOLDBACH/Test-GreaterVersion-0.008 broke wthout this
+        # GGOLDBACH/Test-GreaterVersion-0.008 broke without this
         # $trailer construct. We want the newline be the last thing if
         # there is a newline at the end ensuring that the next line is
         # empty for other players
@@ -11266,6 +11229,7 @@ defined:
   pager              location of external program more (or any pager)
   password           your password if you CPAN server wants one
   patch              path to external prg
+  perl5lib_verbosity verbosity level for PERL5LIB additions
   prefer_installer   legal values are MB and EUMM: if a module comes
                      with both a Makefile.PL and a Build.PL, use the
                      former (EUMM) or the latter (MB); if the module
@@ -11290,8 +11254,6 @@ defined:
                      (and nonsense for characters outside latin range)
   term_ornaments     boolean to turn ReadLine ornamenting on/off
   test_report        email test reports (if CPAN::Reporter is installed)
-  threshold_perl5lib_upto
-                     threshold determining method to extend @INC at runtime
   trust_test_report_history
                      skip testing when previously tested ok (according to
                      CPAN::Reporter history)

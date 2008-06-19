@@ -13,7 +13,7 @@ comment: |
   2007-12-02 akoenig: removed ADAMK/Module-Install-\d from the list of
   banned modules. Unfortunately some authors declare it as a prereq. I
   know it is not meant to be installed but I cannot stop other people
-  declare it as prereq. So If I refuse toe install it, something else
+  declare it as prereq. So If I refuse to install it, something else
   cannot be installed. So I give up resistance. The original reason
   was that it was repeatedly leading to behaviour that I could not
   explain. I'll have to deal with that.
@@ -43,11 +43,12 @@ match:
     |CORLISS/CursesWidgets-\d
     |DDUMONT/Tk-ObjEditor-2.004.tar.gz       # http://rt.cpan.org/Ticket/Display.html?id=29559
     |DMAKI/Text-MeCab                        # hangs asking questions
+    |DSNOPEK/POE-Component-MessageQueue-0.2.2.tar.gz # hangs in 09_ack_auto (but not on k81)
     |DOM/CGI-Wiki-\d                         # asks database questions
     |ECALDER/Proc-PID-File-1.24.tar.gz       # hangs during test.pl
     |EIJABB/MARC-Errorchecks-1.13.tar.gz     # complicated interactivity in make test
     |EKAWAS/MOBY-                            # hangs
-    |ERIC/OpenThought-\d                     # too old MI, 0.63 in 1.99.16, RT 33279
+    |EWILHELM/HTTP-Server-Simple-Er-v0.0.3.tar.gz # hangs on some perls
     |ERIKRAY/XML-SAX-RTF-0                   # harmful: http://rt.cpan.org/Public/Bug/Display.html?id=5943
     |GAISSMAI/Net-SNMP-Mixin-\d              # asks questions about SNMP server
     |GONERI/Ocsinventory-Agent-0.0.8.tar.gz  # hangs
@@ -55,6 +56,8 @@ match:
     |GRICHTER/DBIx-Recordset-\d              # hangs
     |GRM/
     |GRODITI/POE-Component-DirWatch-\d       # the 03editedfile or so seems to take forever
+    |HANENKAMP/Bot-Net-0.1.0                 # hangs during test t/TestNet/t/atoz-peer.t
+    |HOOO/X3D-0                              # hangs at t/nodefield_sfdouble_06 on perl-5.10.0 at 33955
     |IMACAT/DbFramework-\d                   # asks questions but I have not time
     |IMACAT/arclog-3.\d                      # one test (01-exhaust) hangs with several perls
     |JEZRA/Finance-TickerSymbols             # talks endlessly with some ticker sites
@@ -64,8 +67,7 @@ match:
     |KARMAN/Catalyst-Authentication-Store-LDAP-\d # hangs
     |KAZUHO/Parallel-Prefork-0.02            # hangs
     |KESTEB/POE-Component-Client-Stomp-0.05.tar.gz # hangs in t/02_basic.t with 5.10 proper
-    |KNORR/Net-                              # no questions during make test please
-    |KNORR/Net-MirrorDir                     # asks questions
+    |KMACLEOD/XML-Grove-0.46alpha.tar.gz     # (1999) seems to be unmaintained
     |KORTY/
     |LUPE/Filesys-SamFS-\d                   # have no SamFS
     |LZE/CGI-CMS-\d                          # asks questions about paths
@@ -74,13 +76,15 @@ match:
     |MISHIKAL/Net-LDAPapi-\d                 # gives gooood advice and stops
     |MLEHMANN/Deliantra                      # looks complicated and not using CheckLib
     |MSCHWERN/Test-Fork-0.01_01.tar.gz       # test hangs
+    |MSERGEANT/XML-miniXQL-0.04.tar.gz       # rest in peace: missing dependency decl on XML::Parser but so old (1999) that I do not want to RT it
     |MTHURN/Net-Address-Ethernet-\d          # interactive questions that we cannot answer as a bot
     |MTHURN/WWW-Search-Yahoo-\d              # hangs in t/china.t
     |NUFFIN/POE-Component-Supervisor-0.01.tar.gz # hangs during t/04_global_restart_policy.
+    |NUFFIN/POE-Component-Supervisor-0.02.tar.gz # hangs during t/04_global_restart_policy. for some of our maint-5.8
     |OALDERS/URI-ParseSearchString-More-0.04
     |PHILIPS/DBIx-MyParse-\d                 # too complicated to set up (mysql source etc.)
-    |PMIC/parrot-0.5.3.tar.gz                # hangs after testing ctags 
-    |RJRAY/RPC-XML-0.60.tar.gz               # hangs
+    |PMIC/parrot-0.5.3.tar.gz                # hangs after testing ctags
+    |RHANDOM/Template-Alloy-XS-\d            # very hungry for memory, made amd64 unuseable
     |RURBAN/B-Debugger-0.01_03.tar.gz        # hangs with perl-5.8.8 at 33430 during test.pl
     |RYBSKEJ/forks-0.25
     |SAPER/CPAN-Dependency-0.1[25]           # hangs in t/02internals: strace select(16, [4 8], NULL, NULL, NULL <unfinished ...>
@@ -92,6 +96,7 @@ match:
     |TTY/kurila-\d                           # asks too many questions
     |TURNERJW/
     |TURNERMM/HTML-WikiConverter-DokuWikiFCK- # hangs very early
+    |URI/Stem-\d                             # asks questions about conf directories
     |VPIT/IPC-MorseSignals-\d                # hangs too often (see Todo)
     |WONKO/CGI-Application-Dispatch          # endless loop
     |WSMITH/RPC-Oracle-\d                    # asks username for Oracle

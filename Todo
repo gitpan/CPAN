@@ -1,3 +1,176 @@
+2008-06-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Sys-Syscall-0.22 hangs with 34066 (maint-5.8) during 02-sendfile. That
+	makes Danga-Socket a DISCARD. Hmm. And then Perlbal hangs in its test.
+	Hmm.
+
+2008-06-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: report Data::Float the bug to switch to "traditional" instead of
+	"passthrough".
+
+	https://rt.cpan.org/Ticket/Display.html?id=36731
+
+2008-06-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* As the last time in 2008-03-08 today I hit the Makefile.PLs written by
+	Module::Build::Compat "passthough" model. This time with
+	Data-Float-0.009 and Text-SimpleTable-0.03. Why does this perl have no
+	Module::Build? I thought my megainstall rules install it because they
+	install Bundle::CPANxxl? Yes, I do. But M:B FAILs with current
+	5.8.9-tobe. Is it Test::Harness 3.11? At line 675 we install T:H 3.11
+	and at 950 we fail the test compat.t, so yes, this is with 3.11.
+
+	Retrying with 33994 I see T:H 3.11 fail in its
+	t/compat/test-harness-compat.t. It has 3.10 and M:B PASSes.
+
+	Retrying with 33935 I see M:B PASS with T:H 3.10. Here T:H 3.11 PASSes
+	and is now installed. Testing M:B again FAILs on its t/compat.t test.
+
+	Retrying with what next? I would like to have a stock 5.8.8 as it comes
+	with just the bare metal.... Not needed because AndyA apparently
+	already knows (witnessed on #p5p)
+
+	Workaround is to force install M:B.
+
+2008-06-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* URI::Escape::XS has 10 fails all of which have useperlio, usemymalloc,
+	ld=cc, intsize=4, hint=recommended, dlsrc=dl_dlopen.xs,
+	d_longlong=define, ccversion="", cc=cc, alignbytes=4. But what does that
+	tell us?
+
+	perl bin/quidi-getreports.pl -q=conf:intsize URI-Escape-XS | perl -nale 'if ($F[0] eq "FAIL"){ print "~/var/cpantesters/nntp-testers/$F[1]"}'|xargs echo
+
+	With this list we can grep for the test failure (it is always 03-hashu.
+	Uniq -c gives us:
+
+      1 #   Failed test 'decodeURI(&quot;%uD869&quot;)'
+      9 #   Failed test 'decodeURI(&quot;%uD869%uDEB2%u5F3E%u0064&quot;)'
+
+	The shorter one is /home/k/var/cpantesters/nntp-testers/1595927 from chris.
+
+	No clue.
+
+2008-05-31  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* There seems to be a bug when the user has makepl_args and the
+	distroprefs file has other pl/args.
+
+2008-05-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* flock on windows is mandatory -- mail from Jan Dubois
+
+2008-05-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* what's the matter with maint-5.10? need a perl between 33823 and 33921
+	and because 33921 does not build I must read the available perls in the
+	APC directory:
+
+	% ls APC/perl-5.10.x-diffs
+
+	Trying 33883. Trying lots of older 5.10s which all must have worked some
+	time before because I do not think the I have skipped testing often. All
+	fail in the same way. Some debian upgrade must have broken something.
+	For the record:
+
+ok 385 - Archive type recognized properly
+not ok 386 - extract() for 'x.lzma' reports success
+
+#   Failed test 'extract() for 'x.lzma' reports success'
+#   at ../lib/Archive/Extract/t/01_Archive-Extract.t line 334.
+ok 387 - No errors capturing buffers
+not ok 388 - Found correct number of output files
+
+#   Failed test 'Found correct number of output files'
+#   at ../lib/Archive/Extract/t/01_Archive-Extract.t line 356.
+#          got: '0'
+#     expected: '1'
+Modification of non-creatable array value attempted, subscript -1 at ../lib/Archive/Extract/t/01_Archive-Extract.t line 358.
+1..388
+# Looks like you failed 2 tests of 388.
+# Looks like your test died just after 388.
+dubious
+        Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 386, 388
+        Failed 2/388 tests, 99.48% okay
+Failed Test                               Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+../lib/Archive/Extract/t/01_Archive-Extra  255 65280   388    2  386 388
+Failed 1/1 test scripts. 2/388 subtests failed.
+Files=1, Tests=388,  3 wallclock secs ( 1.05 cusr +  0.34 csys =  1.39 CPU)
+
+	But Archive::Extract from CPAN passes its tests.
+
+	Look, the x.lzma files in perl and in Archive::Extract differ:
+
+% md5sum ~/.cpan/build/Archive-Extract-0.26-t7pU2J/t/src/x.lzma ./x.lzma
+44c17dfa72c5277ff13518c9214f8a02  /home/sand/.cpan/build/Archive-Extract-0.26-t7pU2J/t/src/x.lzma
+447ad6244441d9cccfa8ab690b6cd035  ./x.lzma
+>sand@k75:/home/src/perl/repoperls/perl-m-5.10.0@33942/lib/Archive/Extract/t/src% cmp -l ~/.cpan/build/Archive-Extract-0.26-t7pU2J/t/src/x.lzma ./x.lzma
+ 1 135  43
+ 2   0  43
+ 3   0  43
+ 4 200  43
+ 5   0  43
+ 6   0  43
+ 7   0  43
+ 8   0  43
+ 9   0  43
+10   0  43
+11   0  43
+12   0  43
+13   0  43
+14   0  43
+15   0  43
+16   0  43
+17   0  43
+18   0  43
+cmp: EOF auf /home/sand/.cpan/build/Archive-Extract-0.26-t7pU2J/t/src/x.lzma.
+
+	What? The test file in the CPAN distro is only 18 bytes? Bleedperl's
+	also has only 18 bytes.
+
+	see http://public.activestate.com/cgi-bin/perlbrowse/r///depot/maint-5.10/perl/lib/Archive/Extract/t/src/x.lzma.packed which says:
+
+//depot/maint-5.10/perl/lib/Archive/Extract/t/src/x.lzma.packed
+... #2 change 33943 integrate on 2008/05/28 by davem@davem-pigeon (text) 'Integrate: [ 33414] Subject: [p'
+... ... copy from //depot/perl/lib/Archive/Extract/t/src/x.lzma.packed#2
+... #1 change 33113 branch on 2008/01/29 by nicholas@nicholas-saigo (text) 'Integrate: [ 32652] Upgrade to '
+... ... branch from //depot/perl/lib/Archive/Extract/t/src/x.lzma.packed#1
+
+	And the same for bleadperl http://public.activestate.com/cgi-bin/perlbrowse/r///depot/perl/lib/Archive/Extract/t/src/x.lzma.packed
+
+//depot/perl/lib/Archive/Extract/t/src/x.lzma.packed
+... #2 change 33470 edit on 2008/03/10 by rgs@scipion (text) 'Subject: Re: [PATCH] make Archi'
+... ... copy into //depot/maint-5.10/perl/lib/Archive/Extract/t/src/x.lzma.packed#2
+... #1 change 33098 add on 2008/01/28 by stevep@stevep-kirk (text) 'Upgrade to Archive-Extract-0.26'
+... ... branch into //depot/maint-5.10/perl/lib/Archive/Extract/t/src/x.lzma.packed#1
+
+	main-5.10 has the packed file instead of the unpacked one. So who calls
+	uupacktool and how?
+
+	Ahh, 33943 must fix it. My last try was 33942.
+
+2008-05-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* >>>>> On Sun, 25 May 2008 12:53:15 -0400, "David Golden" said:
+
+  > So here's what I think should be the logic, more or less:
+
+  > * under "install", all 'requires' must be satisfied without adding
+  > build directories to PERL5LIB or else they need to be queued.  All
+  > "build_requires" must be satisfied including build directories or they
+  > need to be queued.
+
+  > * under "test/make", "requires" or "build_requires" must be satisfied
+  > including build directories or they need to be queued
+
+  > What do you think?
+
+	Excellent summary. This will indeed allow the user to mix install and
+	make/test commands.
+
 2008-05-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Games::RolePlay::MapGen puzzling fails may need autobundle diffs.
@@ -714,6 +887,18 @@ This module requires Module::Build to install itself.
 
 	Aha. This is a special Module::Build silliness that calls CPAN
 	recursively to install Module::Build::Compat. If you say no, it dies.
+
+	update 2008-06-12 akoenig : what's the politically correct way to deal
+	with this Makefile.PL nowadays? Large Module::Build::Compat thread at
+	http://www.nntp.perl.org/group/perl.perl5.porters/2008/01/msg133202.html
+	(just a random point in the middle), no conclusion there. My conclusion:
+	install Module::Build really early and never see this discussion again.
+	And if Module::Build cannot be built? When this happens it will be fixed
+	within days or we can force install it and with 5.10 this is moot.
+
+	Nope, changing mind again. If there is no reason to use "passthrough",
+	they really should use "traditional", the only sane option when there is
+	no special reason why you'd absolutely need Module::Build.
 
 2008-03-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
