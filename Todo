@@ -1,8 +1,208 @@
+2008-08-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* it has already been reported as http://rt.cpan.org/Ticket/Display.html?id=36912
+
+	Hook::Filter has a use_ok in a BEGIN block. Only reached one of several
+	things is missing because then it is a skip_all. use_ok in BEGIN block?
+	Wasn't this allowed in old times due to a Test::Simple bug? Yes. I added
+	a comment to the ticket.
+
+2008-07-17  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* mixed success with JSON::XS. At least a first binary search
+	demonstrates that there must be some problem.
+
+----Program----
+eval q{use JSON::XS 2.22};
+print $@ ? "N/A" : "OK";
+print "\n";
+
+----Output of .../pQYroRO/perl-5.9.3@27322/bin/perl----
+OK
+
+----EOF ($?='0')----
+----Output of .../piMBZQp/perl-5.9.3@27323/bin/perl----
+N/A
+
+----EOF ($?='0')----
+
+	Is it a Test::Harness problem? The test output looks OK but the summary
+	says FAIL. T:H is up to date, 3.12. Upgrading CPAN from 1.9205 to
+	1.92_63. Upgrading CPAN::Reporter from 1.1601 to 1.16_51.
+
+	Still same bad result.
+
+	Upgrading to Test::Harness::Straps 0.30 No success
+
+cpan[5]> install JSON::XS
+Running install for module 'JSON::XS'
+Running make for M/ML/MLEHMANN/JSON-XS-2.22.tar.gz
+  Has already been unwrapped into directory /home/sand/.cpan/build/JSON-XS-2.22-bEP80n                                                                          
+  Has already been made
+Running make test
+PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/perl/piMBZQp/perl-5.9.3@27323/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00_load...............ok
+t/01_utf8...............ok
+t/02_error.............. All 31 subtests passed
+t/03_types..............ok
+t/04_dwiw_encode........ok
+t/05_dwiw_decode........ok
+t/06_pc_pretty..........ok
+t/07_pc_esc.............ok
+t/08_pc_base............ok
+t/09_pc_extra_number....ok
+t/10_pc_keysort.........ok
+t/11_pc_expo............ok
+t/12_blessed............ok
+t/13_limit..............ok
+t/14_latin1.............ok
+t/15_prefix.............ok
+t/16_tied...............ok
+t/17_relaxed............ok
+t/18_json_checker.......ok
+t/19_incr...............ok
+t/99_binary.............ok
+
+Test Summary Report
+-------------------
+Files=21, Tests=25547, 24 wallclock secs ( 9.90 usr  0.04 sys + 13.26 cusr  0.25 csys = 23.45 CPU)
+Result: FAIL
+Failed 1/21 test programs. 0/25547 subtests failed.
+
+
+	Most probably the t/02error.t thing, it has no "ok".
+
+	Oh no! I saw the above thing several times and now I retried and it has
+	disappeared with that same perl @27323.
+
+2008-07-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* DBD-Pg on k81 hangs forever asking for 'Path to pg_config?'
+
+	* STEVAN/FCGI-Engine-0.04 seems to hang forever
+
+2008-07-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* App-Control-1.02 seems to call the wrong perl and when it then fails
+	it goes into a--fortunately slow--endless loop. Need to investigate
+	soonish if nobody beats me to it.
+
+2008-07-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* XML::RSS::Tools has three FAILS that nobody else reported but me.
+
+	Manually reproducable with 5.10.0 () and ParseReport does not lead me in
+	any direction.
+
+	So I decide to upgrade random pieces.
+
+	I come by Archive::Any and I see it fail the same way as XML::RSS::Tools!!!
+
+t/type............
+#   Failed test 'right warning, unknown type'
+#   at t/type.t line 15.
+# found carped warning: uplevel 2 is more than the caller stack at /home/src/perl/repoperls/installed-perls/perl/pVNtS9N/perl-5.8.0@32642/lib/site_perl/5.10.0/Test/Warn.pm line 283
+# found warning: No mime type found for type 'hominawoof' at /home/sand/.cpan/build/Archive-Any-0.0932-SZsz9I/blib/lib/Archive/Any.pm line 169.
+# expected to find warning: (?-xism:No mime type found for type 'hominawoof')
+
+#   Failed test 'right warning, no type'
+#   at t/type.t line 19.
+# found carped warning: uplevel 2 is more than the caller stack at /home/src/perl/repoperls/installed-perls/perl/pVNtS9N/perl-5.8.0@32642/lib/site_perl/5.10.0/Test/Warn.pm line 283
+# found warning: No handler available for type 'text/plain' at /home/sand/.cpan/build/Archive-Any-0.0932-SZsz9I/blib/lib/Archive/Any.pm line 179.
+# expected to find warning: (?-xism:No handler available for type 'text/plain')
+# Looks like you failed 2 tests of 7.
+ Dubious, test returned 2 (wstat 512, 0x200)
+ Failed 2/7 subtests 
+
+Test Summary Report
+-------------------
+t/type        (Wstat: 512 Tests: 7 Failed: 2)
+  Failed tests:  5, 7
+
+
+	Test-Warn has many used-by and many dependencies. I pick for example
+	dependency on Sub::Uplevel and this perl has 0.19_03.
+
+	Only few have 0.19_03 installed. And indeed, downgrading to 0.1901 fixes
+	the issue.
+
+2008-07-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Math-BaseCalc
+
+	1802488 1802531 1813504 1814071 1819368 1823811 1826225 
+
+2008-06-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	*  rt-perl-22977
+
+----Program----
+sub f ($); # Comment out to get right result!
+sub f ($) {
+        my $test = $_[0];
+        write;
+        format STDOUT =
+@<<<<<<<
+$test
+.
+}
+f(1);
+f(2);
+
+----Output of .../pMZAcVt/perl-5.8.0@19648/bin/perl----
+1
+1
+
+----EOF ($?='0')----
+----Output of .../pgL2gwc/perl-5.8.0@19649/bin/perl----
+
+----EOF ($?='11')----
+
+
+2008-06-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Email-Simple 2.004/2.003: During the latest megainstall I installed
+	first 2.004 and later 2.003 for whatever reason. And then, when he tried
+	to install Email-Simple-FromHandle, he complained that 2.003 was
+	insufficient.
+
+	http://rt.cpan.org/Ticket/Display.html?id=37144
+
 2008-06-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Sys-Syscall-0.22 hangs with 34066 (maint-5.8) during 02-sendfile. That
 	makes Danga-Socket a DISCARD. Hmm. And then Perlbal hangs in its test.
 	Hmm.
+
+	update 2008-06-23: 34074@bleadperl also hangs. 34053 too. Why did I not
+	notice that? 33949 same. Aha: since Jun 15 there is process 9195 running
+	occupying port 60001, owned by sand, parent is 1 and it has plenty
+	children. I kill it and run the tests for 33949 again. Doesn't help. Now
+	process 21113, testing some t/31-realworld.t has occupied port 60001.
+
+	When I kill that then the Syscall test runs through.
+
+	Whose bug is that? I'd say Sys::Syscall should fail more gracefully
+	instead of just hanging.
+
+	Retrying 34053: now Sys-Syscall-0.22/t/01-epoll.t fails! But at least
+	without hanging. Same with 33949:
+
+t/01-epoll.........
+#   Failed test 'made temp listening socket'
+#   at t/01-epoll.t line 61.
+Can't use an undefined value as a symbol reference at t/01-epoll.t line 62.
+# Looks like you planned 20 tests but only ran 13.
+# Looks like you failed 1 test of 13 run.
+# Looks like your test died just after 13.
+ Dubious, test returned 255 (wstat 65280, 0xff00)
+ Failed 8/20 subtests 
+
+	Of course, there's process 9193 listening on 60000 since Jun 15.
+
+	And now epoll runs through everywhere.
+
+	http://rt.cpan.org/Ticket/Display.html?id=37075
 
 2008-06-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 

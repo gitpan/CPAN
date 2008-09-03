@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.92_63';
+$CPAN::VERSION = '1.92_64';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -1554,6 +1554,8 @@ sub cleanup {
 #-> sub CPAN::readhist
 sub readhist {
     my($self,$term,$histfile) = @_;
+    my $histsize = $CPAN::Config->{'histsize'} || 100;
+    $term->Attribs->{'MaxHistorySize'} = $histsize if (defined($term->Attribs->{'MaxHistorySize'}));
     my($fh) = FileHandle->new;
     open $fh, "<$histfile" or return;
     local $/ = "\n";
@@ -3902,12 +3904,13 @@ sub _add_to_statistics {
         push @debug, scalar @{$fullstats->{history}} if $sdebug;
         push @debug, time if $sdebug;
         push @{$fullstats->{history}}, $stats;
-        # arbitrary hardcoded constants until somebody demands to have
-        # them settable; YAML.pm 0.62 is unacceptably slow with 999;
+        # YAML.pm 0.62 is unacceptably slow with 999;
         # YAML::Syck 0.82 has no noticable performance problem with 999;
+        my $ftpstats_size = $CPAN::Config->{ftpstats_size} || 99;
+        my $ftpstats_period = $CPAN::Config->{ftpstats_period} || 14;
         while (
-               @{$fullstats->{history}} > 99
-               || $time - $fullstats->{history}[0]{start} > 14*86400
+               @{$fullstats->{history}} > $ftpstats_size
+               || $time - $fullstats->{history}[0]{start} > 86400*$ftpstats_period
               ) {
             shift @{$fullstats->{history}}
         }
@@ -3927,9 +3930,40 @@ sub _add_to_statistics {
         }
         # Win32 cannot rename a file to an existing filename
         unlink($sfile) if ($^O eq 'MSWin32');
+	_copy_stat($sfile, "$sfile.$$") if -e $sfile;
         rename "$sfile.$$", $sfile
             or $CPAN::Frontend->mydie("Could not rename '$sfile.$$' to '$sfile': $!\n");
     }
+}
+
+# Copy some stat information (owner, group, mode and) from one file to
+# another.
+# This is a utility function which might be moved to a utility repository.
+#-> sub CPAN::FTP::_copy_stat
+sub _copy_stat {
+    my($src, $dest) = @_;
+    my @stat = stat($src);
+    if (!@stat) {
+	$CPAN::Frontend->mywarn("Can't stat '$src': $!\n");
+	return;
+    }
+
+    eval {
+	chmod $stat[2], $dest
+	    or $CPAN::Frontend->mywarn("Can't chmod '$dest' to " . sprintf("0%o", $stat[2]) . ": $!\n");
+    };
+    warn $@ if $@;
+    eval {
+	chown $stat[4], $stat[5], $dest
+	    or do {
+		my $save_err = $!; # otherwise it's lost in the get... calls
+		$CPAN::Frontend->mywarn("Can't chown '$dest' to " .
+					(getpwuid($stat[4]))[0] . "/" .
+					(getgrgid($stat[5]))[0] . ": $save_err\n"
+				       );
+	    };
+    };
+    warn $@ if $@;
 }
 
 # if file is CHECKSUMS, suggest the place where we got the file to be
@@ -5185,18 +5219,7 @@ sub reanimate_build_dir {
                 delete $do->{$skipper};
             }
             # $DB::single = 1;
-            if ($do->{make_test}
-                && $do->{build_dir}
-                && !(UNIVERSAL::can($do->{make_test},"failed") ?
-                     $do->{make_test}->failed :
-                     $do->{make_test} =~ /^YES/
-                    )
-                && (
-                    !$do->{install}
-                    ||
-                    $do->{install}->failed
-                   )
-               ) {
+            if ($do->tested_ok_but_not_installed) {
                 $CPAN::META->is_tested($do->{build_dir},$do->{make_test}{TIME});
             }
             $restored++;
@@ -5391,6 +5414,10 @@ happen.\a
         # 1.57 we assign remaining text to $comment thus allowing to
         # influence isa_perl
         my($mod,$version,$dist,$comment) = split " ", $_, 4;
+        unless ($mod && defined $version && $dist) {
+            $CPAN::Frontend->mywarn("Could not split line[$_]\n");
+            next;
+        }
         my($bundle,$id,$userid);
 
         if ($mod eq 'CPAN' &&
@@ -6099,8 +6126,7 @@ sub normalize {
         $s !~ m|[A-Z]/[A-Z-]{2}/[A-Z-]{2,}/|
        ) {
         return $s if $s =~ m:^N/A|^Contact Author: ;
-        $s =~ s|^(.)(.)([^/]*/)(.+)$|$1/$1$2/$1$2$3$4| or
-            $CPAN::Frontend->mywarn("Strange distribution name [$s]\n");
+        $s =~ s|^(.)(.)([^/]*/)(.+)$|$1/$1$2/$1$2$3$4|;
         CPAN->debug("s[$s]") if $CPAN::DEBUG;
     }
     $s;
@@ -6169,6 +6195,25 @@ sub base_id {
     $base_id =~ s{\.(?:tar\.(bz2|gz|Z)|t(?:gz|bz)|zip)$}{}i;
     return $base_id;
 }
+
+#-> sub CPAN::Distribution::tested_ok_but_not_installed
+sub tested_ok_but_not_installed {
+    my $self = shift;
+    return (
+           $self->{make_test}
+        && $self->{build_dir}
+        && (UNIVERSAL::can($self->{make_test},"failed") ?
+             ! $self->{make_test}->failed :
+             $self->{make_test} =~ /^YES/
+            )
+        && (
+            !$self->{install}
+            ||
+            $self->{install}->failed
+           )
+    ); 
+}
+
 
 # mark as dirty/clean for the sake of recursion detection. $color=1
 # means "in use", $color=0 means "not in use anymore". $color=2 means
@@ -6462,6 +6507,15 @@ EOF
     my $dh = DirHandle->new(File::Spec->curdir)
         or Carp::croak("Couldn't opendir .: $!");
     my @readdir = grep $_ !~ /^\.\.?(?!\n)\Z/s, $dh->read; ### MAC??
+    if (grep { $_ eq "pax_global_header" } @readdir) {
+        $CPAN::Frontend->mywarn("Your (un)tar seems to have extracted a file named 'pax_global_header'
+from the tarball '$local_file'.
+This is almost certainly an error. Please upgrade your tar.
+I'll ignore this file for now.
+See also http://rt.cpan.org/Ticket/Display.html?id=38932\n");
+        $CPAN::Frontend->mysleep(5);
+        @readdir = grep { $_ ne "pax_global_header" } @readdir;
+    }
     $dh->close;
     my ($packagedir);
     # XXX here we want in each branch File::Temp to protect all build_dir directories
@@ -7129,6 +7183,15 @@ Could not determine which directory to use for looking at $dist.
         local $ENV{CPAN_SHELL_LEVEL} = $ENV{CPAN_SHELL_LEVEL}||0;
         $ENV{CPAN_SHELL_LEVEL} += 1;
         my $shell = CPAN::HandleConfig->safe_quote($CPAN::Config->{'shell'});
+
+        local $ENV{PERL5LIB} = defined($ENV{PERL5LIB})
+            ? $ENV{PERL5LIB}
+                : ($ENV{PERLLIB} || "");
+
+        local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
+        $CPAN::META->set_perl5lib;
+        local $ENV{MAKEFLAGS}; # protect us from outer make calls
+
         unless (system($shell) == 0) {
             my $code = $? >> 8;
             $CPAN::Frontend->mywarn("Subprocess shell exit code $code\n");
@@ -8372,7 +8435,7 @@ sub _feature_depends {
     my $meta_yml = $self->parse_meta_yml();
     my $optf = $meta_yml->{optional_features} or return;
     if (!ref $optf or ref $optf ne "HASH"){
-        $CPAN::Frontend->mywarn("The content of optional_feature is not a HASH reference. Cannot use it.\n");
+        $CPAN::Frontend->mywarn("The content of optional_features is not a HASH reference. Cannot use it.\n");
         $optf = {};
     }
     my $wantf = $self->prefs->{features} or return;
@@ -8850,6 +8913,11 @@ sub test {
                     }
                 } else {
                     push @e, "Has already been tested successfully";
+                    # if global "is_tested" has been cleared, we need to mark this to
+                    # be added to PERL5LIB if not already installed
+                    if ($self->tested_ok_but_not_installed) {
+                        $CPAN::META->is_tested($self->{build_dir},$self->{make_test}{TIME});
+                    }
                 }
             }
         } elsif (!@e) {
@@ -8885,26 +8953,30 @@ sub test {
         }
     }
 
-    # bypass actual tests if "trust_test_report_history" and have a report
-    my $have_tested_fcn;
-    if (   ! $self->{force_update}
-        && $CPAN::Config->{trust_test_report_history}
-        && $CPAN::META->has_inst("CPAN::Reporter::History") 
-        && ( $have_tested_fcn = CPAN::Reporter::History->can("have_tested" ))
-    ) {
-        if ( my @reports = $have_tested_fcn->( dist => $self->base_id ) ) {
-            # Do nothing if grade was DISCARD
-            if ( $reports[-1]->{grade} =~ /^(?:PASS|UNKNOWN)$/ ) {
-                $self->{make_test} = CPAN::Distrostatus->new("YES");
-                $CPAN::META->is_tested($self->{build_dir},$self->{make_test}{TIME});
-                $CPAN::Frontend->myprint("Found prior test report -- OK\n");
-                return;
-            }
-            elsif ( $reports[-1]->{grade} =~ /^(?:FAIL|NA)$/ ) {
-                $self->{make_test} = CPAN::Distrostatus->new("NO");
-                $self->{badtestcnt}++;
-                $CPAN::Frontend->mywarn("Found prior test report -- NOT OK\n");
-                return;
+    if ( ! $self->{force_update}  ) {
+        # bypass actual tests if "trust_test_report_history" and have a report
+        my $have_tested_fcn;
+        if (   $CPAN::Config->{trust_test_report_history}
+            && $CPAN::META->has_inst("CPAN::Reporter::History") 
+            && ( $have_tested_fcn = CPAN::Reporter::History->can("have_tested" ))) {
+            if ( my @reports = $have_tested_fcn->( dist => $self->base_id ) ) {
+                # Do nothing if grade was DISCARD
+                if ( $reports[-1]->{grade} =~ /^(?:PASS|UNKNOWN)$/ ) {
+                    $self->{make_test} = CPAN::Distrostatus->new("YES");
+                    # if global "is_tested" has been cleared, we need to mark this to
+                    # be added to PERL5LIB if not already installed
+                    if ($self->tested_ok_but_not_installed) {
+                        $CPAN::META->is_tested($self->{build_dir},$self->{make_test}{TIME});
+                    }
+                    $CPAN::Frontend->myprint("Found prior test report -- OK\n");
+                    return;
+                }
+                elsif ( $reports[-1]->{grade} =~ /^(?:FAIL|NA)$/ ) {
+                    $self->{make_test} = CPAN::Distrostatus->new("NO");
+                    $self->{badtestcnt}++;
+                    $CPAN::Frontend->mywarn("Found prior test report -- NOT OK\n");
+                    return;
+                }
             }
         }
     }
@@ -10743,6 +10815,44 @@ displayed with the rather verbose method C<as_string>, but if we find
 more than one, we display each object with the terse method
 C<as_glimpse>.
 
+Examples:
+
+  cpan> m Acme::MetaSyntactic
+  Module id = Acme::MetaSyntactic
+      CPAN_USERID  BOOK (Philippe Bruhat (BooK) <[...]>)
+      CPAN_VERSION 0.99
+      CPAN_FILE    B/BO/BOOK/Acme-MetaSyntactic-0.99.tar.gz
+      UPLOAD_DATE  2006-11-06
+      MANPAGE      Acme::MetaSyntactic - Themed metasyntactic variables names
+      INST_FILE    /usr/local/lib/perl/5.10.0/Acme/MetaSyntactic.pm
+      INST_VERSION 0.99
+  cpan> a BOOK
+  Author id = BOOK
+      EMAIL        [...]
+      FULLNAME     Philippe Bruhat (BooK)
+  cpan> d BOOK/Acme-MetaSyntactic-0.99.tar.gz
+  Distribution id = B/BO/BOOK/Acme-MetaSyntactic-0.99.tar.gz
+      CPAN_USERID  BOOK (Philippe Bruhat (BooK) <[...]>)
+      CONTAINSMODS Acme::MetaSyntactic Acme::MetaSyntactic::Alias [...]
+      UPLOAD_DATE  2006-11-06
+  cpan> m /lorem/
+  Module  = Acme::MetaSyntactic::loremipsum (BOOK/Acme-MetaSyntactic-0.99.tar.gz)
+  Module    Text::Lorem            (ADEOLA/Text-Lorem-0.3.tar.gz)
+  Module    Text::Lorem::More      (RKRIMEN/Text-Lorem-More-0.12.tar.gz)
+  Module    Text::Lorem::More::Source (RKRIMEN/Text-Lorem-More-0.12.tar.gz)
+  cpan> i /berlin/
+  Distribution    BEATNIK/Filter-NumberLines-0.02.tar.gz
+  Module  = DateTime::TimeZone::Europe::Berlin (DROLSKY/DateTime-TimeZone-0.7904.tar.gz)
+  Module    Filter::NumberLines    (BEATNIK/Filter-NumberLines-0.02.tar.gz)
+  Author          [...]
+
+The examples illustrate several aspects: the first three queries
+target modules, authors, or distros directly and yield exactly one
+result. The last two use regular expressions and yield several
+results. The last one targets all of bundles, modules, authors, and
+distros simultaneously. When more than one result is available, they
+are printed in one-line format.
+
 =item C<get>, C<make>, C<test>, C<install>, C<clean> modules or distributions
 
 These commands take any number of arguments and investigate what is
@@ -11192,6 +11302,8 @@ defined:
   ftp                path to external prg
   ftp_passive        if set, the envariable FTP_PASSIVE is set for downloads
   ftp_proxy          proxy host for ftp requests
+  ftpstats_period    max number of days to keep download statistics
+  ftpstats_size      max number of items to keep in the download statistics
   getcwd             see below
   gpg                path to external prg
   gzip               location of external program gzip
@@ -12881,7 +12993,8 @@ http://www.refcnt.org/papers/module-build-convert
 
 =item 15)
 
-What's the best CPAN site for me?
+I'm frequently irritated with the CPAN shell's inability to help me
+select a good mirror.
 
 The urllist config parameter is yours. You can add and remove sites at
 will. You should find out which sites have the best uptodateness,
@@ -12892,6 +13005,14 @@ You decide which to try in which order.
 Henk P. Penning maintains a site that collects data about CPAN sites:
 
   http://www.cs.uu.nl/people/henkp/mirmon/cpan.html
+
+Also, feel free to play with experimental features. Run
+
+  o conf init randomize_urllist ftpstats_period ftpstats_size
+
+and choose your favorite parameters. After a few downloads running the
+C<hosts> command will probably assist you in choosing the best mirror
+sites.
 
 =item 16)
 

@@ -21,6 +21,7 @@ match:
     |AGENT/Makefile-DOM-\d
     |AGENT/Makefile-GraphViz-\d
     |AGENT/Makefile-Parser-\d
+    |AGENT/XUL-App-\d
     |AGRUNDMA/Catalyst-Engine-HTTP-Prefork-\d
     |AGRUNDMA/Catalyst-Plugin-Static-Simple-\d
     |AGRUNDMA/Catalyst-Plugin-UploadProgress-\d
@@ -47,10 +48,12 @@ match:
     |BLBLACK/Term-Spinner-\d
     |BLBLACK/MooseX-LazyLogDispatch-\d
     |BOBMATH/Crypt-CAST5_PP-\d
+    |BOGDAN/Catalyst-Model-DBIC-Schema-\d
     |BOKUTIN/Template-Plugin-Filter-VisualTruncate-\d
     |BRICAS/CGI-Application-PhotoGallery-\d
     |BRICAS/Catalyst-Model-DBIC-\d
     |BRICAS/Catalyst-Model-Gedcom-\d
+    |BRICAS/Catalyst-Plugin-Authorization-Roles-\d
     |BRICAS/Catalyst-Plugin-ConfigLoader-\d
     |BRICAS/Catalyst-Plugin-I18N-\d
     |BRICAS/Catalyst-View-vCard-\d
@@ -72,6 +75,7 @@ match:
     |CAMELCASE/HTML-TurboForm-\d
     |CFRANKS/Catalyst-Model-Net-Amazon-\d
     |CFRANKS/HTML-FormFu-\d
+    |CFRANKS/HTML-FormFu-Model-DBIC-\d
     |CFRANKS/HTML-Widget-\d
     |CFRANKS/DBIx-Class-HTML-FormFu-\d
     |CFRANKS/Catalyst-Controller-HTML-FormFu-\d
@@ -128,6 +132,11 @@ match:
     |GBARR/Authen-SASL-\d
     |GHENRY/Samba-LDAP-\d
     |GPHAT/Chart-Clicker-\d
+    |GPHAT/Geometry-Primitive-\d
+    |GPHAT/Graphics-Color-\d
+    |GPHAT/Graphics-Primitive-\d
+    |GPHAT/Graphics-Primitive-Driver-Cairo-\d
+    |GPHAT/Layout-Manager-\d
     |GPHAT/MooseX-Method-\d
     |GPHAT/Osgood-Client-\d
     |GPHAT/Osgood-Server-\d
@@ -151,6 +160,7 @@ match:
     |JESSE/Class-Accessor-Named-\d
     |JESSE/DBIx-SearchBuilder-\d
     |JESSE/Data-ICal-\d
+    |JESSE/Scalar-Defer-\d
     |JESSE/Shipwright-\d
     |JGOULAH/Catalyst-Plugin-AutoRestart-\d
     |JGOULAH/Net-Akamai-\d
@@ -166,6 +176,7 @@ match:
     |JROCKWAY/File-Attributes-\d
     |JROCKWAY/Task-Catalyst-Tutorial-\d
     |JROCKWAY/Test-YAML-Valid
+    |JSHIRLEY/Catalyst-Action-REST-\d
     |JSHIRLEY/DBIx-Class-TimeStamp-\d
     |JSMITH/RDF-Server-\d
     |JSWARTZ/CHI-\d
@@ -255,6 +266,7 @@ match:
     |MRAMBERG/Task-Catalyst-\d
     |MSIMERSON/Mail-Toaster-\d
     |MSTROUT/Catalyst-Controller-BindLex-\d
+    |MSTROUT/Catalyst-Plugin-Authentication-Store-DBIC-\d
     |MSTROUT/DBIx-Class-Cursor-Cached-\d
     |MSTROUT/DBIx-Class-\d
     |MSTROUT/Devel-REPL-\d
@@ -262,18 +274,22 @@ match:
     |NEKOKAK/DBIx-Class-TableNames-\d
     |NEMUX/Net-UCP-\d
     |NUFFIN/Catalyst-Plugin-Session-State-Cookie-\d
-    |PERIGRIN/JSON-Any-\d
+    |NUFFIN/MooseX-Getopt-\d
+    |NUFFIN/MooseX-Storage-\d
     |PERIGRIN/MooseX-Async-\d
     |PERIGRIN/MooseX-POE-\d
     |PERIGRIN/MooseX-Workers-\d
     |PERIGRIN/Net-AIML-\d
     |PERIGRIN/Regexp-Common-IRC-\d
     |PHAYLON/MooseX-Types-\d
+    |PHAYLON/Pod-Coverage-Moose-\d
     |PHAYLON/namespace-clean-\d
+    |PLU/DBIx-Class-ResultSet-HashRef-\d
     |REDTREE/PDF-API2-Simple-\d
     |RJBS/Rubric-\d
     |RKITOVER/Catalyst-Plugin-RelativePaths-\d
     |RKITOVER/Catalyst-Plugin-SmartURI-\d
+    |RKRIMEN/Carp-Clan-Share-\d
     |RKRIMEN/Catalyst-Plugin-Assets-\d
     |RKRIMEN/Config-JFDI-\d
     |RKRIMEN/Data-KeyDiff-\d
@@ -315,6 +331,7 @@ match:
     |STEVAN/MooseX-Getopt-\d
     |STEVAN/MooseX-Storage-\d
     |STEVAN/Task-Moose-\d
+    |SUNNAVY/Shipwright-\d
     |TELS/graph/Graph-
     |THEPLER/MooseX-Types-Path-Class-\d
     |TOKUHIROM/Archer-\d
@@ -351,10 +368,3 @@ pl:
 # for very old bundled AutoInstall:
       - "Do you wish to install"
       - "y\n"
-  env:
-    PERL_AUTOINSTALL: --skip
-    PERL_EXTUTILS_AUTOINSTALL: --skip
-make:
-  env:
-    PERL_AUTOINSTALL: --skip
-    PERL_EXTUTILS_AUTOINSTALL: --skip

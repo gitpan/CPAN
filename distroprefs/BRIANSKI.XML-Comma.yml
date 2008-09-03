@@ -38,3 +38,24 @@ depends:
     Class::ClassDecorator: 0
     Math::BaseCalc: 0
     DBD::mysql: 0
+---
+comment: |
+
+  not sure why I wrote the eexpect into a make stanza first...
+
+match:
+  distribution: "^BRIANSKI/Proc-Exists-"
+make:
+  eexpect:
+    mode: anyorder
+    timeout: 5
+    talk:
+      - "forego XS"
+      - "no\n"
+pl:
+  eexpect:
+    mode: anyorder
+    timeout: 5
+    talk:
+      - "forego XS"
+      - "no\n"

@@ -32,7 +32,7 @@ $main::SVN_RELEASE = 0;
 if (-d ".svn") {
   $main::SVN_RELEASE = 1;
 } elsif ($ARGV[0] && $ARGV[0] =~ /setversion/) {
-  warn "!!!making SVK based release, take care!!!";
+  warn "!!!making release without .svn??? Take care!!!";
   @ARGV = ();
   sleep 2;
 }
@@ -272,16 +272,6 @@ README: lib/CPAN.pm Makefile
 	-[ -r $@ ] && chmod +w $@
 	-$(PERL) -MPod::Text -e 'Pod::Text->new->parse_from_file(\*ARGV)' lib/CPAN.pm > $@
 
-chlog-svkstyle :: chlog-svk-short
-
-chlog-svk-short : ChangeLogShort.svk
-ChangeLogShort.svk : Makefile.PL lib/CPAN.pm distroprefs/00.README
-	-LC_ALL=$(LC_ALL_noexport) svk log -v //local/cpanpm > $@
-
-chlog-svk-long : ChangeLogLong.svk
-ChangeLogLong.svk :
-	-LC_ALL=$(LC_ALL_noexport) svk log -v //mirror/cpanpm > $@
-
 # got this from http://ch.tudelft.nl/~arthur/svn2cl/
 chlog-svn :
 	-LC_ALL=$(LC_ALL_noexport) svn log -v https://pause.perl.org:5460/svn/cpanpm/trunk > ChangeLog.svn
@@ -312,9 +302,12 @@ megainstall: logs/.exists
 	for DATE in `date +%Y%m%dT%H%M`; do \
 		nohup $(PERL) -Ilib -MCPAN -e 'install(qw(Term::ReadKey))' < /dev/null > logs/megainstall.$$DATE.out 2>&1; \
 		LANG=en_US.utf8 $(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load; \
-			open FH, "megainstall.txt" or die; chomp(@MEGA = grep {!/^#/} <FH>); \
-			install(grep {!m[/]||-e$$_} qw($(MEGA_BASE)), map {$$_->[0]} sort {$$a->[1]<=>$$b->[1]} map {[$$_,rand(1)]} @MEGA); \
-			CPAN::Shell->failed' >> logs/megainstall.$$DATE.out 2>&1; \
+		  open FH, "megainstall.txt" or die; chomp(@MEGA = grep {!/^#/} <FH>); \
+		  install(grep {!m[/]||-e$$_} qw($(MEGA_BASE))); \
+		  install("DAGOLDEN/CPAN-Reporter-1.16_51.tar.gz"); \
+		  CPAN::Shell->reload("cpan"); \
+		  install(map {$$_->[0]} sort {$$a->[1]<=>$$b->[1]} map {[$$_,rand(1)]} @MEGA); \
+		  CPAN::Shell->failed' >> logs/megainstall.$$DATE.out 2>&1; \
 		$(PERL) bin/colorout-to-dir-2.pl logs/megainstall.$$DATE.out; \
 		`pwd`/bin/dir-to-jifty.pl logs; \
 	done
@@ -669,10 +662,7 @@ ChangeLog : ChangeLogTrad.svn
 };
   } else {
     push @m, qq{
-chlog :: chlog-svkstyle
-
-ChangeLog : ChangeLogShort.svk
-	mv ChangeLogShort.svk ChangeLog
+chlog ::
 
 };
   }

@@ -2,13 +2,14 @@ AI::Categorizer
 AI::Prolog
 AMF::Perl
 ANDK/keepcool-0.344
+ARGV::readonly
 Acme::Bleach
 Acme::Chef
 Acme::MetaSyntactic
 Algorithm::AhoCorasick
 Algorithm::Annotate
-Algorithm::CheckDigits
 Algorithm::C3
+Algorithm::CheckDigits
 Algorithm::Diff
 Algorithm::Nhash
 Algorithm::Partition
@@ -19,6 +20,7 @@ Alter
 Alvis::TermTagger
 Alzabo
 Angerwhale
+AnyEvent::GPSD
 Apache
 Apache::ASP
 Apache::DB
@@ -97,6 +99,7 @@ CDB_File
 CGI
 CGI::Ajax
 CGI::Application
+CGI::Application::Dispatch
 CGI::Application::Plugin::AutoRunmode
 CGI::Application::Plugin::DevPopup
 CGI::Application::Plugin::Forward
@@ -116,15 +119,18 @@ CPAN::Index::Loader
 CPAN::IndexPod
 CPAN::Metrics
 CPAN::Mini
+CPAN::Mini::Webserver
 CPAN::Reporter::Smoker
 CPAN::Site
-CPAN::Testers::Report
 CPAN::Testers::ParseReport
+CPAN::Testers::Report
 CPAN::Unwind
 CPAN::WWW::Testers
 CPAN::YACSmoke
 CPANPLUS
 CSS
+CSS::Minifier
+CSS::Minifier::XS
 CSS::SAC
 Cache::FastMmap
 Cache::File
@@ -141,6 +147,7 @@ Carp::Clan
 Carp::Diagnostics
 Carp::REPL
 Carp::Source
+Catalys::Plugin::Unicode
 Catalyst
 Catalyst::Action::RenderView
 Catalyst::Devel
@@ -153,7 +160,6 @@ Catalyst::Plugin::CookiedSession
 Catalyst::Plugin::FormValidator
 Catalyst::Plugin::Session
 Catalyst::Plugin::Static::Simple
-Catalyst::Plugin::Unicode
 Catalyst::Plugin::Unicode::Encoding
 Catalyst::View::Mason
 Catalyst::View::TT
@@ -237,6 +243,7 @@ Config::JSON
 Config::Simple
 Config::Std
 Config::XPath
+Contextual::Return
 Continuity
 Convert::ASCII::Armour
 Convert::ASCIInames
@@ -288,6 +295,7 @@ DBI::Shell
 DBIx::Admin::TableInfo
 DBIx::Class
 DBIx::Class::Indexed
+DBIx::Class::ResultSet::HashRef
 DBIx::Class::Schema::Loader
 DBIx::Class::Schema::Slave
 DBIx::Class::Stash
@@ -338,13 +346,15 @@ Data::Phrasebook
 Data::PowerSet
 Data::Properties
 Data::Rand
-Data::Random
 Data::Rand::Obscure
+Data::Random
 Data::Remember
 Data::Rmap
 Data::SExpression
+Data::Section
 Data::Semantic::Net
 Data::Semantic::URI
+Data::Serializer
 Data::ShowTable
 Data::Sofu::List
 Data::Structure::Util
@@ -355,6 +365,7 @@ Data::TreeDumper
 Data::Types
 Data::UUID
 Data::Visitor
+Data::YAML
 Date::Calc
 Date::Leapyear
 Date::Manip
@@ -362,6 +373,7 @@ Date::Parse
 Date::Simple
 Date::Tiny
 DateTime
+DateTime::Calendar::Japanese
 DateTime::Calendar::Julian
 DateTime::Event::Recurrence
 DateTime::Format::Builder
@@ -378,6 +390,7 @@ DateTime::Format::RSS
 DateTime::Format::W3CDTF
 DateTime::Set
 DateTimeX::Easy
+DbFramework::Persistent
 Devel::ArgNames
 Devel::CallTrace
 Devel::Caller
@@ -403,10 +416,12 @@ Devel::LeakTrace::Fast
 Devel::LexAlias
 Devel::Modlist
 Devel::Monitor
+Devel::NYTProf
 Devel::PerlySense
 Devel::Profile
 Devel::Profiler
 Devel::REPL
+Devel::Refcount
 Devel::Required
 Devel::SawAmpersand
 Devel::SearchINC
@@ -441,8 +456,8 @@ Egg::Model::Session
 Email::Address
 Email::Date
 Email::Delete
-Email::Find
 Email::Filter
+Email::Find
 Email::Folder
 Email::FolderType
 Email::FolderType::Net
@@ -461,6 +476,7 @@ Encode::Base32::Crockford
 Encode::JavaScript::UCS
 Encode::MAB2table
 Encode::MIME::Header
+Encode::ZapCP1252
 Encode::compat
 Errno
 Error
@@ -485,6 +501,7 @@ ExtUtils::PkgConfig
 ExtUtils::XSBuilder
 FCGI::Engine
 FLV::Info
+FSA::Rules
 Fault
 Fcntl
 Fey
@@ -502,6 +519,7 @@ File::Fetch
 File::Filename
 File::Find::Parallel
 File::Headerinfo::SWF
+File::LibMagic
 File::MMagic::XS
 File::Mirror
 File::Monitor
@@ -516,6 +534,7 @@ File::ShareDir
 File::SortedSeek
 File::Spec
 File::Spec::Functions
+File::System
 File::Tail
 File::Temp
 File::Type
@@ -559,9 +578,9 @@ Geo::Coordinates::Converter::Format::Degree
 Geo::GeoNames
 Geo::Google::PolylineEncoder
 Geo::Gpx
-Geo::Raster
 Geo::Proj::Japan
 Geo::Query
+Geo::Raster
 Geo::ShapeFile
 Geography::Countries
 Getargs::Long
@@ -632,7 +651,9 @@ HTML::Widget
 HTML::WidgetValidator
 HTML::WikiConverter
 HTTP::BrowserDetect
+HTTP::Cache::Transparent
 HTTP::CryptoCookie
+HTTP::DAV
 HTTP::Daemon::Threaded
 HTTP::Engine
 HTTP::GHTTP
@@ -642,6 +663,7 @@ HTTP::Parser
 HTTP::Proxy
 HTTP::RangeSaver
 HTTP::Response::Encoding
+HTTP::Server::Brick
 HTTP::Server::Simple
 HTTP::Server::Simple::Dispatched
 HTTP::Server::Simple::Mason
@@ -664,6 +686,7 @@ IMAP::Admin
 IO
 IO::All
 IO::Async::Buffer
+IO::CaptureOutput
 IO::Compress::Base
 IO::Compress::Lzop
 IO::Compress::Zlib::Constants
@@ -714,11 +737,13 @@ InlineX::CPP2XS
 InlineX::XS
 IsUTF8
 Iterator
+Iterator::File
 JSON
 JSON::DWIW
 JSON::RPC::Server
 JSON::XS
 JavaScript::Dumper
+JavaScript::Writer
 Jcode
 Jemplate
 Jifty
@@ -736,6 +761,7 @@ LWP::ConnCache::Resolving
 LWP::Simple
 LWP::UserAgent
 LWPx::ParanoidAgent
+Layout::Manager
 Lexical::Attributes
 Lexical::Persistence
 Lingua::AR::MacArabic
@@ -761,6 +787,7 @@ List::Maker
 List::MoreUtils
 List::Tuples
 List::Util
+List::oo
 Locale::Constants
 Locale::Geocode
 Locale::Maketext
@@ -776,6 +803,7 @@ Log::Handler
 Log::Message
 Log::Message::Simple
 Lucene
+MARC::Charset
 MD5
 MIME::Base64
 MIME::Body
@@ -833,6 +861,7 @@ Math::SymbolicX::ParserExtensionFactory
 Math::Vec
 Maypole
 MediaWiki
+MediaWiki::API
 Metadata::ByInode
 Metaweb
 Method::Signatures
@@ -866,6 +895,8 @@ MooseX::Clone
 MooseX::Daemonize
 MooseX::Emulate::Class::Accessor::Fast
 MooseX::Iterator
+MooseX::Log::Log4perl
+MooseX::Method
 MooseX::Mutate
 MooseX::Plaggerize
 MooseX::Singleton
@@ -873,6 +904,7 @@ MooseX::Storage
 MooseX::Types::Set::Object
 Mouse
 Muldis
+MySQL::Slurp
 Net::Akamai
 Net::Amazon
 Net::Analysis
@@ -890,6 +922,7 @@ Net::DownloadMirror
 Net::FPing
 Net::FTP
 Net::FTP::Common
+Net::FTP::Throttle
 Net::Frame::Dump
 Net::GrowlClient
 Net::Hiveminder
@@ -959,8 +992,6 @@ PAR
 PAR::Dist::FromCPAN
 PAR::Packer
 PApp
-Package::Builder
-Path::Class::Versioned
 PBS::Build
 PDF
 PDF::API2
@@ -1002,19 +1033,21 @@ POE::Component::RSS
 POE::Component::SSLify
 POE::Component::Server::DNS
 POE::Component::Server::HTTP
-POE::Component::Server::SimpleHTTP
 POE::Component::Server::PreforkTCP
+POE::Component::Server::SimpleHTTP
 POE::Component::SpreadClient
 POE::Component::StackedProcessor
 POE::Component::SubWrapper
 POE::Declarative::Mixin
 POE::Filter::IRCD
+POE::Test::Loops
 POE::XUL::Window
 POSIX
 POSIX::Regex
 PPI
 PTools
 PTools::SDF
+Package::Builder
 Package::Constants
 Pad::Tie
 PadWalker
@@ -1026,10 +1059,13 @@ Paranoid
 Parrot::Interpreter
 Parse::BACKPAN::Packages
 Parse::BooleanLogic
+Parse::CPAN::MirroredBy
 Parse::Marpa
 Parse::RecDescent
 Parse::Yapp
 Path::Class
+Path::Class::Versioned
+Path::Router
 Perl6::Attributes
 Perl6::Caller
 Perl6::Export
@@ -1053,8 +1089,8 @@ Petal::Utils
 Plagger
 Pod::Constants
 Pod::Coverage
-Pod::Coverage::Moose
 Pod::Coverage::CountParents
+Pod::Coverage::Moose
 Pod::Escapes
 Pod::Find
 Pod::Generated
@@ -1166,13 +1202,14 @@ Scalar::Util::Clone
 Scalar::Util::Numeric
 Schedule::Cron
 Scope::Guard
-Scriptalicious
 Script::Remote
+Scriptalicious
 Set::ConsistentHash
 Set::Crontab
 Set::Infinite
 Set::IntSpan::Fast
 Set::Integer::Gapfillers
+Set::Object
 Shell::Autobox
 Shell::Perl
 ShiftJIS::CP932::Correct
@@ -1189,6 +1226,7 @@ Socket6
 Sort::ArbBiLex
 Sort::DataTypes
 Sort::Key::Radix
+Sort::Rank
 Spiffy
 Spoon
 Spread
@@ -1209,8 +1247,10 @@ String::CRC32
 String::Diff
 String::Expand
 String::Fraction
+String::Koremutake
 String::Multibyte
 String::Random
+String::ShellQuote
 String::ShellQuote
 String::Similarity
 String::Truncate
@@ -1256,6 +1296,7 @@ Template::Provider::Unicode::Japanese
 Template::Timer
 Term::Menu
 Term::ProgressBar
+Term::ProgressBar::Quiet
 Term::Prompt
 Term::ReadKey
 Term::ReadLine::Gnu
@@ -1266,6 +1307,7 @@ Term::Size::Perl
 Term::Spinner
 Term::UI
 Test
+Test::A8N
 Test::AutoBuild
 Test::Builder
 Test::Builder::Tester
@@ -1280,7 +1322,7 @@ Test::FormValidator
 Test::HTTP::Server::Simple
 Test::HTTPStatus
 Test::Harness
-Test::A8N
+Test::HexString
 Test::JSON
 Test::Kwalitee
 Test::LongString
@@ -1446,6 +1488,7 @@ Unicode::MapUTF8
 Unicode::Normalize
 Unicode::RecursiveDowngrade
 Unicode::Regex::Set
+Unicode::Semantics
 Unicode::String
 Unicode::Transform
 Unicode::Transliterate
@@ -1467,9 +1510,11 @@ Voting::Condorcet::RankedPairs
 Vroom::Vroom
 WWW::ColiPoste
 WWW::Curl
+WWW::Dict::Leo::Org
 WWW::Facebook::API
 WWW::Live365
 WWW::Mechanize
+WWW::Mechanize::GZip
 WWW::Mechanize::Plugin::Web::Scraper
 WWW::Mechanize::Shell
 WWW::Monitor
@@ -1525,6 +1570,7 @@ XML::Parser::PerlSAX
 XML::RSS
 XML::RSS::FromHTML::Simple
 XML::RSS::LibXML
+XML::RSS::PicLens
 XML::RegExp
 XML::RelaxNG::Compact::PXB
 XML::SAX
@@ -1545,12 +1591,14 @@ XML::XPath
 XML::XPathEngine
 XS::Writer
 XSLoader
+XUL::App
 YAML
 YAML::Syck
 YAML::Tiny
 YAML::XS
 YAPE::Regex::Explain
 Yada::Yada::Yada
+Yahoo::Marketing
 Yahoo::Photos
 Yahoo::Search
 autobox::Core
@@ -1575,6 +1623,7 @@ re::engine::Plan9
 re::engine::Plugin
 re::engine::TRE
 self
+threads::shared
 typesafety
 version
 version::Limit
