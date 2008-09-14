@@ -22,6 +22,7 @@ match:
     |AGENT/Makefile-GraphViz-\d
     |AGENT/Makefile-Parser-\d
     |AGENT/XUL-App-\d
+    |AGRUNDMA/Catalyst-Engine-Apache-\d
     |AGRUNDMA/Catalyst-Engine-HTTP-Prefork-\d
     |AGRUNDMA/Catalyst-Plugin-Static-Simple-\d
     |AGRUNDMA/Catalyst-Plugin-UploadProgress-\d
@@ -46,7 +47,9 @@ match:
     |BLBLACK/DBIx-Class-\d
     |BLBLACK/MRO-Compat-\d
     |BLBLACK/Term-Spinner-\d
+    |BLBLACK/MooseX-ConfigFromFile-\d
     |BLBLACK/MooseX-LazyLogDispatch-\d
+    |BLBLACK/MooseX-SimpleConfig-\d
     |BOBMATH/Crypt-CAST5_PP-\d
     |BOGDAN/Catalyst-Model-DBIC-Schema-\d
     |BOKUTIN/Template-Plugin-Filter-VisualTruncate-\d
@@ -98,6 +101,7 @@ match:
     |DIABLO/Rsync-Config-\d
     |DIZ/Locale-Geocode-\d
     |DJERIUS/App-Env-\d
+    |DJERIUS/HTML-TableParser-\d
     |DJERIUS/Shell-GetEnv-\d
     |DMAKI/Catalyst-Model-FormFu-\d
     |DMAKI/Catalyst-Model-HTML-FormFu-\d
@@ -123,6 +127,7 @@ match:
     |ELLIOTJS/Task-Perl-Critic-[v\d]
     |ERIC/OpenThought-\d
     |FLORA/Catalyst-View-Mason-\d
+    |FLORA/File-Extractor-\d
     |FOX/Bot-CPAN-\d
     |GAAL/Best-\d
     |GAAL/Class-Accessor-Ref-\d
@@ -134,12 +139,13 @@ match:
     |GPHAT/Chart-Clicker-\d
     |GPHAT/Geometry-Primitive-\d
     |GPHAT/Graphics-Color-\d
-    |GPHAT/Graphics-Primitive-\d
     |GPHAT/Graphics-Primitive-Driver-Cairo-\d
+    |GPHAT/Graphics-Primitive-\d
     |GPHAT/Layout-Manager-\d
     |GPHAT/MooseX-Method-\d
     |GPHAT/Osgood-Client-\d
     |GPHAT/Osgood-Server-\d
+    |GRODITI/Catalyst-Component-InstancePerContext-\d
     |GRODITI/DBIx-Class-EncodedColumn-\d
     |GRODITI/MooseX-Object-Pluggable-\d
     |GRUBER/IPC-Messaging-\d
@@ -154,6 +160,7 @@ match:
     |HDP/MooseX-InsideOut-\d
     |HIROSE/Net-SSL-ExpireDate-\d
     |HOLOWAY/Catalyst-Action-REST-\d
+    |HOLOWAY/Catalyst-Log-Log4perl-\d
     |JAYK/Catalyst-Plugin-Authentication-Store-DBIx-Class-\d
     |JAYK/Catalyst-Plugin-Authentication-\d
     |JCAMACHO/Catalyst-Controller-FormBuilder-\d
@@ -163,6 +170,7 @@ match:
     |JESSE/Scalar-Defer-\d
     |JESSE/Shipwright-\d
     |JGOULAH/Catalyst-Plugin-AutoRestart-\d
+    |JGOULAH/MooseX-LogDispatch-\d
     |JGOULAH/Net-Akamai-\d
     |JROBINSON/Catalyst-Plugin-Authentication-Credential-TypeKey-\d
     |JROBINSON/DBIx-Class-\d
@@ -183,6 +191,7 @@ match:
     |KARMAN/Catalyst-Plugin-Session-Store-File-\d
     |KEN/XML-XML2JSON-\d
     |KULP/Text-vFile-toXML-\d
+    |LAMMEL/MooseX-Log-Log4perl-\d
     |LAYE/AI-MaxEntropy-\d
     |LBROCARD/Devel-ebug-HTTP-\d
     |LSAUNDERS/DBIx-Class-Fixtures-\d
@@ -260,6 +269,7 @@ match:
     |MRAMBERG/Catalyst-Plugin-Authentication-Store-DBIC-\d
     |MRAMBERG/Catalyst-Plugin-Compress-Bzip2
     |MRAMBERG/Catalyst-Plugin-Compress-Zlib
+    |MRAMBERG/Catalyst-Plugin-Prototype-\d
     |MRAMBERG/Catalyst-Plugin-SubRequest-\d
     |MRAMBERG/Catalyst-Plugin-Unicode-\d
     |MRAMBERG/Catalyst-Runtime-
@@ -281,10 +291,12 @@ match:
     |PERIGRIN/MooseX-Workers-\d
     |PERIGRIN/Net-AIML-\d
     |PERIGRIN/Regexp-Common-IRC-\d
+    |PERLER/Pod-Browser-\d
     |PHAYLON/MooseX-Types-\d
     |PHAYLON/Pod-Coverage-Moose-\d
     |PHAYLON/namespace-clean-\d
     |PLU/DBIx-Class-ResultSet-HashRef-\d
+    |PRAVUS/Authen-CAS-Client-\d
     |REDTREE/PDF-API2-Simple-\d
     |RJBS/Rubric-\d
     |RKITOVER/Catalyst-Plugin-RelativePaths-\d
@@ -330,6 +342,7 @@ match:
     |STEVAN/MooseX-Daemonize-\d
     |STEVAN/MooseX-Getopt-\d
     |STEVAN/MooseX-Storage-\d
+    |STEVAN/Path-Router-\d
     |STEVAN/Task-Moose-\d
     |SUNNAVY/Shipwright-\d
     |TELS/graph/Graph-

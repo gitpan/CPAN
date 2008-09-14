@@ -1,1 +1,4536 @@
-Repository /home/k/.svk/local does not exist, create? (y/n)
+2008-09-14  k
+
+	* Makefile.PL: changelog creation add missing space
+	* Makefile.PL: changelog creation add missing stdout option and
+	  limit to rev. 2000+
+	* Makefile.PL: missing backslash
+	* Makefile.PL: make changelog creation a bit clearer
+	* README: autogen
+	* Changes: ready for 1.92_65
+	* lib/CPAN.pm: need another beta
+	* t/00signature.t: full rewrite to use skip_all instead of skip;
+	  add test for the three supported SHA modules
+	* MANIFEST: autogen manifest
+
+2008-09-13  k
+
+	* megainstall.txt: megamaint
+	* distroprefs/DAGOLDEN.CPAN-Reporter.yml: 1.1701 is broken
+	* distroprefs/01.DISABLED.yml: megamaint
+	* distroprefs/MI.yml: megamaint
+	* bin/query-rt-group-by-requestor.pl: extend the nbsp option and
+	  call it html
+
+2008-09-12  k
+
+	* megainstall.txt: megamaint
+	* Makefile.PL: keeping track of dev versions...
+	* megainstall.txt: megamaint
+	* distroprefs/MI.yml: megam
+	* megainstall.txt: very nice module
+	* megainstall.txt: a few random additions
+	* megainstall.txt: megamaint
+	* bin/rt-deleter.pl: spam
+	* distroprefs/PODMASTER.HTML-Scrubber.yml: new dependency
+	  discovered
+
+2008-09-11  k
+
+	* Makefile.PL: still cannot recognize the syntax error?
+	* Makefile.PL: oops, did not want to offend the user, remove the
+	  reminder for a newer makemaker to ordinary users
+	* Makefile.PL: there is a syntax error?
+	* Todo: notes
+	* bin/rsync-over-recentfile.pl: notes about recentfiles handling
+	* bin/rsync-over-recentfile-3.pl: notes about recentfiles handling
+
+2008-09-10  k
+
+	* megainstall.txt: a few newbies
+	* Makefile.PL: ready for testing dev releases again, new
+	  Sub::Uplevel uploaded
+
+2008-09-09  k
+
+	* Makefile.PL: no experimental distros available that need to be
+	  tested
+	* distroprefs/01.DISABLED.yml: megamaint
+
+2008-09-08  k
+
+	* distroprefs/MI.yml: megamaint
+	* bin/count-for-ewilhelm.pl: just an experiment
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+	* distroprefs/MI.yml: megamaint
+	* distroprefs/01.DISABLED.yml: megamaint
+	* distroprefs/MI.yml: megamaint
+	* Makefile.PL: take the dev release of Test-Simple out, it is
+	  broken
+	* distroprefs/MI.yml: megamaint
+	* Makefile.PL: remove the EXTRA_META thing and force use of current
+	  MakeMaker
+	* distroprefs/TSCH.Gtk2.yml: Gtk2 now declares its prereqs with
+	  configure_requires so we should not need to
+
+2008-09-07  k
+
+	* distroprefs/MI.yml: megamaint
+	* Makefile.PL: tweak for the next megainstall run to test several
+	  dev versions of the toolchain
+	* Todo, distroprefs/ATOURBIN.rpm-build-perl.yml,
+	  distroprefs/OVID.HOP-Parser.yml, megainstall.txt: megamaint
+	* bin/distlslt.pl: demand less, work without google charts and time
+	  progress for quick runs
+	* bin/rt-deleter.pl: spam
+
+2008-09-06  k
+
+	* t/14forkbomb.t, t/31sessions.t: TH broke the skip thing once
+	  again (cf rt #39031)
+	* lib/CPAN.pm: stop making up a Makefile.PL on everything that has
+	  more than two files or files and subdirectories
+
+2008-09-04  k
+
+	* distroprefs/MI.yml: megamaint
+	* Todo: notes
+	* bin/rt-deleter.pl: spam
+	* distroprefs/01.DISABLED.yml: a new hanger
+
+2008-09-03  k
+
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: megamaint
+
+2008-09-03  dagolden
+
+	* ., lib/CPAN.pm: dont use CPAN::Reporter with a generated
+	  Makefile.PL
+
+2008-09-03  k
+
+	* Makefile.PL: remove the svk agenda from the Makefile.PL
+	* README: autogen
+	* Changes, MANIFEST: prepare a release
+	* lib/CPAN.pm: wallpaper over tar problems with pax_global_header
+	  comments
+	* bin/rt-deleter.pl: spam
+	* distroprefs/01.DISABLED.yml: a new hanger
+	* bin/loop-over-recent.pl.otherperls: stop testing perl 5.8.[56]
+
+2008-09-02  k
+
+	* lib/CPAN.pm: set the perl5lib environment also on "look"
+	  (suggested by Slaven Rezic)
+	* lib/CPAN.pm: add examples for the most basic commands
+	* lib/CPAN.pm: the "strange distro name" warning seems unjustified
+	  and not helpful; if needed, we probably must focus more clearly
+	* bin/rt-deleter.pl: spam
+
+2008-08-28  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+
+2008-08-26  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+
+2008-08-24  k
+
+	* megainstall.txt: megamaint
+	* distroprefs/MI.yml: megamaint
+	* distroprefs/TELS.Devel-Size.yml: megamaint
+	* distroprefs/TELS.Devel-Size.yml: megamaint
+	* distroprefs/MI.yml, distroprefs/TELS.Devel-Size.yml: megamaint
+
+2008-08-23  k
+
+	* distroprefs/TELS.Devel-Size.yml: megamaint
+	* Todo, distroprefs/TELS.Devel-Size.yml: megamaint
+	* distroprefs/01.DISABLED.yml: a hanger
+
+2008-08-22  k
+
+	* lib/CPAN.pm: fix the warning for lines with version=0
+	* lib/CPAN.pm: better protection against invalid index file
+	* distroprefs/MI.yml: megamaint
+	* distroprefs/RBERJON.JSON-Any.yml: megamaint
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: megamaint
+
+2008-08-21  k
+
+	* distroprefs/MI.yml: megamaint
+
+2008-08-20  k
+
+	* megainstall.txt: following leon brocard's talk about his lesser
+	  known modules
+
+2008-08-19  k
+
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: a killer
+
+2008-08-18  dagolden
+
+	* ., lib/CPAN.pm: fix reanimation bug. attempted fix for
+	  build_dir_reuse/reset_tested
+
+2008-08-18  k
+
+	* distroprefs/01.DISABLED.yml: a hanger
+	* distroprefs/01.DISABLED.yml: a hanger
+
+2008-08-17  k
+
+	* bin/recent.pl: replace a deprecated methodname
+
+2008-08-16  srezic
+
+	* lib/CPAN.pm: * corrected typo: optional_feature*s*
+
+2008-08-16  k
+
+	* megainstall.txt: File::LibMagic sounds awesome
+	* megainstall.txt: random additions
+	* bin/rt-deleter.pl: spam
+	* distroprefs/MI.yml: stop using "PERL_AUTOINSTALL: --skip" because
+	  it seems to have changed semantics over time. Not sure about
+	  that. At least in GBARR/Authen-SASL-2.12.tar.gz I discovered that
+	  --skip prevented asking questions about dependencies at all
+	* megainstall.txt: At CPH Damian presented his Contextual::Return
+	* bin/rt-deleter.pl: spam
+	* bin/rsync-over-recentfile.pl: display human readable times
+	  (T=transformed) times as well
+
+2008-08-14  k
+
+	* lib/CPAN.pm: another chance to reanimate ...
+	* lib/CPAN.pm: another chance to reanimate ...
+
+2008-08-12  k
+
+	* bin/loop-over-recent.pl, bin/poesmoe.pl, bin/recent.pl,
+	  bin/rsync-over-recentfile-2.pl, bin/rsync-over-recentfile.pl:
+	  directory name adjusted to repository name
+	* bin/rsync-over-recentfile.pl, distroprefs/01.DISABLED.yml: adding
+	  data
+	* bin/query-rt-group-by-requestor.pl, distroprefs/01.DISABLED.yml:
+	  adding data
+
+2008-08-03  k
+
+	* megainstall.txt: megamaint
+	* bin/rt-deleter.pl: spam
+
+2008-08-01  k
+
+	* megainstall.txt: megamaint
+	* bin/rt-deleter.pl: spam
+	* bin/rsync-over-recentfile.pl: deal more prcicely with time
+
+2008-07-30  k
+
+	* lib/CPAN.pm: patch from Rodrigo Marchant: allow more than 100
+	  commands in history
+	* bin/rt-deleter.pl: spam
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: megamaint
+	* bin/rt-deleter.pl: spam
+
+2008-07-28  k
+
+	* distroprefs/GEOFF.Apache-Test.yml: note about an assocciated
+	  ticket
+	* distroprefs/GEOFF.Apache-Test.yml: comments about "Apache-Test
+	  patched" -- with bugs
+	* distroprefs/GEOFF.Apache-Test.yml: Apache-Test patched
+
+2008-07-27  k
+
+	* distroprefs/MI.yml: megamaint
+	* megainstall.txt: random additions
+	* bin/rt-deleter.pl: spam
+	* bin/rsync-over-recentfile.pl: switch to use the Recentfile from
+	  its own source
+	* bin/recent.pl: switch to use the Recentfile from its own source
+
+2008-07-22  srezic
+
+	* lib/CPAN.pm: use $CPAN::Frontend->mywarn instead of naked warn
+
+2008-07-22  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+	* bin/rsync-over-recentfile-2.pl: adjust recent revelopment on
+	  Recentfile stuff
+	* bin/rsync-over-recentfile.pl: adjust recent revelopment on
+	  Recentfile stuff
+	* Makefile.PL: temporary injection of CPAN-Reporter-1.16_51 into
+	  megainstall. valid until the next release of C:R
+	* distroprefs/01.DISABLED.yml, megainstall.txt: megamaint
+
+2008-07-20  k
+
+	* bin/rt-deleter.pl: spam
+	* distroprefs/MI.yml: megamaint
+
+2008-07-20  srezic
+
+	* lib/CPAN.pm: wrap new chmod and chown calls in an eval{}, for OSs
+	  not supporting these calls
+	* lib/CPAN.pm: preserve modification and owner bits when
+	  overwriting FTPstats.yml
+
+2008-07-20  k
+
+	* bin/recent.pl: side effects in short circuits may have other side
+	  effects
+	* distroprefs/MI.yml: megamaint
+
+2008-07-19  k
+
+	* bin/loop-over-recent.pl, bin/poesmoe.pl, bin/recent.pl,
+	  bin/rsync-over-recentfile-2.pl, bin/rsync-over-recentfile.pl: the
+	  RECENT stuff has moved into its own module
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+
+2008-07-18  k
+
+	* megainstall.txt: random additions
+	* bin/rt-deleter.pl: spam
+	* Todo: notes
+
+2008-07-17  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+	* megainstall.txt: random additions
+	* lib/CPAN/HandleConfig.pm: patch by David Wheeler in ticket #32841
+	* megainstall.txt: random additions
+	* bin/rt-deleter.pl: fix autoflush option
+
+2008-07-16  k
+
+	* Todo, bin/rt-deleter.pl: notes&spam
+
+2008-07-13  k
+
+	* Todo, distroprefs/01.DISABLED.yml: hanging stuff
+
+2008-07-09  k
+
+	* distroprefs/01.DISABLED.yml: disable openresty again
+	* bin/query-rt-group-by-requestor.pl: another busy RT hacker
+	  identified
+	* bin/rsync-over-recentfile-2.pl: 5 seconds make the laptop too hot
+	* bin/rt-deleter.pl: new spam
+	* distroprefs/MI.yml: megamaint
+
+2008-07-08  k
+
+	* bin/loop-over-recent.pl: allow running when no megainstall stuff
+	  is running
+	* bin/loop-over-recent.pl: allow bypassing PAUSE.pm
+	* bin/rsync-over-recentfile-2.pl: oops
+	* bin/rt-deleter.pl: new spam
+	* bin/rsync-over-recentfile-2.pl: new script for testing recent
+	  file handling in my intranet
+	* Todo: notes
+
+2008-07-06  k
+
+	* bin/loop-over-recent.pl, bin/recent.pl,
+	  bin/rsync-over-recentfile.pl: changed name and interval of the
+	  recent file once again
+	* bin/rt-deleter.pl: new spam
+	* distroprefs/MI.yml: megamaint
+
+2008-07-04  k
+
+	* Todo: notes
+	* distroprefs/MI.yml: another MI user
+	* bin/rt-deleter.pl: new spam
+	* bin/rt-deleter.pl: more spam combat
+	* bin/rsync-over-recentfile.pl: improve the reflecitve pod
+	* bin/rt-deleter.pl: new spam combat
+
+2008-07-01  k
+
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm:
+	  make the statistics part configurable and update the FAQ about
+	  choosing mirror sites
+
+2008-06-29  k
+
+	* Todo, distroprefs/01.DISABLED.yml, megainstall.txt: megamaint
+
+2008-06-28  k
+
+	* bin/loop-over-recent.pl: switch to the newer recentfile
+	* bin/recent.pl: prefer the newer recentfile
+	* bin/rsync-over-recentfile.pl: adjust rsyncing: do both authors
+	  and modules in one loop, introduce new options
+
+2008-06-26  k
+
+	* Todo, distroprefs/AGENT.OpenResty.yml: operesty issues
+	* MANIFEST, distroprefs/BRIANSKI.XML-Comma.yml,
+	  distroprefs/TIMB.GoferTransport-http.yml: add a depends where the
+	  author cannot decide which dependency he wants
+	* distroprefs/TIMB.GoferTransport-http.yml: add a depends where the
+	  author cannot decide which dependency he wants
+
+2008-06-25  k
+
+	* distroprefs/BRIANSKI.XML-Comma.yml: megamaint
+	* distroprefs/MI.yml: megamaint
+	* Todo: note bugreport sys::syscall
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: megamaint
+
+2008-06-24  k
+
+	* distroprefs/BRIANSKI.XML-Comma.yml: include Proc-Exists within
+	  XML-Comma
+	* bin/rt-deleter.pl: new spam
+	* bin/recent.pl: do not merge two lines into one: the longer thing
+	  gets truncated in the middle of the second line too often
+	* Todo: talk about Sys::Syscall
+
+2008-06-19  k
+
+	* lib/CPAN/Kwalify/distroprefs.dd: last dd-prefs call brought his
+	  in sync
+	* Changes: prepare a release
+	* MANIFEST, MANIFEST.SKIP: prepare a release
+	* Changes, lib/CPAN.pm: prepare a release
+	* distroprefs/01.DISABLED.yml, megainstall.txt: megamaint
+	* bin/ls-build+tmp.pl: include $HOME
+	* Todo: notes
+
+2008-06-18  dagolden
+
+	* ., Changes, MANIFEST, lib/CPAN.pm, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm, lib/CPAN/PERL5INC.pm: ***
+	  CPAN::PERL5INC removed ***
+	* ., Changes, lib/CPAN/HandleConfig.pm: fixed some localization
+	  bugs seen on 5.6.2
+
+2008-06-17  dagolden
+
+	* ., lib/CPAN.pm: localize yaml lodecode manually
+
+2008-06-16  k
+
+	* bin/recent.pl: for testing only: switch between two different
+	  RECENT files
+	* distroprefs/01.DISABLED.yml: skip a hanger
+
+2008-06-15  k
+
+	* bin/loop-over-recent.pl, bin/poesmoe.pl,
+	  bin/rsync-over-recentfile.pl: s/intervals/interval/
+	* bin/recent.pl: s/intervals/interval/
+	* distroprefs/MI.yml: megamaint
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+	* bin/recent.pl: chop long lines
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+	* bin/recent.pl: introduce burn in protection
+	* distroprefs/MAHEX.Image-Grab.yml: introduce burn in protection
+	* lib/CPAN.pm: fix a typo and a wrong comment
+
+2008-06-14  k
+
+	* distroprefs/MI.yml: SARTAK/Moose
+	* Todo: notes
+
+2008-06-13  k
+
+	* distroprefs/01.DISABLED.yml, megainstall.txt: megamaint
+
+2008-06-12  k
+
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+	* bin/recent.pl: this was a bit too buggy to describe
+	* distroprefs/MI.yml,
+	  distroprefs/RICKM.DateTime-Format-Strptime.yml, megainstall.txt:
+	  megamaint
+	* bin/quidi-getreports.pl: getreports has gone into its own distro
+	* Todo: notes
+	* bin/loop-over-recent.pl.otherperls: more recent -tobe perls;
+	  reduce number of involved perls
+	* distroprefs/ANDYA.Test-Harness.yml, megainstall.txt: megamaint
+	* Todo: notes
+
+2008-06-11  k
+
+	* Makefile.PL: add a comment on EXTRA_META
+	* megainstall.txt: megamaint
+
+2008-06-07  k
+
+	* distroprefs/01.DISABLED.yml: stop a hanger
+
+2008-06-06  k
+
+	* distroprefs/MI.yml: megamaint
+	* bin/loop-over-recent.pl: do not install dev versions of C:R
+	* megainstall.txt: megamaint
+	* megainstall.txt: megamaint
+	* bin/recent.pl: paint the star that makrs currently processing
+	  item also in the case that current timestamp falls between two
+	  displayable items
+	* megainstall.txt: megamaint
+	* bin/loop-over-recent.pl: skip C:R 1.15 and play with current
+	  bleadperl again
+	* Todo: notes
+
+2008-06-04  k
+
+	* distroprefs/AGENT.OpenResty.yml,
+	  distroprefs/BINGOS.POE-Component-Server-SimpleContent.yml,
+	  megainstall.txt: megamaint
+	* distroprefs/BINGOS.POE-Component-Server-SimpleContent.yml,
+	  distroprefs/DOMM.Module-CPANTS-ProcessCPAN.yml,
+	  distroprefs/NICOLAW.WWW-Comic.yml,
+	  distroprefs/ZOFFIX.LWP-UserAgent-ProxyHopper.yml: megamaint
+
+2008-06-02  k
+
+	* megainstall.txt: megamaint
+
+2008-06-01  k
+
+	* Todo: note about a bug which I witnessed on a box without root
+	  access
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+	* distroprefs/JDIEPEN.Audio-LADSPA.yml: a new dp
+
+2008-05-31  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+	* bin/query-rt-group-by-requestor.pl: calculate the max id before
+	  the loop
+	* distroprefs/01.DISABLED.yml, megainstall.txt: megamaint
+
+2008-05-30  k
+
+	* Todo: upstream resolved the bug I was chasing today
+	  (Archive::Extract)
+	* distroprefs/01.DISABLED.yml: disable Bot::Net
+
+2008-05-30  dagolden
+
+	* ., Changes, lib/CPAN.pm, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm: added perl5lib_verbosity option
+
+2008-05-30  k
+
+	* distroprefs/ESUMMERS.MARC-Charset.yml, distroprefs/MI.yml,
+	  distroprefs/RICKM.DateTime-Format-Strptime.yml, megainstall.txt:
+	  megamaint
+	* bin/rt-deleter.pl: new spam
+	* Todo: notes about 5.10.1 patch bug (x.lzwa)
+
+2008-05-28  k
+
+	* distroprefs/NUFFIN.Devel-Events.yml, megainstall.txt: megamaint
+
+2008-05-27  k
+
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: megamaint
+	* bin/loop-over-recent.pl, bin/poesmoe.pl, bin/recent.pl,
+	  bin/rsync-over-recentfile.pl: files containing absolute paths on
+	  the developerr machine -- and the paths changed
+	* distroprefs/ANDYA.File-Find-Parallel.yml,
+	  distroprefs/EIJABB.MARC-Errorchecks.yml: new distroprefs
+
+2008-05-25  k
+
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+	* bin/mytail-f.pl: relax a little
+	* bin/mytail-f-megalogdir.pl: display the time when we reach the
+	  max of sleepscala
+	* Todo: David writes a summary about how mixing test&install
+	  commands should work
+
+2008-05-24  k
+
+	* distroprefs/01.DISABLED.yml, distroprefs/AGENT.OpenResty.yml,
+	  distroprefs/DMARTIN.Unix-SavedIDs.yml, distroprefs/MI.yml:
+	  megamaint
+	* distroprefs/01.DISABLED.yml,
+	  distroprefs/BINGOS.POE-Component-Server-NSCA.yml,
+	  distroprefs/BINGOS.POE-Component-SmokeBox-Recent.yml,
+	  distroprefs/ERIC.OpenThought.yml, distroprefs/MI.yml,
+	  distroprefs/RKOBES.PPM-Make.yml, megainstall.txt: megamaint
+	* distroprefs/JKEGL.Test-Weaken.yml,
+	  distroprefs/KARASIK.IO-Lambda.yml,
+	  distroprefs/KNORR.Net-MirrorDir.yml, distroprefs/MI.yml,
+	  distroprefs/RONAN.Transform-Canvas.yml: megamaint
+	* distroprefs/MI.yml: typo
+	* distroprefs/MI.yml: typo
+	* megainstall.txt: megamaint
+	* bin/mytail-f-megalogdir.pl: introdice debug switch and reset
+	  lines after first file
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: megamaint
+	* lib/CPAN/Kwalify/distroprefs.yml: reserve a new keyword without
+	  docs and implementation: reminder
+
+2008-05-23  k
+
+	* distroprefs/MI.yml, megainstall.txt: random additions
+	* .gitignore, MANIFEST: bring back a few dd files
+	* Changes: ready for the next devel release
+	* t/31sessions.t: silence noisy and misleading test
+	* Changes: ready for the next devel release
+
+2008-05-22  k
+
+	* MANIFEST: ready for the next devel release
+	* MANIFEST: ready for the next devel release
+	* Changes, lib/CPAN.pm: ready for the next devel release
+	* distroprefs/CHISEL.Zucchini.yml: zucchini, I love zucchini
+	* distroprefs/CHISEL.Zucchini.yml: zucchini, I love zucchini
+	* distroprefs/CHISEL.Zucchini.yml, distroprefs/MI.yml: zucchini, I
+	  love zucchini
+
+2008-05-22  dagolden
+
+	* ., Changes: document recent bug fixes in Changes
+	* ., lib/CPAN.pm: prefs cache must not be persistent
+
+2008-05-22  k
+
+	* distroprefs/BTROTT.Crypt-DH.yml, distroprefs/MI.yml: restricting
+	  to installed-perls--why?
+	* distroprefs/DMAKI.Class-DBI-Plugin-DateTime.yml,
+	  distroprefs/MI.yml: megamaint
+	* bin/quidi-getreports.pl: introduce meta:output_from
+	* bin/quidi-getreports.pl: parse the build_requires: headline
+	  correctly
+	* distroprefs/MI.yml: megamaint
+
+2008-05-21  k
+
+	* lib/CPAN.pm: patch from chocelateboy who found a FileHandle->new
+	  with an argument; hopefully the last one
+
+2008-05-21  dagolden
+
+	* ., lib/CPAN.pm: shortcut make and test if disabled (needed under
+	  build_dir_reuse)
+
+2008-05-21  k
+
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+	* bin/mytail-f-megalogdir.pl: sleep longer when nothing happens
+	* Todo: notes about Games:RP:MG
+	* distroprefs/SANKO.Net-BitTorrent.yml: initial checkin
+
+2008-05-19  k
+
+	* MANIFEST, Todo: notes
+	* distroprefs/BTROTT.Crypt-OpenPGP.yml,
+	  distroprefs/GBARR.Authen-SASL.yml, distroprefs/MI.yml,
+	  megainstall.txt: megamaint
+
+2008-05-17  k
+
+	* megainstall.txt: megamaint
+
+2008-05-17  dagolden
+
+	* ., lib/CPAN.pm: reverting earlier tempdir tagging -- didn't
+	  realize this was in the build dir
+	* ., lib/CPAN.pm: ensure prereqs exist when reusing build_dirs
+	* ., lib/CPAN.pm: refactor prereq queueing into separate subroutine
+	* ., lib/CPAN.pm: choose_MM_or_MB() is a less confusing name
+	* ., lib/CPAN.pm: tag temp dirs more clearly
+
+2008-05-17  k
+
+	* distroprefs/CORDATA.Kwiki-Formatter-Emphasis.yml: megamaint
+	* megainstall.txt: megamaint
+	* distroprefs/KROW.DBIx-Password.yml: megamaint
+	* distroprefs/KROW.DBIx-Password.yml: megamaint
+	* distroprefs/ADAMK.PPI.yml: megamaint
+	* distroprefs/BTROTT.Crypt-DH.yml, megainstall.txt: megamaint
+	* distroprefs/MI.yml, distroprefs/TSCH.Cairo.yml: megamaint
+	* bin/mytail-f-megalogdir.pl: flush was missing
+	* bin/mytail-f-megalogdir.pl: small pod and some tweaking
+	* bin/mytail-f-megalogdir.pl: recall the current package whenever
+	  displaying the file name and adjust the langth of the labels
+	* bin/mytail-f-megalogdir.pl: read the directory less often
+	* bin/mytail-f-megalogdir.pl: taking note of three bugs and fixing
+	  one: no prefixes in the middle of the line
+	* bin/mytail-f-megalogdir.pl: taking note of three bugs and fixing
+	  one: no prefixes in the middle of the line
+
+2008-05-16  k
+
+	* bin/mytail-f-megalogdir.pl: yet another useful logfile watcher
+
+2008-05-16  dagolden
+
+	* ., Changes, lib/CPAN.pm: fixed PERL5INC tempfile leak when no
+	  lock file is used
+
+2008-05-16  k
+
+	* lib/CPAN.pm: fix "exiting subroutine via last" bug (patch from
+	  Gisle Aas)
+	* distroprefs/BINGOS.POE-Component-CPAN-YACSmoke.yml,
+	  distroprefs/BTROTT.Crypt-OpenPGP.yml, distroprefs/MI.yml,
+	  megainstall.txt: random additions and several tunings
+
+2008-05-14  k
+
+	* distroprefs/MIYAGAWA.Catalyst-View-JSON.yml,
+	  distroprefs/NKH.PerlBuildSystem.yml: random additions and several
+	  tunings
+	* megainstall.txt: random additions and several tunings
+	* megainstall.txt: random additions
+
+2008-05-13  k
+
+	* distroprefs/ABELTJE.Test-Smoke.yml, distroprefs/MI.yml,
+	  megainstall.txt: megamaint
+	* distroprefs/MI.yml, megainstall.txt: megamaint
+
+2008-05-12  k
+
+	* bin/query-rt-group-by-requestor.pl: better symbols as feedback
+	* bin/rt-deleter.pl: new spam
+	* megainstall.txt: random additions
+
+2008-05-11  k
+
+	* megainstall.txt: random additions
+	* distroprefs/MI.yml: new MIs
+	* distroprefs/MLEHMANN.AnyEvent.yml: AnyEvent hanging
+
+2008-05-10  k
+
+	* distroprefs/MI.yml: MI surprise
+	* distroprefs/01.DISABLED.yml,
+	  distroprefs/HORROCKS.PersistentPerl.yml: deal in more depth with
+	  PersistentPerl and make 01DISABLE one line lighter
+	* distroprefs/LICHTKIND.Kephra.yml: add kephra
+	* Todo: notes
+	* megainstall.txt: random additions
+	* distroprefs/MBARBON.Alien-wxWidgets.yml: help Wx with display
+	* distroprefs/MBARBON.Alien-wxWidgets.yml,
+	  distroprefs/MLEHMANN.Gtk-Perl.yml, megainstall.txt: random
+	  installation help
+
+2008-05-09  k
+
+	* MANIFEST, distroprefs/FLORA.File-Extractor.yml: adding
+	  file-extractor
+	* Todo: typo
+	* megainstall.txt: random additions
+
+2008-05-05  dagolden
+
+	* ., lib/CPAN.pm: - dont hardcode YAML module names
+	* ., lib/CPAN/FirstTime.pm: discourage people from using LIBS/INC
+	  in makepl_arg
+	* ., lib/CPAN.pm: patch Pod (RT#33729)
+
+2008-05-05  k
+
+	* megainstall.txt: random additions
+	* distroprefs/PARDUS.File-MimeInfo.yml: memo about decreasing
+	  version number
+	* bin/rt-deleter.pl: new spam
+	* distroprefs/01.DISABLED.yml: get rid of an @ sign that cause
+	  "possible unintended interpolation" warnings
+	* megainstall.txt: random additions
+
+2008-05-04  k
+
+	* distroprefs/SREZIC.Tk-Autoscroll.yml: missing prereq declaration?
+	* distroprefs/MI.yml: new MI users
+	* Todo: notes
+	* megainstall.txt: random additions
+
+2008-05-03  k
+
+	* bin/distlslt.pl: journal entry calculations
+	* Todo: notes
+
+2008-05-02  k
+
+	* megainstall.txt: random additions
+	* distroprefs/MI.yml: new MIs
+	* bin/distlslt.pl: make the graph a bit thicker
+	* bin/distlslt.pl: base the labels on months
+	* bin/distlslt.pl: google graph with labels and stripes and markers
+	* lib/CPAN.pm: better wording suggested by Slaven Rezic
+	* megainstall.txt: random additions
+	* bin/distlslt.pl: interesting but not ready for public showing
+	* bin/distlslt.pl: the first chart that seemed to display something
+	  reasonable
+	* megainstall.txt: random additions
+	* bin/distlslt.pl: show age in days instead of dates
+
+2008-05-02  dagolden
+
+	* ., t/42distroprefs.t: fixed incorrect diagnostic message
+	* ., t/42distroprefs.t: improve diagnostics for test failure
+	* ., t/42distroprefs.t: use File::Spec when testing for filenames
+
+2008-05-02  k
+
+	* megainstall.txt: random additions
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml, megainstall.txt:
+	  megamaint
+
+2008-05-01  k
+
+	* bin/query-rt-group-by-requestor.pl: REST 0.35 still broken, new
+	  workarounds for testing out
+	* distroprefs/DAMS.RT-Client-REST.yml: dated patch in
+	  RT-Client-REST
+	* bin/loop-over-recent.pl.otherperls: working with other perls,
+	  both newer and older
+
+2008-04-30  hdp
+
+	* lib/CPAN/Distroprefs.pm: simplify reading/sorting
+
+2008-04-30  k
+
+	* distroprefs/MI.yml, megainstall.txt: random additions
+
+2008-04-29  k
+
+	* Todo: XML::SAX::RTF
+
+2008-04-29  hdp
+
+	* lib/CPAN/Distroprefs.pm, t/42distroprefs.t: preserve sortedness
+	  of distroprefs + test
+
+2008-04-29  k
+
+	* Todo, distroprefs/BOBTFISH.Text-Markdown.yml, distroprefs/MI.yml:
+	  text-markdown was covered twice and so uncovered a bug
+
+2008-04-28  k
+
+	* distroprefs/BOBTFISH.Text-Markdown.yml: s/expect/eexpect/
+	* megainstall.txt: random additions
+	* bin/distlslt.pl: fix "uninitialized $have"
+
+2008-04-27  k
+
+	* megainstall.txt: random additions to megainstall
+	* bin/distlslt.pl: make the comparison with local disk optional to
+	  speed up the default processing
+	* Todo: notes
+	* distroprefs/01.DISABLED.yml: a new hanger
+	* bin/quidi-getreports.pl: the allvars now also knows the histogram
+	  of OKs of all variables
+	* distroprefs/CORION.List-Sliding-Changes.yml,
+	  distroprefs/CORION.Test-Without-Module.yml: fixed
+	  list-sliding-changes
+	* bin/quidi-getreports.pl: convert date to iso
+	* bin/quidi-getreports.pl: now works again without --allvars
+	* Todo: notes
+	* bin/quidi-getreports.pl: the --allvars now looks good
+	* bin/quidi-getreports.pl: work in progress on --allvars
+
+2008-04-26  k
+
+	* Todo, megainstall.txt: notes
+	* distroprefs/ILYAZ.Math-Pari.yml: new math::pari
+	* bin/rt-deleter.pl: new spam
+
+2008-04-25  k
+
+	* t/42distroprefs.t: do not allow that a stray st file disturbs the
+	  test results
+	* MANIFEST: if we want to test for a dd file, we must ship it,
+	  right?
+	* bin/rt-deleter.pl: new spam
+	* README: autogen
+	* Changes: prepare next release
+	* Changes: prepare next release
+	* MANIFEST, Todo: IPC::Run acts up on the wrong locale
+	* t/42distroprefs.t: adjust test to a fully dd-populated
+	  distroprefs directory
+	* t/42distroprefs.t: add emacs stanza
+	* distroprefs/RSOD.IPC-Run.yml: turn off LANG for the tests on
+	  IPC::Run
+	* megainstall.txt: megamaint
+
+2008-04-24  dagolden
+
+	* ., lib/CPAN/PERL5INC.pm: r9141@NYC-L3AM346: dgolden | 2008-04-24
+	  07:23:31 -0400
+	  untaint paths in CPAN::PERL5INC
+
+2008-04-24  k
+
+	* Changes: prepare release
+	* Changes: prepare release
+	* MANIFEST: prepare for the next release
+	* distroprefs/01.DISABLED.yml, distroprefs/02.NOREPORT.yml: move
+	  barbie from disabled to noreport
+	* distroprefs/02.NOREPORT.yml: renaming because we want to collect
+	  more authors there
+	* distroprefs/MSHELOR.yml: renaming because we want to collect more
+	  authors there
+	* Todo: notes
+	* lib/CPAN.pm: small refactoring and bugfix for #30464 (imacat):
+	  extend the loop protection from install only on make_test
+
+2008-04-23  k
+
+	* distroprefs/MSHELOR.yml: clarify what the comment was about
+	* bin/rt-deleter.pl: new spam flood
+
+2008-04-22  k
+
+	* bin/rt-deleter.pl: protect against failing downloads or
+	  lwp->decoded_content
+
+2008-04-21  k
+
+	* bin/quidi-getreports.pl: the long awaited rewrite that makes this
+	  script more fun to use; need to rename the script itself though
+	* distroprefs/MI.yml, megainstall.txt: add Google::Chart
+	* Todo: notes
+
+2008-04-20  k
+
+	* distroprefs/01.DISABLED.yml, megainstall.txt: random additions to
+	  megainstall
+	* distroprefs/ARFREITAS.DTS.yml, distroprefs/RGIERSIG.Expect.dd:
+	  random additions to megainstall
+	* .gitignore: do not track the majority of dd files
+	* Todo: notes
+	* SlayMakefile: slaymake annoyed me writing a row of "1"s
+
+2008-04-19  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+	* bin/quidi-getreports.pl: move the data files to
+	  ~/.cpan/cpantesters/
+
+2008-04-17  k
+
+	* bin/quidi-getreports.pl: move the downloaded files over to
+	  HOME/var/
+	* distroprefs/GOZER.mod_perl.yml: new mod_perl as endlessly looping
+	  as the one before
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml, megainstall.txt:
+	  random embrace
+	* bin/distlslt.pl: make N settable
+
+2008-04-16  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+	* distroprefs/01.DISABLED.yml: megamaint
+
+2008-04-15  k
+
+	* Todo: notes
+
+2008-04-14  k
+
+	* bin/quidi-getreports.pl: notes about TODO
+	* .gitignore, MANIFEST, Makefile.PL, Todo, lib/CPAN.pm,
+	  t/31sessions.t, t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/lib/CPAN/Test/Dummy/Perl5/Make/Features.pm,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/mymeta.yml,
+	  t/CPAN/authors/id/A/AN/ANDK/cpantestdummies/CPAN-Test-Dummy-Perl5-Make-Features-1.04.tar.gz,
+	  t/CPAN/modules/02packages.details.txt: rework the whole "feature"
+	  thingie since the META.yml spec was fixed yesterday
+	* t/CPAN/authors/id/A/AN/ANDK/cpantestdummies,
+	  t/CPAN/authors/id/A/AN/ANDK/cpantestdummies/CHECKSUMS,
+	  t/CPAN/authors/id/A/AN/ANDK/cpantestdummies/CPAN-Test-Dummy-Perl5-Make-Features-1.04.tar.gz:
+	  rework the whole "feature" thingie since the META.yml spec was
+	  fixed yesterday
+	* bin/rt-deleter.pl: collecting spam regexps
+	* megainstall.txt: mega maint
+	* distroprefs/CLAESJAC.JavaScript.yml,
+	  distroprefs/DAMS.RT-Client-REST.yml: new difficult modules
+	* Makefile.PL: No idea why I wanted to remove the meta.ymls
+	* bin/query-rt-group-by-requestor.pl: s/http/https/
+
+2008-04-13  hdp
+
+	* t/42distroprefs.t: test matching .dd distroprefs also
+	* lib/CPAN.pm: wrong file
+
+2008-04-12  k
+
+	* distroprefs/MI.yml: add Curses-UI
+	* Todo: notes
+	* Makefile.PL: ensure that we make dd-prefs when we update
+	* megainstall.txt: a few new discoveries
+	* distroprefs/ILMARI.DBIx-Class-Schema-Loader.yml: excellent
+	  testing example for --features
+	* distroprefs/MI.yml: another MRAMBERG MI
+	* bin/distlslt.pl: much prettier version with
+	  CPAN,DateTime,Time::Progress and such
+	* Todo: notes
+	* bin/rt-deleter.pl: today's other favorite spam
+	* Todo: notes
+	* megainstall.txt: mega maintenance
+	* lib/CPAN.pm: add Distroprefs.pm to the reloading files
+	* lib/CPAN/Distroprefs.pm: fix DD file processing
+	* bin/rt-deleter.pl: today's favorite spam
+	* lib/CPAN/Debug.pm, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm, lib/CPAN/Queue.pm, lib/CPAN/Tarzip.pm:
+	  get rid of all automatic version numbers for easier repo
+	  switching
+
+2008-04-10  k
+
+	* ., distroprefs/SLANNING.Ogre.yml, megainstall.txt: r4548@k75: k |
+	  2008-04-10 21:31:17 +0200
+	  mega maint
+	* ., bin/distlslt.pl, bin/rt-deleter.pl, megainstall.txt:
+	  r4547@k75: k | 2008-04-10 21:00:39 +0200
+	  current quartiles on modules age
+
+2008-04-09  k
+
+	* ., bin/rt-deleter.pl, distroprefs/01.DISABLED.yml: r4544@k75: k |
+	  2008-04-09 21:53:48 +0200
+	  a few additions and re-sorting
+	* ., scripts/cpan: r4536@k75: k | 2008-04-09 04:46:08 +0200
+	  upgrade to cpan 1.53, release by dbfoy a few days ago
+	* ., bin/rt-deleter.pl: r4535@k75: k | 2008-04-09 04:45:29 +0200
+	  today's favourite spam
+	* ., megainstall.txt: r4534@k75: k | 2008-04-09 04:44:36 +0200
+	  mega maint
+
+2008-04-08  hdp
+
+	* MANIFEST: add to MANIFEST
+	* t/42distroprefs.t: basic distroprefs test
+	* lib/CPAN/Distroprefs.pm: don't match by default for empty match:
+	  attrs
+	* MANIFEST, lib/CPAN.pm, lib/CPAN/Distroprefs.pm: apply my
+	  distroprefs refactoring patch
+
+2008-04-08  k
+
+	* ., distroprefs/01.DISABLED.yml, distroprefs/MSHELOR.yml,
+	  megainstall.txt: r4532@k75: k | 2008-04-08 18:09:12 +0200
+	  another hanger
+	* ., bin/rt-deleter.pl, distroprefs/01.DISABLED.yml,
+	  distroprefs/MSHELOR.yml: r4530@k75: k | 2008-04-08 07:48:03 +0200
+	  a better way to turn off reporting for MSHELOR
+
+2008-04-07  k
+
+	* ., Todo, bin/quidi-getreports.pl, distroprefs/01.DISABLED.yml,
+	  distroprefs/YAMATO.QDBM_File.yml: r4528@k75: k | 2008-04-08
+	  00:22:56 +0200
+	  mega maint
+
+2008-04-06  k
+
+	* distroprefs/MI.yml, lib/CPAN.pm: repair smoke command
+
+2008-04-05  k
+
+	* ., distroprefs/01.DISABLED.yml, distroprefs/MI.yml,
+	  megainstall.txt: r4522@k75: k | 2008-04-05 18:49:55 +0200
+	  mega maint
+	* ., bin/rsync-over-recentfile.pl: r4521@k75: k | 2008-04-05
+	  18:49:22 +0200
+	  add getoptions "loops" to limit the number of loops
+	* ., Todo: r4520@k75: k | 2008-04-05 18:48:11 +0200
+	  notes
+
+2008-04-04  srezic
+
+	* lib/CPAN.pm: r2922 was wrong, next try to fix perl5lib condition
+	  temporarily disabled warning message if PERL5LIB could not be
+	  used
+	* lib/CPAN.pm: removed an our, regained 5.005 compat again
+	* lib/CPAN.pm: fixed condition in PERL5LIB-related code
+
+2008-04-04  k
+
+	* ., lib/CPAN/PERL5INC.pm, megainstall.txt: r4514@k75: k |
+	  2008-04-04 11:57:56 +0200
+	  in order to get the PERL5LIB behaviour we must unshift, not push
+	  as Slaven and I found out the hard way
+	* ., distroprefs/HDP.Perl-Version.yml, megainstall.txt: r4510@k75:
+	  k | 2008-04-04 08:25:25 +0200
+	  meaginstall maint
+	* ., bin/rt-deleter.pl: r4509@k75: k | 2008-04-03 08:08:45 +0200
+	  silence warnings and improve feedback
+	* ., Todo: r4508@k75: k | 2008-04-03 08:07:46 +0200
+	  notes
+
+2008-04-02  k
+
+	* ., Todo, distroprefs/MAKAMAKA.JSON.yml,
+	  distroprefs/STAS.libapreq.yml: r4506@k75: k | 2008-04-02 06:04:08
+	  +0200
+	  maitainer change
+
+2008-04-01  k
+
+	* ., Todo, distroprefs/MAKAMAKA.JSON.yml: r4504@k75: k | 2008-04-01
+	  21:19:03 +0200
+	  fix JSON with a trivial patch
+	* ., distroprefs/TSCH.Gtk2.yml: r4499@k75: k | 2008-04-01 05:51:04
+	  +0200
+	  glib now has its own configure_requires
+	* ., bin/cp-to-perl.pl: r4498@k75: k | 2008-04-01 05:50:17 +0200
+	  reflect name change of api howto file and improve diagnostics
+	* ., Todo: r4497@k75: k | 2008-04-01 05:47:22 +0200
+	  notes
+	* ., Todo, bin/cp-to-perl.pl: r4496@k75: k | 2008-03-29 21:36:27
+	  +0100
+	  add PERL5INC to perl proper
+
+2008-03-29  k
+
+	* ., Todo, distroprefs/NESTING.Unicode-Wrap.yml: r4494@k75: k |
+	  2008-03-29 13:14:56 +0100
+	  new dependency
+	* ., distroprefs/LDS.Crypt-CBC.yml: r4492@k75: k | 2008-03-29
+	  10:20:04 +0100
+	  typo
+	* ., Todo, distroprefs/LDS.Crypt-CBC.yml: r4490@k75: k | 2008-03-29
+	  10:17:38 +0100
+	  new dependency
+	* ., Todo, distroprefs/NEELY.Data-Serializer.yml: r4487@k75: k |
+	  2008-03-29 10:01:08 +0100
+	  notes about Data::Serializer debugging
+	* ., bin/loop-over-recent.pl: r4486@k75: k | 2008-03-29 10:00:35
+	  +0100
+	  inform the user about the current time between runs
+	* ., bin/loop-over-recent.pl, distroprefs/01.DISABLED.yml:
+	  r4484@k75: k | 2008-03-29 04:44:17 +0100
+	  a hanger
+
+2008-03-28  k
+
+	* ., Todo, distroprefs/01.DISABLED.yml,
+	  distroprefs/ILYAZ.Math-Pari.yml: r4482@k75: k | 2008-03-28
+	  23:55:10 +0100
+	  barbie tests generally disabled
+	* ., Todo, distroprefs/ILYAZ.Math-Pari.yml: r4480@k75: k |
+	  2008-03-28 05:48:56 +0100
+	  notes
+
+2008-03-27  k
+
+	* ., distroprefs/ILYAZ.Math-Pari.yml,
+	  patches/nclark-math-pari-2008-03-06.patch,
+	  patches/nclark-math-pari-perlmonks-672924.patch: r4478@k75: k |
+	  2008-03-27 22:34:47 +0100
+	  
+	* ., distroprefs/NEELY.Data-Serializer.yml: r4473@k75: k |
+	  2008-03-27 21:21:37 +0100
+	  avoid random test results for Data::Serializer
+	* ., distroprefs/MI.yml, distroprefs/MIYAGAWA.XML-Atom.yml:
+	  r4472@k75: k | 2008-03-27 17:59:00 +0100
+	  Atom missing dependecy decl
+	* ., bin/quidi-getreports.pl: r4471@k75: k | 2008-03-27 08:50:05
+	  +0100
+	  improve verbosity options so we can quickier find out timestamps
+	  at cpantesters site
+
+2008-03-26  k
+
+	* README: autogenerated readme
+	* ., distroprefs/DANKOGAI.Regexp-Optimizer.yml: r4467@k75: k |
+	  2008-03-26 08:31:59 +0100
+	  prepare next dev release
+	* ., Changes, MANIFEST, MANIFEST.SKIP: r4464@k75: k | 2008-03-26
+	  08:30:26 +0100
+	  prepare next dev release
+	* ., lib/CPAN.pm: r4463@k75: k | 2008-03-26 08:19:51 +0100
+	  prepare next dev release
+	* ., distroprefs/JRENNIE.WordNet-QueryData.yml: r4461@k75: k |
+	  2008-03-26 07:04:23 +0100
+	  Giving up on wordnet for now
+	* ., distroprefs/JRENNIE.WordNet-QueryData.yml: r4459@k75: k |
+	  2008-03-26 06:57:51 +0100
+	  I don't get it
+	* ., distroprefs/JRENNIE.WordNet-QueryData.yml: r4457@k75: k |
+	  2008-03-26 06:52:26 +0100
+	  suspect module conventions:-(
+	* ., lib/CPAN.pm: r4451@k75: k | 2008-03-26 06:45:39 +0100
+	  protect against accidental creation of empty prefs
+	* ., megainstall.txt: r4450@k75: k | 2008-03-26 06:45:09 +0100
+	  new guest
+	* ., distroprefs/JRENNIE.WordNet-QueryData.yml: r4449@k75: k |
+	  2008-03-26 06:44:36 +0100
+	  new guest
+	* ., distroprefs/WYANT.Astro-satpass.yml: r4448@k75: k | 2008-03-26
+	  06:41:56 +0100
+	  higher timeout needed
+	* ., distroprefs/AUDREYT.Module-Signature.yml: r4447@k75: k |
+	  2008-03-26 06:41:33 +0100
+	  trailing whitespace
+
+2008-03-25  k
+
+	* ., distroprefs/01.DISABLED.yml,
+	  distroprefs/WYANT.Astro-SpaceTrack.yml,
+	  distroprefs/WYANT.Astro-satpass.yml, megainstall.txt: r4445@k75:
+	  k | 2008-03-25 23:58:23 +0100
+	  trivial smoke maintainance
+	* ., megainstall.txt: r4442@k75: k | 2008-03-25 23:36:48 +0100
+	  trivial smoke maintainance
+	* ., bin/quidi-getreports.pl: r4441@k75: k | 2008-03-25 23:36:38
+	  +0100
+	  better parsing of prereq versions on longer version strings
+	* ., distroprefs/MI.yml, megainstall.txt: r4439@k75: k | 2008-03-25
+	  22:28:57 +0100
+	  trivial smoke maintainance
+	* ., Todo, distroprefs/01.DISABLED.yml: r4437@k75: k | 2008-03-25
+	  21:36:58 +0100
+	  interesting bug: an AT in a comment causes a warning;
+	  interesting...
+	* ., Todo, distroprefs/VMAN.Net-Libdnet.yml, megainstall.txt:
+	  r4435@k75: k | 2008-03-25 08:14:26 +0100
+	  trivial smoke maintainance
+	* ., bin/quidi-getreports.pl, distroprefs/01.DISABLED.yml,
+	  distroprefs/RCAPUTO.POE.yml: r4433@k75: k | 2008-03-25 05:38:16
+	  +0100
+	  again a new hanger
+
+2008-03-24  k
+
+	* ., distroprefs/01.DISABLED.yml: r4431@k75: k | 2008-03-24
+	  20:23:21 +0100
+	  a new hanger
+	* ., Makefile.PL: r4429@k75: k | 2008-03-24 18:32:43 +0100
+	  writing perl in a Makefile is a chore
+	* ., bin/quidi-getreports.pl, distroprefs/01.DISABLED.yml,
+	  distroprefs/MI.yml, megainstall.txt: r4427@k75: k | 2008-03-24
+	  10:51:54 +0100
+	  trivial smoke maintainance
+
+2008-03-23  k
+
+	* ., distroprefs/CRISB.WWW-Curl.yml, megainstall.txt: r4423@k75: k
+	  | 2008-03-23 20:31:14 +0100
+	  trivial smoke maintainance
+	* ., Makefile.PL: r4422@k75: k | 2008-03-23 20:30:58 +0100
+	  filter nonexisting directories from MEGA_BASE
+	* ., bin/query-rt-group-by-requestor.pl: r4421@k75: k | 2008-03-23
+	  17:27:41 +0100
+	  new option --top; new aliases
+	* ., distroprefs/BOBTFISH.Text-Markdown.yml: r4415@k75: k |
+	  2008-03-23 16:03:00 +0100
+	  trivial smoke maintainance
+	* ., bin/quidi-getreports.pl, distroprefs/RBS.XML-AutoWriter.yml,
+	  megainstall.txt: r4414@k75: k | 2008-03-23 13:33:59 +0100
+	  extract perl version, remove trailing comma from reportwriter,
+	  prettier output
+
+2008-03-23  dagolden
+
+	* ., lib/CPAN/FirstTime.pm: discourage people from using LIBS/INC
+	  in makepl_arg
+	* ., lib/CPAN.pm: patch Pod (RT#33729)
+
+2008-03-23  k
+
+	* ., Todo, distroprefs/RBS.XML-AutoWriter.yml: r4411@k75: k |
+	  2008-03-23 12:14:32 +0100
+	  notes
+	* ., bin/quidi-getreports.pl: r4410@k75: k | 2008-03-23 12:13:50
+	  +0100
+	  add a manpage and support picking of named distros
+	* ., distroprefs/RBS.XML-AutoWriter.yml: r4408@k75: k | 2008-03-23
+	  07:41:46 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/CHOCOLATE.Scalar-Util-Clone.yml,
+	  patches/Scalar-Util-Clone-0.10-ANDK-01.patch,
+	  patches/Scalar-Util-Clone-0.10-ANDK-02.patch,
+	  patches/Scalar-Util-Clone-0.10-ANDK-03.patch: r4404@k75: k |
+	  2008-03-23 06:42:19 +0100
+	  trivial patches but no complete fix for S:U:C
+	* ., bin/quidi-getreports.pl: r4403@k75: k | 2008-03-22 22:03:42
+	  +0100
+	  detection of report writer needs continuation lines
+	* ., bin/quidi-getreports.pl: r4402@k75: k | 2008-03-22 21:47:06
+	  +0100
+	  support new key FROM
+
+2008-03-22  k
+
+	* ., distroprefs/CHOCOLATE.Scalar-Util-Clone.yml: r4400@k75: k |
+	  2008-03-22 21:13:34 +0100
+	  one step further towards Scalar-Util-Clone
+	* ., distroprefs/CHOCOLATE.Scalar-Util-Clone.yml, megainstall.txt:
+	  r4398@k75: k | 2008-03-22 19:40:40 +0100
+	  one step further towards Scalar-Util-Clone
+	* ., distroprefs/CHOCOLATE.Scalar-Util-Clone.yml: r4396@k75: k |
+	  2008-03-22 12:01:01 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/DAGOLDEN.Term-Title.yml, megainstall.txt:
+	  r4394@k75: k | 2008-03-22 09:16:10 +0100
+	  trivial smoke maintainance
+	* ., megainstall.txt: r4392@k75: k | 2008-03-22 06:00:30 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/01.DISABLED.yml,
+	  distroprefs/AUDREYT.Module-Signature.yml: r4388@k75: k |
+	  2008-03-22 05:30:49 +0100
+	  trivial smoke maintainance
+	* ., bin/quidi-getreports.pl: r4387@k75: k | 2008-03-22 05:30:35
+	  +0100
+	  buglet
+	* ., Todo: r4386@k75: k | 2008-03-22 05:30:16 +0100
+	  notes
+
+2008-03-21  k
+
+	* ., lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm,
+	  lib/CPAN/PERL5INC.pm: r4383@k75: k | 2008-03-21 13:26:55 +0100
+	  streamline the @INC stuff
+	* ., Todo: r4382@k75: k | 2008-03-21 13:12:14 +0100
+	  notes
+	* ., distroprefs/PHRED.Apache-Reload.yml: r4379@k75: k | 2008-03-21
+	  11:40:07 +0100
+	  fixing Apache::Request
+	* ., bin/quidi-getreports.pl: r4378@k75: k | 2008-03-21 07:51:14
+	  +0100
+	  now mirroring cpantesters AND nntp on latest release and letting
+	  Getopt care for the options
+
+2008-03-20  k
+
+	* ., distroprefs/01.DISABLED.yml,
+	  distroprefs/DAGOLDEN.Term-Title.yml, distroprefs/MI.yml,
+	  lib/CPAN.pm: r4376@k75: k | 2008-03-20 07:59:36 +0100
+	  forgot to handle undefined threshold_perl5lib_upto
+
+2008-03-19  k
+
+	* ., Todo, distroprefs/MSCHILLI.RRDTool-OO.yml, megainstall.txt:
+	  r4374@k75: k | 2008-03-19 07:26:34 +0100
+	  trivial smoke maintainance
+
+2008-03-18  k
+
+	* ., Todo, distroprefs/01.DISABLED.yml: r4372@k75: k | 2008-03-18
+	  23:35:30 +0100
+	  unfortunate smoke maintainance
+	* ., megainstall.txt: r4369@k75: k | 2008-03-18 08:55:40 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/NEILW.Inline-CPP.yml: r4368@k75: k | 2008-03-18
+	  08:55:36 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/01.DISABLED.yml: r4366@k75: k | 2008-03-18
+	  08:15:19 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/TIMB.DBI.yml: r4360@k75: k | 2008-03-18 06:48:03
+	  +0100
+	  trivial smoke maintainance
+	* ., lib/CPAN.pm: r4359@k75: k | 2008-03-18 06:10:00 +0100
+	  introduce threshold_perl5lib_upto
+	* ., lib/CPAN.pm: r4358@k75: k | 2008-03-18 06:09:30 +0100
+	  trying to get reload working again
+	* ., lib/CPAN/FirstTime.pm, t/31sessions.t: r4357@k75: k |
+	  2008-03-18 06:05:44 +0100
+	  skipall when File::Temp not available or C:T:D:P:M:Features
+	  installed
+	* ., distroprefs/MI.yml, megainstall.txt: r4356@k75: k | 2008-03-18
+	  06:04:30 +0100
+	  trivial smoke maintainance
+
+2008-03-17  k
+
+	* ., Todo, bin/rt-deleter.pl, lib/CPAN.pm, lib/CPAN/PERL5INC.pm:
+	  r4353@k75: k | 2008-03-17 08:59:42 +0100
+	  ongoing story PERL5OPT
+
+2008-03-16  k
+
+	* ., MANIFEST: r4351@k75: k | 2008-03-16 18:55:48 +0100
+	  manifest
+	* ., t/31sessions.t: r4349@k75: k | 2008-03-16 18:49:28 +0100
+	  put the prelude into a BEGIN block to have a Test::Builder
+	  counter that knows (and displays) the number of tests
+	* README: autogenerated files
+	* ., MANIFEST: r4345@k75: k | 2008-03-16 18:25:40 +0100
+	  prepare new release, really
+	* ., Changes, lib/CPAN.pm, t/31sessions.t: r4340@k75: k |
+	  2008-03-16 18:22:43 +0100
+	  first stab at optional_feaures works
+	* ., Makefile.PL, t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.01.tar.gz,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.02.tar.gz,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/lib/CPAN/Test/Dummy/Perl5/Make/Features.pm,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/mymeta.yml,
+	  t/CPAN/modules/02packages.details.txt: r4339@k75: k | 2008-03-16
+	  15:40:41 +0100
+	  writing optional_feature stanza is surprisingly hard and doe not
+	  look very bright
+	* ., Changes, MANIFEST, Makefile.PL, t/30shell.t, t/31sessions.t,
+	  t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.00.tar.gz,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.01.tar.gz,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/lib/CPAN/Test/Dummy/Perl5/Make/Features.pm,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/mymeta.yml,
+	  t/CPAN/modules/02packages.details.txt: r4338@k75: k | 2008-03-16
+	  15:18:37 +0100
+	  preparations for the new test
+	* ., t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS: r4337@k75: k |
+	  2008-03-16 14:42:39 +0100
+	  new checksums after upload
+	* README, lib/CPAN/Kwalify/distroprefs.dd: autogenerated files
+	* ., Changes, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	  distroprefs/MI.yml, megainstall.txt, t/30shell.t,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.00.tar.gz,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/MANIFEST,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/Makefile.PL,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/lib/CPAN/Test/Dummy/Perl5/Make/ConfReq.pm,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/lib/CPAN/Test/Dummy/Perl5/Make/Features.pm,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/mymeta.yml,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/t/00_load.t:
+	  r4332@k75: k | 2008-03-16 14:29:13 +0100
+	  test distro for optional_features
+	* .,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features/Changes:
+	  r4331@k75: k | 2008-03-16 13:22:51 +0100
+	  blueprint for features
+	* ., Changes: r4328@k75: k | 2008-03-16 11:33:58 +0100
+	  prepare next release
+	* ., distroprefs/MI.yml: r4327@k75: k | 2008-03-16 11:33:38 +0100
+	  trivial smoke maintainance
+	* ., SlayMakefile, distroprefs/MI.yml: r4323@k75: k | 2008-03-16
+	  11:14:17 +0100
+	  let validate use the schema we are distributiong, not some older
+	  one
+	* ., lib/CPAN.pm: r4322@k75: k | 2008-03-16 10:55:59 +0100
+	  protect against "called too early" error
+	* ., distroprefs/MI.yml: r4321@k75: k | 2008-03-16 10:55:25 +0100
+	  trivial smoke maintainance
+	* ., lib/CPAN.pm: r4318@k75: k | 2008-03-16 10:38:13 +0100
+	  shut up "exited subroutine via last" warning
+	* ., megainstall.txt: r4317@k75: k | 2008-03-16 10:37:27 +0100
+	  trivial smoke maintainance
+	* ., lib/CPAN.pm: r4315@k75: k | 2008-03-16 08:15:04 +0100
+	  address #34062: cpan "." was broken
+	* ., distroprefs/MI.yml: r4313@k75: k | 2008-03-16 07:52:23 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/MI.yml: r4310@k75: k | 2008-03-16 07:48:05 +0100
+	  trivial smoke maintainance
+	* ., lib/CPAN.pm: r4309@k75: k | 2008-03-16 07:47:51 +0100
+	  make the warning against a missing YAML better stand out
+
+2008-03-15  k
+
+	* ., distroprefs/TIMB.DBI.yml: r4307@k75: k | 2008-03-15 21:34:44
+	  +0100
+	  older perls need extra help on DBI
+	* ., lib/CPAN.pm: r4305@k75: k | 2008-03-15 21:20:24 +0100
+	  seriously, I have seen so weird things happen with 5.6.2 and
+	  version.pm that I believe this extra sanity check is unavoidable
+	* ., distroprefs/MI.yml, lib/CPAN.pm, megainstall.txt: r4303@k75: k
+	  | 2008-03-15 19:01:11 +0100
+	  address #34102: wrong diagnostic message when no META.yml was
+	  there
+	* ., distroprefs/MI.yml: r4301@k75: k | 2008-03-15 18:17:22 +0100
+	  typo
+	* ., distroprefs/01.DISABLED.yml: r4299@k75: k | 2008-03-15
+	  17:43:08 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/01.DISABLED.yml: r4297@k75: k | 2008-03-15
+	  17:41:19 +0100
+	  trivial smoke maintainance
+	* ., lib/CPAN.pm, lib/CPAN/Kwalify/distroprefs.yml: r4291@k75: k |
+	  2008-03-15 15:32:07 +0100
+	  address #34104: add match/env into the distroprefs mix
+	* ., t/03pkgs.t: r4290@k75: k | 2008-03-15 15:23:03 +0100
+	  by chance discovered the missing version verification for Kwalify
+	* ., t/52podcover.t: r4289@k75: k | 2008-03-15 15:22:24 +0100
+	  undoced method uncovered by podcover, whee!
+	* ., lib/CPAN/Kwalify.pm: r4288@k75: k | 2008-03-15 15:21:01 +0100
+	  add schema filename to error diagnostics
+	* ., distroprefs/DAGOLDEN.Term-Title.yml: r4287@k75: k | 2008-03-15
+	  15:19:06 +0100
+	  distroprefs file for private testing
+	* ., lib/CPAN.pm: r4285@k75: k | 2008-03-15 14:18:40 +0100
+	  flushiung once seems more efficient than turning on autoflush
+	* ., lib/CPAN.pm: r4283@k75: k | 2008-03-15 12:18:05 +0100
+	  this might help Slaven's case
+	* ., lib/CPAN.pm: r4281@k75: k | 2008-03-15 10:14:47 +0100
+	  throw in some defined() in the right spots
+	* ., MANIFEST, distroprefs/DOWENS.JSON-DWIW.yml,
+	  distroprefs/JV.Getopt-Long.yml, megainstall.txt: r4279@k75: k |
+	  2008-03-15 06:28:32 +0100
+	  trivial smoke maintainance
+
+2008-03-14  k
+
+	* ., lib/CPAN.pm: r4277@k75: k | 2008-03-14 22:21:22 +0100
+	  maybe autoflush needed; see RT 34098
+	* ., Todo: r4275@k75: k | 2008-03-14 08:25:47 +0100
+	  notes
+	* ., Todo, lib/CPAN.pm: r4273@k75: k | 2008-03-14 08:18:24 +0100
+	  protect against META.yml files that do not produce a hash
+	* ., Todo, distroprefs/PETDANCE.WWW-Mechanize.yml, lib/CPAN.pm,
+	  lib/CPAN/Kwalify/distroprefs.yml: r4271@k75: k | 2008-03-14
+	  08:02:15 +0100
+	  introduce "features" without implementing it
+
+2008-03-13  k
+
+	* ., distroprefs/MTHURN.I18N-Charset.yml: r4269@k75: k | 2008-03-13
+	  22:22:58 +0100
+	  trivial smoke maintainance
+
+2008-03-13  dagolden
+
+	* ., Changes, lib/CPAN.pm, lib/CPAN/API/HOWTO.pm,
+	  lib/CPAN/API/HOWTO.pod: r7852@NYC-L3AM346: dgolden | 2008-03-12
+	  17:40:39 -0400
+	  remove POD for CPAN::Distribution::is_tested (wrong package)
+	  r7853@NYC-L3AM346: dgolden | 2008-03-12 17:45:41 -0400
+	  renamed API.pm to API.pod since it is only docs and no code
+	  r7862@NYC-L3AM346: dgolden | 2008-03-12 23:59:07 -0400
+	  remove is_tested doc again (lost during merge)
+	  r7863@NYC-L3AM346: dgolden | 2008-03-13 00:02:38 -0400
+	  added reset_tested() function
+	  r7870@NYC-L3AM346: dgolden | 2008-03-13 08:37:53 -0400
+	  fix CRLF that crept into local copy somehow
+	  r7872@NYC-L3AM346: dgolden | 2008-03-13 08:41:10 -0400
+	  more CRLF fixes
+
+2008-03-13  k
+
+	* ., lib/CPAN.pm: r4265@k75: k | 2008-03-13 08:47:48 +0100
+	  silence an unini warning
+	* ., bin/loop-over-recent.pl.otherperls: r4262@k75: k | 2008-03-13
+	  07:12:43 +0100
+	  get rid of dated comments
+	* ., lib/CPAN/Nox.pm: r4261@k75: k | 2008-03-13 07:12:09 +0100
+	  prevent version accidents
+	* ., bin/colorout-to-dir.pl, lib/CPAN.pm, lib/CPAN/FirstTime.pm,
+	  t/02nox.t, t/11mirroredby.t, t/12cpan.t, t/14forkbomb.t,
+	  t/31sessions.t: r4259@k75: k | 2008-03-13 06:38:52 +0100
+	  untabify
+	* ., patches/HandleConfig.diff: r4255@k75: k | 2008-03-13 05:50:43
+	  +0100
+	  remove an old patch file from Corion, it has been checked in with
+	  CRLF
+	* ., distroprefs/DCANTRELL.Devel-CheckOS.yml: r4254@k75: k |
+	  2008-03-12 22:06:12 +0100
+	  split the answers for CheckOS into archnames
+
+2008-03-12  k
+
+	* ., Changes: r4252@k75: k | 2008-03-12 08:46:49 +0100
+	  prepare for the next release
+	* ., t/03pkgs.t: r4250@k75: k | 2008-03-12 08:33:11 +0100
+	  prepare for the next release
+	* ., lib/CPAN/PERL5INC.pm: r4248@k75: k | 2008-03-12 08:23:07 +0100
+	  prepare for the next release
+	* ., MANIFEST: r4245@k75: k | 2008-03-12 08:16:51 +0100
+	  prepare for the next release
+	* ., lib/CPAN.pm: r4244@k75: k | 2008-03-12 08:12:08 +0100
+	  prepare for the next release
+	* ., lib/CPAN.pm, lib/CPAN/PERL5INC.pm: r4242@k75: k | 2008-03-12
+	  05:08:48 +0100
+	  bugfix on previous checkin
+	* ., lib/CPAN.pm, lib/CPAN/PERL5INC.pm: r4240@k75: k | 2008-03-12
+	  04:39:52 +0100
+	  first stab at PERL5INC
+	* ., Todo, distroprefs/01.DISABLED.yml: r4238@k75: k | 2008-03-12
+	  02:04:39 +0100
+	  trivial smoke maintainance
+
+2008-03-11  k
+
+	* ., distroprefs/JAYK.Catalyst-Authen-S-D-C.yml,
+	  distroprefs/MI.yml: r4236@k75: k | 2008-03-11 20:36:49 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/AGENT.OpenResty.yml: r4234@k75: k | 2008-03-11
+	  08:17:05 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/AGENT.OpenResty.yml, distroprefs/MI.yml:
+	  r4232@k75: k | 2008-03-11 07:45:55 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/MI.yml: r4230@k75: k | 2008-03-11 07:42:21 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/01.DISABLED.yml, distroprefs/MI.yml,
+	  megainstall.txt: r4228@k75: k | 2008-03-11 07:28:05 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/MI.yml: r4226@k75: k | 2008-03-11 07:17:57 +0100
+	  trivial smoke maintainance
+	* ., MANIFEST, Todo, distroprefs/MI.yml,
+	  distroprefs/OVID.Test-JSON.yml: r4224@k75: k | 2008-03-11
+	  06:59:03 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/JPRIT.Event.yml: r4222@k75: k | 2008-03-11
+	  05:55:43 +0100
+	  protect smoker from 5.6.2+Event combination
+
+2008-03-10  k
+
+	* ., Todo, distroprefs/01.DISABLED.yml: r4220@k75: k | 2008-03-10
+	  21:37:53 +0100
+	  trivial smoke maintainance
+	* ., MANIFEST, distroprefs/JAYK.Catalyst-Authen-S-D-C.yml:
+	  r4218@k75: k | 2008-03-10 08:24:44 +0100
+	  trivial smoke maintainance
+	* ., bin/loop-over-recent.pl.otherperls,
+	  bin/query-rt-group-by-requestor.pl, megainstall.txt: r4216@k75: k
+	  | 2008-03-10 07:18:46 +0100
+	  trivial smoke maintainance
+
+2008-03-09  k
+
+	* ., distroprefs/GRAY.IO-AIO-Util.yml, distroprefs/MI.yml,
+	  lib/CPAN.pm: r4213@k75: k | 2008-03-09 19:07:57 +0100
+	  let force override "disabled" as suggested by David Golden
+	* ., Todo: r4212@k75: k | 2008-03-09 19:07:16 +0100
+	  notes
+	* ., MANIFEST, Todo, bin/loop-over-recent.pl.otherperls,
+	  distroprefs/CSOE.PDL.yml, megainstall.txt: r4210@k75: k |
+	  2008-03-09 13:35:02 +0100
+	  PDL is back!
+	* ., distroprefs/01.DISABLED.yml: r4208@k75: k | 2008-03-09
+	  07:09:54 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/01.DISABLED.yml, distroprefs/ILYAZ.FreezeThaw.yml,
+	  megainstall.txt: r4206@k75: k | 2008-03-09 01:39:26 +0100
+	  trivial smoke maintainance
+
+2008-03-08  k
+
+	* ., distroprefs/RMUHLE.classes.yml: r4204@k75: k | 2008-03-08
+	  15:42:53 +0100
+	  trivial smoke maintainance
+	* ., distroprefs/MI.yml, distroprefs/RMUHLE.classes.yml: r4202@k75:
+	  k | 2008-03-08 15:28:50 +0100
+	  trivial smoke maintainance
+	* ., bin/quidi-getreports.pl,
+	  distroprefs/FOTANGO.Data-Structure-Util.yml, distroprefs/MI.yml,
+	  megainstall.txt: r4199@k75: k | 2008-03-08 13:00:38 +0100
+	  inviting a few new friends
+	* ., bin/quidi-getreports.pl: r4198@k75: k | 2008-03-08 12:31:08
+	  +0100
+	  more elaborate parsing of testers reports
+	* ., Todo, distroprefs/MARKOV.Mail-Box.yml, distroprefs/MI.yml,
+	  megainstall.txt: r4196@k75: k | 2008-03-08 05:44:34 +0100
+	  mega maintainance
+	* ., MANIFEST, Todo, distroprefs/FOTANGO.Data-Structure-Util.yml:
+	  r4194@k75: k | 2008-03-08 04:46:30 +0100
+	  the first module ever that have to protect against this "compat"
+	  Makefile silliness
+	* ., Todo, distroprefs/MI.yml: r4192@k75: k | 2008-03-08 04:38:10
+	  +0100
+	  a new MI
+
+2008-03-07  k
+
+	* ., distroprefs/KWILLIAMS.Module-Build.yml, megainstall.txt:
+	  r4190@k75: k | 2008-03-07 21:11:07 +0100
+	  it seems the border was wrong, MB started to work later
+	* ., megainstall.txt: r4185@k75: k | 2008-03-07 08:30:19 +0100
+	  add Data::Structure::Util
+	* ., distroprefs/MSCHWERN.Test-Simple.yml: r4184@k75: k |
+	  2008-03-07 08:30:03 +0100
+	  start testing with 0.78 again
+	* ., bin/quidi-getreports.pl: r4183@k75: k | 2008-03-07 08:29:23
+	  +0100
+	  investigate CipherSaber
+	* ., Todo: r4182@k75: k | 2008-03-07 08:28:55 +0100
+	  notes
+
+2008-03-06  k
+
+	* ., MANIFEST, MANIFEST.SKIP, distroprefs/ILYAZ.FreezeThaw.yml:
+	  r4180@k75: k | 2008-03-06 08:21:07 +0100
+	  FreezeThaw patch for 5.11 open for testing
+	* ., distroprefs/01.DISABLED.yml: r4178@k75: k | 2008-03-06
+	  06:26:10 +0100
+	  correct the reasoning for disabling DBIx::MyParse
+
+2008-03-05  k
+
+	* ., Todo, distroprefs/01.DISABLED.yml: r4176@k75: k | 2008-03-05
+	  23:11:35 +0100
+	  disable askers of questions
+	* ., Todo, bin/quidi-getreports.pl: r4174@k75: k | 2008-03-05
+	  08:53:55 +0100
+	  initial checkin
+	* ., Todo, distroprefs/01.DISABLED.yml, distroprefs/MI.yml:
+	  r4172@k75: k | 2008-03-05 05:37:59 +0100
+	  not sure if it only a MI user or a hanger due to network
+	  activities
+	* ., bin/loop-over-recent.pl.otherperls, lib/CPAN.pm: r4170@k75: k
+	  | 2008-03-05 04:58:38 +0100
+	  remove a spurious null byte discovered by
+	  http://use.perl.org/~bart/journal/35835
+
+2008-03-04  k
+
+	* ., Todo, bin/loop-over-recent.pl.otherperls, megainstall.txt:
+	  r4168@k75: k | 2008-03-04 06:34:13 +0100
+	  collector's impulse
+
+2008-03-03  k
+
+	* ., Todo, distroprefs/PHRED.Apache-Reload.yml: r4166@k75: k |
+	  2008-03-03 21:21:21 +0100
+	  adding Apache::Reload build argument
+	* ., Todo, distroprefs/01.DISABLED.yml: r4164@k75: k | 2008-03-03
+	  06:11:01 +0100
+	  a new hanger
+
+2008-03-02  k
+
+	* ., t/30shell.t: r4162@k75: k | 2008-03-02 12:45:46 +0100
+	  adjust the test to feedback changes on build_dir_reuse
+	* ., lib/CPAN.pm, lib/CPAN/HandleConfig.pm: r4159@k75: k |
+	  2008-03-02 07:46:52 +0100
+	  speed up find_perl by caching absolute path in $^X
+	* ., lib/CPAN.pm, megainstall.txt: r4158@k75: k | 2008-03-02
+	  06:43:37 +0100
+	  small cosmetics
+	* ., Todo, distroprefs/01.DISABLED.yml, distroprefs/MI.yml:
+	  r4153@k75: k | 2008-03-02 04:57:26 +0100
+	  several new MIs, CPAN::Dependency acting up
+	  
+	* ., distroprefs/BYRNE.SOAP-Lite.yml: r4152@k75: k | 2008-03-01
+	  06:13:43 +0100
+	  new soap has arrives!
+
+2008-03-01  dagolden
+
+	* ., lib/CPAN.pm: patch Pod (RT#33729)
+
+2008-02-28  k
+
+	* ., distroprefs/MSCHWERN.Test-Simple.yml: r4149@k75: k |
+	  2008-02-28 08:28:16 +0100
+	  prevent installing broken Test::Simple stuff
+	* ., lib/CPAN.pm: r4148@k75: k | 2008-02-28 06:39:40 +0100
+	  add two FAQs about the build directory
+	* ., megainstall.txt: r4146@k75: k | 2008-02-28 06:04:03 +0100
+	  discovered that Object::Relation was not in megainstall
+	* ., lib/CPAN.pm: r4144@k75: k | 2008-02-28 05:09:17 +0100
+	  silence the recursion warnings once again according to a
+	  dagolden's suggestions
+	* ., distroprefs/01.DISABLED.yml: r4142@k75: k | 2008-02-28
+	  04:59:02 +0100
+	  a new hanger
+
+2008-02-27  k
+
+	* ., lib/CPAN.pm: r4137@k75: k | 2008-02-27 06:04:07 +0100
+	  turn off the (potential) recursion warning if only two levels
+	  deep
+	* README: autogen
+	* ., MANIFEST: r4135@k75: k | 2008-02-27 05:44:38 +0100
+	  fix manifest
+	* ., lib/CPAN.pm: r4133@k75: k | 2008-02-27 05:43:31 +0100
+	  prevent stack corruption with intelligent sorting on older perls
+	* ., Changes: r4129@k75: k | 2008-02-27 05:27:25 +0100
+	  preparing a release
+	* ., megainstall.txt: r4128@k75: k | 2008-02-27 05:26:46 +0100
+	  usual maintainance
+	* ., distroprefs/01.DISABLED.yml: r4127@k75: k | 2008-02-27
+	  05:25:45 +0100
+	  hanger
+
+2008-02-26  k
+
+	* ., Todo, megainstall.txt: r4125@k75: k | 2008-02-26 08:56:50
+	  +0100
+	  new recommendations from use.perl.org
+	* ., Todo, distroprefs/01.DISABLED.yml,
+	  distroprefs/MTHURN.I18N-Charset.yml: r4123@k75: k | 2008-02-26
+	  06:59:02 +0100
+	  new dependency discovered
+	* ., distroprefs/MI.yml: r4121@k75: k | 2008-02-26 06:00:57 +0100
+	  Gungho demands MI
+	* ., distroprefs/MI.yml: r4119@k75: k | 2008-02-26 05:54:19 +0100
+	  GunghoX::* demands MI
+	* ., distroprefs/01.DISABLED.yml: r4117@k75: k | 2008-02-26
+	  05:51:12 +0100
+	  give GunghoX::* a chance again
+	* ., Todo, distroprefs/01.DISABLED.yml: r4115@k75: k | 2008-02-26
+	  05:19:29 +0100
+	  endless loop
+
+2008-02-25  k
+
+	* ., Todo, t/30shell.t: r4113@k75: k | 2008-02-25 23:21:30 +0100
+	  try variations to possibly get coverage info out of my tests
+
+2008-02-24  k
+
+	* ., megainstall.txt: r4111@k75: k | 2008-02-24 21:27:24 +0100
+	  remove a dup
+	* ., Todo, megainstall.txt: r4107@k75: k | 2008-02-24 21:22:57
+	  +0100
+	  new recommendations from cpan ratings
+	* ., t/12cpan.t: r4106@k75: k | 2008-02-24 11:40:02 +0100
+	  silence unini in test
+	* ., distroprefs/01.DISABLED.yml: r4105@k75: k | 2008-02-24
+	  10:30:04 +0100
+	  give WWW::Mechanize::Shell a chance again
+	* ., distroprefs/01.DISABLED.yml,
+	  distroprefs/BRIANSKI.XML-Comma.yml: r4103@k75: k | 2008-02-24
+	  10:24:36 +0100
+	  give XML::Comma a chance again
+	* ., MANIFEST, Todo, distroprefs/01.DISABLED.yml,
+	  distroprefs/AGRUNDMA.POE-Loop-EV.yml: r4101@k75: k | 2008-02-24
+	  10:05:44 +0100
+	  chop one from 01.DISABLED
+	* ., bin/rt-deleter.pl: r4098@k75: k | 2008-02-24 04:08:04 +0100
+	  verify the answer coming from RT
+	* ., distroprefs/ILYAZ.Math-Pari.yml: r4097@k75: k | 2008-02-24
+	  04:01:45 +0100
+	  switch back to unpatched Pari
+	* ., distroprefs/01.DISABLED.yml: r4095@k75: k | 2008-02-24
+	  02:39:14 +0100
+	  some day I must spare tuits for the hangers
+
+2008-02-23  k
+
+	* ., Todo, lib/CPAN.pm, t/12cpan.t: r4092@k75: k | 2008-02-23
+	  13:27:31 +0100
+	  address #33505: allow empty passwords in the config and pass
+	  proxy data through to curl
+	* ., megainstall.txt: r4091@k75: k | 2008-02-23 13:26:21 +0100
+	  new recommendations in megainstall
+
+2008-02-21  k
+
+	* ., distroprefs/01.DISABLED.yml: r4089@k75: k | 2008-02-21
+	  08:39:13 +0100
+	  some day I must spare tuits for the hangers
+
+2008-02-20  k
+
+	* ., distroprefs/01.DISABLED.yml: r4087@k75: k | 2008-02-20
+	  20:49:05 +0100
+	  a new hanger
+	* ., lib/CPAN.pm: r4085@k75: k | 2008-02-20 14:06:48 +0100
+	  something_has_just_failed() did not cover the unini case
+
+2008-02-19  k
+
+	* ., lib/CPAN.pm, t/31sessions.t: r4080@k75: k | 2008-02-19
+	  22:53:05 +0100
+	  try to re-implement halt_on_failure differently; with test
+	* ., lib/CPAN.pm: r4079@k75: k | 2008-02-19 22:50:51 +0100
+	  make the recursion message even less alarming, prepare next dev
+	  release
+	* ., megainstall.txt: r4078@k75: k | 2008-02-19 22:46:28 +0100
+	  adding Getargs-Long
+	* ., distroprefs/MI.yml: r4077@k75: k | 2008-02-19 22:46:06 +0100
+	  adding Getargs-Long
+	* ., distroprefs/PODMASTER.HTML-Scrubber.yml: r4074@k75: k |
+	  2008-02-19 07:41:03 +0100
+	  oops
+
+2008-02-18  k
+
+	* ., distroprefs/PODMASTER.HTML-Scrubber.yml: r4069@k75: k |
+	  2008-02-18 17:13:07 +0100
+	  discovered another user of PREREQ_FATAL
+	* ., bin/rt-deleter.pl, distroprefs/PODMASTER.HTML-Scrubber.yml:
+	  r4068@k75: k | 2008-02-18 17:12:43 +0100
+	  discovered another user of PREREQ_FATAL
+
+2008-02-18  dagolden
+
+	* lib/CPAN.pm: add CPAN::Reporter::PrereqCheck to the reload list
+	* lib/CPAN/Tarzip.pm: prevent undefined warnings for unspecified
+	  external programs
+
+2008-02-17  k
+
+	* ., bin/rt-deleter.pl, distroprefs/01.DISABLED.yml: r4066@k75: k |
+	  2008-02-17 21:03:02 +0100
+	  a hanger
+
+2008-02-16  k
+
+	* ., distroprefs/MI.yml, megainstall.txt: r4064@k75: k | 2008-02-16
+	  20:37:42 +0100
+	  bestpractical? want it
+	* ., distroprefs/01.DISABLED.yml, distroprefs/MI.yml: r4062@k75: k
+	  | 2008-02-16 08:58:56 +0100
+	  new MIs and a few things that went wrong the last days
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml, megainstall.txt:
+	  discovered during Erlangen perl workshop
+
+2008-02-14  k
+
+	* ., lib/CPAN.pm: r4058@k75: k | 2008-02-15 00:33:54 +0100
+	  applied a patch from Randy Kobes to update index before a query
+	  when CPAN::SQLite is active
+
+2008-02-14  dagolden
+
+	* lib/CPAN.pm, lib/CPAN/Queue.pm: for halt_on_failure, don't warn
+	  and nullify if queue has only one item
+
+2008-02-14  k
+
+	* lib/CPAN.pm: Jost Krieger lets me know that Solaris emulates
+	  flock via fcntl
+
+2008-02-13  k
+
+	* megainstall.txt, talks/gpw10talk-cpantesters.crumbs,
+	  talks/gpw10talk-cpantesters.pod: state of the talk as of Hotel,
+	  after the talk
+	* talks/gpw10talk-cpantesters.crumbs,
+	  talks/gpw10talk-cpantesters.pod: state of the talk as of Hotel,
+	  Wednesday about 9
+	* Todo, bin/loop-over-recent.pl, megainstall.txt: add smoker
+	* talks/gpw10talk-cpantesters.pod: state of the talk as of Hotel,
+	  Wednesday early morning
+
+2008-02-12  k
+
+	* talks/Makefile, talks/gpw10talk-cpantesters.crumbs,
+	  talks/gpw10talk-cpantesters.pod, talks/leftarrow.gif,
+	  talks/rightarrow.gif, talks/splithtml.pl, talks/uparrow.gif:
+	  state of the talk as of Hotel, Tuesday
+
+2008-02-12  dagolden
+
+	* lib/CPAN.pm: fixed halt_on_failure -- won't halt on delayed items
+	  added a meaningful return to CPAN::Shell::rematein for cpan
+	  script
+	* scripts/cpan: Modify cpan script to respect 'halt_on_failure'
+	  config option
+	* Changes, lib/CPAN.pm, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm: added 'halt_on_failure' config option
+	  to halt queue processing
+	  after the first failure rather than processing all remaining
+	  times
+
+2008-02-12  k
+
+	* ., Todo, talks/gpw10talk-cpantesters.pod: r4044@k75: k |
+	  2008-02-12 05:00:22 +0100
+	  notes
+
+2008-02-10  k
+
+	* ., lib/CPAN.pm: r4042@k75: k | 2008-02-10 14:35:17 +0100
+	  address #32823
+	* ., Todo: r4040@k75: k | 2008-02-10 13:30:21 +0100
+	  notes, just notes
+	* ., Todo, distroprefs/DMAKI.File-Extract.yml: r4038@k75: k |
+	  2008-02-10 12:00:34 +0100
+	  somebody added new questions to File::Extract?
+	* ., Todo, lib/CPAN.pm: r4036@k75: k | 2008-02-10 11:01:51 +0100
+	  address 32525 with a different implementation
+	* ., lib/CPAN.pm: r4032@k75: k | 2008-02-10 08:37:38 +0100
+	  tone down the recursion alert; another spot where to use
+	  pretty_id instead of ID
+	* ., bin/add-perl-meta.pl: r4031@k75: k | 2008-02-10 08:36:50 +0100
+	  doc patch
+	* ., Todo: r4030@k75: k | 2008-02-10 08:35:59 +0100
+	  typo
+
+2008-02-09  k
+
+	* ., Changes, distroprefs/MLEHMANN.Coro.yml: r4028@k75: k |
+	  2008-02-09 16:52:40 +0100
+	  Coro was fixable once we knew the 33018 magic number
+	* ., lib/CPAN.pm, t/14forkbomb.t: r4026@k75: k | 2008-02-09
+	  11:52:21 +0100
+	  make the recursion detection less aggressive
+	* ., Todo, distroprefs/DCOPPIT.Mail-Mbox-MessageParser.yml:
+	  r4024@k75: k | 2008-02-09 10:31:10 +0100
+	  fixed MessageParser
+
+2008-02-08  k
+
+	* ., lib/CPAN.pm: r4022@k75: k | 2008-02-08 06:28:06 +0100
+	  speed up eexpect/anyorder by reducing timeout to 1 second and
+	  retrying until full timeout reached. Added comment explaining how
+	  this *really* should be fixed
+	* ., distroprefs/DCOPPIT.Mail-Mbox-MessageParser.yml,
+	  megainstall.txt: r4020@k75: k | 2008-02-08 05:41:58 +0100
+	  M:M:Messageparser
+	* ., distroprefs/ILYAZ.Math-Pari.yml,
+	  distroprefs/RCLAMP.Devel-Caller.yml: r4018@k75: k | 2008-02-08
+	  05:26:06 +0100
+	  Devel-Caller patched for 5.11
+
+2008-02-07  k
+
+	* ., MANIFEST, Todo, bin/ls-build+tmp.pl, lib/CPAN.pm,
+	  t/14forkbomb.t: r4016@k75: k | 2008-02-07 08:18:21 +0100
+	  alert user when CPAN.pm is being called recursively and protect
+	  other processes with extending sleeping periods
+
+2008-02-06  k
+
+	* ., distroprefs/MI.yml, talks/gpw10talk-cpantesters.pod:
+	  r4013@k75: k | 2008-02-06 21:58:27 +0100
+	  blah
+	* ., lib/CPAN.pm: r4012@k75: k | 2008-02-06 06:09:13 +0100
+	  rename $comp to $compmt to make the Safe using spots better
+	  greppable
+
+2008-02-05  k
+
+	* ., distroprefs/01.DISABLED.yml: r4010@k75: k | 2008-02-05
+	  20:26:46 +0100
+	  a new hanger
+	* ., Todo, distroprefs/OLAF.Net-DNS.yml: r4008@k75: k | 2008-02-05
+	  08:56:19 +0100
+	  simple fix to the Net-DNS thing
+	* ., lib/CPAN.pm: r4006@k75: k | 2008-02-05 03:56:02 +0100
+	  address 32923: allow =head1 CONTENT without regard to case (David
+	  Wheeler)
+
+2008-02-04  k
+
+	* README: autogen
+	* ., lib/CPAN.pm: r4001@k75: k | 2008-02-04 22:47:53 +0100
+	  prepare a new release
+	* ., Changes: r3995@k75: k | 2008-02-04 22:43:44 +0100
+	  prepare a new release
+	* ., Makefile.PL: r3994@k75: k | 2008-02-04 22:36:21 +0100
+	  make File::HomeDir prereq on OSX
+	* ., distroprefs/ROBIN.Want.yml: r3993@k75: k | 2008-02-04 22:35:48
+	  +0100
+	  comment about second ticket
+	* ., MANIFEST: r3992@k75: k | 2008-02-04 22:35:21 +0100
+	  many new distroprefs
+	* ., lib/CPAN/FirstTime.pm: r3991@k75: k | 2008-02-04 22:35:00
+	  +0100
+	  inconsistent treatment of HOME, switching to File::HomeDir once
+	  again
+	* ., bin/rt-deleter.pl, distroprefs/ROBIN.Want.yml: r3989@k75: k |
+	  2008-02-04 06:58:50 +0100
+	  another JDHEDDEN patch to support
+
+2008-02-03  k
+
+	* ., distroprefs/01.DISABLED.yml: r3987@k75: k | 2008-02-03
+	  22:46:33 +0100
+	  no questions!
+	* ., MANIFEST, Makefile.PL, distroprefs/01.DISABLED.yml,
+	  talks/gpw10talk-cpantesters.pod: r3985@k75: k | 2008-02-03
+	  22:42:04 +0100
+	  no questions!
+	* ., distroprefs/ROBIN.Want.yml, lib/CPAN/FirstTime.pm: r3983@k75:
+	  k | 2008-02-03 16:12:48 +0100
+	  Jerry is patching everything before I even discover the breakage
+	* ., lib/CPAN.pm: r3981@k75: k | 2008-02-03 13:36:58 +0100
+	  t/51pod complained about missing doc for
+	  trust_test_report_history
+	* ., lib/CPAN.pm: r3978@k75: k | 2008-02-03 13:28:21 +0100
+	  yet more eval protection of version operations to catch the next
+	  Safe.pm bug with more grace
+	* ., Todo: r3977@k75: k | 2008-02-03 13:23:21 +0100
+	  story of a bugreport for Safe.pm
+	* ., Todo, distroprefs/JROCKWAY.Chroniton.yml, distroprefs/MI.yml:
+	  r3975@k75: k | 2008-02-03 05:40:05 +0100
+	  Chroniton triggers my old friend MI recursion
+	* ., distroprefs/MI.yml, megainstall.txt,
+	  talks/gpw10talk-cpantesters.pod: r3973@k75: k | 2008-02-03
+	  04:58:27 +0100
+	  a few new modules and MI users
+
+2008-02-02  k
+
+	* ., related/CPAN-ToDist/Todo, related/CPAN-ToDist/Todo.txt:
+	  r3971@k75: k | 2008-02-02 18:32:07 +0100
+	  Randy Kobes requested a rename so that windows users can check
+	  out both todo files
+	* ., distroprefs/JOSEPHW.XML-Writer.yml: r3969@k75: k | 2008-02-02
+	  10:49:46 +0100
+	  new patch for 5.11
+	* ., distroprefs/01.DISABLED.yml,
+	  distroprefs/DROLSKY.Params-Validate.yml: r3967@k75: k |
+	  2008-02-02 10:18:25 +0100
+	  a new hanger
+	* ., distroprefs/DROLSKY.Devel-StackTrace.yml,
+	  distroprefs/DROLSKY.Params-Validate.yml,
+	  talks/gpw10talk-cpantesters.pod: r3965@k75: k | 2008-02-02
+	  06:33:59 +0100
+	  patches for 5.11
+
+2008-02-01  k
+
+	* ., Todo, distroprefs/MI.yml: r3963@k75: k | 2008-02-01 21:11:51
+	  +0100
+	  new modules always use MI?
+	* ., megainstall.txt: r3961@k75: k | 2008-02-01 08:26:45 +0100
+	  two more modules
+	* ., Todo, megainstall.txt: r3959@k75: k | 2008-02-01 08:17:25
+	  +0100
+	  two interesting modules mentioned recently
+
+2008-01-30  k
+
+	* ., distroprefs/ROBIN.PadWalker.yml: r3956@k75: k | 2008-01-30
+	  03:57:57 +0100
+	  PadWalker for 5.11
+	* ., talks/gpw10talk-cpantesters.pod: r3955@k75: k | 2008-01-30
+	  03:25:08 +0100
+	  tiny notes
+
+2008-01-29  k
+
+	* ., distroprefs/MI.yml: r3950@k75: k | 2008-01-29 06:20:19 +0100
+	  the rise and rise and rise of the Module::Install era
+	* ., distroprefs/ILYAZ.Math-Pari.yml: r3949@k75: k | 2008-01-29
+	  06:19:45 +0100
+	  light at the end of the tunnel
+	* ., distroprefs/01.DISABLED.yml: r3948@k75: k | 2008-01-29
+	  06:19:14 +0100
+	  a hanging distro
+	* ., bin/rt-deleter.pl: r3947@k75: k | 2008-01-29 06:18:52 +0100
+	  fix a rollover bug
+
+2008-01-28  k
+
+	* ., distroprefs/ILYAZ.Math-Pari.yml: r3942@k75: k | 2008-01-28
+	  22:25:28 +0100
+	  about to binsect with a rafl patch
+	* ., bin/rt-deleter.pl: r3941@k75: k | 2008-01-28 22:24:44 +0100
+	  exclude the DOS ticket 17751 from all future trials to view a
+	  ticket
+	* ., bin/ls-build+tmp.pl: r3940@k75: k | 2008-01-28 22:23:06 +0100
+	  removing all the crappy bugs to make way free for the KISS
+	  version
+	* ., Todo: r3939@k75: k | 2008-01-28 22:22:13 +0100
+	  notesd
+
+2008-01-27  k
+
+	* ., bin/ls-build+tmp.pl, bin/rt-deleter.pl,
+	  distroprefs/01.DISABLED.yml, distroprefs/FDALY.Test-Deep.yml:
+	  r3937@k75: k | 2008-01-27 13:11:50 +0100
+	  Test-Deep is now 5.11 compliant
+	* ., megainstall.txt: r3932@k75: k | 2008-01-27 10:48:11 +0100
+	  nice new module
+	* ., distroprefs/01.DISABLED.yml: r3931@k75: k | 2008-01-27
+	  10:47:51 +0100
+	  Moxy hangs, disabling
+	* ., bin/rtdatagaps.pl: r3930@k75: k | 2008-01-27 10:47:18 +0100
+	  initial checkin
+	* ., bin/rt-deleter.pl: r3929@k75: k | 2008-01-27 10:45:44 +0100
+	  add a nonono option
+
+2008-01-26  k
+
+	* ., related/CPAN-ToDist/Todo,
+	  related/CPAN-ToDist/lib/CPAN/ToDist/Deb.pm: r3924@k75: k |
+	  2008-01-26 22:12:22 +0100
+	  notes about my encounter with ToDist
+	* ., talks/gpw10talk-cpantesters.crumbs,
+	  talks/gpw10talk-cpantesters.pod: r3923@k75: k | 2008-01-26
+	  22:10:02 +0100
+	  notes for the talk at gpw 10
+	* ., bin/rt-deleter.pl: r3922@k75: k | 2008-01-26 12:31:00 +0100
+	  fix the unicode bugs
+	* ., bin/rt-deleter.pl, distroprefs/MI.yml: r3921@k75: k |
+	  2008-01-26 12:01:09 +0100
+	  first stab at it
+
+2008-01-25  k
+
+	* ., distroprefs/01.DISABLED.yml,
+	  distroprefs/EWILHELM.Math-Vec.yml: r3919@k75: k | 2008-01-25
+	  23:33:52 +0100
+	  another question I do not want to answer
+
+2008-01-24  dagolden
+
+	* Changes, lib/CPAN.pm, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm: - add 'trust_test_report_history'
+	  config to skip testing if reports are found
+
+2008-01-24  k
+
+	* ., lib/CPAN.pm: r3915@k75: k | 2008-01-24 06:26:09 +0100
+	  missing newline
+	* ., lib/CPAN.pm: r3912@k75: k | 2008-01-24 06:24:47 +0100
+	  disambiguate the diagnostic message when no Makefile has been
+	  built
+	* ., Todo, distroprefs/MSCHILLI.RRDTool-OO.yml: r3911@k75: k |
+	  2008-01-24 05:57:48 +0100
+	  a new questions being asked
+
+2008-01-21  k
+
+	* ., distroprefs/BINGOS.POE-Component-Client-FTP.yml,
+	  distroprefs/BINGOS.POE-Component-Client-NSCA.yml: r3909@k75: k |
+	  2008-01-21 05:30:56 +0100
+	  two new distros asking questions
+
+2008-01-20  k
+
+	* ., distroprefs/01.DISABLED.yml: r3906@k75: k | 2008-01-20
+	  16:15:55 +0100
+	  ooops, too much disabling does harm on dependencies
+
+2008-01-19  k
+
+	* ., bin/query-rt-group-by-requestor.pl,
+	  distroprefs/01.DISABLED.yml, distroprefs/AUDREYT.YAML-Syck.yml:
+	  r3903@k75: k | 2008-01-19 20:23:27 +0100
+	  prevent starvation
+
+2008-01-19  dagolden
+
+	* lib/CPAN/HandleConfig.pm: suppress File::HomeDir loading messages
+	  entirely to avoid confusing behavior
+	  when load_module_verbosity is actually turned off (chicken and
+	  egg problem)
+
+2008-01-17  rafl
+
+	* related/CPAN-ToDist/TODO: Add CPAN::ToDist TODO.
+	* related/CPAN-ToDist, related/CPAN-ToDist/lib,
+	  related/CPAN-ToDist/lib/CPAN,
+	  related/CPAN-ToDist/lib/CPAN/ToDist,
+	  related/CPAN-ToDist/lib/CPAN/ToDist.pm,
+	  related/CPAN-ToDist/lib/CPAN/ToDist/Deb,
+	  related/CPAN-ToDist/lib/CPAN/ToDist/Deb.pm,
+	  related/CPAN-ToDist/lib/CPAN/ToDist/Deb/Template.pm,
+	  related/CPAN-ToDist/lib/CPAN/ToDist/Template.pm: Add a first
+	  version of CPAN::ToDist.
+	  
+	  It's still quite hackish and totally undocumented.
+	  Use it like this:
+	  
+	  CPAN::ToDist::Deb->new({
+	  module => CPAN::Shell->expand('Module', 'Data::UUID'),
+	  destination => '/tmp',
+	  })->run;
+
+2008-01-17  k
+
+	* ., distroprefs/MI.yml: r3898@k75: k | 2008-01-17 06:20:20 +0100
+	  MI again
+
+2008-01-16  k
+
+	* ., distroprefs/01.DISABLED.yml: r3895@k75: k | 2008-01-16
+	  08:37:28 +0100
+	  another one to avoid
+	* ., bin/loop-over-recent.pl.otherperls,
+	  talks/gpw10talk-cpantesters.crumbs,
+	  talks/gpw10talk-cpantesters.pod: r3894@k75: k | 2008-01-16
+	  08:35:41 +0100
+	  first version of the talk to send to the committee
+
+2008-01-14  k
+
+	* ., distroprefs/01.DISABLED.yml: r3892@k75: k | 2008-01-14
+	  17:18:07 +0100
+	  no SamFS
+
+2008-01-13  k
+
+	* ., distroprefs/DROLSKY.Params-Validate.yml: r3890@k75: k |
+	  2008-01-13 21:55:05 +0100
+	  version 04 of the Params::Validate patch to get regexes into the
+	  inherent type system, DateTime::Format::Builder shook this out
+	* ., distroprefs/DROLSKY.Params-Validate.yml: r3888@k75: k |
+	  2008-01-13 19:11:48 +0100
+	  looks good
+	* ., distroprefs/DROLSKY.Params-Validate.yml: r3886@k75: k |
+	  2008-01-13 19:03:32 +0100
+	  it seems I integrated the patch from Steven
+	* ., distroprefs/DROLSKY.Params-Validate.yml: r3884@k75: k |
+	  2008-01-13 18:56:44 +0100
+	  previous patch stopped working, trying how far we get with this
+	  variant
+	* ., distroprefs/AUDREYT.Jifty-DBI.yml,
+	  distroprefs/AUDREYT.YAML-Syck.yml,
+	  distroprefs/JESSE.Data-ICal.yml,
+	  distroprefs/MIYAGAWA.Plagger.yml: r3882@k75: k | 2008-01-13
+	  18:30:29 +0100
+	  new patch against YAML::Syck and a few older disposed
+
+2008-01-12  k
+
+	* ., lib/CPAN/Tarzip.pm: r3880@k75: k | 2008-01-12 17:52:49 +0100
+	  whitespace only variables where a path is expected have always
+	  had the meaning of "i dont exist", so we implement this bahaviour
+	  for gzip and tar
+	* ., Todo, distroprefs/01.DISABLED.yml: r3878@k75: k | 2008-01-12
+	  10:30:51 +0100
+	  skip a hanger
+
+2008-01-07  k
+
+	* ., distroprefs/AUDREYT.YAML-Syck.yml: r3876@k75: k | 2008-01-08
+	  00:19:28 +0100
+	  YAML::Syck again compatible with 5.11 but with various new fails
+	  with and without this patch
+	* ., distroprefs/GAAS.Data-Dump.yml: r3874@k75: k | 2008-01-07
+	  23:04:52 +0100
+	  Data::Dump now compatible with 5.11 without an if
+	* ., Todo, distroprefs/01.DISABLED.yml, distroprefs/MI.yml:
+	  r3871@k75: k | 2008-01-07 20:26:26 +0100
+	  the usual distroprefs/megainstall maintenance
+	* ., distroprefs/01.DISABLED.yml, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm: r3870@k75: k | 2008-01-06 23:16:56
+	  +0100
+	  another patch from Randy Kobes to improve the ppm support
+
+2008-01-06  k
+
+	* ., distroprefs/01.DISABLED.yml, distroprefs/GAAS.Data-Dump.yml,
+	  patches/Data-Dump-1.08-ANDK-01.patch: r3868@k75: k | 2008-01-06
+	  12:16:27 +0100
+	  got Data-Dump working with blead
+
+2008-01-05  k
+
+	* ., distroprefs/01.DISABLED.yml: r3866@k75: k | 2008-01-05
+	  17:17:59 +0100
+	  a new hanger
+	* ., megainstall.txt: r3864@k75: k | 2008-01-05 13:15:40 +0100
+	  remove unknown modules from the megainstall
+	* ., distroprefs/AUDREYT.YAML-Syck.yml: r3862@k75: k | 2008-01-05
+	  12:56:38 +0100
+	  YAML::Syck patched for 5.11
+	* ., distroprefs/DROLSKY.Params-Validate.yml,
+	  distroprefs/RDF.Clone.yml, megainstall.txt: r3858@k75: k |
+	  2008-01-05 09:02:28 +0100
+	  new patches for Clone and Params::Validate
+	* ., bin/loop-over-recent.pl.otherperls: r3857@k75: k | 2008-01-05
+	  09:02:01 +0100
+	  add 5.10 and remove 5.9.5
+	* ., bin/loop-over-recent.pl: r3856@k75: k | 2008-01-05 09:01:20
+	  +0100
+	  do not trust most recent perls to be suited for mass testing
+
+2008-01-04  k
+
+	* ., lib/CPAN/HandleConfig.pm: r3854@k75: k | 2008-01-04 06:33:34
+	  +0100
+	  applied apatch by Randy Kobes to anable *_install_make_command
+	  for Win32: ppm can be used too instead of sudo
+
+2008-01-03  k
+
+	* ., distroprefs/MI.yml: r3852@k75: k | 2008-01-03 08:35:18 +0100
+	  the usual distroprefs/megainstall maintenance
+
+2008-01-02  k
+
+	* ., distroprefs/01.DISABLED.yml, distroprefs/OLAF.Net-DNS.yml,
+	  talks/gpw10talk-cpantesters.pod: r3850@k75: k | 2008-01-03
+	  00:37:59 +0100
+	  another to disable
+
+2007-12-31  k
+
+	* ., bin/query-rt-group-by-requestor.pl: r3846@k75: k | 2007-12-31
+	  18:12:30 +0100
+	  after the first posting...
+	* ., bin/query-rt-group-by-requestor.pl: r3845@k75: k | 2007-12-31
+	  18:12:13 +0100
+	  after the first posting...
+	* ., Todo, bin/query-rt-group-by-requestor.pl: r3844@k75: k |
+	  2007-12-31 18:11:11 +0100
+	  after the first posting...
+	* ., Makefile.PL, distroprefs/LOCAL.trailing_dot_distros.yml:
+	  r3842@k75: k | 2007-12-31 08:38:55 +0100
+	  at home, use the released version of SQLite, the CVS seems
+	  stalled
+	* ., distroprefs/01.DISABLED.yml: r3840@k75: k | 2007-12-31
+	  07:40:08 +0100
+	  the usual distroprefs/megainstall maintenance
+
+2007-12-30  k
+
+	* ., distroprefs/FLORA.Net_SSLeay.yml,
+	  distroprefs/JENDA.Mail-Sender.yml: r3835@k75: k | 2007-12-31
+	  00:14:51 +0100
+	  make the two distroprefs ready for YAML, we have no YAML::Syck in
+	  5.11 atm
+	* ., bin/query-rt-group-by-requestor.pl: r3834@k75: k | 2007-12-30
+	  17:09:45 +0100
+	  this statistics script produced a nice top 40 included in the
+	  script itself
+	* README: autogen
+	* ., Changes: r3832@k75: k | 2007-12-30 16:09:35 +0100
+	  prepare a dev release
+	* ., Changes: r3830@k75: k | 2007-12-30 16:07:24 +0100
+	  prepare a release
+	* ., lib/CPAN.pm, lib/CPAN/Tarzip.pm: r3827@k75: k | 2007-12-30
+	  16:02:21 +0100
+	  address #32003: if untar breaks we broke too much of the session
+	* ., bin/query-rt-group-by-requestor.pl: r3826@k75: k | 2007-12-30
+	  16:01:30 +0100
+	  wip
+	* ., bin/query-rt-group-by-requestor.pl, distroprefs/MI.yml:
+	  r3824@k75: k | 2007-12-30 15:35:15 +0100
+	  the usual distroprefs/megainstall maintenance
+	* ., bin/query-rt-group-by-requestor.pl,
+	  distroprefs/01.DISABLED.yml, distroprefs/MI.yml: r3822@k75: k |
+	  2007-12-30 14:59:25 +0100
+	  a new Module::Install customer
+	* ., distroprefs/MI.yml, megainstall.txt: r3816@k75: k | 2007-12-30
+	  09:15:55 +0100
+	  the usual distroprefs/megainstall maintenance
+	* ., bin/query-rt-group-by-requestor.pl: r3815@k75: k | 2007-12-30
+	  09:15:11 +0100
+	  wip
+	* ., distroprefs/LBROCARD.Test-WWW-Mechanize-Catalyst.yml:
+	  r3814@k75: k | 2007-12-30 09:14:12 +0100
+	  a patch holder
+	* ., bin/query-rt-group-by-requestor.pl: r3813@k75: k | 2007-12-29
+	  19:43:50 +0100
+	  wip
+	* ., bin/query-rt-group-by-requestor.pl: r3811@k75: k | 2007-12-29
+	  17:56:04 +0100
+	  just an example that lists nearly all tickets of the database as
+	  a demo
+
+2007-12-29  k
+
+	* ., distroprefs/DROLSKY.Params-Validate.yml,
+	  distroprefs/RDF.Clone.yml: r3809@k75: k | 2007-12-29 12:03:05
+	  +0100
+	  ready to dive into 5.11 again
+
+2007-12-28  k
+
+	* ., t/CPAN/modules/02packages.details.txt: r3807@k75: k |
+	  2007-12-28 21:41:39 +0100
+	  play safe with regards to 5.6.x when listing Fcntl in the
+	  02packages file
+	* ., lib/CPAN.pm, lib/CPAN/FirstTime.pm, t/12cpan.t: r3805@k75: k |
+	  2007-12-28 20:47:30 +0100
+	  make tests pass on perl 5.6.x and document that deferedcode does
+	  not work there
+	* ., t/31sessions.t: r3801@k75: k | 2007-12-28 20:21:01 +0100
+	  another refinement in diagnostics after failure
+	* ., lib/CPAN.pm: r3800@k75: k | 2007-12-28 20:20:34 +0100
+	  add a rather useless alert when there is no Build; need to track
+	  such a crap as early as possible
+	* ., distroprefs/01.DISABLED.yml: r3799@k75: k | 2007-12-28
+	  20:19:32 +0100
+	  disable another one that I have no time for
+	* ., talks/gpw10talk-cpantesters.pod: r3792@k75: k | 2007-12-28
+	  09:03:02 +0100
+	  a joke
+	* ., t/31sessions.t: r3791@k75: k | 2007-12-28 09:02:37 +0100
+	  improve diagnostics on fail
+	* ., lib/CPAN.pm: r3790@k75: k | 2007-12-28 09:01:51 +0100
+	  fail gracefully on distroprefs parse errors
+	* ., Todo: r3789@k75: k | 2007-12-28 08:57:17 +0100
+	  notes
+
+2007-12-27  k
+
+	* README: autogen
+	* ., Changes: r3787@k75: k | 2007-12-27 05:46:12 +0100
+	  prepare a new release
+
+2007-12-26  k
+
+	* ., Todo: r3784@k75: k | 2007-12-26 22:04:55 +0100
+	  notes
+	* ., lib/CPAN.pm: r3783@k75: k | 2007-12-26 22:04:34 +0100
+	  small documentation overhaul
+	* ., distroprefs/01.DISABLED.yml: r3781@k75: k | 2007-12-26
+	  18:08:50 +0100
+	  typo
+	* ., distroprefs/01.DISABLED.yml, distroprefs/NI-S.Tk-HTML.yml,
+	  lib/CPAN.pm: r3779@k75: k | 2007-12-26 17:17:14 +0100
+	  prevent endless loop
+	* ., MANIFEST, distroprefs/GAAS.Font-AFM.yml,
+	  talks/gpw10talk-cpantesters.pod: r3777@k75: k | 2007-12-26
+	  11:39:27 +0100
+	  Font-AFM has a patch and a ticket
+	* ., distroprefs/HANJE.Syntax-Highlight-Engine-Kate.yml: r3775@k75:
+	  k | 2007-12-26 05:11:58 +0100
+	  more about Kate
+
+2007-12-25  k
+
+	* ., MANIFEST, Todo,
+	  distroprefs/HANJE.Syntax-Highlight-Engine-Kate.yml,
+	  distroprefs/MI.yml: r3773@k75: k | 2007-12-25 13:54:47 +0100
+	  silence the noise of Kate
+
+2007-12-24  k
+
+	* ., Todo, distroprefs/MSCHWERN.Test-Simple.yml: r3771@k75: k |
+	  2007-12-24 22:30:19 +0100
+	  notes
+
+2007-12-23  k
+
+	* ., lib/CPAN/HandleConfig.pm: r3769@k75: k | 2007-12-23 15:04:55
+	  +0100
+	  applied a patch by Michael Stillwell from ticket #31825
+	* ., MANIFEST, Makefile.PL, lib/CPAN/Tarzip.pm, t/13tarzip.t:
+	  r3765@k75: k | 2007-12-23 14:46:59 +0100
+	  fix the logic when Compress::Zlib is not installed, add a test to
+	  verify it; fixes #31750
+	* ., distroprefs/MI.yml: r3764@k75: k | 2007-12-23 14:22:24 +0100
+	  new user of Module::Install
+	* ., megainstall.txt: r3763@k75: k | 2007-12-23 14:21:54 +0100
+	  new recommendations
+
+2007-12-22  k
+
+	* ., distroprefs/GOZER.mod_perl.yml: r3761@k75: k | 2007-12-22
+	  10:27:26 +0100
+	  LOCAL is the wrong specification
+	* ., Todo, distroprefs/GOZER.mod_perl.yml: r3759@k75: k |
+	  2007-12-22 10:07:10 +0100
+	  mod_perl 1.31 rc1 is available
+	* ., distroprefs/OLAF.Net-DNS.yml: r3757@k75: k | 2007-12-22
+	  05:53:31 +0100
+	  Test-Simple 0.74 is now in bleadperl
+	* ., Todo, distroprefs/BRADFITZ.Danga-Socket.yml, megainstall.txt:
+	  r3755@k75: k | 2007-12-22 04:32:43 +0100
+	  notes
+
+2007-12-17  k
+
+	* ., Todo, distroprefs/MI.yml, megainstall.txt: r3753@k75: k |
+	  2007-12-17 20:54:48 +0100
+	  the usual distroprefs/megainstall maintenance
+	* ., MANIFEST, Todo, distroprefs/BDFOY.Test-HTTPStatus.yml:
+	  r3751@k75: k | 2007-12-17 05:57:34 +0100
+	  new distroprefs
+
+2007-12-16  k
+
+	* ., megainstall.txt: r3749@k75: k | 2007-12-16 18:11:50 +0100
+	  the usual distroprefs/megainstall maintenance
+
+2007-12-15  k
+
+	* ., Todo, bin/ls-build+tmp.pl, distroprefs/01.DISABLED.yml,
+	  megainstall.txt, talks/gpw10talk-cpantesters.pod: r3747@k75: k |
+	  2007-12-15 09:05:57 +0100
+	  notes
+
+2007-12-13  k
+
+	* ., Todo, distroprefs/GOZER.mod_perl.yml: r3745@k75: k |
+	  2007-12-13 06:28:33 +0100
+	  have tried Steve Hay's patch for mod_perl
+	* ., distroprefs/GOZER.mod_perl.yml,
+	  patches/mod_perl-1.30-SHAY-01.patch.gz: r3743@k75: k | 2007-12-13
+	  05:42:46 +0100
+	  try Steve Hay's patch for mod_perl
+	* ., distroprefs/MI.yml,
+	  distroprefs/MIKER.IPtables-IPv4-DBTarpit.yml: r3741@k75: k |
+	  2007-12-13 05:20:08 +0100
+	  the usual distroprefs/megainstall maintenance
+
+2007-12-12  k
+
+	* ., Todo, bin/loop-over-recent.pl.otherperls,
+	  distroprefs/MIKER.IPtables-IPv4-DBTarpit.yml: r3739@k75: k |
+	  2007-12-12 23:13:30 +0100
+	  new package with too many questions
+	* ., Todo, distroprefs/MI.yml, megainstall.txt: r3735@k75: k |
+	  2007-12-12 07:02:21 +0100
+	  the usual distroprefs/megainstall maintenance
+
+2007-12-09  k
+
+	* README: autogenerated readme
+	* ., t/30shell.t: r3732@k75: k | 2007-12-10 00:17:27 +0100
+	  a changed default naturally needs changes in the tests too
+	* ., t/30shell.t: r3731@k75: k | 2007-12-10 00:08:41 +0100
+	  more timeout for the slow solaris boxen
+	* ., Changes: r3729@k75: k | 2007-12-10 00:00:38 +0100
+	  preparing a new release
+	* ., Changes, distroprefs/ZOOLEIKA.SVG-Plot.yml, megainstall.txt:
+	  r3727@k75: k | 2007-12-09 23:55:48 +0100
+	  preparing a new release
+	* ., MANIFEST, distroprefs/MI.yml, megainstall.txt: r3725@k75: k |
+	  2007-12-09 15:13:50 +0100
+	  the usual distroprefs/megainstall maintenance
+	* ., Todo, distroprefs/MI.yml, distroprefs/ZOOLEIKA.RDF-Simple.yml,
+	  megainstall.txt: r3723@k75: k | 2007-12-09 12:08:41 +0100
+	  add a dependency
+
+2007-12-08  k
+
+	* ., Todo, distroprefs/MARKSTOS.CGI-Session.yml: r3721@k75: k |
+	  2007-12-08 08:09:47 +0100
+	  the usual distroprefs/megainstall maintenance
+	* ., Todo, distroprefs/MARKSTOS.CGI-Session.yml, megainstall.txt:
+	  r3719@k75: k | 2007-12-08 07:56:34 +0100
+	  the usual distroprefs/megainstall maintainance
+
+2007-12-07  k
+
+	* ., lib/CPAN.pm: r3715@k75: k | 2007-12-07 22:02:38 +0100
+	  fix the bug where CPAN.pm refused to upgrade to Test::Harness 3
+	  because Test::Harness was too old
+	* distroprefs/01.DISABLED.yml: the sudo doing seems to have been
+	  removed from the code
+	* ., MANIFEST, distroprefs/WRW.Barcode-Code128.yml: r3713@k75: k |
+	  2007-12-07 08:42:50 +0100
+	  the usual distroprefs/megainstall maintainance
+	* ., distroprefs/PETERW.SVG-Parser.yml: r3711@k75: k | 2007-12-07
+	  08:18:55 +0100
+	  the usual distroprefs/megainstall maintainance
+	* ., distroprefs/MI.yml: r3708@k75: k | 2007-12-07 06:57:33 +0100
+	  the usual distroprefs/megainstall maintainance
+	* ., Todo, distroprefs/01.DISABLED.yml, distroprefs/MI.yml,
+	  megainstall.txt: r3707@k75: k | 2007-12-07 06:53:05 +0100
+	  the usual distroprefs/megainstall maintainance
+
+2007-12-05  k
+
+	* ., Todo, distroprefs/KRUSCOE.Tie-DxHash.yml, megainstall.txt:
+	  r3705@k75: k | 2007-12-05 06:06:31 +0100
+	  replace Bundle::Phalanx100 with its content dropping Oracle,
+	  Sybase, and Image::Magick
+
+2007-12-04  k
+
+	* ., distroprefs/01.DISABLED.yml, megainstall.txt,
+	  talks/gpw10talk-cpantesters.pod: r3703@k75: k | 2007-12-04
+	  04:38:02 +0100
+	  reject total opt-out by Marc again; add Authen::Htpasswd
+	* ., distroprefs/01.DISABLED.yml: r3701@k75: k | 2007-12-04
+	  03:47:55 +0100
+	  honour total opt-out by Marc LEhmann
+
+2007-12-03  k
+
+	* ., distroprefs/01.DISABLED.yml: r3699@k75: k | 2007-12-03
+	  08:00:02 +0100
+	  hanging test
+	* ., Todo, distroprefs/01.DISABLED.yml: r3697@k75: k | 2007-12-03
+	  07:18:43 +0100
+	  hanging test
+
+2007-12-02  k
+
+	* ., Todo, bin/loop-over-recent.pl.otherperls,
+	  distroprefs/01.DISABLED.yml: r3695@k75: k | 2007-12-02 07:24:13
+	  +0100
+	  the usual distroprefs/megainstall maintainance
+
+2007-12-01  k
+
+	* ., distroprefs/01.DISABLED.yml, distroprefs/MI.yml: r3693@k75: k
+	  | 2007-12-01 19:49:14 +0100
+	  the usual distroprefs/megainstall maintainance
+	* ., distroprefs/01.DISABLED.yml, distroprefs/SEANO.Sepia.yml,
+	  megainstall.txt: r3690@k75: k | 2007-12-01 10:00:55 +0100
+	  the usual distroprefs/megainstall maintainance
+	* ., MANIFEST, Todo, distroprefs/JESSE.Jifty.yml,
+	  distroprefs/MI.yml: r3689@k75: k | 2007-12-01 05:04:45 +0100
+	  a new Jifty
+
+2007-11-29  k
+
+	* ., Todo, distroprefs/01.DISABLED.yml, distroprefs/MI.yml:
+	  r3687@k75: k | 2007-11-29 22:56:23 +0100
+	  delays on the instant tester
+	* ., Todo, distroprefs/GEOFF.Apache-Test.yml: r3685@k75: k |
+	  2007-11-29 08:30:20 +0100
+	  it seems this needs a PERL_MM_USE_DEFAULT too
+	* ., MANIFEST, distroprefs/DKWILSON.Tk-DKW.yml,
+	  distroprefs/MARKOV.Mail-IMAPClient.yml, megainstall.txt,
+	  talks/gpw10talk-cpantesters.pod: r3683@k75: k | 2007-11-29
+	  07:07:36 +0100
+	  new distroprefs
+
+2007-11-28  k
+
+	* ., Todo, distroprefs/GEOFF.Apache-Test.yml: r3681@k75: k |
+	  2007-11-28 05:12:59 +0100
+	  it seems that current Apache-Test is better dealt with in an
+	  envariable
+
+2007-11-27  k
+
+	* ., distroprefs/MI.yml, distroprefs/SEANO.Sepia.yml: r3679@k75: k
+	  | 2007-11-27 20:51:13 +0100
+	  quick observations
+	* ., Todo, distroprefs/SEANO.Sepia.yml: r3677@k75: k | 2007-11-27
+	  08:40:49 +0100
+	  new difficult distropref that has to supply < /dev/null
+	* ., distroprefs/MLEHMANN.Gtk-Perl.yml, megainstall.txt: r3674@k75:
+	  k | 2007-11-27 04:05:14 +0100
+	  tiny additions
+	* ., megainstall.txt: r3673@k75: k | 2007-11-27 02:40:35 +0100
+	  just discovered DBIx::HA
+
+2007-11-26  k
+
+	* ., distroprefs/YVES.Date-Simple.yml: r3671@k75: k | 2007-11-26
+	  08:09:21 +0100
+	  the whole text about Date-Simple was crap, it was due to a broken
+	  MakeMaker 6.37_01
+	* ., MANIFEST, distroprefs/YVES.Date-Simple.yml: r3669@k75: k |
+	  2007-11-26 05:57:31 +0100
+	  Switch to a Date-Simple workaround
+
+2007-11-25  k
+
+	* ., distroprefs/DONEILL.MIME-tools.yml,
+	  distroprefs/JPRIT.Event.yml, distroprefs/MLEHMANN.AnyEvent.yml:
+	  r3667@k75: k | 2007-11-25 12:01:16 +0100
+	  improved DPs
+	* ., Todo, distroprefs/MI.yml, distroprefs/RCLAMP.Devel-Caller.yml,
+	  megainstall.txt: r3665@k75: k | 2007-11-25 07:15:15 +0100
+	  patch address changed
+	* ., Todo,
+	  distroprefs/FABPOT.Plucene-Plugin-Analyzer-SnowballAnalyzer.yml,
+	  distroprefs/MLEHMANN.AnyEvent.yml,
+	  distroprefs/RCLAMP.Devel-Caller.yml, megainstall.txt: r3662@k75:
+	  k | 2007-11-25 05:40:25 +0100
+	  new and improved distroprefs
+	* ., t/31sessions.t: r3661@k75: k | 2007-11-25 05:39:43 +0100
+	  skip the test with old YAML, no pay off to support broken YAMLs
+
+2007-11-24  k
+
+	* ., Todo: r3656@k75: k | 2007-11-24 04:29:35 +0100
+	  notes
+	* ., bin/ls-build+tmp.pl: r3655@k75: k | 2007-11-24 04:23:00 +0100
+	  helper script to detect left-over files in /tmp
+	* ., patches/CPAN2.diff: r3654@k75: k | 2007-11-24 04:22:22 +0100
+	  the original patch by Rich Paul
+	* ., distroprefs/DHARRIS.DB_File-Lock.yml,
+	  talks/gpw10talk-cpantesters.pod: r3653@k75: k | 2007-11-23
+	  22:18:29 +0100
+	  http://rt.cpan.org/Ticket/Display.html?id=30942
+
+2007-11-23  k
+
+	* ., Todo, megainstall.txt: r3650@k75: k | 2007-11-23 20:08:47
+	  +0100
+	  notes and DB_File now in megainstall
+	* ., lib/CPAN/FirstTime.pm: r3649@k75: k | 2007-11-23 05:53:03
+	  +0100
+	  prefer the conservative choice to NOT use build_dir_reuse
+	* ., MANIFEST: r3646@k75: k | 2007-11-23 04:52:48 +0100
+	  distroprefs/DONEILL.MIME-tools.yml
+	* ., Todo, distroprefs/DONEILL.MIME-tools.yml,
+	  distroprefs/SWALTERS.typesafety.yml: r3645@k75: k | 2007-11-23
+	  04:52:14 +0100
+	  distroprefs/DONEILL.MIME-tools.yml
+
+2007-11-22  k
+
+	* ., MANIFEST, Todo, distroprefs/PETERW.SVG-Parser.yml: r3643@k75:
+	  k | 2007-11-22 21:02:35 +0100
+	  fix a missing dependency
+	* ., Todo, distroprefs/MLEHMANN.AnyEvent.yml, megainstall.txt:
+	  r3641@k75: k | 2007-11-22 08:52:47 +0100
+	  AnyEvent still hangs for me
+
+2007-11-21  k
+
+	* Todo: notes
+	* megainstall.txt: add Test::WWW::Declare
+	* ., Todo, megainstall.txt: r3636@k75: k | 2007-11-21 09:02:35
+	  +0100
+	  add GzipChain; notes about breakage on Web::Scraper
+	* ., Todo, distroprefs/DCANTRELL.Devel-CheckOS.yml,
+	  megainstall.txt: r3634@k75: k | 2007-11-21 05:29:56 +0100
+	  new friends
+
+2007-11-20  k
+
+	* ., distroprefs/TSCH.Gtk2.yml: r3632@k75: k | 2007-11-20 04:55:49
+	  +0100
+	  experiment if Gtk2 needs the DISPLAY?
+	* ., MANIFEST, Todo, distroprefs/SWALTERS.typesafety.yml:
+	  r3630@k75: k | 2007-11-20 04:47:29 +0100
+	  distroprefs no 250
+
+2007-11-18  k
+
+	* ., Todo, bin/loop-over-recent.pl.otherperls,
+	  distroprefs/MLEHMANN.AnyEvent.yml,
+	  distroprefs/ROODE.Readonly-XS.yml: r3628@k75: k | 2007-11-18
+	  23:14:39 +0100
+	  notes and distroprefs
+	* ., distroprefs/MSERGEANT.XML-Parser.yml: r3626@k75: k |
+	  2007-11-18 19:53:08 +0100
+	  XML-Parser 2.35 needs a workaround for a weird bug
+	* ., distroprefs/MLEHMANN.AnyEvent.yml: r3624@k75: k | 2007-11-18
+	  18:10:44 +0100
+	  variations of a workaround
+	* ., Todo, distroprefs/MLEHMANN.AnyEvent.yml: r3622@k75: k |
+	  2007-11-18 17:58:43 +0100
+	  Found a workaround against AnyEvent hanging
+	* ., Todo, distroprefs/01.DISABLED.yml,
+	  distroprefs/MLEHMANN.AnyEvent.yml: r3620@k75: k | 2007-11-18
+	  17:06:48 +0100
+	  AnyEvent hangs and may need a binary search
+	* ., MANIFEST, Todo, bin/loop-over-recent.pl,
+	  distroprefs/KRUSCOE.Tie-DxHash.yml, megainstall.txt: r3618@k75: k
+	  | 2007-11-18 16:42:18 +0100
+	  newly discovered "negative" dependency in Tie-DxHash
+
+2007-11-17  k
+
+	* ., Todo, distroprefs/AUDREYT.Jifty-DBI.yml, distroprefs/MI.yml:
+	  r3616@k75: k | 2007-11-17 13:09:25 +0100
+	  notes about XML::XPathScript and MI growth
+	* ., lib/CPAN/Tarzip.pm: r3611@k75: k | 2007-11-17 07:39:33 +0100
+	  improve diagnostics when Tarzip believes that it must give up
+	* ., bin/loop-over-recent.pl: r3610@k75: k | 2007-11-17 07:38:33
+	  +0100
+	  speedup loop-over-recent by turning off build_dir_reuse
+	* ., talks/gpw10talk-cpantesters.pod: r3609@k75: k | 2007-11-17
+	  07:37:54 +0100
+	  ideas from looking at slavens cpantesters cgi
+	* ., Todo: r3608@k75: k | 2007-11-17 07:37:13 +0100
+	  notes
+
+2007-11-16  k
+
+	* ., Todo, distroprefs/MI.yml: r3606@k75: k | 2007-11-16 08:19:12
+	  +0100
+	  another MI user
+
+2007-11-15  k
+
+	* ., Todo, bin/poesmoe.pl: r3602@k75: k | 2007-11-15 22:29:33 +0100
+	  notes
+	* ., megainstall.txt: r3601@k75: k | 2007-11-15 22:29:11 +0100
+	  discovered new interesting modules
+	* ., lib/CPAN.pm: r3600@k75: k | 2007-11-15 22:28:04 +0100
+	  51pod fails because connect_to_internet_ok was not documented in
+	  the main manpage
+
+2007-11-14  k
+
+	* ., distroprefs/MRAMBERG.MojoMojo.yml, megainstall.txt: r3598@k75:
+	  k | 2007-11-14 22:23:01 +0100
+	  accidental family extensions
+	* ., MANIFEST, Todo, distroprefs/MRAMBERG.MojoMojo.yml,
+	  megainstall.txt: r3596@k75: k | 2007-11-14 20:31:36 +0100
+	  integrate mojomojo
+	* ., MANIFEST, distroprefs/PHOENIX.Term-ReadPassword.yml,
+	  lib/CPAN.pm: r3593@k75: k | 2007-11-14 06:45:37 +0100
+	  add HVDS patch for Term-ReadPassword
+	* ., MANIFEST, distroprefs/PDCAWLEY.Class-Inner.yml: r3592@k75: k |
+	  2007-11-14 06:15:11 +0100
+	  add HVDS patch for Class-Inner
+
+2007-11-13  k
+
+	* ., lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm:
+	  r3584@k75: k | 2007-11-13 22:16:12 +0100
+	  new config variable connect_to)internet_ok
+	* ., Todo, distroprefs/BRADFITZ.Danga-Socket.yml, megainstall.txt:
+	  r3583@k75: k | 2007-11-13 22:00:31 +0100
+	  recent discoveries
+	* ., talks/gpw10talk-cpantesters.pod: r3582@k75: k | 2007-11-13
+	  21:59:45 +0100
+	  renee asking me for topics to present on the perl workshop
+	* ., Changes: r3581@k75: k | 2007-11-13 21:54:59 +0100
+	  merge in the changes file of 1.9205
+	* ., Todo, t/31sessions.t: r3576@k75: k | 2007-11-11 18:53:00 +0100
+	  protect the testrunner from people who install the test dummy
+	  modules
+	* ., Todo: r3575@k75: k | 2007-11-11 14:20:55 +0100
+	  notes
+	* ., Todo, lib/CPAN.pm: r3574@k75: k | 2007-11-11 14:15:17 +0100
+	  whitespace fixes in redirect code
+
+2007-11-12  k
+
+	* distroprefs/JESSE.Data-ICal.yml, distroprefs/MI.yml,
+	  megainstall.txt: news/changes for ical
+
+2007-11-11  k
+
+	* ., MANIFEST: r3571@k75: k | 2007-11-11 12:19:58 +0100
+	  the case of a lost letter
+	* ., Changes: r3569@k75: k | 2007-11-11 12:16:53 +0100
+	  prepare a release
+	* ., MANIFEST, MANIFEST.SKIP, Makefile.PL, t/30shell.t,
+	  t/31sessions.t, t/CPAN/authors/id/A/AN/ANDK/CHECKSUMS,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/Changes,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/MANIFEST,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/META.yml,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/Makefile.PL,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/README,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/lib,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/lib/CPAN,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/lib/CPAN/Test,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/lib/CPAN/Test/Dummy,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/lib/CPAN/Test/Dummy/Perl5,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/lib/CPAN/Test/Dummy/Perl5/Make,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/lib/CPAN/Test/Dummy/Perl5/Make/UnsatPrereq.pm,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/t,
+	  t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq/t/00_load.t,
+	  t/CPAN/modules/02packages.details.txt: r3566@k75: k | 2007-11-11
+	  12:03:50 +0100
+	  add the testdistro from Slaven and a test in 31sessions that
+	  covers the recent bugfix for unsatisfyable dependencies
+	* ., Todo, lib/CPAN.pm, megainstall.txt: r3565@k75: k | 2007-11-11
+	  11:05:58 +0100
+	  bugfix: the recent bugfix was accessing the wrong hash directly
+	* ., MANIFEST, distroprefs/MLEHMANN.EV.yml, megainstall.txt:
+	  r3563@k75: k | 2007-11-11 06:52:35 +0100
+	  The EV module
+
+2007-11-10  k
+
+	* ., distroprefs/01.DISABLED.yml: r3561@k75: k | 2007-11-10
+	  08:48:26 +0100
+	  blah
+	* ., MANIFEST, bin/poesmoe.pl,
+	  distroprefs/WITTROCK.Tk-PathEntry.yml: r3559@k75: k | 2007-11-10
+	  05:38:50 +0100
+	  blah
+	* ., distroprefs/WITTROCK.Tk-PathEntry.yml: r3557@k75: k |
+	  2007-11-10 05:32:37 +0100
+	  blah
+	* ., megainstall.txt: r3555@k75: k | 2007-11-10 05:18:37 +0100
+	  blah
+
+2007-11-09  k
+
+	* ., lib/CPAN.pm: r3552@k75: k | 2007-11-09 08:34:43 +0100
+	  avoid warning "once"
+	* ., lib/CPAN.pm: r3551@k75: k | 2007-11-09 08:34:11 +0100
+	  whitespace addaption of the redirect code
+	* ., bin/dir-to-jifty.pl, distroprefs/01.DISABLED.yml: r3549@k75: k
+	  | 2007-11-09 07:23:03 +0100
+	  there seems to be a Jifty vs. FindBin fight going on
+	* ., Todo, megainstall.txt: r3547@k75: k | 2007-11-09 07:18:59
+	  +0100
+	  more megainstall
+
+2007-11-08  k
+
+	* ., Todo, distroprefs/MI.yml: r3545@k75: k | 2007-11-08 06:02:52
+	  +0100
+	  new module install colleague
+
+2007-11-07  k
+
+	* ., distroprefs/FLORA.Net_SSLeay.yml: r3543@k75: k | 2007-11-07
+	  22:02:01 +0100
+	  trying SSLeay with MUCH longer timeout
+	* ., Todo, distroprefs/FLORA.Net_SSLeay.yml: r3541@k75: k |
+	  2007-11-07 21:56:26 +0100
+	  trying SSLeay with longer timeout
+	* ., Todo, lib/CPAN.pm, megainstall.txt: r3538@k75: k | 2007-11-07
+	  06:37:11 +0100
+	  repair whitespace; add a few modules to megainstall
+	* ., Todo, lib/CPAN.pm: r3536@k75: k | 2007-11-06 08:17:39 +0100
+	  a recent bugfix introduced a static variable accidentally
+
+2007-11-06  k
+
+	* ., Todo: r3534@k75: k | 2007-11-06 01:16:28 +0100
+	  notes only
+
+2007-11-05  k
+
+	* ., lib/CPAN.pm: r3524@k75: k | 2007-11-06 00:45:54 +0100
+	  upp the version number
+	* ., lib/CPAN.pm: r3523@k75: k | 2007-11-06 00:44:21 +0100
+	  import chdir from Cwd into all packages that use chdir so that we
+	  set PWD everywhere for better portability
+	* ., Changes, Makefile.PL, Todo, t/60credentials.t: r3522@k75: k |
+	  2007-11-06 00:31:20 +0100
+	  merge back what we learned during the release of 1.9204
+	* README: autogen
+
+2007-11-04  k
+
+	* distroprefs/ABW.Template-Toolkit.dd: do not need cc files in the
+	  repo (I think)
+	* ., Changes, lib/CPAN.pm: r3517@k75: k | 2007-11-04 23:53:14 +0100
+	  repaired the mistakes that make test reveiled and fix a few
+	  things in the release notes
+	* ., Changes: r3514@k75: k | 2007-11-04 23:31:31 +0100
+	  prepare a release
+	* ., lib/CPAN.pm: r3513@k75: k | 2007-11-04 23:11:31 +0100
+	  addressing #30464 Endless loops with prereq resolution
+	* ., lib/CPAN.pm: r3511@k75: k | 2007-11-04 22:40:42 +0100
+	  applied a patch by Rich Paul to support redirections and pipes on
+	  the shell commandline
+	* ., Todo, lib/CPAN.pm: r3509@k75: k | 2007-11-04 22:37:25 +0100
+	  Slaven Rezic points me to perlipc where it explains how kill 0 is
+	  to be used
+	* ., distroprefs/EBOHLMAN.Text-Query.yml: r3507@k75: k | 2007-11-04
+	  12:08:19 +0100
+	  now with the uploaded patch
+	* ., distroprefs/EBOHLMAN.Text-Query.yml: r3505@k75: k | 2007-11-04
+	  12:04:11 +0100
+	  typo
+	* ., MANIFEST, Todo, distroprefs/EBOHLMAN.Text-Query.yml:
+	  r3498@k75: k | 2007-11-04 12:02:50 +0100
+	  testing a new distroprefs for a very dated module
+	* ., distroprefs/ABW.Template-Toolkit.yml,
+	  distroprefs/RDF.Clone.yml: r3497@k75: k | 2007-11-04 11:16:56
+	  +0100
+	  tiny cleanups in dated distroprefs
+	* ., bin/loop-over-recent.pl.otherperls: r3496@k75: k | 2007-11-04
+	  11:16:26 +0100
+	  activating other perls for the recent testing loop
+	* ., Todo: r3495@k75: k | 2007-11-04 11:15:48 +0100
+	  big table over all BBC incidents
+	* ., distroprefs/RGIERSIG.Expect.yml: r3494@k75: k | 2007-11-04
+	  11:15:10 +0100
+	  expect is fixed now
+	* ., MANIFEST: r3493@k75: k | 2007-11-04 11:15:04 +0100
+	  expect is fixed now
+
+2007-11-02  k
+
+	* ., megainstall.txt: r3489@k75: k | 2007-11-02 08:48:46 +0100
+	  (untested) three new megainstall friends after reading about them
+	  on cpanratings
+	* ., bin/loop-over-recent.pl.otherperls: r3488@k75: k | 2007-11-02
+	  08:48:11 +0100
+	  repaired a few otherperl entries after the Perl-Dist desaster
+	* ., Todo: r3487@k75: k | 2007-11-02 08:47:36 +0100
+	  notes on today's BBC article
+	* ., distroprefs/PODMASTER.HTML-Scrubber.yml: r3485@k75: k |
+	  2007-11-02 05:39:24 +0100
+	  just uploaded the HTML-Scribber patch
+
+2007-11-01  k
+
+	* ., distroprefs/01.DISABLED.yml: r3483@k75: k | 2007-11-01
+	  09:21:41 +0100
+	  disable Mech shell, it has caused complicated hangs
+	* ., Todo, bin/loop-over-recent.pl.otherperls,
+	  distroprefs/01.DISABLED.yml: r3481@k75: k | 2007-11-01 08:48:58
+	  +0100
+	  investigation about Perl-Dist ended with RT 30404
+
+2007-10-31  k
+
+	* ., distroprefs/01.DISABLED.yml: r3479@k75: k | 2007-11-01
+	  00:55:11 +0100
+	  trying to get the thing running again
+	* ., Todo, lib/CPAN.pm, lib/CPAN/Version.pm: r3477@k75: k |
+	  2007-10-31 09:02:55 +0100
+	  the recently introduced version check for File::Temp reveiled
+	  that some of these checks could produce silly warnings visavis
+	  1.16_01 etc
+	* ., Todo, distroprefs/MLEHMANN.Coro.yml: r3475@k75: k | 2007-10-31
+	  05:35:37 +0100
+	  Coro now needs "s" for perls with optimize=-g (on my box)
+
+2007-10-30  k
+
+	* ., distroprefs/01.DISABLED.yml: r3473@k75: k | 2007-10-30
+	  09:01:12 +0100
+	  oops
+	* ., Todo, distroprefs/METZZO.Java.yml,
+	  distroprefs/PODMASTER.HTML-Scrubber.yml: r3471@k75: k |
+	  2007-10-30 08:58:32 +0100
+	  stalled RT ticket
+
+2007-10-28  k
+
+	* ., Todo, megainstall.txt, talks/gpw10talk-cpantesters.pod:
+	  r3466@k75: k | 2007-10-28 15:04:49 +0100
+	  lots of notes about my current investigations for BBC articles
+	* ., lib/CPAN.pm: r3465@k75: k | 2007-10-28 15:03:53 +0100
+	  File::Temp must not be used when older than 0.16 or so; up to now
+	  we did not check the version number
+	* ., lib/CPAN.pm: r3464@k75: k | 2007-10-27 19:37:05 +0200
+	  * Bug fix: doing i /./ fails, on my system, because some authors
+	  have ='s in their data. This is mistaken for a command and
+	  rejected. I commented out the $command initialization.
+	  
+	  
+	  * Optimization 1:
+	  rewrote uptodate to eliminate initial call to inst_file (which
+	  is repeated in the inst_version code), to avoid calling
+	  cpan_version until it is known that there is something to
+	  compare it to, and to make an extra call to inst_file only when
+	  debuggin.
+	  
+	  Also changed it's return, to return undef for uninstalled
+	  Modules and 0 for out-of date modules.
+	  
+	  * Optimization 2:
+	  alter as_glimpse to remove extra call to inst_version, and
+	  use the new tristate return of uptodate to discriminate.
+	  
+	  * Optimization 3:
+	  alter as_glimpse to store the result of the first call to
+	  $self->distribution, in order to eliminate the second call.
+	  
+	* ., Todo, bin/poesmoe.pl, distroprefs/MI.yml,
+	  talks/gpw10talk-cpantesters.pod: r3463@k75: k | 2007-10-27
+	  19:33:24 +0200
+	  talks/gpw10talk-cpantesters.pod
+
+2007-10-27  k
+
+	* ., distroprefs/GOZER.mod_perl.yml: r3460@k75: k | 2007-10-27
+	  14:35:11 +0200
+	  give mod_perl a dependency from the backstage
+	* ., Todo: r3459@k75: k | 2007-10-26 22:26:33 +0200
+	  followup with new facts for the contingency table
+
+2007-10-26  k
+
+	* related/Bundle-CPAN/CPAN.pm, related/Bundle-CPAN/Makefile.PL:
+	  prepare a release
+	* ., Makefile.PL, Todo, megainstall.txt: r3454@k75: k | 2007-10-26
+	  06:01:54 +0200
+	  notes about threads and debugging (which lead to a posting on P5P
+	* ., related/Bundle-CPAN/CPAN.pm: r3453@k75: k | 2007-10-26
+	  05:57:50 +0200
+	  applied a patch provided by TCO in RT #30273
+
+2007-10-25  k
+
+	* ., Todo, bin/loop-over-recent.pl, distroprefs/01.DISABLED.yml,
+	  megainstall.txt: r3451@k75: k | 2007-10-25 17:28:53 +0200
+	  disable newest version of Gungho again
+
+2007-10-23  k
+
+	* ., distroprefs/MIROD.XML-Twig.yml: r3449@k75: k | 2007-10-23
+	  03:14:35 +0200
+	  link to RT ticket
+	* ., Todo, distroprefs/MIROD.XML-Twig.yml,
+	  distroprefs/VPIT.Variable-Magic.yml: r3447@k75: k | 2007-10-23
+	  03:11:46 +0200
+	  discovered a new dependency of XML::Twig on Test::Pod::Coverage
+
+2007-10-22  srezic
+
+	* lib/CPAN.pm, lib/CPAN/Nox.pm: small Pod fixes
+	  * corrected a C<...>
+	  * introduced a missing C<...>
+	  * removed the stars in the "smoke" section because they were
+	  never aligned
+	  * added some L<...>
+	  * removed manpage chapters from SEE ALSO links
+
+2007-10-22  k
+
+	* ., Todo, distroprefs/VPIT.Variable-Magic.yml: r3443@k75: k |
+	  2007-10-22 21:55:18 +0200
+	  Variable::Magic needs a break
+	* ., Todo, distroprefs/VPIT.Variable-Magic.yml: r3441@k75: k |
+	  2007-10-22 06:18:40 +0200
+	  tests resumed on Variable::Magic
+	* ., Makefile.PL, Todo, distroprefs/VPIT.Variable-Magic.yml:
+	  r3439@k75: k | 2007-10-22 06:06:44 +0200
+	  tests finished on Variable::Magic
+
+2007-10-21  k
+
+	* ., bin/dir-to-jifty.pl: r3437@k75: k | 2007-10-21 20:11:43 +0200
+	  because we switched the perl that runs jifty need to adjust
+	  shebang
+	* ., Todo, distroprefs/VPIT.Variable-Magic.yml: r3435@k75: k |
+	  2007-10-21 20:00:15 +0200
+	  temporary new distropref file that shall be removed ASAP
+	* ., bin/rsync-over-recentfile.pl, distroprefs/RJBS.Email-Send.yml:
+	  r3431@k75: k | 2007-10-21 16:54:43 +0200
+	  Ricardo has fixed Email::Send
+	* ., bin/quidi-test-unlinklockfile.pl: r3430@k75: k | 2007-10-21
+	  13:52:25 +0200
+	  final words on the test experience with different locking
+	  strategies
+	* ., bin/quidi-test-unlinklockfile.pl: r3429@k75: k | 2007-10-21
+	  13:23:32 +0200
+	  relying on the atomicity of mkdir needs less code and needs less
+	  temporary file
+	* ., megainstall.txt: r3424@k75: k | 2007-10-21 10:35:49 +0200
+	  add some modules to megainstall that Jifty has added since the
+	  last release
+	* ., bin/quidi-test-unlinklockfile.pl: r3423@k75: k | 2007-10-20
+	  23:09:28 +0200
+	  my preferred model without flock, just old school hardlinking
+	  works out of the box and is mcu clearer in its functioning
+	* ., bin/quidi-test-unlinklockfile.pl: r3422@k75: k | 2007-10-20
+	  22:16:03 +0200
+	  model without a permanent lockfile survived several manual
+	  invocations
+	* ., bin/poesmoe.pl.otherperls, bin/quidi-test-unlinklockfile.pl:
+	  r3421@k75: k | 2007-10-20 21:47:52 +0200
+	  a working locking model with flock
+
+2007-10-20  k
+
+	* ., Todo, lib/CPAN.pm: r3419@k75: k | 2007-10-20 11:22:01 +0200
+	  replace all occurrences of $^X with findperl (bug reported by
+	  Slaven Rezic)
+
+2007-10-19  k
+
+	* ., megainstall.txt: r3416@k75: k | 2007-10-19 02:54:21 +0200
+	  add Devel::CheckLib to megainstall
+	* ., distroprefs/TSCH.Gtk2.yml: r3415@k75: k | 2007-10-19 02:41:13
+	  +0200
+	  discovered a new configure_dependency between Gtk2 and Cairo
+
+2007-10-18  k
+
+	* ., distroprefs/RJBS.Email-Send.yml: r3412@k75: k | 2007-10-18
+	  08:43:25 +0200
+	  discovered a new dependency between Email::Send and IO::All
+	* ., bin/loop-over-recent.pl, bin/loop-over-recent.pl.otherperls,
+	  bin/poesmoe.pl, megainstall.txt: r3411@k75: k | 2007-10-18
+	  05:05:55 +0200
+	  minor maintainance stuff
+
+2007-10-17  k
+
+	* ., distroprefs/MARKOV.Mail-Box.yml: r3409@k75: k | 2007-10-17
+	  20:58:21 +0200
+	  Mark has hidden more questions that need to be prepared
+	* ., distroprefs/MARKOV.Mail-Box.yml: r3407@k75: k | 2007-10-17
+	  20:56:49 +0200
+	  Mark has hidden more questions that need to be prepared
+	* ., distroprefs/MARKOV.Mail-Box.yml: r3405@k75: k | 2007-10-17
+	  20:53:37 +0200
+	  Mark has hidden more questions that need to be prepared
+	* ., Todo, distroprefs/01.DISABLED.yml,
+	  distroprefs/MARKOV.Mail-Box.yml: r3403@k75: k | 2007-10-17
+	  20:21:29 +0200
+	  turn on testing from now on
+
+2007-10-16  k
+
+	* ., Todo, distroprefs/MSCHWERN.Test-Simple.yml: r3401@k75: k |
+	  2007-10-16 08:09:40 +0200
+	  protect me from the next Test::Simple attack
+
+2007-10-15  k
+
+	* ., bin/poesmoe.pl: r3399@k75: k | 2007-10-16 00:36:18 +0200
+	  work in progress
+	* ., Todo, distroprefs/OLAF.Net-DNS.yml: r3397@k75: k | 2007-10-16
+	  00:22:33 +0200
+	  minor maintainance stuff
+
+2007-10-14  k
+
+	* ., patches/Curses-1.16-GIRAFFED-01.patch: r3395@k75: k |
+	  2007-10-14 10:55:24 +0200
+	  wrong path in patch header
+	* ., distroprefs/GIRAFFED.Curses.yml: r3393@k75: k | 2007-10-14
+	  10:53:06 +0200
+	  typo
+	* ., distroprefs/GIRAFFED.Curses.yml,
+	  patches/Curses-1.16-GIRAFFED-01.patch: r3391@k75: k | 2007-10-14
+	  10:50:40 +0200
+	  got a working patch for Curses
+	* ., distroprefs/RKINYON.DBM-Deep.yml: r3389@k75: k | 2007-10-14
+	  09:22:16 +0200
+	  add the files referred to in the previous checkin
+	* ., MANIFEST, SlayMakefile: r3387@k75: k | 2007-10-14 09:20:28
+	  +0200
+	  minor maintainance stuff
+	* ., Todo, bin/loop-over-recent.pl.otherperls,
+	  distroprefs/01.DISABLED.yml: r3385@k75: k | 2007-10-14 08:41:28
+	  +0200
+	  minor maintainance stuff
+	* ., Todo, bin/loop-over-recent.pl,
+	  bin/loop-over-recent.pl.otherperls, distroprefs/01.DISABLED.yml,
+	  lib/CPAN.pm, megainstall.txt: r3383@k75: k | 2007-10-14 04:53:45
+	  +0200
+	  minor maintainance stuff
+
+2007-10-13  k
+
+	* ., bin/loop-over-recent.pl, distroprefs/01.DISABLED.yml:
+	  r3381@k75: k | 2007-10-13 16:26:34 +0200
+	  minor maintainance stuff
+	* ., distroprefs/DAGOLDEN.CPAN-Reporter.yml, megainstall.txt:
+	  r3379@k75: k | 2007-10-13 10:57:26 +0200
+	  minor maintainance stuff
+	* ., distroprefs/BLUEFEET.GIS-Distance.yml,
+	  distroprefs/CMOORE.Archive-Any.yml, distroprefs/JESSE.Jifty.yml,
+	  distroprefs/PAJAS.XML-LibXML.yml,
+	  distroprefs/SCHWIGON.Class-MethodMaker.yml: r3377@k75: k |
+	  2007-10-13 06:56:27 +0200
+	  revisit a few older distroprefs files
+	* ., Todo, bin/loop-over-recent.pl.otherperls,
+	  distroprefs/BLUEFEET.GIS-Distance.yml,
+	  distroprefs/CMOORE.Archive-Any.yml,
+	  distroprefs/DAGOLDEN.CPAN-Reporter.yml,
+	  patches/CPAN-Reporter-100.patch: r3375@k75: k | 2007-10-13
+	  06:40:11 +0200
+	  patch CPAN-Reporter
+
+2007-10-12  k
+
+	* ., Todo, distroprefs/MI.yml: r3370@k75: k | 2007-10-12 07:09:03
+	  +0200
+	  maybe we need a new "match" subkey, "is_module_install"?
+	* ., Todo, lib/CPAN.pm: r3369@k75: k | 2007-10-12 05:56:57 +0200
+	  better wording suggested by Mark Overmeer for the "reports" hint
+	* ., lib/CPAN.pm: r3368@k75: k | 2007-10-12 05:27:58 +0200
+	  do not bother to mkpath a prefs_dir if the config variable is
+	  empty or whitespace only; this user does not want to use
+	  distroprefs
+	* ., Todo, distroprefs/MI.yml: r3367@k75: k | 2007-10-12 04:19:39
+	  +0200
+	  maybe we need a new "match" subkey, "is_module_install"?
+
+2007-10-11  k
+
+	* ., Makefile.PL: r3365@k75: k | 2007-10-11 23:44:30 +0200
+	  oops
+	* ., bin/loop-over-recent.pl.otherperls, distroprefs/MI.yml,
+	  megainstall.txt: r3363@k75: k | 2007-10-11 09:06:19 +0200
+	  watch a bit of sterling problems
+	* ., Makefile.PL: r3361@k75: k | 2007-10-11 05:42:28 +0200
+	  bad escaping
+	* ., Makefile.PL: r3359@k75: k | 2007-10-11 05:39:08 +0200
+	  dd-prefs not known in SVN based installs
+	* ., MANIFEST, MANIFEST.SKIP, Makefile.PL, SlayMakefile, Todo,
+	  distroprefs, megainstall.txt: r3357@k75: k | 2007-10-11 04:56:47
+	  +0200
+	  introduce slaymake for the perly make targets (donated by
+	  Slaven); remove all distroprefs/*.dd files from the MANIFEST;
+	  introduce commentlines in megainstall.txt
+
+2007-10-10  k
+
+	* ., distroprefs/01.DISABLED.yml: r3355@k75: k | 2007-10-10
+	  20:39:19 +0200
+	  cpanplus installation weirdness
+	* ., Todo, distroprefs/01.DISABLED.yml: r3353@k75: k | 2007-10-10
+	  13:55:10 +0200
+	  hanging test
+	* ., MANIFEST, Todo, distroprefs/DMUEY.File-Copy-Recursive.yml:
+	  r3351@k75: k | 2007-10-10 08:48:22 +0200
+	  make F:C:R compatible with 5.00505
+	* ., MANIFEST: r3349@k75: k | 2007-10-10 03:04:48 +0200
+	  typo
+
+2007-10-09  k
+
+	* ., distroprefs/ACH.Tk-Contrib.yml,
+	  distroprefs/DJBERG.Tk-JListbox.yml,
+	  distroprefs/DKWILSON.Tk-DKW.yml,
+	  distroprefs/DUNNIGANJ.Tk-CursorControl.yml,
+	  distroprefs/GBROCK.Tk-StayOnTop.yml,
+	  distroprefs/HMBRAND.Tk-Clock.yml, distroprefs/JOHNSCA.TkCarp.yml,
+	  distroprefs/KVAIL.Tk-Stderr.yml,
+	  distroprefs/LAMPRECHT.Tk-GraphItems.yml,
+	  distroprefs/LUSOL.Tk-Gauge.yml,
+	  distroprefs/MJCARMAN.Tie-Tk-Text.yml,
+	  distroprefs/NI-S.Tk-HTML.yml,
+	  distroprefs/RCSEEGE.Tk-JComboBox.yml,
+	  distroprefs/TJENNESS.Tk-TextANSIColor.yml: r3347@k75: k |
+	  2007-10-09 21:23:39 +0200
+	  now really the bunch of Tk prefs which I believed to have checked
+	  in earlier today
+	* ., Makefile.PL, Todo, distroprefs/01.DISABLED.yml: r3345@k75: k |
+	  2007-10-09 17:01:17 +0200
+	  hanger on kurila
+	* ., MANIFEST, Makefile.PL, Todo, megainstall.txt: r3343@k75: k |
+	  2007-10-09 03:29:50 +0200
+	  bunch of Tk because they all need DISPLAY; keeping separate
+	  because some may have other needs too
+
+2007-10-08  k
+
+	* ., distroprefs/MI.yml: r3341@k75: k | 2007-10-08 06:34:45 +0200
+	  another Module::Install user
+
+2007-10-07  k
+
+	* ., distroprefs/01.DISABLED.yml: r3339@k75: k | 2007-10-07
+	  22:27:47 +0200
+	  a hanging test and no time to write abugreport
+	* ., Todo, megainstall.txt: r3336@k75: k | 2007-10-07 21:46:28
+	  +0200
+	  Max asked for binary search of WWW::Mechanize::Shell so it seems
+	  reasonable to put it into megainstall
+	* ., distroprefs/MI.yml: r3335@k75: k | 2007-10-07 21:45:25 +0200
+	  another Module::Install user
+	* ., Todo, distroprefs/MTHURN.Tk-Wizard.yml, megainstall.txt:
+	  r3333@k75: k | 2007-10-07 15:34:53 +0200
+	  add a bunch of Tk modules to megainstall
+
+2007-10-06  k
+
+	* ., MANIFEST, Todo, distroprefs/ARJAY.Compress-Bzip2.yml,
+	  distroprefs/MI.yml: r3331@k75: k | 2007-10-06 05:15:12 +0200
+	  a new Module::Install user
+
+2007-10-05  k
+
+	* ., distroprefs/01.DISABLED.yml: r3328@k75: k | 2007-10-05
+	  07:22:19 +0200
+	  Compress::Bzip2 should be resolved asap
+	* ., lib/CPAN.pm: r3327@k75: k | 2007-10-04 23:57:14 +0200
+	  address #29754: Lockfile problem with perl 5.005_05 (Slaven
+	  Rezic)
+
+2007-10-04  k
+
+	* ., Todo, distroprefs/01.DISABLED.yml: r3325@k75: k | 2007-10-04
+	  22:00:04 +0200
+	  disable a network hog
+	* ., Todo, distroprefs/01.DISABLED.yml: r3323@k75: k | 2007-10-04
+	  20:43:01 +0200
+	  disable a test hanger
+	* ., Todo, megainstall.txt: r3321@k75: k | 2007-10-04 08:06:04
+	  +0200
+	  notes
+	* ., Todo: r3319@k75: k | 2007-10-04 06:24:00 +0200
+	  notes
+	* ., Todo, distroprefs/01.DISABLED.yml, megainstall.txt: r3317@k75:
+	  k | 2007-10-04 04:55:20 +0200
+	  notes about reading test results
+
+2007-10-03  k
+
+	* ., MANIFEST, MANIFEST.SKIP, Todo,
+	  distroprefs/BDFOY.Business-ISBN.yml,
+	  distroprefs/REDTREE.PDF-API2-Simple.yml: r3315@k75: k |
+	  2007-10-03 11:53:16 +0200
+	  new distropref accompanying a bugreport
+
+2007-10-02  k
+
+	* ., MANIFEST, Todo,
+	  distroprefs/RCLAMP.POE-Component-Server-HTTP.yml: r3313@k75: k |
+	  2007-10-02 05:09:51 +0200
+	  undeclared dependency
+
+2007-10-01  k
+
+	* ., distroprefs/01.DISABLED.yml,
+	  distroprefs/BRADFITZ.Danga-Socket.yml, megainstall.txt:
+	  r3311@k75: k | 2007-10-01 21:00:57 +0200
+	  Gungho now better
+
+2007-09-30  k
+
+	* ., bin/unauthorized.pl: r3309@k75: k | 2007-09-30 21:38:36 +0200
+	  teach a helper script about 06perms.txt
+	* ., MANIFEST, Todo, distroprefs/RYBSKEJ.forks.yml,
+	  megainstall.txt: r3307@k75: k | 2007-09-30 21:03:23 +0200
+	  new distroprefs facts
+	* ., Makefile.PL, Todo, distroprefs/SREZIC.Tk-Autoscroll.yml:
+	  r3304@k75: k | 2007-09-30 09:18:57 +0200
+	  let the kwalify target optionally switch to another yaml module
+	* ., Todo, distroprefs/TSCH.Gtk2.yml: r3303@k75: k | 2007-09-29
+	  18:22:16 +0200
+	  get Gtk2 working a bit more automatic
+
+2007-09-29  k
+
+	* ., MANIFEST: r3301@k75: k | 2007-09-29 15:19:03 +0200
+	  fix manifest
+	* ., distroprefs/01.DISABLED.yml, distroprefs/GRICHTER.Embperl.yml,
+	  megainstall.txt: r3299@k75: k | 2007-09-29 15:16:09 +0200
+	  maintain and extend distroprefs
+	* ., Todo, distroprefs/01.DISABLED.yml, megainstall.txt: r3297@k75:
+	  k | 2007-09-29 11:10:51 +0200
+	  add a few random POE modules to megainstall
+	* ., Todo, distroprefs/SREZIC.Tk-Autoscroll.yml, megainstall.txt:
+	  r3295@k75: k | 2007-09-29 09:47:00 +0200
+	  add a bunch of Tk modules
+	* ., distroprefs/01.DISABLED.yml: r3293@k75: k | 2007-09-29
+	  07:30:58 +0200
+	  the new version hangs again
+
+2007-09-28  k
+
+	* ., lib/CPAN.pm: r3291@k75: k | 2007-09-28 21:28:19 +0200
+	  the next stable 1.92 release must come from a branch, if
+	  necessary
+	* ., lib/CPAN.pm: r3289@k75: k | 2007-09-28 21:26:47 +0200
+	  let containsmods cache negative results: Slaven Rezic found out
+	  that distros without modules can be a performance killer without
+	  this measure
+	* ., distroprefs/TSCH.Cairo.yml: r3285@k75: k | 2007-09-28 21:25:08
+	  +0200
+	  hey TSCH, your Cairo is fine on my linux, no need to dispair
+	* ., Todo: r3284@k75: k | 2007-09-28 21:19:32 +0200
+	  notes
+	* ., Makefile.PL: r3283@k75: k | 2007-09-28 21:16:17 +0200
+	  prevent the same poop to happen again as with the 1.9202 release
+	* ., distroprefs/GOZER.mod_perl.yml,
+	  distroprefs/GTERMARS.Apache2-Filter-Minifier-JavaScript.yml:
+	  r3280@k75: k | 2007-09-28 20:47:51 +0200
+	  apache2 disabled for now; too annoying to have a potential hungry
+	  empty endless loop
+	* ., Changes: r3278@k75: k | 2007-09-28 09:07:49 +0200
+	  new release
+	* ., distroprefs/PARDUS.File-MimeInfo.yml, lib/CPAN.pm: r3275@k75:
+	  k | 2007-09-28 09:05:59 +0200
+	  aaaaaaarggg: syntax error in a distroprefs file????
+	* ., Changes, MANIFEST, Todo, distroprefs/BDFOY.Business-ISBN.yml,
+	  distroprefs/DAXIM.Yahoo-Photos.yml,
+	  distroprefs/PARDUS.File-MimeInfo.yml, lib/CPAN.pm: r3273@k75: k |
+	  2007-09-28 08:46:46 +0200
+	  prepare a release
+	* ., distroprefs/01.DISABLED.yml: r3271@k75: k | 2007-09-28
+	  06:19:35 +0200
+	  add Gungho and move the comments into the regex itself
+
+2007-09-27  k
+
+	* ., distroprefs/GTERMARS.Apache2-Filter-Minifier-JavaScript.yml:
+	  r3269@k75: k | 2007-09-27 23:24:20 +0200
+	  oops
+	* ., MANIFEST,
+	  distroprefs/GTERMARS.Apache2-Filter-Minifier-JavaScript.yml:
+	  r3267@k75: k | 2007-09-27 23:19:44 +0200
+	  what a ridiculous endless loop
+
+2007-09-27  dagolden
+
+	* Changes, lib/CPAN.pm: failure to generate a Makefile/Build file
+	  will not continue to make/Build
+	  
+	  added persistance and a goodbye message on some PL stage failures
+	  that
+	  didn't have them. (Not sure if this was entirely right, but it
+	  looked
+	  consistent)
+
+2007-09-27  k
+
+	* ., distroprefs/TIMB.Apache-Status-DBI.yml: r3262@k75: k |
+	  2007-09-27 08:46:49 +0200
+	  missed to check in a distroprefs file
+	* ., Makefile.PL: r3260@k75: k | 2007-09-27 08:45:13 +0200
+	  another buglet in verify-changes-* make targets
+	* ., Makefile.PL: r3258@k75: k | 2007-09-27 08:43:47 +0200
+	  buglet in verify-changes-version make target
+	* ., Changes, lib/CPAN/Admin.pm: r3256@k75: k | 2007-09-27 08:40:39
+	  +0200
+	  going to release 1.9201
+	* ., lib/CPAN/Admin.pm: r3254@k75: k | 2007-09-27 08:26:45 +0200
+	  loading CPAN::Admin was calling has_inst with all consequences;
+	  added deprecation note to CPAN::Admin
+
+2007-09-26  k
+
+	* ., MANIFEST, distroprefs/TLOWERY.DBI-Shell.yml: r3252@k75: k |
+	  2007-09-26 08:39:31 +0200
+	  discovered a goto for the DBI::Shell
+	* ., distroprefs/MI.yml: r3250@k75: k | 2007-09-26 08:07:52 +0200
+	  another Module::Install candidate
+
+2007-09-25  k
+
+	* ., lib/CPAN.pm: r3248@k75: k | 2007-09-25 22:51:34 +0200
+	  address #29606: only warn once when we ignore locking issuesl
+	  (but better solution would be to try alternative locking
+	  mechanisms)
+	* ., lib/CPAN.pm: r3245@k75: k | 2007-09-25 22:32:04 +0200
+	  add CPAN::Reporter::* to the packages needed for "reload cpan"
+	* ., megainstall.txt: r3244@k75: k | 2007-09-25 22:30:18 +0200
+	  jjore posted about overload::eval on use.perl.org
+	* ., distroprefs/MARKOV.MailTools.yml: r3242@k75: k | 2007-09-25
+	  08:43:52 +0200
+	  note about RT ticket
+	* ., MANIFEST, distroprefs/ADAMK.Image-Delivery.yml,
+	  distroprefs/MARKOV.MailTools.yml, distroprefs/MI.yml,
+	  megainstall.txt: r3240@k75: k | 2007-09-25 08:43:03 +0200
+	  Image::Delivery into distroprefs
+	* ., Todo, distroprefs/01.DISABLED.yml: r3238@k75: k | 2007-09-25
+	  07:48:36 +0200
+	  notes about recent CPAN distros
+	* ., Makefile.PL: r3236@k75: k | 2007-09-25 06:06:05 +0200
+	  new QA to have a sane Changes file on the next release
+	* ., Todo, distroprefs/DSKOLL.MIME-tools.yml,
+	  distroprefs/MARKOV.MailTools.yml, lib/CPAN.pm: r3233@k75: k |
+	  2007-09-25 05:46:26 +0200
+	  two distropref updates with notes about a trickkky bug in
+	  MailTools
+	* ., MANIFEST, distroprefs/RIZEN.Config-JSON.yml: r3232@k75: k |
+	  2007-09-24 05:22:40 +0200
+	  missing dependency declaration
+
+2007-09-24  k
+
+	* ., distroprefs/MSERGEANT.DBD-SQLite.yml: r3230@k75: k |
+	  2007-09-24 05:07:59 +0200
+	  DBD::SQLite has a new version
+	* ., distroprefs/TBONE.HTTP-File.yml: r3228@k75: k | 2007-09-24
+	  04:49:25 +0200
+	  HTTP-File dialog not in pl phase
+	* ., MANIFEST, distroprefs/TBONE.HTTP-File.yml: r3226@k75: k |
+	  2007-09-24 04:40:38 +0200
+	  HTTP-File has a dialog
+
+2007-09-23  k
+
+	* README: autogenerated readme
+	* ., bin/loop-over-recent.pl.otherperls, lib/CPAN.pm,
+	  patches/perl0-bug.patch: r3221@k75: k | 2007-09-23 12:49:12 +0200
+	  about to release 1.92
+	* ., MANIFEST, distroprefs/01.DISABLED.yml,
+	  distroprefs/DDUMONT.Tk-ObjScanner.yml, distroprefs/DISABLED.yml,
+	  distroprefs/NI-S.Tk.yml: r3219@k75: k | 2007-09-23 10:58:02 +0200
+	  Tk
+	* ., Todo, distroprefs/DISABLED.yml, distroprefs/MI.yml: r3217@k75:
+	  k | 2007-09-23 04:47:55 +0200
+	  new cpan distros
+
+2007-09-22  dagolden
+
+	* Changes, lib/CPAN.pm, t/30shell.t: fixed regex for converting '?'
+	  command to 'help'
+	  added 30shell.t tests for help, h, and ? both with and without
+	  args
+	  fixed typo on message for connecting to internet
+
+2007-09-22  k
+
+	* ., Todo, bin/rsync-over-recentfile.pl, distroprefs/DISABLED.yml:
+	  r3213@k75: k | 2007-09-22 12:42:40 +0200
+	  workaround for and comments about bad recentfile errorhandling
+	* ., MANIFEST, Todo, distroprefs/ANDREWF.LaTeX-Driver.yml,
+	  distroprefs/MI.yml, lib/CPAN.pm: r3211@k75: k | 2007-09-22
+	  08:09:21 +0200
+	  add latex-driver
+
+2007-09-21  k
+
+	* ., bin/loop-over-recent.pl: r3208@k75: k | 2007-09-21 06:01:22
+	  +0200
+	  setting DISPLAY globally
+	* ., MANIFEST, distroprefs/CERNEY.Tk-IDElayout.yml: r3207@k75: k |
+	  2007-09-21 06:00:22 +0200
+	  I will have to set DISPLAY globally
+	* ., Todo, distroprefs/DISABLED.yml: r3205@k75: k | 2007-09-21
+	  05:27:06 +0200
+	  shell::getenv still doing it
+
+2007-09-20  k
+
+	* ., Makefile.PL: r3203@k75: k | 2007-09-20 07:59:43 +0200
+	  remove the forgotten exceptional prereq ExtUtils::Install 1.4104
+	  and insert a general dependency on Test::Simple because of the
+	  current situation with the BEGIN{use_ok} bugfix
+	* ., distroprefs/URI.File-Slurp.yml: r3201@k75: k | 2007-09-20
+	  04:53:35 +0200
+	  new patch for File-Slurp dealing with Test-Simple 0.71
+	* ., distroprefs/DISABLED.yml,
+	  distroprefs/PETDANCE.WWW-Mechanize.yml: r3199@k75: k | 2007-09-20
+	  03:09:44 +0200
+	  another test that disturbs normal testing workflow
+
+2007-09-19  k
+
+	* ., MANIFEST, Todo, distroprefs/avoid.yml: r3197@k75: k |
+	  2007-09-19 21:14:41 +0200
+	  remove "avoid", we have "DISABLED" anyway and the reason why I
+	  had avoid has gone anyway
+	* ., bin/loop-over-recent.pl.otherperls, distroprefs/DISABLED.yml:
+	  r3195@k75: k | 2007-09-19 03:33:23 +0200
+	  exclude a suicidophil
+
+2007-09-18  k
+
+	* ., Todo, bin/rsync-over-recentfile.pl,
+	  distroprefs/DROLSKY.DateTime-Locale.yml: r3193@k75: k |
+	  2007-09-18 08:53:59 +0200
+	  boy, they fix their bugs quicker than I can fix the distroprefs
+
+2007-09-16  k
+
+	* ., distroprefs/MI.yml: r3189@k75: k | 2007-09-16 17:55:02 +0200
+	  Markus again with a new distro in MI...
+	* ., bin/rsync-over-recentfile.pl: r3188@k75: k | 2007-09-16
+	  14:25:35 +0200
+	  more refactoring into the recentfile module
+	* ., bin/rsync-over-recentfile.pl, megainstall.txt: r3187@k75: k |
+	  2007-09-16 13:46:20 +0200
+	  rename $upload to $recent_event to underpin the general purpose
+	  character
+	* ., MANIFEST, Todo, bin/rsync-over-recentfile.pl,
+	  distroprefs/DROLSKY.DateTime-Locale.yml: r3185@k75: k |
+	  2007-09-16 12:05:27 +0200
+	  found the culprit for strptime being broken
+	* ., distroprefs/FLORA.Net_SSLeay.yml: r3178@k75: k | 2007-09-16
+	  04:41:43 +0200
+	  I forgot that Net::SSLeay is an MI module
+	* ., bin/rsync-over-recentfile.pl: r3177@k75: k | 2007-09-15
+	  21:41:10 +0200
+	  another refactoring into the recentfile module (which currently
+	  lives in the pause repo)
+	* ., bin/rsync-over-recentfile.pl: r3176@k75: k | 2007-09-15
+	  11:33:53 +0200
+	  tiny step on recentfile: three new accessors for remote and make
+	  the output prettier
+
+2007-09-15  k
+
+	* README: autogenerated
+	* ., Changes, lib/CPAN.pm, t/31sessions.t: r3172@k75: k |
+	  2007-09-15 08:40:45 +0200
+	  one test fixed that was broken by Test::Harness 2.99_02
+
+2007-09-14  rafl
+
+	* Changes: Changes =~ s/Florain/Florian/
+
+2007-09-14  k
+
+	* ., Changes: r3169@k75: k | 2007-09-14 23:01:11 +0200
+	  preparing for the release
+	* ., Todo, bin/rsync-over-recentfile.pl, lib/CPAN/FirstTime.pm:
+	  r3167@k75: k | 2007-09-14 22:43:21 +0200
+	  addressing #29235: default for prefer_installer in the dialog
+	* ., distroprefs/FHOXH.Test-Reporter.yml,
+	  distroprefs/FLORA.Net_SSLeay.yml: r3165@k75: k | 2007-09-14
+	  06:28:52 +0200
+	  comment on Test::Reporter and a reuse for Net::SSLeay just in
+	  case
+	* ., distroprefs/MI.yml: r3163@k75: k | 2007-09-14 06:04:23 +0200
+	  Task-Catalyst
+	* ., Changes, Todo, distroprefs/MTHURN.Tk-Wizard.yml: r3161@k75: k
+	  | 2007-09-14 06:00:42 +0200
+	  disable Tk::Wizard and document why
+
+2007-09-13  k
+
+	* ., distroprefs/JENDA.Mail-Sender.yml: r3159@k75: k | 2007-09-13
+	  21:19:20 +0200
+	  it seems that the distropref for Mail::Sender was wrong
+
+2007-09-12  k
+
+	* ., lib/CPAN/DeferedCode.pm, t/03pkgs.t: r3155@k75: k | 2007-09-12
+	  06:38:43 +0200
+	  fix VERSION on DeferedCode
+	* ., t/12cpan.t: r3154@k75: k | 2007-09-12 06:38:18 +0200
+	  shut up warning in test
+	* ., lib/CPAN.pm, lib/CPAN/FirstTime.pm: r3153@k75: k | 2007-09-12
+	  06:37:31 +0200
+	  introduce new option RAND to prefer_installer and more text on
+	  the assciated question
+	* ., distroprefs/FLORA.Net_SSLeay.yml: r3151@k75: k | 2007-09-12
+	  05:01:23 +0200
+	  just discovered rafl is MI user too
+	* ., Todo, distroprefs/MLEHMANN.IO-AIO.yml: r3149@k75: k |
+	  2007-09-12 04:53:54 +0200
+	  there seems to have been a heisenbug
+
+2007-09-11  k
+
+	* ., MANIFEST, Todo, distroprefs/TODDR.Net-Jabber-Bot.yml:
+	  r3147@k75: k | 2007-09-11 22:55:23 +0200
+	  new chatty distro
+	* ., Todo, bin/loop-over-recent.pl, bin/recent.pl,
+	  distroprefs/DMAKI.Xango.yml: r3145@k75: k | 2007-09-11 07:56:42
+	  +0200
+	  Xango needs prefer_installer=MB
+
+2007-09-10  k
+
+	* ., Todo: r3141@k75: k | 2007-09-11 00:28:09 +0200
+	  notes about prefer_installer=MB; autobox
+	* ., bin/loop-over-recent.pl, bin/loop-over-recent.pl.otherperls:
+	  r3140@k75: k | 2007-09-11 00:27:02 +0200
+	  tiny progress on the rsync/mirror/recentfile front
+	* ., distroprefs/SCHWIGON.Class-MethodMaker.yml: r3139@k75: k |
+	  2007-09-11 00:24:00 +0200
+	  MethodMaker got a new release
+
+2007-09-09  k
+
+	* ., MANIFEST, MANIFEST.SKIP, Todo, bin/mytail-f.pl,
+	  distroprefs/DMAKI.File-Extract.yml, distroprefs/MI.yml:
+	  r3137@k75: k | 2007-09-09 22:52:08 +0200
+	  new distroprefs; introduce reuse in MI.yml; make the mytail
+	  script a bit like a real tail; lots of notes about recent
+	  breakages
+
+2007-09-08  rafl
+
+	* lib/CPAN/Tarzip.pm: Minor indenting fix.
+	* lib/CPAN.pm, lib/CPAN/Admin.pm, lib/CPAN/Debug.pm,
+	  lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm,
+	  lib/CPAN/Queue.pm, lib/CPAN/Tarzip.pm: Consistently put a space
+	  between ) and { for branch and loop statements.
+	* lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/Queue.pm: outdent
+	  labels by two spaces.
+	* lib/CPAN/Tarzip.pm, lib/CPAN/Version.pm: Update emacs variables.
+	* lib/CPAN.pm: Some minor whitespace-only changes.
+	* lib/CPAN.pm: Indenting improvements for lib/CPAN.pm.
+	* lib/CPAN/HandleConfig.pm: Remove some tailing whitespace.
+	* lib/CPAN/HandleConfig.pm: Change quoting to not confuse vim.
+	* lib/CPAN/HandleConfig.pm: Indenting improvements for
+	  lib/CPAN/HandleConfig.pm.
+	* lib/CPAN/FirstTime.pm: Indenting improvements for
+	  lib/CPAN/FirstTime.pm.
+	* lib/CPAN/Admin.pm: Indenting improvements for lib/CPAN/Admin.pm.
+	* lib/CPAN/Tarzip.pm: Indenting improvements for
+	  lib/CPAN/Tarzip.pm.
+	* lib/CPAN/Queue.pm: Indenting improvements for lib/CPAN/Queue.pm.
+	* lib/CPAN/Version.pm: Indenting improvements for
+	  lib/CPAN/Version.pm.
+
+2007-09-07  k
+
+	* ., Todo, distroprefs/MI.yml: r3118@k75: k | 2007-09-07 22:21:27
+	  +0200
+	  MI get another baby
+	* ., distroprefs/MI.yml: r3116@k75: k | 2007-09-07 07:26:00 +0200
+	  another module using Module::Install
+
+2007-09-06  k
+
+	* ., megainstall.txt: r3114@k75: k | 2007-09-06 21:25:46 +0200
+	  added Task::Catalyst, HTML::FormFu suggested by rafl
+	* ., bin/colorout-to-dir-2.pl: r3112@k75: k | 2007-09-06 06:18:40
+	  +0200
+	  fix the parser more
+	* ., Todo, bin/colorout-to-dir-2.pl, megainstall.txt: r3110@k75: k
+	  | 2007-09-06 05:51:13 +0200
+	  fix the parser of the CPAN.pm output to recognize a hint at the
+	  end of a unit (untested)
+
+2007-09-05  k
+
+	* ., distroprefs/FLORA.Net_SSLeay.yml: r3108@k75: k | 2007-09-05
+	  07:15:28 +0200
+	  untighten the release version for Net-SSLeay
+
+2007-09-04  k
+
+	* Changes, README: preparations for the next dev release
+	* ., Todo, bin/mytail-f.pl: r3104@k75: k | 2007-09-04 23:18:31
+	  +0200
+	  a new helper script and notes about a bug in some Pod module
+	* ., distroprefs/JOHNL.DBD-Informix.yml: r3101@k75: k | 2007-09-04
+	  08:11:42 +0200
+	  wow, DBD::Informix needs ExtUtils::AutoInstall 0.4; looking
+	  forward to this
+
+2007-09-03  rafl
+
+	* .gitignore: Update .gitignore.
+
+2007-09-03  k
+
+	* ., MANIFEST, distroprefs/DSKOLL.MIME-tools.yml: r3099@k75: k |
+	  2007-09-04 00:02:04 +0200
+	  adjust manifest to recent additions; re-activate MIME-tools
+	  distropref
+
+2007-09-03  rafl
+
+	* .gitignore: Update .gitignore.
+	* t/12cpan.t: Temporarly run the yaml/DeferedCode tests with
+	  YAML::Syck.
+	  
+	  YAML.pm needs a fix for loading blessed coderefs with LoadCode
+	  disabled.
+	  See RT #29114.
+	* lib/CPAN.pm: Document yaml_load_code in CPAN.pm.
+	  
+	  Makes 51pod.t pass again.
+
+2007-09-02  rafl
+
+	* t/12cpan.t: More yaml tests.
+	* t/CPAN/TestConfig.pm: Explicitly disable yaml_load_code in the
+	  TestConfig.
+
+2007-09-02  k
+
+	* ., Todo, distroprefs/MI.yml: r3090@k75: k | 2007-09-02 21:12:54
+	  +0200
+	  these MI users everywhere...
+	* ., megainstall.txt: r3084@k75: k | 2007-09-02 15:59:21 +0200
+	  the driving module in YAML-LibYAML seems to be called YAML::XS;
+	  add YAML::Syck for good measure
+	* ., lib/CPAN/HandleConfig.pm: r3083@k75: k | 2007-09-02 15:58:22
+	  +0200
+	  sort the list of valid keys
+	* ., lib/CPAN/FirstTime.pm: r3082@k75: k | 2007-09-02 15:57:53
+	  +0200
+	  first asking for the module and then for something within the
+	  module seems the natural order
+	* ., bin/loop-over-recent.pl, bin/rsync-over-recentfile.pl:
+	  r3081@k75: k | 2007-09-02 15:56:20 +0200
+	  small progress with the RECENT file handling
+	* ., lib/CPAN.pm: r3071@k75: k | 2007-09-02 11:51:42 +0200
+	  introduce a hint for using the reports command (suggested by
+	  Gabor Szabo)
+
+2007-09-02  rafl
+
+	* lib/CPAN.pm: Make _yaml_loadfile use the yaml_load_code option.
+	* lib/CPAN/FirstTime.pm: Make yaml_load_code default to 0.
+	* lib/CPAN/FirstTime.pm: Put yaml_load_code in the right position.
+	* .gitignore: Add a .gitignore file.
+	* Todo: Mark yaml_load_code TODO as DONE.
+
+2007-09-02  k
+
+	* ., lib/CPAN.pm: r3071@k75: k | 2007-09-02 11:51:42 +0200
+	  introduce a hint for using the reports command (suggested by
+	  Gabor Szabo)
+
+2007-09-02  rafl
+
+	* lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: Add a new config
+	  option: yaml_load_code.
+	  
+	  It currently defaults to 1 as I think it's an extremly useful
+	  feature, but the
+	  default might need some discussion as there might be security
+	  issues when
+	  enabling it.
+
+2007-09-02  k
+
+	* ., distroprefs/DBRIAN.XML-SimpleObject.yml: r3069@k75: k |
+	  2007-09-02 06:38:02 +0200
+	  upgrade a requires to configure_requires because they check at PL
+	  time
+	* ., Todo, megainstall.txt: r3063@k75: k | 2007-09-02 06:25:29
+	  +0200
+	  new friends in megainstall; notes
+	* ., bin/rsync-over-recentfile.pl: r3062@k75: k | 2007-09-02
+	  06:24:59 +0200
+	  gradually start using constructs from F:R:M:Recentfile
+	* ., lib/CPAN.pm: r3061@k75: k | 2007-09-02 06:23:58 +0200
+	  regain 5.005 compatibility
+	* ., lib/CPAN/HandleConfig.pm: r3060@k75: k | 2007-09-02 06:23:37
+	  +0200
+	  regain 5.005 compatibility
+	* ., MANIFEST, distroprefs/DSKOLL.MIME-tools.yml: r3059@k75: k |
+	  2007-09-02 06:22:26 +0200
+	  turns out to work flawlessly now
+
+2007-09-01  rafl
+
+	* t/12cpan.t: Don't try to dereference and call a CPAN::DeferedCode
+	  obj. Interpolate instead.
+	* lib/CPAN.pm, lib/CPAN/DeferedCode.pm: Add CPAN::DeferedCode and
+	  make CPAN.pm use it.
+	* t/12cpan.t, t/yaml_code.yml: Also check deserialising blessed
+	  coderefs.
+	* lib/CPAN.pm: Enable code deserialisation for YAML.
+	* t/12cpan.t, t/yaml_code.yml: Check if loading serialized code
+	  from YAML works.
+
+2007-09-01  k
+
+	* ., distroprefs/DISABLED.yml: r3051@k75: k | 2007-09-01 17:06:36
+	  +0200
+	  add OpenGL-Image to the disabled stuff, test result never valid
+	  because OpenGL is never available
+	* ., distroprefs/DISABLED.yml: r3049@k75: k | 2007-09-01 17:03:46
+	  +0200
+	  add OpenGL to the disabled stuff, it needs human interaction
+
+2007-08-30  k
+
+	* Todo, bin/loop-over-recent.pl: nothing but notes and extended
+	  comments coming from talks on the yapc vienna
+	* distroprefs/MI.yml: Time-Duration has switched to Module-Install
+
+2007-08-28  k
+
+	* megainstall.txt: add 5 new friends to megainstall;
+	* Todo, lib/CPAN.pm, lib/CPAN/API, lib/CPAN/API/HOWTO.pm,
+	  lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm: * New manpage
+	  CPAN::API::HOWTO by David Cantrell
+	  * New method optprint to streamline upcoming verbosity settings
+	  * make inhibit_startup_message a normal config variable like all
+	  others
+	  * HandleConfig::load now takes a doit => 1 argument to force the
+	  init run
+	  * turn a few myprint() into mywarn()
+
+2007-08-27  k
+
+	* Todo, lib/CPAN.pm, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm: * now setting PERL5_CPAN_IS_EXECUTING
+	  as requested by Adam Kennedy
+	  * fix broken recursion detection in HndleConfig::load
+	  * ask once if we may try to connect to the internet when we try
+	  to use
+	  @CPAN::Defaultsites
+	  * several mini buglets in FirstTime::init
+
+2007-08-25  k
+
+	* lib/CPAN.pm: oops
+	* Todo, lib/CPAN.pm: address #28946: skip locking on platforms not
+	  supporting flock
+	* Todo, lib/CPAN/HandleConfig.pm: address #28915:
+	  CPAN::HandleConfig::home did not cope with getting undef from
+	  File::HomeDir-> my_data()
+	* Todo, lib/CPAN.pm: document the new "o conf /xxx/"
+
+2007-08-24  k
+
+	* Todo, t/30shell.t: the test was expecting that histfile always
+	  sets histsize and vice versa; this is no longer expected
+	* Todo: note bout failing tests on bleadeprl
+	* ., Todo: r3034@k75: k | 2007-08-24 10:55:31 +0200
+	  resolved a conflict with local copy
+	* Todo, bin/rsync-over-recentfile.pl, lib/CPAN.pm,
+	  lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm, t/30shell.t: *
+	  support 'help' with argument
+	  * integrate all FirstTime questions into POD
+	  * FirstTime::my_prompt_loop now has support for *_intro prompts
+	  * simplified lots of the complicated FirstTime::init dialogues
+	  * new config variable load_modules_verbosity
+	  * support 'o conf /regex/' to selectivel display the state of
+	  config varibles
+	  * prevent recursion into HandleConfig::load()
+	  * PERL5*_CPAN_IS_RUNNING now points to the process number
+	  * several comands were missing in @COMMANDS so were not supported
+	  for completion
+	  * started deprecating term_is_latin config variable
+
+2007-08-14  k
+
+	* ., distroprefs/DISABLED.yml: r3029@k75: k | 2007-08-14 08:44:30
+	  +0200
+	  cursesforms are agressively interactive, must skip
+	* ., bin/rsync-over-recentfile.pl, distroprefs/DISABLED.yml:
+	  r3027@k75: k | 2007-08-14 08:38:18 +0200
+	  curseswidgets are agressively interactive, must skip; new method
+	  for doing rsync
+
+2007-08-13  k
+
+	* ., Todo, bin/loop-over-recent.pl.otherperls, distroprefs/MI.yml:
+	  r3024@k75: k | 2007-08-13 14:58:36 +0200
+	  new MI member
+
+2007-08-12  k
+
+	* eg/operations-recent.png: memo image about current operating
+	  consoles
+	* ., lib/CPAN.pm: r3022@k75: k | 2007-08-12 19:27:47 +0200
+	  more book keeping about delayers
+	* ., distroprefs/DISABLED.yml: r3014@k75: k | 2007-08-12 18:44:46
+	  +0200
+	  forks: distro seems to hang
+	* ., lib/CPAN.pm: r3013@k75: k | 2007-08-12 18:42:22 +0200
+	  changing a comment slightly because I always read it wrong
+	* ., distroprefs/FHOXH.Test-Reporter.yml: r3012@k75: k | 2007-08-12
+	  18:41:32 +0200
+	  a note about the wonderful plans with Test::Reporter
+	* ., bin/loop-over-recent.pl.otherperls: r3011@k75: k | 2007-08-12
+	  18:40:51 +0200
+	  commenting the perls we use in loop-over-recent
+	* ., distroprefs/MI.yml: r3010@k75: k | 2007-08-12 18:39:49 +0200
+	  new DBIx-Class release by yet another maintainer
+	* ., Todo, bin/confreq_bug.sh, bin/confreq_bug_logs.pl: r3009@k75:
+	  k | 2007-08-12 18:39:07 +0200
+	  more notes and helperscripts to debug rare megainstall bugs
+	* ., MANIFEST, Todo, distroprefs/MJEVANS.DBD-ODBC.yml, lib/CPAN.pm:
+	  r3008@k75: k | 2007-08-12 11:46:35 +0200
+	  dbd-odbc wants interaction on threaded perls
+	* ., lib/CPAN.pm: r3006@k75: k | 2007-08-12 10:09:51 +0200
+	  oops
+	* ., Todo, bin/loop-over-recent.pl,
+	  bin/loop-over-recent.pl.otherperls, lib/CPAN.pm: r3003@k75: k |
+	  2007-08-12 10:01:06 +0200
+	  list context ruined my debugging code, switching to YAML::Syck
+	  for better usage; notes about my thread perls; reactivating them
+	* ., Todo, bin/loop-over-recent.pl,
+	  bin/loop-over-recent.pl.otherperls, bin/recent.pl: r2999@k75: k |
+	  2007-08-12 05:03:43 +0200
+	  trivia
+	* ., lib/CPAN.pm: r2998@k75: k | 2007-08-12 05:02:30 +0200
+	  debugging aid for the next time when the configure_require bug
+	  hits
+	* ., megainstall.txt: r2997@k75: k | 2007-08-12 05:01:58 +0200
+	  gtop was missing
+
+2007-08-11  k
+
+	* ., distroprefs/DISABLED.yml, megainstall.txt: r2992@k75: k |
+	  2007-08-11 04:26:52 +0200
+	  new modules in mega; new exceptions in recent loop
+	* ., bin/loop-over-recent.pl, bin/loop-over-recent.pl.otherperls:
+	  r2991@k75: k | 2007-08-11 04:25:46 +0200
+	  disable 5 threaded perls in the configuration
+	* ., Todo: r2990@k75: k | 2007-08-11 04:24:49 +0200
+	  notes about threaded perl
+	* ., Todo, bin/loop-over-recent.pl: r2987@k75: k | 2007-08-10
+	  06:04:21 +0200
+	  loop-over-recent printing dots when waiting and stops warning
+
+2007-08-10  dagolden
+
+	* lib/CPAN.pm: changed warnings for old CPAN::Reporter
+
+2007-08-10  k
+
+	* ., bin/loop-over-recent.pl, bin/loop-over-recent.pl.otherperls,
+	  lib/CPAN.pm: r2985@k75: k | 2007-08-10 05:22:49 +0200
+	  if we want to run unknown objects we must not die, just warn
+
+2007-08-09  k
+
+	* ., MANIFEST, bin/loop-over-recent.pl, distroprefs/DISABLED.yml:
+	  r2983@k75: k | 2007-08-09 19:38:13 +0200
+	  put disabled things in their own yaml file
+	* ., Changes: r2980@k75: k | 2007-08-09 08:38:11 +0200
+	  prepare release
+	* ., MANIFEST, distroprefs/PEVANS.IPC-PerlSSH.yml: r2978@k75: k |
+	  2007-08-09 08:34:40 +0200
+	  IPC::PerlSSH needs an environment variable
+	* ., bin/loop-over-recent.pl, bin/recent.pl,
+	  distroprefs/GRM.App-CamelPKI.yml: r2976@k75: k | 2007-08-09
+	  06:51:56 +0200
+	  playing with recent file
+	* ., MANIFEST, distroprefs/GRM.App-CamelPKI.yml, megainstall.txt:
+	  r2973@k75: k | 2007-08-09 06:16:07 +0200
+	  hanging distro to be disabled
+	* ., bin/loop-over-recent.pl: r2972@k75: k | 2007-08-08 22:57:28
+	  +0200
+	  protect against accidental downgrade of C:R
+
+2007-08-08  k
+
+	* ., MANIFEST: r2970@k75: k | 2007-08-08 22:48:23 +0200
+	  the 200th distroprefs file
+	* ., distroprefs/GRAY.IO-AIO-Util.yml: r2966@k75: k | 2007-08-08
+	  22:44:00 +0200
+	  taming the hanging fruits
+	* ., bin/loop-over-recent.pl: r2965@k75: k | 2007-08-08 22:43:33
+	  +0200
+	  more metadata when running the loop-over-recent
+	* ., bin/loop-over-recent.pl: r2964@k75: k | 2007-08-08 21:39:03
+	  +0200
+	  try to ensure that the script runs without disturbing the system
+	* ., Todo, bin/loop-over-recent.pl,
+	  distroprefs/FHOXH.Test-Reporter.yml, lib/CPAN.pm: r2962@k75: k |
+	  2007-08-08 21:15:47 +0200
+	  never thaw the value of should_report from a previous session
+	* ., lib/CPAN.pm: r2959@k75: k | 2007-08-08 05:34:33 +0200
+	  newline tweak
+	* ., Changes, Todo, bin/loop-over-recent.pl,
+	  bin/loop-over-recent.pl.otherperls,
+	  distroprefs/ZINCDEV.tk-zinc.yml: r2958@k75: k | 2007-08-08
+	  05:19:22 +0200
+	  a new script playing with RECENT file
+
+2007-08-08  dagolden
+
+	* ., Changes, lib/CPAN.pm: - merged changes from
+	  dagolden-cpan-reporter branch: supports CPAN testers
+	  reporting on pl and make stages
+
+2007-08-07  k
+
+	* ., MANIFEST, Todo, distroprefs/MLEHMANN.IO-AIO.yml: r2953@k75: k
+	  | 2007-08-07 21:25:01 +0200
+	  disable IO-AIO
+	* ., distroprefs/MI.yml: r2951@k75: k | 2007-08-07 08:06:05 +0200
+	  new module using Module::Install
+	* ., distroprefs/MI.yml: r2946@k75: k | 2007-08-07 07:36:49 +0200
+	  new module using Module::Install
+	* ., distroprefs/KWILLIAMS.Module-Build.yml: r2944@k75: k |
+	  2007-08-07 02:54:50 +0200
+	  support a fix to module build for older bleadperls
+	* ., distroprefs/MI.yml: r2942@k75: k | 2007-08-07 02:32:06 +0200
+	  new MI using modules
+
+2007-08-05  k
+
+	* ., distroprefs/MI.yml: r2939@k75: k | 2007-08-05 18:56:15 +0200
+	  two new modules using Module::Install
+	* ., lib/CPAN.pm, lib/CPAN/FirstTime.pm, lib/CPAN/HandleConfig.pm,
+	  lib/CPAN/Tarzip.pm, t/10version.t: r2938@k75: k | 2007-08-05
+	  02:10:39 +0200
+	  new option tar_verbosity
+
+2007-08-04  k
+
+	* ., Todo: r2936@k75: k | 2007-08-04 13:01:15 +0200
+	  Test::Reporter still needs to be patched
+	* ., Changes, Todo, distroprefs/FHOXH.Test-Reporter.yml,
+	  distroprefs/MInoinc.yml: r2934@k75: k | 2007-08-04 12:59:32 +0200
+	  Test::Reporter still needs to be patched
+	* ., Todo, distroprefs/LZE.HTML-Menu-TreeView.yml,
+	  distroprefs/MI.yml, distroprefs/MSISK.HTML-TableExtract.yml,
+	  megainstall.txt: r2932@k75: k | 2007-08-04 09:23:16 +0200
+	  notes and small corrections distroprefs and small expansion
+	  megainstall
+
+2007-08-03  k
+
+	* ., MANIFEST, Todo, distroprefs/DDUMONT.Tk-ObjScanner.yml,
+	  distroprefs/YVES.Data-Dump-Streamer.yml: r2930@k75: k |
+	  2007-08-03 20:57:29 +0200
+	  more Tk apps need the right DISPLA|Y
+	* ., Todo, lib/CPAN.pm: r2928@k75: k | 2007-08-03 08:40:04 +0200
+	  some more debugging on a configure_requires bug
+
+2007-08-02  k
+
+	* ., distroprefs/GAAS.libwww.yml: r2926@k75: k | 2007-08-02
+	  23:49:28 +0200
+	  temporarily disable online tests with LWP because W3 is
+	  unreliable ATM
+	* ., MANIFEST: r2924@k75: k | 2007-08-02 23:47:09 +0200
+	  new distropref for a Tk app that wants to connect to windoe
+	  server
+	* ., megainstall.txt: r2918@k75: k | 2007-08-02 23:24:30 +0200
+	  a few more interesting things in megainstall
+	* ., distroprefs/YVES.Data-Dump-Streamer.yml: r2917@k75: k |
+	  2007-08-02 23:24:08 +0200
+	  fixing newly discovered bug in DDS 2.03-30 with a distropref
+	* ., lib/CPAN.pm: r2916@k75: k | 2007-08-02 23:22:24 +0200
+	  bugfix: make install did not set the environment
+	* ., distroprefs/MI.yml: r2915@k75: k | 2007-08-02 23:21:51 +0200
+	  a few new distros using Module::Install
+	* ., Todo: r2914@k75: k | 2007-08-02 23:21:19 +0200
+	  notes
+
+2007-07-31  k
+
+	* ., MANIFEST, distroprefs/MI.yml,
+	  distroprefs/SHEVEK.Mail-Karmasphere-Client.yml: r2912@k75: k |
+	  2007-07-31 22:32:49 +0200
+	  add Mail::Karmasphere
+	* ., lib/CPAN.pm: r2909@k75: k | 2007-07-31 22:00:23 +0200
+	  prohibit that smoke is using a distro it did not find on disk
+	* ., distroprefs/MI.yml, lib/CPAN.pm: r2908@k75: k | 2007-07-31
+	  21:57:40 +0200
+	  new FAQ entry about auto_commit
+	* ., MANIFEST, Todo, distroprefs/MSISK.HTML-TableExtract.yml:
+	  r2903@k75: k | 2007-07-31 06:15:08 +0200
+	  notes and distroprefs
+
+2007-07-31  dagolden
+
+	* Changes, MANIFEST, lib/CPAN.pm, t/41distribution.t: added
+	  base_id() to CPAN::Distribution
+
+2007-07-30  k
+
+	* ., MANIFEST, distroprefs/ACG.Scrabble-Dict.yml: r2901@k75: k |
+	  2007-07-30 08:21:54 +0200
+	  new distroprefs
+	* ., MANIFEST, distroprefs/ADAMK.Chart-Math-Axis.yml,
+	  distroprefs/JMASON.Mail-SpamAssassin.yml, distroprefs/MI.yml:
+	  r2899@k75: k | 2007-07-30 05:56:54 +0200
+	  new distroprefs
+
+2007-07-29  k
+
+	* ., MANIFEST, distroprefs/RJBS.MIME-Light.yml, megainstall.txt:
+	  r2897@k75: k | 2007-07-29 18:11:36 +0200
+	  add mime-light distroprefs
+	* ., MANIFEST,
+	  distroprefs/KAWASAKI.Lingua-JA-Romanize-Japanese.yml: r2895@k75:
+	  k | 2007-07-29 07:42:35 +0200
+	  new distropref
+
+2007-07-28  k
+
+	* ., Todo, distroprefs/MI.yml, distroprefs/PAJAS.XML-LibXML.yml,
+	  megainstall.txt: r2893@k75: k | 2007-07-28 11:32:00 +0200
+	  maintaining distroprefs
+	* ., MANIFEST, Todo, distroprefs/PAJAS.XML-LibXML.yml, lib/CPAN.pm:
+	  r2891@k75: k | 2007-07-28 10:42:21 +0200
+	  repair a minor LibXML breakage
+	* ., MANIFEST, lib/CPAN.pm, lib/CPAN/Queue.pm: r2889@k75: k |
+	  2007-07-28 10:01:33 +0200
+	  refactor jumpqueue to take an array of hashes instead of an array
+	  of arrays
+	* ., MANIFEST, distroprefs/GOMOR.Net-Write.yml: r2887@k75: k |
+	  2007-07-28 08:16:53 +0200
+	  add Net::Write
+	* ., lib/CPAN.pm: r2885@k75: k | 2007-07-28 03:43:29 +0200
+	  deal with #28438: unneeded creation of the download directory
+	  (Michael Schwern)
+	* ., lib/CPAN/FirstTime.pm: r2883@k75: k | 2007-07-28 03:21:23
+	  +0200
+	  deal with #28438: wording of the dialog for keep_source_where
+	  (Martin Thurn,Michael Schwern)
+	* ., lib/CPAN.pm: r2880@k75: k | 2007-07-28 03:10:28 +0200
+	  fix #28439: did not report missing file: URL when LWP not
+	  installed (Martin Thurn,Michael Schwern)
+	* ., lib/CPAN/Queue.pm: r2879@k75: k | 2007-07-28 02:31:52 +0200
+	  adjust comment to sub name
+	* ., lib/CPAN.pm, lib/CPAN/Queue.pm: r2876@k75: k | 2007-07-28
+	  02:17:20 +0200
+	  refactor the queue into two distinct classes, one for the queue
+	  and one for the items, no functional change
+	* ., lib/CPAN.pm: r2875@k75: k | 2007-07-27 16:55:27 +0200
+	  add another debugging aid
+
+2007-07-27  k
+
+	* ., Todo, bin/unauthorized.pl, megainstall.txt: r2873@k75: k |
+	  2007-07-27 13:59:34 +0200
+	  quick hackish script to get the owners of unauthorized uploads
+	* ., Todo, lib/CPAN.pm, lib/CPAN/Kwalify/distroprefs.dd,
+	  megainstall.txt, t/30shell.t: r2870@k75: k | 2007-07-27 11:43:29
+	  +0200
+	  some more debugging aid in 30shell.t and bringing back the args
+	  to _reload_this because it was needed for "o conf defaults"
+	* ., distroprefs/GAAS.libwww.yml,
+	  distroprefs/QANTINS.BitTorrent.yml: r2869@k75: k | 2007-07-27
+	  11:41:43 +0200
+	  w3.org unavailable at the moment
+	* ., Todo, distroprefs/GAAS.libwww.yml,
+	  distroprefs/LDS.Crypt-CBC.yml, distroprefs/MI.yml,
+	  megainstall.txt: r2867@k75: k | 2007-07-27 04:45:46 +0200
+	  the libwww patch from RT
+
+2007-07-26  k
+
+	* ., megainstall.txt: r2864@k75: k | 2007-07-26 08:29:11 +0200
+	  adding interesting Bundle by Bingos to megainstall
+	* ., distroprefs/BTROTT.Crypt-DH.yml,
+	  distroprefs/TELS.Math-BigInt-GMP.yml: r2863@k75: k | 2007-07-26
+	  08:28:44 +0200
+	  New BigInt version available, adjusting distroprefs
+	* ., distroprefs/GAAS.libwww.yml: r2861@k75: k | 2007-07-26
+	  06:10:45 +0200
+	  integrate a patch for libwww 0.806
+
+2007-07-25  k
+
+	* ., Todo, distroprefs/MI.yml: r2858@k75: k | 2007-07-25 22:52:44
+	  +0200
+	  notes
+	* ., distroprefs/MI.yml: r2857@k75: k | 2007-07-25 10:29:19 +0200
+	  add Handel
+	* ., distroprefs/MI.yml: r2855@k75: k | 2007-07-25 05:43:54 +0200
+	  new MI member URI::ToDisk
+
+2007-07-24  k
+
+	* ., MANIFEST, Todo, distroprefs/avoid.yml, megainstall.txt:
+	  r2853@k75: k | 2007-07-24 22:14:40 +0200
+	  stop overambitious bundles and task from interfering
+	* ., MANIFEST, distroprefs/ANDYA.TAP-Parser.yml, megainstall.txt:
+	  r2851@k75: k | 2007-07-24 07:09:32 +0200
+	  TAP::Parser
+
+2007-07-23  k
+
+	* ., MANIFEST, distroprefs/MARKOV.CPAN-Site.yml: r2849@k75: k |
+	  2007-07-23 12:17:49 +0200
+	  add CPAN::Site
+	* ., Todo, distroprefs/MI.yml: r2847@k75: k | 2007-07-23 09:14:19
+	  +0200
+	  notes and one new MI
+
+2007-07-22  k
+
+	* ., MANIFEST, distroprefs/MSCHWERN.Test-Simple.yml: r2845@k75: k |
+	  2007-07-22 13:43:04 +0200
+	  disable two tests on Test::Simple
+	* ., MANIFEST, Todo, distroprefs/BSMITH.Devel-EvalContext.yml,
+	  megainstall.txt: r2843@k75: k | 2007-07-22 13:11:48 +0200
+	  prepare for a binary search against Devel::EvalContext
+	* ., MANIFEST, Todo, distroprefs/BRYCE.SVG-Metadata.yml: r2841@k75:
+	  k | 2007-07-22 10:10:39 +0200
+	  dependency missing
+	* ., distroprefs/RDF.Clone.yml: r2839@k75: k | 2007-07-22 08:25:54
+	  +0200
+	  another chance to use goto for joy and profit
+	* ., related/Bundle-CPAN/Makefile.PL: r2837@k75: k | 2007-07-22
+	  07:38:56 +0200
+	  prepare a bundle release; fic locale
+	* ., distroprefs/MI.yml, related/Bundle-CPAN/CPAN.pm: r2835@k75: k
+	  | 2007-07-22 07:36:52 +0200
+	  prepare a bundle release
+	* ., lib/CPAN.pm: r2830@k75: k | 2007-07-22 07:26:03 +0200
+	  some cleanups and a bugfix for "reload cpan"
+	* ., related/Bundle-CPAN/CPAN.pm: r2829@k75: k | 2007-07-22
+	  07:23:01 +0200
+	  add MakeMaker to the bundle
+	* ., megainstall.txt: r2828@k75: k | 2007-07-22 07:22:26 +0200
+	  add Directory::Scratch
+	* ., Todo, distroprefs/BRADFITZ.Danga-Socket.yml: r2827@k75: k |
+	  2007-07-22 07:21:59 +0200
+	  taking notes
+
+2007-07-21  k
+
+	* ., lib/CPAN.pm, lib/CPAN/Kwalify/distroprefs.yml: r2825@k75: k |
+	  2007-07-21 12:28:39 +0200
+	  introduce new parameter to eexpect: reuse; suggested by Slaven
+	  Rezic
+	* ., MANIFEST, Todo, distroprefs/FHOXH.Test-Reporter.yml,
+	  distroprefs/MARKOV.MailTools.yml, distroprefs/MI.yml: r2823@k75:
+	  k | 2007-07-21 11:56:59 +0200
+	  notes and prefs for Test::Reporter and MailTools
+
+2007-07-20  k
+
+	* ., distroprefs/GAAS.libwww.yml, distroprefs/MARKOV.Mail-Box.yml:
+	  r2821@k75: k | 2007-07-20 08:33:31 +0200
+	  new releases demanding for adjustments
+	* ., Makefile.PL, distroprefs/LOCAL.trailing_dot_distros.yml:
+	  r2819@k75: k | 2007-07-20 06:14:09 +0200
+	  include IM to have new test environment
+	* ., Todo, lib/CPAN.pm: r2817@k75: k | 2007-07-20 05:30:08 +0200
+	  fix unintuitive behaviour of reload cpan: did not load freshly
+	  installed CPAN::Reporter (reported by David Golden)
+
+2007-07-19  k
+
+	* ., distroprefs/STAS.libapreq.yml: r2815@k75: k | 2007-07-19
+	  07:59:07 +0200
+	  libapr not happy with a build_requires
+	* ., MANIFEST, Todo, distroprefs/MI.yml,
+	  distroprefs/STEPANOV.IMDB-Film.yml: r2813@k75: k | 2007-07-18
+	  23:51:56 +0200
+	  new question discovered
+
+2007-07-18  k
+
+	* ., MANIFEST, Todo, distroprefs/DBRIAN.XML-SimpleObject.yml,
+	  distroprefs/MI.yml, megainstall.txt: r2811@k75: k | 2007-07-18
+	  21:56:52 +0200
+	  another dependency bug
+	* ., MANIFEST, Todo, distroprefs/BDFOY.Module-Release.yml,
+	  distroprefs/JESSE.Jifty.yml, distroprefs/MI.yml: r2809@k75: k |
+	  2007-07-18 07:22:13 +0200
+	  dependency bug
+
+2007-07-17  k
+
+	* ., Todo, distroprefs/JESSE.Jifty.yml: r2807@k75: k | 2007-07-17
+	  21:33:38 +0200
+	  00load is too demanding for a binsearch, too many reasons to fail
+	* ., Todo, distroprefs/JESSE.Jifty-DBI.yml: r2805@k75: k |
+	  2007-07-17 08:42:44 +0200
+	  switch to install Jifty::DBI from SVN
+	* ., MANIFEST, distroprefs/JESSE.Jifty-DBI.yml: r2803@k75: k |
+	  2007-07-17 08:22:20 +0200
+	  repair some distroprefs
+	* ., distroprefs/DCONWAY.Parse-RecDescent.yml,
+	  distroprefs/JESSE.Jifty.yml: r2801@k75: k | 2007-07-17 08:18:51
+	  +0200
+	  repair some distroprefs
+	* ., Todo, distroprefs/JESSE.Jifty.yml, megainstall.txt: r2799@k75:
+	  k | 2007-07-17 07:35:59 +0200
+	  preparations for a binary search for combination Jifty and
+	  Universal-require
+
+2007-07-16  k
+
+	* ., lib/CPAN.pm: r2797@k75: k | 2007-07-16 04:24:14 +0200
+	  oops
+	* ., lib/CPAN.pm: r2794@k75: k | 2007-07-16 04:22:55 +0200
+	  formally withdraw with NA when goto is sending us away
+	* ., megainstall.txt: r2793@k75: k | 2007-07-16 04:22:13 +0200
+	  inexistent module in megainstall
+
+2007-07-15  k
+
+	* ., megainstall.txt: r2791@k75: k | 2007-07-15 20:34:41 +0200
+	  typos in megainstall
+	* ., lib/CPAN.pm: r2789@k75: k | 2007-07-15 20:28:47 +0200
+	  a symmmetrical (to the last checkin) bugfix/typo in dealing with
+	  "later" during configure_requires
+	* ., Todo, distroprefs/FLORA.Net_SSLeay.yml, distroprefs/MI.yml,
+	  lib/CPAN.pm: r2787@k75: k | 2007-07-15 17:30:59 +0200
+	  bugfix/typo in dealing with "later" during configure_requires
+	* ., Changes, MANIFEST, Todo, distroprefs/ADAMK.Test-Inline.yml,
+	  distroprefs/CHARTGRP.Chart.yml, megainstall.txt: r2784@k75: k |
+	  2007-07-15 08:16:53 +0200
+	  new buggers in distroprefs
+
+2007-07-14  k
+
+	* README: autogen
+	* ., Changes, Todo, lib/CPAN.pm: r2780@k75: k | 2007-07-14 20:30:00
+	  +0200
+	  prepare release
+	* ., Todo, distroprefs/MI.yml, lib/CPAN.pm, lib/CPAN/FirstTime.pm,
+	  lib/CPAN/HandleConfig.pm: r2778@k75: k | 2007-07-14 18:21:57
+	  +0200
+	  finish off support for show_xxx_versions
+	* ., Todo, lib/CPAN.pm: r2776@k75: k | 2007-07-14 12:48:47 +0200
+	  let SIGINT during "recent" mean that I do not want to continue to
+	  read this document
+	* ., MANIFEST, distroprefs/LDS.Crypt-CBC.yml: r2774@k75: k |
+	  2007-07-14 10:28:18 +0200
+	  another dependency bug on the CPAN
+	* ., distroprefs/BYRNE.SOAP-Lite.yml: r2772@k75: k | 2007-07-14
+	  10:23:45 +0200
+	  tracking undeclared dependencies as if it were a fun job:)
+	* ., distroprefs/SAMTREGAR.DBIx-Timeout.yml: r2769@k75: k |
+	  2007-07-14 10:20:08 +0200
+	  update distropref on DBIx::Timeout
+	* ., Todo, distroprefs/SAMTREGAR.DBIx-Timeout.yml, megainstall.txt:
+	  r2768@k75: k | 2007-07-14 10:19:35 +0200
+	  update distropref on DBIx::Timeout
+	* ., MANIFEST: r2765@k75: k | 2007-07-14 10:00:53 +0200
+	  manifest
+	* ., distroprefs/DAXIM.Yahoo-Photos.yml,
+	  distroprefs/JESSE.HTTP-Server-Simple.yml, distroprefs/MI.yml,
+	  megainstall.txt: r2764@k75: k | 2007-07-14 10:00:16 +0200
+	  notes about MI and a new friend, Yahoo::Photos
+	* ., MANIFEST, Todo, distroprefs/NODINE.Text-Restructured.yml,
+	  distroprefs/PIERS.sapnwrfc.yml, lib/CPAN.pm: r2762@k75: k |
+	  2007-07-14 06:43:55 +0200
+	  new distroprefs
+
+2007-07-13  k
+
+	* ., lib/CPAN/Version.pm, t/10version.t: r2759@k75: k | 2007-07-13
+	  23:57:57 +0200
+	  again version cosmetics, hopefully the last before I switch to
+	  version.pm: trim trailing ".0" sequences to a single one on
+	  vstring and add 3 tests to verify behaviour. Triggered by
+	  Set::IntSpan::Fast.
+	* ., Todo, distroprefs/MI.yml, lib/CPAN.pm: r2758@k75: k |
+	  2007-07-13 22:13:36 +0200
+	  a new MI member
+	* ., MANIFEST, Todo, distroprefs/OVID.Perl6-Caller.yml: r2756@k75:
+	  k | 2007-07-13 08:58:49 +0200
+	  the bugreport is filed...
+	* ., Changes, MANIFEST, distroprefs/MI.yml,
+	  distroprefs/MInoinc.yml,
+	  distroprefs/MRAMBERG.Catalyst-Plugin-Unicode.yml,
+	  distroprefs/REDTREE.PDF-API2-Simple.yml: r2753@k75: k |
+	  2007-07-13 07:15:57 +0200
+	  new distropref to collect MI users without inc so we can remove
+	  two recently added ones
+	* ., Changes, Todo, lib/CPAN.pm: r2752@k75: k | 2007-07-13 00:32:57
+	  +0200
+	  previous checkin was too radical: do not discriminate between ftp
+	  and http for sites actively chosen by the user because he
+	  probably knew what he was doing; prepare Changes file for next
+	  dev release
+
+2007-07-12  k
+
+	* ., distroprefs/MI.yml, lib/CPAN.pm: r2748@k75: k | 2007-07-13
+	  00:00:42 +0200
+	  rewrite the hostdl* code in a less obnoxious style
+	* ., MANIFEST, distroprefs/NUFFIN.Catalyst-Plugin-Session.yml:
+	  r2747@k75: k | 2007-07-12 22:38:44 +0200
+	  new missing dependency
+

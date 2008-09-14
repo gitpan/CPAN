@@ -103,6 +103,7 @@ CGI::Application::Dispatch
 CGI::Application::Plugin::AutoRunmode
 CGI::Application::Plugin::DevPopup
 CGI::Application::Plugin::Forward
+CGI::Cookie::XS
 CGI::Prototype
 CGI::Scriptpaths
 CGI::Session
@@ -116,6 +117,7 @@ CPAN::Checksums
 CPAN::Dependency
 CPAN::Faker
 CPAN::Index::Loader
+CPAN::Indexer::Mirror
 CPAN::IndexPod
 CPAN::Metrics
 CPAN::Mini
@@ -147,7 +149,6 @@ Carp::Clan
 Carp::Diagnostics
 Carp::REPL
 Carp::Source
-Catalys::Plugin::Unicode
 Catalyst
 Catalyst::Action::RenderView
 Catalyst::Devel
@@ -160,6 +161,7 @@ Catalyst::Plugin::CookiedSession
 Catalyst::Plugin::FormValidator
 Catalyst::Plugin::Session
 Catalyst::Plugin::Static::Simple
+Catalyst::Plugin::Unicode
 Catalyst::Plugin::Unicode::Encoding
 Catalyst::View::Mason
 Catalyst::View::TT
@@ -362,6 +364,7 @@ Data::Swap
 Data::Throttler
 Data::Throttler::Memcached
 Data::TreeDumper
+Data::TreeDumper::Renderer::DHTML
 Data::Types
 Data::UUID
 Data::Visitor
@@ -390,6 +393,7 @@ DateTime::Format::RSS
 DateTime::Format::W3CDTF
 DateTime::Set
 DateTimeX::Easy
+Date::Tiny
 DbFramework::Persistent
 Devel::ArgNames
 Devel::CallTrace
@@ -510,11 +514,13 @@ File::BaseDir
 File::Basename
 File::Binary
 File::Copy
+File::Corresponding
 File::CounterFile
 File::EmptyDirs
 File::ExtAttr
 File::Extract
 File::Extractor
+File::FcntlLock
 File::Fetch
 File::Filename
 File::Find::Parallel
@@ -613,6 +619,7 @@ Gtk2
 Gungho
 GunghoX::FollowLinks
 HOP::Lexer
+HOP::Parser
 HTML::Clean
 HTML::DOM
 HTML::Entities
@@ -686,6 +693,7 @@ IMAP::Admin
 IO
 IO::All
 IO::Async::Buffer
+IO::Capture
 IO::CaptureOutput
 IO::Compress::Base
 IO::Compress::Lzop
@@ -785,6 +793,7 @@ Linux::SysInfo
 List::Compare
 List::Maker
 List::MoreUtils
+List::Pairwise
 List::Tuples
 List::Util
 List::oo
@@ -904,6 +913,7 @@ MooseX::Storage
 MooseX::Types::Set::Object
 Mouse
 Muldis
+MyCPAN::Indexer
 MySQL::Slurp
 Net::Akamai
 Net::Amazon
@@ -1059,6 +1069,7 @@ Paranoid
 Parrot::Interpreter
 Parse::BACKPAN::Packages
 Parse::BooleanLogic
+Parse::CPAN::Distributions
 Parse::CPAN::MirroredBy
 Parse::Marpa
 Parse::RecDescent
@@ -1075,6 +1086,7 @@ Perl6::Perldoc
 Perl6::Say
 Perl::Critic::More
 Perl::Dist
+Perl::Metrics::Simple
 Perl::MinimumVersion
 Perl::Unsafe::Signals
 Perl::Version
@@ -1122,6 +1134,7 @@ PostScript::Simple
 PostScript::Simple::Table
 PowerTools::Data
 Prima
+Proc::InvokeEditor
 Proc::ProcessTable
 Proc::Simple
 ProgressMonitor::AbstractConfiguration
@@ -1319,6 +1332,7 @@ Test::Exception
 Test::FITesque::Fixture
 Test::File
 Test::FormValidator
+Test::Group
 Test::HTTP::Server::Simple
 Test::HTTPStatus
 Test::Harness
@@ -1356,6 +1370,7 @@ Text::Aspell
 Text::Autoformat
 Text::CSV_XS
 Text::Diff
+Text::Diff::HTML
 Text::FIGlet
 Text::Filter
 Text::Format
@@ -1389,6 +1404,7 @@ Text::Wrapper
 Text::vFile::asData
 Text::xSV
 ThreatNet::IRC
+Tie::Array::Lazy
 Tie::Array::Sorted
 Tie::Cache::LRU
 Tie::Cycle
@@ -1555,11 +1571,13 @@ XML::DOM::XPath
 XML::DTD
 XML::Descent
 XML::Elemental
+XML::Entities
 XML::Filter::XInclude
 XML::Generator
 XML::Generator::SVG::ShapeFile
 XML::Handler::YAWriter
 XML::LibXML
+XML::LibXML::Simple
 XML::LibXSLT
 XML::NamespaceSupport
 XML::Node

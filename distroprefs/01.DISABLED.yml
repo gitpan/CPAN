@@ -40,7 +40,7 @@ match:
     |BOWMANBS/Audio-Ecasound-\d              # hangs very early: RT 32101
     |BSCHMAL/parrot-0.6.0.tar.gz             # hangs during configure with 5.10
     |CAIDAPERL/Chart-Graph-\d                # hangs Makefile.PL: RT 33541
-    |CGUINE/Games-Sudoku-SudokuTk-0.07.tar.gz # hangs
+    |CGUINE/Games-Sudoku-SudokuTk-\d         # hangs: seen with 0.07 and 0.09
     |CLACO/AxKit-XSP-                        # looped in a readline
     |CORLISS/CursesForms-\d
     |CORLISS/CursesWidgets-\d
@@ -81,6 +81,7 @@ match:
     |LAOMOI/XiaoI-0.01.tar.gz                # hung
     |LAOMOI/XiaoI-0.03.tar.gz                # hung
     |LUPE/Filesys-SamFS-\d                   # have no SamFS
+    |LUSHE/Egg-Release-DBI                   # brings laptop to its knees RT #39239
     |LZE/CGI-CMS-\d                          # asks questions about paths
     |MCMAHON/WWW-Mechanize-Pluggable-1.03.tar.gz # killed the cpan shell with kill(); I don't understand how
     |MIKEM/Authen-TacacsPlus/Authen-TacacsPlus-0.17 # seems to hang
@@ -106,6 +107,7 @@ match:
     |SAPER/CPAN-Dependency-0.1[25]           # hangs in t/02internals: strace select(16, [4 8], NULL, NULL, NULL <unfinished ...>
     |SMEE/P4-\d                              # asks for Perforce api paths
     |SRVANCE/P4-Server-\d                    # or maybe it was this one?
+    |SSCAFFIDI/Stem-0.12.tar.gz              # hangs
     |STEPHENCA/Cvs-Simple-\d                 # asks for CVS paths
     |STEVAN/FCGI-Engine-\d                   # 0.04 hangs on t/002_basic_with_listen
     |STSANDER/Device-Davis-\d                # asks me for a tty to use
@@ -121,6 +123,9 @@ match:
     |WSMITH/RPC-Oracle-\d                    # asks username for Oracle
     |XERN/CGI-QuickApp-\d                    # hangs immediately
     |YAPPO/HTTP-Engine-0.0.15.tar.gz         # hangs in test 020_interface/standalone-restart
+    |YAPPO/HTTP-Engine-0.0.16.tar.gz         # ditto but not with all perls
+    |YAPPO/HTTP-Engine-0.0.17.tar.gz         # and once again
+    |YAPPO/HTTP-Engine-0.0.1..tar.gz         # preventing the next case
     |ANONWB/WWW-Patent-Page-\d               # downloads something largish
     |YEWENBIN/PDE-                           # probably a broken Makefile.PL that tries to install Module::Build even if it is installed and calls CPAN recursively; in any case an endless loop
     )|

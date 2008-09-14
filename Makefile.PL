@@ -25,8 +25,6 @@ my $version_from;
 {
   local $^W;
   $ExtUtils::MakeMaker::VERSION = eval $ExtUtils::MakeMaker::VERSION;
-  warn "Your MakeMaker is a bit dated[$ExtUtils::MakeMaker::VERSION].\nYou should get a new one\n"
-        if $ExtUtils::MakeMaker::VERSION < 6.0;
 }
 $main::SVN_RELEASE = 0;
 if (-d ".svn") {
@@ -43,7 +41,7 @@ if ($HAVE_FILE_SPEC) {
   if ($ARGV[0] && $ARGV[0] eq "--setversion") {
     die "Your perl is a bit dated[$]].\nDo not make a release with it\n" if $] < 5.008;
     die "Your MakeMaker is a bit dated[$ExtUtils::MakeMaker::VERSION].\nDo not make a release with it\n"
-        if $ExtUtils::MakeMaker::VERSION < 6.3004;
+        if $ExtUtils::MakeMaker::VERSION < 6.4502;
     die "Your MakeMaker doesn't do the sign woodoo" unless
         MM->can("signature_target");
     shift @ARGV;
@@ -182,11 +180,10 @@ WriteMakefile(
                        COMPRESS => 'gzip -9',
                       },
               # I took it from RT-CPAN ticket 30098:
-              ($ExtUtils::MakeMaker::VERSION >= 6.3002 ?
-               (EXTRA_META => <<EMETA,
-repository: "https://pause.perl.org:5460/svn/cpanpm/trunk"
-EMETA
-               ) : ()),
+              ($ExtUtils::MakeMaker::VERSION >= 6.4502 ?
+               (META_ADD => {
+                             repository => "https://pause.perl.org:5460/svn/cpanpm/trunk",
+                            }) : ()),
              );
 
 if ($version_diff){
@@ -272,13 +269,10 @@ README: lib/CPAN.pm Makefile
 	-[ -r $@ ] && chmod +w $@
 	-$(PERL) -MPod::Text -e 'Pod::Text->new->parse_from_file(\*ARGV)' lib/CPAN.pm > $@
 
-# got this from http://ch.tudelft.nl/~arthur/svn2cl/
-chlog-svn :
-	-LC_ALL=$(LC_ALL_noexport) svn log -v https://pause.perl.org:5460/svn/cpanpm/trunk > ChangeLog.svn
-
+# http://ch.tudelft.nl/~arthur/svn2cl/
 chlog-trad : ChangeLogTrad.svn
-ChangeLogTrad.svn :
-	-/home/src/devel/svn/svn2cl/svn2cl-current/svn2cl.sh --strip-prefix trunk --group-by-day https://pause.perl.org:5460/svn/cpanpm/trunk > $@
+ChangeLogTrad.svn : Makefile lib/CPAN.pm MANIFEST
+	-/home/src/devel/svn/svn2cl/svn2cl-current/svn2cl.sh --strip-prefix trunk --group-by-day --stdout -r HEAD:2000 https://pause.perl.org:5460/svn/cpanpm/trunk > $@
 
 # for debugging
 chlog-xml :
@@ -301,10 +295,13 @@ checkout ::
 megainstall: logs/.exists
 	for DATE in `date +%Y%m%dT%H%M`; do \
 		nohup $(PERL) -Ilib -MCPAN -e 'install(qw(Term::ReadKey))' < /dev/null > logs/megainstall.$$DATE.out 2>&1; \
-		LANG=en_US.utf8 $(PERL) -Ilib -MCPAN -e 'CPAN::HandleConfig->load; \
+		LANG=en_US.utf8 $(PERL) -Ilib -MCPAN -MPOSIX -e 'sub intime {POSIX::strftime("%FT%T",localtime()) lt "2008-09-15T23:59:59"}; \
+		  CPAN::HandleConfig->load; \
 		  open FH, "megainstall.txt" or die; chomp(@MEGA = grep {!/^#/} <FH>); \
 		  install(grep {!m[/]||-e$$_} qw($(MEGA_BASE))); \
-		  install("DAGOLDEN/CPAN-Reporter-1.16_51.tar.gz"); \
+		  install("ANDK/CPAN-1.92_64.tar.gz"); \
+		  install("MSCHWERN/Test-Simple-0.81_02.tar.gz")    if intime(); \
+		  install("EWILHELM/Module-Build-0.2808_04.tar.gz") if intime(); \
 		  CPAN::Shell->reload("cpan"); \
 		  install(map {$$_->[0]} sort {$$a->[1]<=>$$b->[1]} map {[$$_,rand(1)]} @MEGA); \
 		  CPAN::Shell->failed' >> logs/megainstall.$$DATE.out 2>&1; \
@@ -655,10 +652,10 @@ st-prefs ::
 };
   if ($main::SVN_RELEASE) {
     push @m, qq{
-chlog :: chlog-svn chlog-trad
+chlog :: chlog-trad
 
 ChangeLog : ChangeLogTrad.svn
-	mv ChangeLogTrad.svn ChangeLog
+	\$(CP) ChangeLogTrad.svn ChangeLog
 };
   } else {
     push @m, qq{
