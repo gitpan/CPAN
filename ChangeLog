@@ -1,3 +1,71 @@
+2008-09-29  k
+
+	* lib/CPAN.pm: prepare release
+	* Changes: prepare release
+	* megainstall.txt: random additions
+	* distroprefs/MI.yml: megamaint
+
+2008-09-28  k
+
+	* Makefile.PL: prolongate the support for Test-Simple-0.81_02, take
+	  out Module-Build since it is released
+	* megainstall.txt: megamaint
+	* distroprefs/01.DISABLED.yml, distroprefs/LDS.Crypt-CBC.yml,
+	  distroprefs/MI.yml, megainstall.txt: megamaint
+
+2008-09-27  k
+
+	* distroprefs/01.DISABLED.yml, distroprefs/MI.yml: megamaint
+	* lib/CPAN.pm: dealing with a tarball with zero permissions (thanks
+	  to RPHANEY/openStatisticalServices-0.018.tar.gz)
+	* megainstall.txt: add two modules mentioned on p5p
+
+2008-09-23  dagolden
+
+	* ., Changes, lib/CPAN/Tarzip.pm: SECURITY: Archive::Tar should not
+	  preserve permissions
+
+2008-09-23  k
+
+	* distroprefs/01.DISABLED.yml, distroprefs/LICHTKIND.Kephra.yml:
+	  kephra hangs NOT, this was a misreading, DBIx::DataModel does
+	* distroprefs/LICHTKIND.Kephra.yml: kephra hangs, disable it
+	* megainstall.txt: random additions
+
+2008-09-21  k
+
+	* distroprefs/DROLSKY.Class-MOP.yml, megainstall.txt: megamaint
+	* distroprefs/DROLSKY.Class-MOP.yml,
+	  distroprefs/ERIC.OpenThought.yml, distroprefs/MI.yml,
+	  megainstall.txt: megamaint
+
+2008-09-19  k
+
+	* Makefile.PL: and CPAN stands at _65!
+	* Makefile.PL: EWILHELM uploaded 05
+	* t/31sessions.t:
+	  http://www.nntp.perl.org/group/perl.cpan.testers/2008/09/msg2241501.html
+	  shows a missing close statement
+
+2008-09-18  k
+
+	* distroprefs/DROLSKY.Class-MOP.yml: the moose is resistant against
+	  5.11
+	* MANIFEST, distroprefs/DROLSKY.Class-MOP.yml, distroprefs/MI.yml,
+	  megainstall.txt: the moose is not moving
+	* megainstall.txt: remove Object::Relation
+
+2008-09-16  k
+
+	* t/31sessions.t: skip the test if neither unzip not Archive::Zip
+	  are available (similar for tar/gzip)
+	* t/30shell.t: remove a redundant my
+
+2008-09-15  k
+
+	* megainstall.txt: a SEGV in 5.10, interesting enough
+	* Todo, megainstall.txt: notes and random additions
+
 2008-09-14  k
 
 	* Makefile.PL: changelog creation add missing space

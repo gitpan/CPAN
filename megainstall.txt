@@ -11,6 +11,7 @@ Algorithm::Annotate
 Algorithm::C3
 Algorithm::CheckDigits
 Algorithm::Diff
+Algorithm::Line::Bresenham
 Algorithm::Nhash
 Algorithm::Partition
 Algorithm::Permute
@@ -39,6 +40,7 @@ App::Asciio
 App::CLI
 App::Info
 App::Info::Lib::Iconv
+App::Prove::History
 App::TemplateServer
 App::a2pdf
 App::sync_cpantesters
@@ -52,7 +54,9 @@ Array::RefElem
 Array::Slice
 Astro::Flux
 Astro::MoonPhase
+Attribute::Cached
 Attribute::Types
+Audio::FLAC::Header
 Audio::SndFile
 Audio::TagLib
 Authen::Htpasswd
@@ -62,6 +66,7 @@ Authen::Simple
 AutoLoader
 B::Debug
 B::Deobfuscate
+B::Flags
 B::Lint
 B::Size
 B::TerseSize
@@ -89,6 +94,7 @@ Bundle::RT
 Bundle::Slash
 Bundle::XML
 Business::CreditCard
+Business::DE::Konto
 Business::IBAN
 Business::ISBN
 Business::OnlinePayment
@@ -130,6 +136,7 @@ CPAN::Unwind
 CPAN::WWW::Testers
 CPAN::YACSmoke
 CPANPLUS
+CPANPLUS::Dist::RPM
 CSS
 CSS::Minifier
 CSS::Minifier::XS
@@ -252,6 +259,7 @@ Convert::ASCIInames
 Convert::ASN1
 Convert::BER
 Convert::Base32
+Convert::BaseN
 Convert::Bencode
 Convert::BinHex
 Convert::CharMap
@@ -273,6 +281,7 @@ Crypt::DH::GMP
 Crypt::DSA
 Crypt::IDEA
 Crypt::NULL
+Crypt::OTP26
 Crypt::OpenPGP
 Crypt::OpenSSL::Bignum
 Crypt::OpenSSL::RSA
@@ -396,6 +405,7 @@ DateTimeX::Easy
 Date::Tiny
 DbFramework::Persistent
 Devel::ArgNames
+Devel::CallSite
 Devel::CallTrace
 Devel::Caller
 Devel::CheckLib
@@ -523,6 +533,7 @@ File::Extractor
 File::FcntlLock
 File::Fetch
 File::Filename
+File::Find::Match
 File::Find::Parallel
 File::Headerinfo::SWF
 File::LibMagic
@@ -540,6 +551,7 @@ File::ShareDir
 File::SortedSeek
 File::Spec
 File::Spec::Functions
+File::Stat::Moose
 File::System
 File::Tail
 File::Temp
@@ -553,6 +565,7 @@ Filter::Simple
 Filter::Util::Call
 Finance::Bank::Postbank_de
 Finance::Currency::Convert::XE
+Finance::Quote
 FindBin
 FindBin::libs
 Flickr::API
@@ -614,6 +627,7 @@ Graph::SocialMap
 GraphViz
 Graphics::ColorNames
 Graphics::ColorObject
+Grid::Coord
 Gtk
 Gtk2
 Gungho
@@ -703,6 +717,7 @@ IO::File
 IO::Handle
 IO::Interface
 IO::LockedFile
+IO::Moose
 IO::Multiplex
 IO::Pager
 IO::Pipe
@@ -734,6 +749,7 @@ Image::Info::SVG
 Image::Magick::Thumbnail
 Image::Magick::Thumbnail::Fixed
 Image::Magick::Thumbnail::PDF
+Image::Match
 Image::Pngslimmer
 Image::Size
 Imager
@@ -907,9 +923,11 @@ MooseX::Iterator
 MooseX::Log::Log4perl
 MooseX::Method
 MooseX::Mutate
+MooseX::Params::Validate
 MooseX::Plaggerize
 MooseX::Singleton
 MooseX::Storage
+MooseX::TheSchwartz
 MooseX::Types::Set::Object
 Mouse
 Muldis
@@ -967,6 +985,7 @@ Net::SSH::Perl
 Net::SSL::ExpireDate
 Net::SSLeay
 Net::Server
+Net::Social
 Net::Telnet
 Net::Time
 Net::Twitter
@@ -978,6 +997,7 @@ Net::XMPP
 Net::XMPP2
 Net::Z3950::ZOOM
 NetAddr::IP
+NetHack::Item::Weapon
 News::Article
 Number::Format
 Number::Range
@@ -987,7 +1007,7 @@ OOPS
 Object::Accessor
 Object::Destroyer
 Object::Realize::Later
-Object::Relation
+Object::Relation::NO_SMOKER_39316
 Object::Signature
 Object::Tiny
 Ogre::SceneManager
@@ -1088,6 +1108,7 @@ Perl::Critic::More
 Perl::Dist
 Perl::Metrics::Simple
 Perl::MinimumVersion
+Perl::Tags
 Perl::Unsafe::Signals
 Perl::Version
 PerlIO::Util
@@ -1155,6 +1176,7 @@ RPC::XML
 RRDTool::Creator
 RT::Client::REST
 RTF::HTMLConverter
+Reaction
 Regex::PreSuf
 Regexp::Assemble
 Regexp::Common::IRC
@@ -1176,6 +1198,7 @@ Runops::Trace
 SGML::Parser::OpenSP
 SIOC
 SNMP
+SNMP::LogParser
 SOAP::Lite
 SOAP::WSDL
 SQL::Abstract::Limit
@@ -1221,6 +1244,7 @@ Set::ConsistentHash
 Set::Crontab
 Set::Infinite
 Set::IntSpan::Fast
+Set::IntSpan::Island
 Set::Integer::Gapfillers
 Set::Object
 Shell::Autobox
@@ -1238,7 +1262,9 @@ Sms::Token::UD
 Socket6
 Sort::ArbBiLex
 Sort::DataTypes
+Sort::Key
 Sort::Key::Radix
+Sort::Maker
 Sort::Rank
 Spiffy
 Spoon
@@ -1268,9 +1294,11 @@ String::ShellQuote
 String::Similarity
 String::Truncate
 Sub::Assert
+Sub::Auto
 Sub::Context
 Sub::Contract
 Sub::Current
+Sub::Curried
 Sub::Exporter
 Sub::Install
 Sub::Name
@@ -1278,6 +1306,7 @@ Sub::Override
 Sub::Uplevel
 Sub::WrapPackages
 Sys::CPU
+Sys::FreezeThaw
 Sys::Hostname
 Sys::Mmap
 Sys::SigAction
@@ -1324,6 +1353,7 @@ Test::A8N
 Test::AutoBuild
 Test::Builder
 Test::Builder::Tester
+Test::CPAN::Meta
 Test::Class
 Test::Deep
 Test::Dependencies
@@ -1381,6 +1411,7 @@ Text::Metaphone
 Text::NSP
 Text::Ngram
 Text::PDF
+Text::Phonetic
 Text::Query
 Text::Quoted
 Text::RecordParser
@@ -1409,6 +1440,8 @@ Tie::Array::Sorted
 Tie::Cache::LRU
 Tie::Cycle
 Tie::DxHash
+Tie::Hash::Sorted
+Tie::Hash::StructKeyed
 Tie::EncryptedHash
 Tie::Sub
 Time::Duration
@@ -1519,6 +1552,7 @@ V
 VCI
 VFSsimple
 VS::Chart
+Variable::Magic
 Verilog::Parser
 Vim::Complete
 Vim::Snippet::Converter
@@ -1585,6 +1619,7 @@ XML::NodeFilter
 XML::Parser
 XML::Parser::Lite::Tree
 XML::Parser::PerlSAX
+XML::Pastor
 XML::RSS
 XML::RSS::FromHTML::Simple
 XML::RSS::LibXML
@@ -1610,6 +1645,7 @@ XML::XPathEngine
 XS::Writer
 XSLoader
 XUL::App
+XUL::Node
 YAML
 YAML::Syck
 YAML::Tiny

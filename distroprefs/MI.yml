@@ -125,7 +125,6 @@ match:
     |EKAWAS/MOSES-MOBY-\d
     |ELLIOTJS/Task-Perl-Critic-IncludingOptionalDependencies-
     |ELLIOTJS/Task-Perl-Critic-[v\d]
-    |ERIC/OpenThought-\d
     |FLORA/Catalyst-View-Mason-\d
     |FLORA/File-Extractor-\d
     |FOX/Bot-CPAN-\d
@@ -235,6 +234,7 @@ match:
     |MARCEL/Google-Chart-\d
     |MARCEL/Hash-Inflator-\d
     |MARCEL/LWP-UserAgent-ProgressBar-\d
+    |MARCEL/Module-Install-Template-\d
     |MARCEL/PerlIO-via-Pipe-\d
     |MARCEL/Pod-Generated-\d
     |MARCEL/String-BlackWhiteList-\d
@@ -280,12 +280,16 @@ match:
     |MSTROUT/DBIx-Class-Cursor-Cached-\d
     |MSTROUT/DBIx-Class-\d
     |MSTROUT/Devel-REPL-\d
+    |MSTROUT/Reaction-\d
     |NEKOKAK/DBIx-Class-Stash-\d
     |NEKOKAK/DBIx-Class-TableNames-\d
     |NEMUX/Net-UCP-\d
     |NUFFIN/Catalyst-Plugin-Session-State-Cookie-\d
     |NUFFIN/MooseX-Getopt-\d
     |NUFFIN/MooseX-Storage-\d
+    |OSFAMERON/Perl-Tags-\d
+    |OSFAMERON/Sub-Auto-\d
+    |OSFAMERON/Sub-Curried-\d
     |PERIGRIN/MooseX-Async-\d
     |PERIGRIN/MooseX-POE-\d
     |PERIGRIN/MooseX-Workers-\d
@@ -317,6 +321,7 @@ match:
     |RKRIMEN/Path-Abstract-\d
     |RKRIMEN/Path-Resource-\d
     |RLB/Notification-Center-\d
+    |RSRCHBOY/CPANPLUS-Dist-RPM-\d
     |SARTAK/Acme-Aspartame-\d
     |SARTAK/App-Nopaste-\d
     |SARTAK/Carp-REPL-\d
