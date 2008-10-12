@@ -1,3 +1,44 @@
+2008-10-12  k
+
+	* Changes: about to release unaltered code base as 1.93
+	* lib/CPAN.pm: about to release unaltered code base as 1.93
+	* bin/rt-deleter.pl: spam
+	* megainstall.txt: random additions
+
+2008-10-10  k
+
+	* megainstall.txt: megamaint
+	* MANIFEST.SKIP, distroprefs/MIKER.IPtables-IPv4-DBTarpit.yml:
+	  megamaint
+
+2008-10-09  k
+
+	* distroprefs/01.DISABLED.yml: megamaint
+	* bin/recent.pl: Recent mechanism again
+	* megainstall.txt: megamaint
+	* bin/loop-over-recent.pl, bin/loop-over-recent.pl.otherperls,
+	  bin/recent.pl: boldly(?) move forward adjusting the smoker
+	  infrastructure to current Recent mechanisms
+
+2008-10-07  k
+
+	* distroprefs/DBROBINS.Net-SSH-Perl.yml, megainstall.txt: megamaint
+	* megainstall.txt: recent uploads
+
+2008-10-03  k
+
+	* distroprefs/LDS.Crypt-CBC.yml: 2.30 seems to be fixed
+
+2008-10-02  k
+
+	* megainstall.txt: megamaint
+	* distroprefs/01.DISABLED.yml: megamaint
+
+2008-10-01  k
+
+	* distroprefs/MI.yml, distroprefs/MIKER.IPtables-IPv4-DBTarpit.yml,
+	  megainstall.txt: megamaint
+
 2008-09-29  k
 
 	* lib/CPAN.pm: prepare release
