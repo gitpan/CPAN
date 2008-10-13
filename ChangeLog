@@ -1,5 +1,14 @@
+2008-10-13  k
+
+	* Changes, lib/CPAN.pm, t/12cpan.t, t/30shell.t, t/31sessions.t:
+	  fix tests that have been failing and reported; increase timeouts;
+	  adapt skip messages to newer Test::Harness
+	* t/03pkgs.t: for perl core adjusted module list
+
 2008-10-12  k
 
+	* distroprefs/MI.yml: megamaint
+	* bin/cp-to-perl.pl: trying to produce a patch for bleadperl
 	* Changes: about to release unaltered code base as 1.93
 	* lib/CPAN.pm: about to release unaltered code base as 1.93
 	* bin/rt-deleter.pl: spam
