@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               CPAN
-version:            1.93_03
+version:            1.93_51
 abstract:           query, download and build perl modules from CPAN sites
 author:
     - Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>
@@ -18,7 +18,7 @@ no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.4801
+generated_by:       ExtUtils::MakeMaker version 6.48
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4
