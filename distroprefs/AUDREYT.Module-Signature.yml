@@ -4,8 +4,7 @@ match:
 pl:
   eexpect:
     mode: anyorder
-    timeout: 15
-    reuse: 1
+    timeout: 5
     talk:
       - "Import PAUSE"
       - "y\n"

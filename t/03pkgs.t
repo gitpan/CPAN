@@ -7,7 +7,7 @@ use lib "lib";
 my @m;
 if ($ENV{PERL_CORE}){
   @m = ("CPAN", map { "CPAN::$_" } qw(Debug
-                                      DeferredCode
+                                      DeferedCode
                                       Distroprefs
                                       FirstTime
                                       Kwalify

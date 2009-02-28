@@ -1,8 +1,5 @@
 ---
-comment: |
-
-  Just for testing a potential CPAN.pm bug
-
+comment: "Just for testing a potential CPAN.pm bug"
 match:
   distribution: "DMAKI/DateTime-Util-Astro-0.09.tar.gz"
   perl: "XXXX ---- never matches ---- XXXX"
@@ -18,26 +15,28 @@ pl:
 match:
   distribution: "^DMAKI/DateTime-Util-Calc-0\.1[23]"
 pl:
+  env:
+    PERL_AUTOINSTALL: --skip
   eexpect:
     mode: anyorder
-    reuse: 1
     talk:
       - "Upgrade DateTime::Util::Calc\?"
       - "y\n"
       - "Auto-install"
       - "n\n"
+make:
+  env:
+    PERL_AUTOINSTALL: --skip    
 ---
-comment: |
-
-  all other DateTime modules only need Module::Install support at the moment
-
+comment: "all other DateTime modules only need Module::Install support at the moment"
 match:
   distribution: "DMAKI/DateTime-.*-\d"
 pl:
+  env:
+    PERL_AUTOINSTALL: --skip
   eexpect:
     mode: anyorder
-    reuse: 1
-    timeout: 60
+    timeout: 5
     talk:
       - "Auto-install"
       - "y\n"
@@ -45,3 +44,6 @@ pl:
       - "y\n"
       - "Auto-install"
       - "y\n"
+make:
+  env:
+    PERL_AUTOINSTALL: --skip    

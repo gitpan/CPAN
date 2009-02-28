@@ -1,22 +1,6 @@
 ---
 comment: |
 
-  In general nobody wants to see reports about 5.[79] anymore
-
-  But then on 2009-01-14 my smoker sent this:
-  http://www.nntp.perl.org/group/perl.cpan.testers/2009/01/msg3068489.html
-  which I cannot explain why. CPAN.pm was 1.9205, did it not implement
-  the construct? CPAN::Reporter was 1.13. Cannot reproduce (but did
-  not try very hard)
-
-match:
-  perlconfig:
-    version: "^5\.[79]"
-cpanconfig:
-  test_report: 0
----
-comment: |
-
   Author would prefer to never see false positives which I cannot
   guarantee, so we turn off mails for him completely. Main involvement
   was Digest::SHA which got FAILs during a short phase of 5.9.3 due to
