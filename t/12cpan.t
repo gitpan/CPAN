@@ -29,6 +29,11 @@ require CPAN::HandleConfig;
     BEGIN{$count++}
 }
 {
+    my $rdep = CPAN::Exception::RecursiveDependency->new([qw(foo bar baz)]);
+    like $rdep, qr/^--not.*--$/, "not a recursive/circular dependency";
+    BEGIN{$count++}
+}
+{
     my $rdep = CPAN::Exception::RecursiveDependency->new([qw(foo bar baz foo)]);
     like $rdep, qr/foo.+=>.+bar.+=>.+baz.+=>.+foo/s, "circular dependency";
     BEGIN{$count++}
@@ -156,7 +161,7 @@ require CPAN::HandleConfig;
             is($::yaml_load_code_works, 0, 'running the code did the right thing');
 
             my $obj = $data->{object};
-            isa_ok($obj, 'CPAN::DeferedCode');
+            isa_ok($obj, 'CPAN::DeferredCode');
             local $^W;
             my $dummy = "$obj";
             is($::yaml_load_code_works, 0, 'stringifying the obj does nothing');
@@ -175,7 +180,7 @@ require CPAN::HandleConfig;
             is($::yaml_load_code_works, 1, 'running the code did the right thing');
 
             my $obj = $data->{object};
-            isa_ok($obj, 'CPAN::DeferedCode');
+            isa_ok($obj, 'CPAN::DeferredCode');
             my $dummy = "$obj";
             is($::yaml_load_code_works, 2, 'stringifying the obj ran the code');
         }
@@ -214,6 +219,20 @@ require CPAN::HandleConfig;
                "found $k\[$v] on domain[$n->{domain}]");
         }
     }
+}
+
+{
+    my $this_block_count;
+    BEGIN {
+        $this_block_count = 2;
+        $count += $this_block_count;
+    }
+    use CPAN::FirstTime;
+    my $keys = keys %CPAN::FirstTime::prompts;
+    ok $keys>=105, "found keys[$keys] prompts";
+    my $join = join "", %CPAN::FirstTime::prompts;
+    my $length = length $join;
+    ok $length>=20468, "found length[$length] prompts";
 }
 
 BEGIN{plan tests => $count}

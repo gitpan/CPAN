@@ -24,15 +24,20 @@ match:
     |AGENT/XUL-App-\d
     |AGRUNDMA/Catalyst-Engine-Apache-\d
     |AGRUNDMA/Catalyst-Engine-HTTP-Prefork-\d
+    |AGRUNDMA/Catalyst-Plugin-Session-Store-DBI-\d
     |AGRUNDMA/Catalyst-Plugin-Static-Simple-\d
     |AGRUNDMA/Catalyst-Plugin-UploadProgress-\d
-    |AGRUNDMA/Catalyst-Plugin-Session-Store-DBI-\d
+    |ALEXMV/Data-ICal-\d
+    |ALEXMV/Template-Declare-\d
     |ANDREMAR/Number-Phone-NO-\d
     |ASH/DBIx-Class-\d
+    |ASH/Parse-Method-Signatures-\d
     |ASHLEY/Catalyst-Authentication-Credential-OpenID-\d
+    |ASHLEY/RSSycklr-\d
     |ASKSH/Acme-Locals-\d
     |ASKSH/sys-\d
     |AUDREYT/Scalar-Defer-\d
+    |AUTRIJUS/ExtUtils-AutoInstall-0.63.tar.gz
     |AVAR/Bot-BB2-\d
     |AVAR/SMS-Send-IS-Vodafone-\d
     |AVIF/Image-Compare-\d
@@ -51,6 +56,9 @@ match:
     |BLBLACK/MooseX-LazyLogDispatch-\d
     |BLBLACK/MooseX-SimpleConfig-\d
     |BOBMATH/Crypt-CAST5_PP-\d
+    |BOBTFISH/Catalyst-Plugin-Authentication-\d
+    |BOBTFISH/Catalyst-Plugin-Session-State-Cookie-\d
+    |BOBTFISH/Catalyst-Plugin-Session-State-URI-\d
     |BOBTFISH/MooseX-Storage-\d
     |BOGDAN/Catalyst-Model-DBIC-Schema-\d
     |BOKUTIN/Template-Plugin-Filter-VisualTruncate-\d
@@ -74,16 +82,18 @@ match:
     |BRICAS/WWW-OpenSearch-\d
     |BRICAS/WWW-Wikipedia-\d
     |BTROTT/Authen-TypeKey-\d
+    |BTROTT/Data-ObjectDriver-\d
     |BTROTT/Feed-Find-
     |BTROTT/URI-Fetch-\d
+    |BTROTT/WWW-Blog-Metadata-\d             
     |BTROTT/XML-Feed-\d
     |CAMELCASE/HTML-TurboForm-\d
-    |CFRANKS/Catalyst-Model-Net-Amazon-\d
-    |CFRANKS/HTML-FormFu-\d
-    |CFRANKS/HTML-FormFu-Model-DBIC-\d
-    |CFRANKS/HTML-Widget-\d
-    |CFRANKS/DBIx-Class-HTML-FormFu-\d
     |CFRANKS/Catalyst-Controller-HTML-FormFu-\d
+    |CFRANKS/Catalyst-Model-Net-Amazon-\d
+    |CFRANKS/DBIx-Class-HTML-FormFu-\d
+    |CFRANKS/HTML-FormFu-Model-DBIC-\d
+    |CFRANKS/HTML-FormFu-\d
+    |CFRANKS/HTML-Widget-\d
     |CLACO/Catalyst-Model-NetBlogger-\d
     |CLACO/Class-Accessor-Grouped-\d
     |CLACO/DBIx-Class-InflateColumn-Currency-\d
@@ -97,6 +107,8 @@ match:
     |CLKAO/Pushmi-v\d
     |CLKAO/RunApp-\d
     |CLKAO/SVK-v\d
+    |CTBROWN/MooseX-Meta-Attribute-Lvalue-\d
+    |CWEST/JSAN-\d
     |DAXIM/Mediawiki-Blame-\d
     |DCOPPIT/Benchmark-Timer-\d
     |DCOPPIT/Getargs-Long-\d
@@ -108,11 +120,14 @@ match:
     |DMAKI/Catalyst-Model-FormFu-\d
     |DMAKI/Catalyst-Model-HTML-FormFu-\d
     |DMAKI/Danga-Socket-Callback-\d
+    |DMAKI/Data-Decode-\d
     |DMAKI/Data-Throttler-Memcached-\d
     |DMAKI/Data-Visitor-Encode-\d
+    |DMAKI/DateTime-.+-\d
     |DMAKI/Event-Notify-\d
     |DMAKI/Gungho-\d
     |DMAKI/GunghoX-FollowLinks-\d
+    |DMAKI/HTTP-Response-OnDisk-\d
     |DMAKI/Iterator-File-Line-\d
     |DMAKI/POE-Component-Q4M-\d
     |DMAKI/WWW-RobotRules-Parser-\d
@@ -123,12 +138,16 @@ match:
     |DOY/Games-Word-\d
     |DRPROLIX/Catalyst-Helper-View-TT-Bootstrap-\d
     |DSNOPEK/POE-Component-MessageQueue-\d
+    |ECARROLL/MooseX-Types-DateTimeX-\d
     |EDENC/MooseX-Role-Cmd-\d
     |EKAWAS/MOSES-MOBY-\d
     |ELLIOTJS/Task-Perl-Critic-IncludingOptionalDependencies-
     |ELLIOTJS/Task-Perl-Critic-[v\d]
+    |FAYLAND/Foorum-\d
     |FLORA/Catalyst-View-Mason-\d
+    |FLORA/Class-C3-\d
     |FLORA/File-Extractor-\d
+    |FLORA/namespace-clean-\d
     |FOX/Bot-CPAN-\d
     |GAAL/Best-\d
     |GAAL/Class-Accessor-Ref-\d
@@ -150,6 +169,9 @@ match:
     |GRODITI/DBIx-Class-EncodedColumn-\d
     |GRODITI/MooseX-Object-Pluggable-\d
     |GRUBER/IPC-Messaging-\d
+    |GUGOD/Template-Provider-Markdown-\d
+    |GUGOD/Test-Continuous-\d
+    |GUGU/Algorithm-FloodControl-\d
     |HANENKAMP/Bot-Net-\d
     |HANENKAMP/Data-Remember-\d
     |HANENKAMP/HTML-ParagraphSplit-\d
@@ -159,20 +181,29 @@ match:
     |HDP/Data-Hive-\d
     |HDP/KSx-IndexManager-\d
     |HDP/MooseX-InsideOut-\d
+    |HDP/Object-Array-\d
     |HIROSE/Net-SSL-ExpireDate-\d
     |HOLOWAY/Catalyst-Action-REST-\d
     |HOLOWAY/Catalyst-Log-Log4perl-\d
+    |ISILLITOE/MooseX-Role-Cmd-\d
     |JAYK/Catalyst-Plugin-Authentication-Store-DBIx-Class-\d
     |JAYK/Catalyst-Plugin-Authentication-\d
     |JCAMACHO/Catalyst-Controller-FormBuilder-\d
     |JESSE/Class-Accessor-Named-\d
     |JESSE/DBIx-SearchBuilder-\d
     |JESSE/Data-ICal-\d
+    |JESSE/Net-Jifty-\d
+    |(?:JESSE|SARTAK)/Jifty-\d
+    |JESSE/Net-Trac-\d
     |JESSE/Scalar-Defer-\d
     |JESSE/Shipwright-\d
+    |JESSE/Template-Declare-\d
     |JGOULAH/Catalyst-Plugin-AutoRestart-\d
     |JGOULAH/MooseX-LogDispatch-\d
     |JGOULAH/Net-Akamai-\d
+    |JJNAPIORK/MooseX-Types-Structured-\d
+    |JJNAPIORK/MooseX-Types-\d
+    |JONALLEN/Perldoc-Server-\d
     |JROBINSON/Catalyst-Plugin-Authentication-Credential-TypeKey-\d
     |JROBINSON/DBIx-Class-\d
     |JROCKWAY/Algorithm-IncludeExclude-\d
@@ -195,6 +226,8 @@ match:
     |LAMMEL/MooseX-Log-Log4perl-\d
     |LAYE/AI-MaxEntropy-\d
     |LBROCARD/Devel-ebug-HTTP-\d
+    |LBROCARD/Test-WWW-Mechanize-Catalyst-\d 
+    |LORN/LWP-Curl-\d
     |LSAUNDERS/DBIx-Class-Fixtures-\d
     |LUKEC/Blikistan-\d
     |LUKEC/Test-Mock-LWP-\d
@@ -204,56 +237,14 @@ match:
     |LYOKATO/Catalyst-View-TT-ForceUTF8-\d
     |LYOKATO/FormValidator-Simple-\d
     |LYOKATO/Pod-ProjectDocs-\d
-    |MARCEL/App-sync_cpantesters-\d
-    |MARCEL/Business-Address-POBox-\d
-    |MARCEL/Class-Accessor-Bundle-\d
-    |MARCEL/Class-Accessor-Complex-\d
-    |MARCEL/Class-Accessor-Constructor-\d
-    |MARCEL/Class-Accessor-FactoryTyped-\d
-    |MARCEL/Class-Accessor-Installer-\d
-    |MARCEL/Class-Factory-Enhanced-\d
-    |MARCEL/Class-Scaffold-\d
-    |MARCEL/Class-Value-Bundle-\d
-    |MARCEL/Class-Value-Contact-\d
-    |MARCEL/Class-Value-SemanticAdapter-\d
-    |MARCEL/Class-Value-\d
-    |MARCEL/DB-Pluggable-\d
-    |MARCEL/Data-Conveyor-\d
-    |MARCEL/Data-Domain-Net-\d
-    |MARCEL/Data-Domain-SemanticAdapter-\d
-    |MARCEL/Data-Domain-URI-\d
-    |MARCEL/Data-Semantic-Net-\d
-    |MARCEL/Data-Semantic-URI-\d
-    |MARCEL/Data-Semantic-\d
-    |MARCEL/Data-Storage-\d
-    |MARCEL/Data-Timeline-Bundle-\d
-    |MARCEL/Data-Timeline-IScrobbler-\d
-    |MARCEL/Data-Timeline-SVK-\d
-    |MARCEL/Data-Timeline-\d
-    |MARCEL/Dist-Joseki-\d
-    |MARCEL/Games-Go-Coordinate-\d
-    |MARCEL/Games-Go-Rank-\d
-    |MARCEL/Google-Chart-\d
-    |MARCEL/Hash-Inflator-\d
-    |MARCEL/LWP-UserAgent-ProgressBar-\d
-    |MARCEL/Module-Install-Template-\d
-    |MARCEL/PerlIO-via-Pipe-\d
-    |MARCEL/Pod-Generated-\d
-    |MARCEL/String-BlackWhiteList-\d
-    |MARCEL/String-FlexMatch-\d
-    |MARCEL/Template-Plugin-CPAN-Packages-\d
-    |MARCEL/Template-Plugin-GoogleChart-\d
-    |MARCEL/Test-CompanionClasses-\d
-    |MARCEL/Test-Compile-\d
-    |MARCEL/Text-Pipe-Translate-\d
-    |MARCEL/Text-Pipe-W3CDTF-\d
-    |MARCEL/Text-Pipe-\d
-    |MARCEL/Vim-Complete-\d
+    |MARCEL/
     |MARKSTOS/Test-WWW-Selenium-CGIApp-\d
     |MASAKI/Catalyst-Controller-Resources-\d
     |MDXI/Curses-UI-\d
     |MEMOWE/HTML-SBC-\d
     |MIKI/HTML-Feature-\d
+    |MIKI/Lingua-JA-Expand-\d
+    |MIKI/Lingua-JA-TFIDF-\d
     |MITREHC/HoneyClient-Agent-\d
     |MITREHC/HoneyClient-Manager-\d
     |MITREHC/HoneyClient-Util-\d
@@ -264,6 +255,10 @@ match:
     |MLAWREN/MySpam-\d
     |MLAWREN/NCGI-\d
     |MLAWREN/SQL-DB-\d
+    |MONS/Test-More-UTF8-\d
+    |MONS/XML-Parser-Style-EasyTree-\d
+    |MONS/XML-RPC-Fast-\d
+    |MONS/ex-lib-\d
     |MPG/POD-Credentials-\d
     |MRAMBERG/Catalyst-Action-RenderView-\d
     |MRAMBERG/Catalyst-Devel-\d
@@ -275,6 +270,7 @@ match:
     |MRAMBERG/Catalyst-Plugin-SubRequest-\d
     |MRAMBERG/Catalyst-Plugin-Unicode-\d
     |MRAMBERG/Catalyst-Runtime-
+    |MRAMBERG/Task-Catalyst-Tutorial-\d
     |MRAMBERG/Task-Catalyst-\d
     |MSIMERSON/Mail-Toaster-\d
     |MSTROUT/Catalyst-Controller-BindLex-\d
@@ -290,9 +286,12 @@ match:
     |NUFFIN/Catalyst-Plugin-Session-State-Cookie-\d
     |NUFFIN/MooseX-Getopt-\d
     |NUFFIN/MooseX-Storage-\d
+    |NUFFIN/Task-KiokuDB-\d
+    |OLIVER/Devel-REPL-\d
     |OSFAMERON/Perl-Tags-\d
     |OSFAMERON/Sub-Auto-\d
     |OSFAMERON/Sub-Curried-\d
+    |PERIGRIN/JSON-Any-\d
     |PERIGRIN/MooseX-Async-\d
     |PERIGRIN/MooseX-POE-\d
     |PERIGRIN/MooseX-Workers-\d
@@ -305,7 +304,10 @@ match:
     |PLU/DBIx-Class-ResultSet-HashRef-\d
     |PRAVUS/Authen-CAS-Client-\d
     |REDTREE/PDF-API2-Simple-\d
+    |RIBASUSHI/DBIx-Class-\d
+    |RJBS/MooseX-Getopt-\d
     |RJBS/Rubric-\d
+    |RKITOVER/Catalyst-Controller-WrapCGI-\d
     |RKITOVER/Catalyst-Plugin-RelativePaths-\d
     |RKITOVER/Catalyst-Plugin-SmartURI-\d
     |RKRIMEN/Carp-Clan-Share-\d
@@ -323,8 +325,11 @@ match:
     |RKRIMEN/JS-jQuery-Loader-\d
     |RKRIMEN/Path-Abstract-\d
     |RKRIMEN/Path-Resource-\d
+    |RKRIMEN/Text-Lorem-More-\d
     |RLB/Notification-Center-\d
+    |RSRCHBOY/Archive-RPM-\d
     |RSRCHBOY/CPANPLUS-Dist-RPM-\d
+    |RSRCHBOY/Fedora-Bugzilla-\d
     |SARTAK/Acme-Aspartame-\d
     |SARTAK/App-Nopaste-\d
     |SARTAK/Carp-REPL-\d
@@ -334,7 +339,6 @@ match:
     |SARTAK/IncPatch-\d
     |SARTAK/Jifty-DBI-\d
     |SARTAK/Jifty-Plugin-OAuth-\d
-    |(?:JESSE|SARTAK)/Jifty-\d
     |SARTAK/Moose-\d
     |SARTAK/Net-Hiveminder-\d
     |SARTAK/Net-Jifty-\d
@@ -353,6 +357,7 @@ match:
     |STEVAN/Path-Router-\d
     |STEVAN/Task-Moose-\d
     |SUNNAVY/Shipwright-\d
+    |SYBER/DBIx-RetryOverDisconnects-\d
     |TELS/graph/Graph-
     |THEPLER/MooseX-Types-Path-Class-\d
     |TOKUHIROM/Archer-\d
@@ -362,13 +367,15 @@ match:
     |TOMYHERO/Catalyst-Plugin-Config-Multi-\d
     |TOMYHERO/Catalyst-Plugin-ConfigLoader-Multi-\d
     |TRAVAIL/DBIx-Class-Schema-Slave-\d
+    |YAPPO/Class-Component-\d
     |YAPPO/Geo-Coordinates-Converter-\d
     |YAPPO/HTTP-Engine-\d
-    |YAPPO/Class-Component-\d
+    |YAPPO/Lingua-JA-Summarize-Extract-\d
     |YARON/WWW-Monitor-\d
     |YVESAGO/NET-Sieve-\d
     |YVESAGO/Net-Sieve-\d
     |ZAKAME/Tie-Amazon-S3-\d
+    |ZARQUON/Catalyst-Helper-AuthDBIC-\d
     |ZIGOROU/Catalyst-Helper-Model-MozRepl-\d
     |ZIGOROU/Catalyst-Model-MozRepl-\d
     |ZIGOROU/Data-ClearSilver-HDF-\d
@@ -381,7 +388,7 @@ match:
 pl:
   eexpect:
     mode: anyorder
-    timeout: 60
+    timeout: 120
     reuse: 1
     talk:
       - "Auto-install"

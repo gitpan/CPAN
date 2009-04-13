@@ -76,6 +76,7 @@ $VERSION = "5.5";
      "pager",
      "password",
      "patch",
+     "patches_dir",
      "perl5lib_verbosity",
      "prefer_installer",
      "prefs_dir",
@@ -523,6 +524,7 @@ sub load {
     use Carp;
     require_myconfig_or_config;
     my @miss = $self->missing_config_data;
+    CPAN->debug("doit[$doit]loading[$loading]miss[@miss]") if $CPAN::DEBUG;
     return unless $doit || @miss;
     return if $loading;
     $loading++;
@@ -704,7 +706,7 @@ sub prefs_lookup {
     $VERSION = "5.5";
 
     # formerly CPAN::HandleConfig was known as CPAN::Config
-    sub AUTOLOAD {
+    sub AUTOLOAD { ## no critic
         my $class = shift; # e.g. in dh-make-perl: CPAN::Config
         my($l) = $AUTOLOAD;
         $CPAN::Frontend->mywarn("Dispatching deprecated method '$l' to CPAN::HandleConfig\n");

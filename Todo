@@ -1,3 +1,123 @@
+2009-03-13  Andreas J. Koenig  <andk@cpan.org>
+
+	* git tags not exported. Why? Need to export the release tags. How?
+
+	Do I actually have some? 
+
+% git tag -l | tail
+1.92_63
+1.92_64
+1.92_65
+1.92_66
+1.93
+1.9301
+1.9304
+1.93_02
+1.93_03
+1.93_51
+
+	But on the re-imported clone it ends with 1.9301
+
+	git push --tags
+
+	this is considered to dtrt. Can be checked visiting github and hovering
+	over "all tags". According to
+	http://blog.ashchan.com/archive/2008/06/30/tags-on-git/ at least.
+	Problem with that is we have so many tags that we cannot scroll to the
+	last in firefox.
+
+	But indeed 'git push --tags' did work as expected and downloading to the
+	the other box also
+
+2009-03-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* test YAML::XS and YAML::Perl.
+
+|                 | YAML::Syck | YAML::XS | YAML | YAML::Perl     | YAML::Tiny |
+|                 |            |          |      |                |            |
+| hosts command   | 0 s        | 0 s      | 5 s  | INTR after 1 m | FAILS      |
+|                 |            |          |      |                |            |
+| test Acme::Meta | 4 s        | 4 s      | 35 s | FAILS          | FAILS      |
+|                 |            |          |      |                |            |
+
+2009-02-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* support deprecate.pm: Nick's plan seems to be that when Switch.pm is
+	installed at
+
+	/Users/nick/Sandpit/511v/lib/perl5/5.11.0/Switch.pm
+
+	then it is a second class citizen (because it came with perl) which
+	warns when being loaded (due to deprecated.pm). But when it (the very
+	same file) is installed from the CPAN it will live in a different
+	location, say
+
+	/Users/nick/Sandpit/511v/lib/perl5/site_perl/5.11.0/Switch.pm
+
+	and then it will not warn about deprecate although the 'use deprecate'
+	is in the file.
+
+	The plan is to change CPAN.pm such that it installs from CPAN the very
+	same version as the core version is. The difference should be recognized
+	in the installation directory. So there shall be more magic in the INC
+	order.
+	
+2009-02-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* todo/nice to have: completion on distros such that before the slash we
+	complete user ids and after the slash not ls() but existing distros. Or
+	maybe if we have more than x characters we complete the distros. Or some
+	such.
+
+2009-01-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* todo: add a new pause batch signing key
+
+2009-01-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* 12:04:17 <@Alias> What I'm suggesting is that CPAN.pm can be embedded inside of 
+                  larger programs
+12:04:36 <@Alias> Or at least, it should be... it is extremely front-end 
+                  centric in many places
+12:05:22 <@Alias> Well, I can't actually load up CPAN.pm inside my process, as 
+                  it's unsafe...
+12:05:29 <@Alias> Because it does permalocks on files and stuff
+12:05:36 <@Alias> And that goes all explodey
+12:05:47 <@Alias> So I have to isolate each CPAN.pm call out in seperate 
+                  processes
+12:06:20 <@Alias> Mostly via pip or "cpan Whatever" calls
+12:07:04 <@klapperl> maybe we can get rid of the permalocks 
+12:07:11 <@Alias> That would be nice
+12:07:26 <@Alias> Also, to not apply the "don't try to reinstall" between 
+                  user-land commands
+12:08:12 <@Alias> But if we could flush some of this stuff out, it would be nice
+
+2008-11-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* shlomi-regex-utf8.pl needs a trick to kill itself after a second or
+	two but without alarm because alarm doesn't kill the running regexp.
+	Implemented with open..."|-". It uses alarm but in the parent and the
+	child runs the regex.
+
+	* S/SR/SRI/Catalyst-Plugin-HTML-Widget-1.1.tar.gz also calls cpanplus.
+
+2008-11-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* somebody has successfully called cpanplus. I suspect it was
+	Devel-ebug-HTTP-0.32. Or Module::Install::Catalyst. Whatever. I now have
+	a process standing in
+	/home/sand/.cpanplus/5.11.0/build/Catalyst-Runtime-5.7015 doing nothing
+	having 6 pipes open and giving me no clue.
+
+	Yes, Leon has Module::Install 0.60 in inc/. Arrrrrrrgh.
+
+	http://rt.cpan.org/Ticket/Display.html?id=40599
+
+2008-10-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Scriptalicious had its first fail on 2008-07-08 with a bleadperl since
+	then 6 green and 31 red.
+
 2008-09-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Class::MOP and 32734:
