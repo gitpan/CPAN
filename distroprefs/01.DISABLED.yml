@@ -35,6 +35,7 @@ match:
     |BOOK/Net-Proxy-0.12                     # hangs quite often, not always
     |BOWMANBS/Audio-Ecasound-\d              # hangs very early: RT 32101
     |BSCHMAL/parrot-0.6.0.tar.gz             # hangs during configure with 5.10
+    |BSUGARS/IPC-Shareable-0.60.tar.gz       # hangs
     |BTROTT/WWW-Blog-Metadata-0.02           # ExtUtils::AutoInstall 0.56 http://rt.cpan.org/Ticket/Display.html?id=40601
     |CAIDAPERL/Chart-Graph-\d                # hangs Makefile.PL: RT 33541
     |CGUINE/Games-Sudoku-SudokuTk-\d         # hangs: seen with 0.07 and 0.09
@@ -44,6 +45,7 @@ match:
     |CORION/WWW-Mechanize-Shell-0.4[678].tar.gz  # hangs every so often in t/13-command-au.t
     |CORLISS/CursesForms-\d
     |CORLISS/CursesWidgets-\d
+    |DAVIDNICO/handy_tied_functions/Tie-Quicksort-Lazy-0.02 # endless loop
     |DDUMONT/Tk-ObjEditor-2.004.tar.gz       # http://rt.cpan.org/Ticket/Display.html?id=29559
     |DMAKI/Alien-MeCab                       # ditto
     |DMAKI/Text-MeCab                        # hangs asking questions
@@ -51,6 +53,7 @@ match:
     |DSNOPEK/POE-Component-MessageQueue-0.2..*.tar.gz # same with 3
     |DSNOPEK/POE-Component-MessageQueue-0.2.2.tar.gz # hangs in 09_ack_auto (but not on k81)
     |ECALDER/Proc-PID-File-1.24.tar.gz       # hangs during test.pl
+    |EDALY/Text-GenderFromName-0.32.tar.gz   # bad prompt
     |EIJABB/MARC-Errorchecks-1.13.tar.gz     # complicated interactivity in make test
     |EILARA/XUL-Node-\d                      # asks for port -- 8077?
     |EKAWAS/MOBY-                            # hangs
