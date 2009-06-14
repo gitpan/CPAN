@@ -433,7 +433,7 @@ is($CPAN::Config->{histsize},100,"histsize is 100 after testing");
 # note: E=expect; P=program(=print); T=timeout; R=requires(=relies_on); N=Notes(internal); C=Comment(visible during testing)
 __END__
 ########
-#E:(?s:ReadLine support (enabled|suppressed|available).*?cpan[^>]*>)
+#E:(?s:Enter 'h' for help.*?cpan[^>]*>)
 ########
 #P:o conf init urllist
 #E:(MIRR).+?y\]
@@ -448,7 +448,7 @@ __END__
 #E:another URL.+?(\])
 ########
 #P:
-#E:(?s:New set.+?commit.+?(!).+?\])
+#E:(?s:New urllist.+?commit.+?(!).+?\])
 ########
 #P:o conf init urllist
 #E:MIRR.+?(\])
@@ -466,7 +466,7 @@ __END__
 #E:(\])
 ########
 #P:
-#E:(?s:New set.+?commit.+?(!).+?\])
+#E:(?s:New urllist.+?commit.+?(!).+?\])
 ########
 #P:o conf urllist
 #E:linuxforum
@@ -477,17 +477,15 @@ __END__
 ########
 #P:o conf urllist pop
 ########
-#P:o conf urllist splice 1 3
-########
 #P:o conf urllist
-#E:mirrors.+\n.+linuxforum
+#E:programming(?s:.+)linuxforum
 ########
 #P:o conf urllist push PUSH
 ########
 #P:o conf urllist unshift UNSHIFT
 ########
 #P:o conf urllist
-#E:UNSHIFT(.+\n)+.+mirrors(.+\n)+.+linuxforum.+\n.+PUSH
+#E:UNSHIFT(?s:.+)programming(?s:.+)linuxforum(?s:.+)PUSH
 ########
 #P:o conf urllist ONE TWO
 ########

@@ -1,3 +1,20 @@
+2009-06-14  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 1.94_01, a candidate for the next stable release
+
+	* friendlier CPAN shell startup message (RT#46869 by ADAMK)
+	
+	* sets $Archive::Tar::CHOWN=0 and $Archive::Tar::SAME_PERMISSIONS=0;
+  (RT#46384 reported by John Lightsey)
+	
+	* fix CPAN Testers reports summary for new website YAML format
+	(RT#46652; David Golden)
+
+	* continuing to improve error handling on unplugged operation (tracked
+	in RT#44549)
+
+	* fix RT#46378: what happens when using 'o conf urllist' for reordering 
+
 2009-05-24  Andreas J. Koenig  <andk@cpan.org>
 
 	* this is release 1.94
@@ -6,12 +23,11 @@
 	Text::Glob was not installed.
 
 	* since 1.93 (which was released 2008-10-12) changes are documented in
-	the release notes for 1.93_5[1234] below. Here is a quick summary of the
-	highlights: SQLite dependency tracking fixed; packaging works around
-	bugs in Solaris tar; fixed ls on subdirectories; tested with YAML::XS
-	and documented as such; support for MYMETA.yml; CPAN.pm file split into
-	separate files; mega doc/English corrections; negated match variables in
-	distroprefs
+	the release notes for 1.93_5[1234] below. Here is a quick summary:
+	SQLite dependency tracking fixed; packaging works around bugs in Solaris
+	tar; fixed ls on subdirectories; tested with YAML::XS; support for
+	MYMETA.yml; CPAN.pm file split into separate files; mega doc/English
+	corrections; negated match variables in distroprefs
 
 	* thanks to Gisle Aas, Tom Christiansen, Alexandr Ciornii, Nicholas
 	Clark, Jan Dubois, David Golden, Randy Kobes, Olivier 'dolmen' Mengué,
