@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               CPAN
-version:            1.94_01
+version:            1.9402
 abstract:           query, download and build perl modules from CPAN sites
 author:
     - Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>
