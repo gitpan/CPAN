@@ -1,3 +1,65 @@
+2009-07-08  Andreas J. Koenig  <andk@cpan.org>
+
+	* from cpantesters-discuss
+
+	05:04:06 <@ST47> Hey
+	05:04:21 <@ST47> Anyone ever had a problem with the FTPstats.yml getting 
+  corrupted?
+	05:04:49 <@ST47> It keeps getting messed up and throwing a syntax error through 
+  YAML::Syck and throwing my smokers into a useless state
+	06:28:45 <@ST47> Probably ran out of disk space mid-write...
+	07:53:33 <@rafl> yeah, i've seen that.
+
+2009-07-02  Andreas J. Koenig  <andk@cpan.org>
+
+	* Curtis Jewell reports failing tests that I overlooked on cpantesters.
+	Seems to be that Expect-less systems fail some tests around push/pop on
+	urllist???
+
+	http://www.nntp.perl.org/group/perl.cpan.testers/2009/06/msg4356518.html
+
+	Nope, I can remove Expect and still pass all tests.
+
+	He is stuck in the test "urllist empty" and then gets the fail for the
+	test "reordering urllist". Skipping the "urllist empty" test when no
+	Expect is installed will most probably "fix" this. I mean, we're fixing
+	a test, not code.
+
+	Nope. Was a whitespace bug, FIXED.
+
+2009-07-01  Andreas J. Koenig  <andk@cpan.org>
+
+	* amend version numbers and let Andy Armstrongs script care for them
+	automatically. 1.9402 was delivered with 3 decreasing version numbers.
+	How come?
+
+	Status: Decreasing version number
+	=================================
+	
+	     module: CPAN::Distribution
+	    version: 1.93
+	    in file: CPAN-1.9402/lib/CPAN/Distribution.pm
+	     status: Not indexed because CPAN-1.9304/lib/CPAN.pm in
+	             A/AN/ANDK/CPAN-1.9304.tar.gz has a higher version number
+	             (1.9304)
+	
+	     module: CPAN::Index
+	    version: 1.93
+	    in file: CPAN-1.9402/lib/CPAN/Index.pm
+	     status: Not indexed because CPAN-1.9304/lib/CPAN.pm in
+	             A/AN/ANDK/CPAN-1.9304.tar.gz has a higher version number
+	             (1.9304)
+	
+	     module: CPAN::LWP::UserAgent
+	    version: 1.00
+	    in file: CPAN-1.9402/lib/CPAN/LWP/UserAgent.pm
+	     status: Not indexed because CPAN-1.9304/lib/CPAN.pm in
+	             A/AN/ANDK/CPAN-1.9304.tar.gz has a higher version number
+	             (1.9304)
+
+	Something like
+	perl-reversion -current 0.0.4 -set 0.0.5 lib/**/*.pm
+
 2009-04-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
 
 	* Acme::Badexample ($VERSION = do { $_++ while 1; return $_ };) breaks
