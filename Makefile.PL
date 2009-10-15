@@ -101,7 +101,9 @@ if ($HAVE_FILE_SPEC) {
 }
 
 if ($HAVE_FILE_SPEC) {
-    unless (-f File::Spec->catdir("t","CPAN","authors","id","A","AN","ANDK","NotInChecksums-0.000.tar.gz")) {
+    my $have_distroprefs = -d "distroprefs";
+    my $have_notinchecksums = -f File::Spec->catdir("t","CPAN","authors","id","A","AN","ANDK","NotInChecksums-0.000.tar.gz");
+    if ($have_distroprefs && !$have_notinchecksums) {
         warn <<EOW;
 
 ####-Note-for-repository-users-####
@@ -223,10 +225,15 @@ the-release-name :
 	$(NOECHO) $(ECHO) 'version ' $(VERSION)
 	$(NOECHO) $(ECHO) 'release-name ' $(DISTVNAME).tar$(SUFFIX)
 
-release ::
-	/usr/bin/perl -Irelease-lib -S release $(DISTVNAME).tar$(SUFFIX)
-	rm -rf $(DISTVNAME)
+release :: disttest
 	git tag -m 'This is $(VERSION)' "$(VERSION)"
+	ls -l $(DISTVNAME).tar$(SUFFIX)
+	rm -rf $(DISTVNAME)
+	echo '%   lftp pause.perl.org'
+	echo '>   cd incoming'
+	echo '>   put $(DISTVNAME).tar$(SUFFIX)'
+
+snapshot : Makefile no_CR META.yml README testdistros all tardist
 
 # 16=Distribution; 32=Bundle; 32768=Queue
 depefails:

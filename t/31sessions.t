@@ -128,6 +128,41 @@ EOF
     @SESSIONS =
         (
          {
+          name => "urllist empty",
+          perl_mm_use_default => 0,
+          requires => [qw(Expect)],
+          pairs =>
+          [
+           "o conf connect_to_internet_ok 0" => ".",
+           "o conf urllist pop" => ".",
+           "o conf urllist" => "urllist\\s+Type.+all configuration items",
+           "test CPAN::Test::Dummy::Perl5::Make" => "Client not fully configured",
+           "o conf init urllist\nfoo:bar\n\n" => "enter the URL[\\s\\S]+Enter another URL[\\s\\S]+New (set of picks:|urllist)\\s+foo:bar",
+          ]
+         },
+         {
+          name => "unambiguous regexps",
+          pairs =>
+          [
+           "d    /CPAN-Test-Dummy-Perl5-Make-1/" => "Distribution id = A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-1",
+           "test /CPAN-Test-Dummy-Perl5-Make-1/" => "test -- OK",
+           "test /CPAN-Test-Dummy-Perl5/" => "Sorry, test with a regular",
+          ]},
+         {
+          name => "reordering urllist",
+          perl_mm_use_default => 0,
+          gets_mirrored_by => 1,
+          pairs =>
+          [
+           "o conf connect_to_internet_ok 0" => ".",
+           "o conf urllist ONE TWO THREE FOUR" => ".",
+           # we are asked if using the found urllist is ok, we say
+           # yes, then we say 8 for the previous picks, then we pick
+           # items 4 and 2 in that order
+           "o conf init urllist\ny\n8\n4 2\n" => "New urllist\\s+FOUR\\s+TWO",
+          ]
+         },
+         {
           name => "the historically first",
           perl_mm_use_default => 1,
           pairs =>
@@ -151,7 +186,7 @@ EOF
            "make CPAN::Test::Dummy::Perl5::Build::Fails" => "(?sx:Has.already.been.unwrapped.*
                                                   Has.already.been.made)",
            "force get CPAN::Test::Dummy::Perl5::Build::Fails" => "(?sx:security.checks.disabled
-                         |Checksum.for.*/CPAN-Test-Dummy-Perl5-Build-Fails-1.03.tar.gz.ok)",
+                         |Checksum.for.*CPAN-Test-Dummy-Perl5-Build-Fails-1.03.tar.gz.ok)",
            "o conf build_dir_reuse 1" => "build_dir_reuse",
            "o conf commit" => "commit: wrote",
           ]
@@ -283,33 +318,6 @@ EOF
            "ls ANDK/patches/*SADA*" => "-SADAHIRO-",
           ]
          },
-         {
-          name => "urllist empty",
-          perl_mm_use_default => 0,
-          requires => [qw(Expect)],
-          pairs =>
-          [
-           "o conf connect_to_internet_ok 0" => ".",
-           "o conf urllist pop" => ".",
-           "o conf urllist" => "urllist\\s+Type.+all configuration items",
-           "test CPAN::Test::Dummy::Perl5::Make" => "Client not fully configured",
-           "o conf init urllist\nfoo:bar\n\n" => "enter the URL[\\s\\S]+Enter another URL[\\s\\S]+New (set of picks:|urllist)\\s+foo:bar",
-          ]
-         },
-         {
-          name => "reordering urllist",
-          perl_mm_use_default => 0,
-          gets_mirrored_by => 1,
-          pairs =>
-          [
-           "o conf connect_to_internet_ok 0" => ".",
-           "o conf urllist ONE TWO THREE FOUR" => ".",
-           # we are asked if using the found urllist is ok, we say
-           # yes, then we say 8 for the previous picks, then we pick
-           # items 4 and 2 in that order
-           "o conf init urllist\ny\n8\n4 2\n" => "New urllist\\s+FOUR\\s+TWO",
-          ]
-         }
         );
 
     my $cnt;
@@ -347,6 +355,8 @@ for my $si (0..$#SESSIONS) {
     if ($session->{gets_mirrored_by}) {
         cp _f"t/CPAN/TestMirroredBy", _f"t/dot-cpan/sources/MIRRORED.BY"
             or die "Could not cp t/CPAN/TestMirroredBy over t/dor-cpan/sources/MIRRORED.BY: $!";
+        # fix timestamp "bug" (?) on Win32
+        utime( (time) x 2, _f"t/dot-cpan/sources/MIRRORED.BY" ); 
     } else {
         unlink _f"t/dot-cpan/sources/MIRRORED.BY";
     }

@@ -663,6 +663,9 @@ sub satisfy_configure_requires {
             $CPAN::Frontend->mywarn($@);
             return $self->goodbye("[depend] -- NOT OK");
         }
+        else {
+          return $self->goodbye("[configure_requires] -- NOT OK");
+        }
     }
     die "never reached";
 }
@@ -687,8 +690,13 @@ sub choose_MM_or_MB {
     if (-f File::Spec->catfile($self->{build_dir},"Build.PL")) {
         if ($mpl_exists) { # they *can* choose
             if ($CPAN::META->has_inst("Module::Build")) {
-                $prefer_installer = CPAN::HandleConfig->prefs_lookup($self,
-                                                                     q{prefer_installer});
+                $prefer_installer = CPAN::HandleConfig->prefs_lookup(
+                  $self, q{prefer_installer}
+                );
+                # M::B <= 0.35 left a DATA handle open that 
+                # causes problems upgrading M::B on Windows
+                close *Module::Build::Version::DATA
+                  if fileno *Module::Build::Version::DATA;
             }
         } else {
             $prefer_installer = "mb";
@@ -2084,6 +2092,8 @@ sub _run_via_expect_anyorder {
                     $expo->send($send);
                     # never allow reusing an QA pair unless they told us
                     splice @expectacopy, $i, 2 unless $reuse;
+                    $but =~ s/(?s:^.*?)$regex//;
+                    $timeout_start = time;
                     next EXPECT;
                 }
             }

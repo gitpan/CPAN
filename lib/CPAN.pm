@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.94_51';
+$CPAN::VERSION = '1.94_52';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -1024,7 +1024,8 @@ sub has_usable {
                                             my $atv = Archive::Tar->VERSION;
                                             for ("You have Archive::Tar $atv, but $demand or later is recommended. Please upgrade.\n") {
                                                 $CPAN::Frontend->mywarn($_);
-                                                die $_;
+                                            # don't die, because we may need
+                                            # Archive::Tar to upgrade
                                             }
                                             
                                        }
@@ -1473,7 +1474,16 @@ file name (recognized by embedded slashes), it is processed. If it is
 a module, CPAN determines the distribution file in which this module
 is included and processes that, following any dependencies named in
 the module's META.yml or Makefile.PL (this behavior is controlled by
-the configuration parameter C<prerequisites_policy>.)
+the configuration parameter C<prerequisites_policy>). If an argument
+is enclosed in slashes it is treated as a regular expression: it is
+expanded and if the result is a single object (distribution, bundle or
+module), this object is processed.
+
+Example:
+
+    install Dummy::Perl                   # installs the module
+    install AUXXX/Dummy-Perl-3.14.tar.gz  # installs that distribution
+    install /Dummy-Perl-3.14/             # same if the regexp is unambiguous
 
 C<get> downloads a distribution file and untars or unzips it, C<make>
 builds it, C<test> runs the test suite, and C<install> installs it.
@@ -1609,7 +1619,8 @@ pressing C<^C> twice.
 
 CPAN.pm ignores SIGPIPE. If the user sets C<inactivity_timeout>, a
 SIGALRM is used during the run of the C<perl Makefile.PL> or C<perl
-Build.PL> subprocess.
+Build.PL> subprocess. A SIGALRM is also used during module version
+parsing, and is controlled by C<version_timeout>.
 
 =back
 
@@ -1985,6 +1996,8 @@ currently defined:
   urllist            arrayref to nearby CPAN sites (or equivalent locations)
   use_sqlite         use CPAN::SQLite for metadata storage (fast and lean)
   username           your username if you CPAN server wants one
+  version_timeout    stops version parsing after this many seconds.
+                     Default is 15 secs. Set to 0 to disable.
   wait_list          arrayref to a wait server to try (See CPAN::WAIT)
   wget               path to external prg
   yaml_load_code     enable YAML code deserialisation via CPAN::DeferredCode
@@ -3610,9 +3623,7 @@ nice about obeying that variable as well):
 How do I create a Module::Build based Build.PL derived from an
 ExtUtils::MakeMaker focused Makefile.PL?
 
-http://search.cpan.org/search?query=Module::Build::Convert
-
-http://www.refcnt.org/papers/module-build-convert
+http://search.cpan.org/dist/Module-Build-Convert/
 
 =item 15)
 
