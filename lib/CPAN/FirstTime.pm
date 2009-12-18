@@ -1,15 +1,4 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
-package CPAN::Mirrored::By;
-use strict;
-
-sub new {
-    my($self,@arg) = @_;
-    bless [@arg], $self;
-}
-sub continent { shift->[0] }
-sub country { shift->[1] }
-sub url { shift->[2] }
-
 package CPAN::FirstTime;
 use strict;
 
@@ -18,7 +7,8 @@ use FileHandle ();
 use File::Basename ();
 use File::Path ();
 use File::Spec ();
-use vars qw($VERSION $urllist $silent);
+use CPAN::Mirrors ();
+use vars qw($VERSION $silent);
 $VERSION = "5.53";
 
 =head1 NAME
@@ -601,6 +591,11 @@ conf init' at the cpan prompt.)
 
 ],
 
+auto_pick => qq{
+Would you like me to automatically choose the best CPAN mirror
+sites for you? (This means connecting to the Internet and could
+take a couple minutes)},
+
 config_intro => qq{
 
 The following questions are intended to help you with the
@@ -653,22 +648,20 @@ session.
 },
 
 urls_intro => qq{
-Now we need to know where your favorite CPAN mirror sites are located. 
-You should select more than one (just in case the first isn't available).
-You can select from the global list of CPAN mirror sites or you can
-enter CPAN mirror URLs by hand.  A local CPAN mirror can be listed using
-a 'file:///' URL.  For example: 'file:///path/to/cpan/'
-
+Now you need to choose your CPAN mirror sites.  You can let me
+pick mirrors for you, you can select them from a list or you
+can enter them by hand.
 },
 
-urls_picker_intro => qq{
-First, pick a nearby continent and country by typing in the number(s)
+urls_picker_intro => qq{First, pick a nearby continent and country by typing in the number(s)
 in front of the item(s) you want to select. You can pick several of
 each, separated by spaces. Then, you will be presented with a list of
 URLs of CPAN mirrors in the countries you selected, along with
 previously selected URLs. Select some of those URLs, or just keep the
 old list. Finally, you will be prompted for any extra URLs -- file:,
 ftp:, or http: -- that host a CPAN mirror.
+
+You should select more than one (just in case the first isn't available).
 
 },
 
@@ -1142,13 +1135,31 @@ sub init {
     # remember, this is only triggered if no urllist is given, so 0 is
     # fair and protects the default site from being overloaded and
     # gives the user more chances to select his own urllist.
-    my_yn_prompt("connect_to_internet_ok" => 0, $matcher);
+    my_yn_prompt("connect_to_internet_ok" => $fastread ? 1 : 0, $matcher);
+    $CPAN::Config->{urllist} ||= [];
     if ($matcher) {
         if ("urllist" =~ $matcher) {
+            $CPAN::Frontend->myprint($prompts{urls_intro});
+
             # conf_sites would go into endless loop with the smash prompt
             local *_real_prompt;
             *_real_prompt = \&CPAN::Shell::colorable_makemaker_prompt;
-            conf_sites();
+            my $_conf = prompt($prompts{auto_pick}, "yes");
+
+            if ( $_conf =~ /^y/i ) {
+              conf_sites( auto_pick => 1 ) or bring_your_own();
+            }
+            else {
+              my $_conf = prompt(
+                "Would you like to pick from the CPAN mirror list?", "yes"
+              );
+
+              if ( $_conf =~ /^y/i ) {
+                conf_sites();
+              }
+              bring_your_own();
+            }
+            _print_urllist();
         }
         if ("randomize_urllist" =~ $matcher) {
             my_dflt_prompt(randomize_urllist => 0, $matcher);
@@ -1163,30 +1174,34 @@ sub init {
         $silent = 0;
         local *_real_prompt;
         *_real_prompt = \&CPAN::Shell::colorable_makemaker_prompt;
-        if ( @{ $CPAN::Config->{urllist} || [] } ) {
+        if ( @{ $CPAN::Config->{urllist} } ) {
             $CPAN::Frontend->myprint(
               "\nYour 'urllist' is already configured. Type 'o conf init urllist' to change it.\n"
             );
         }
         else {
           $CPAN::Frontend->myprint(
-              "Autoconfigured everything but 'urllist'.\n"
+            "Autoconfigured everything but 'urllist'.\n"
           );
 
           $CPAN::Frontend->myprint($prompts{urls_intro});
 
-          my $_conf = prompt(
-            "Would you like to pick from the CPAN mirror list?", "yes"
-          );
-          $CPAN::Frontend->myprint("\n");
+          my $_conf = prompt($prompts{auto_pick}, "yes");
 
-          if ( $_conf =~ /^y/ ) {
-            conf_sites();
+          if ( $_conf =~ /^y/i ) {
+            conf_sites( auto_pick => 1 ) or bring_your_own();
           }
           else {
+            my $_conf = prompt(
+              "Would you like to pick from the CPAN mirror list?", "yes"
+            );
+
+            if ( $_conf =~ /^y/i ) {
+              conf_sites();
+            }
             bring_your_own();
           }
-          $CPAN::Config->{urllist} = $urllist;
+          _print_urllist();
         }
         $CPAN::Frontend->myprint(
             "\nAutoconfiguration complete.\n"
@@ -1195,10 +1210,10 @@ sub init {
 
     $silent = 0; # reset
 
-    $CPAN::Frontend->myprint("\n\n");
+    $CPAN::Frontend->myprint("\n");
     if ($matcher && !$CPAN::Config->{auto_commit}) {
         $CPAN::Frontend->myprint("Please remember to call 'o conf commit' to ".
-                                 "make the config permanent!\n\n");
+                                 "make the config permanent!\n");
     } else {
         CPAN::HandleConfig->commit($configpm);
     }
@@ -1311,7 +1326,6 @@ Shall we use it as the general CPAN build and cache directory?
         my($last_ans,$ans);
         $CPAN::Frontend->myprint(" <cpan_home>\n") unless $silent;
     PROMPT: while ($ans = prompt("CPAN build and cache directory?",$default)) {
-            print "\n";
             if (File::Spec->file_name_is_absolute($ans)) {
                 my @cpan_home = split /[\/\\]/, $ans;
             DIR: for my $dir (@cpan_home) {
@@ -1364,7 +1378,6 @@ sub my_dflt_prompt {
         }
         $CPAN::Frontend->myprint(" <$item>\n");
         $CPAN::Config->{$item} = prompt($prompts{$item}, $default);
-        $CPAN::Frontend->myprint("\n");
     } else {
         $CPAN::Config->{$item} = $default;
     }
@@ -1383,7 +1396,6 @@ sub my_yn_prompt {
         $CPAN::Frontend->myprint(" <$item>\n");
         my $ans = prompt($prompts{$item}, $default ? 'yes' : 'no');
         $CPAN::Config->{$item} = ($ans =~ /^[y1]/i ? 1 : 0);
-        $CPAN::Frontend->myprint("\n");
     } else {
         $CPAN::Config->{$item} = $default;
     }
@@ -1400,103 +1412,111 @@ sub my_prompt_loop {
         do { $ans = prompt($prompts{$item}, $default);
         } until $ans =~ /$ok/;
         $CPAN::Config->{$item} = $ans;
-        $CPAN::Frontend->myprint("\n");
     } else {
         $CPAN::Config->{$item} = $default;
     }
 }
 
 
+# Here's the logic about the MIRRORED.BY file.  There are a number of scenarios:
+# (1) We have a cached MIRRORED.BY file
+#   (1a) We're auto-picking
+#       - Refresh it automatically if it's old
+#   (1b) Otherwise, ask if using cached is ok.  If old, default to no.
+#       - If cached is not ok, get it from the Internet. If it succeeds we use
+#         the new file.  Otherwise, we use the old file.
+# (2) We don't have a copy at all
+#   (2a) If we are allowed to connect, we try to get a new copy.  If it succeeds,
+#        we use it, otherwise, we warn about failure
+#   (2b) If we aren't allowed to connect, 
+
 sub conf_sites {
+    my %args = @_;
+    # auto pick implies using the internet
+    $CPAN::Config->{connect_to_internet_ok} = 1 if $args{auto_pick};
+
     my $m = 'MIRRORED.BY';
-    my $use_mby;
     my $mby = File::Spec->catfile($CPAN::Config->{keep_source_where},$m);
     File::Path::mkpath(File::Basename::dirname($mby));
+    # Why are we using MIRRORED.BY from the current directory?
+    # Is this for testing? -- dagolden, 2009-11-05
     if (-f $mby && -f $m && -M $m < -M $mby) {
-        $use_mby = 1;
         require File::Copy;
         File::Copy::copy($m,$mby) or die "Could not update $mby: $!";
     }
     local $^T = time;
-    my $overwrite_local = 0;
-    if ($mby && -f $mby && -M _ <= 60 && -s _ > 0) {
-        $use_mby = 1;
-        my $mtime = localtime((stat _)[9]);
-        my $prompt = qq{Found $mby as of $mtime
+    # if we have a cached copy is not older than 60 days, we either
+    # use it or refresh it or fall back to it if the refresh failed.
+    if ($mby && -f $mby && -s _ > 0 ) {
+      my $very_old = (-M $mby > 60);
+      my $mtime = localtime((stat _)[9]);
+      # if auto_pick, refresh anything old automatically
+      if ( $args{auto_pick} ) {
+        if ( $very_old ) {
+          $CPAN::Frontend->myprint(qq{Trying to refresh your mirror list\n});
+          eval { CPAN::FTP->localize($m,$mby,3,1) }
+            or $CPAN::Frontend->myprint(qq{Refresh failed.  Using the old cached copy instead.\n});
+          $CPAN::Frontend->myprint("\n");
+        }
+      }
+      else {
+        my $prompt = qq{Found a cached mirror list as of $mtime
 
-I'd use that as a database of CPAN sites. If that is OK for you,
-please answer 'y', but if you want me to get a new database from the
-internet now, please answer 'n' to the following question.
+If you'd like to just use the cached copy, answer 'yes', below.
+If you'd like an updated copy of the mirror list, answer 'no' and
+I'll get a fresh one from the Internet.
 
-Shall I use the local database in $mby?};
-        my $ans = prompt($prompt,"y");
+Shall I use the cached mirror list?};
+        my $ans = prompt($prompt, $very_old ? "no" : "yes");
+        if ($ans =~ /^n/i) {
+          $CPAN::Frontend->myprint(qq{Trying to refresh your mirror list\n});
+          # you asked for it from the Internet
+          $CPAN::Config->{connect_to_internet_ok} = 1;
+          eval { CPAN::FTP->localize($m,$mby,3,1) }
+            or $CPAN::Frontend->myprint(qq{Refresh failed.  Using the old cached copy instead.\n});
+          $CPAN::Frontend->myprint("\n");
+        }
+      }
+    }
+    # else there is no cached copy and we must fetch or fail
+    else {
+      # If they haven't agree to connect to the internet, ask again
+      if ( ! $CPAN::Config->{connect_to_internet_ok} ) {
+        my $prompt = q{You are missing a copy of the CPAN mirror list.
+
+May I connect to the Internet to get it?};
+        my $ans = prompt($prompt, "yes");
         if ($ans =~ /^y/i) {
-            $CPAN::Config->{connect_to_internet_ok} = 1;
-        } else {
-            $overwrite_local = 1;
+          $CPAN::Config->{connect_to_internet_ok} = 1;
         }
-    }
-    local $urllist = $CPAN::Config->{urllist};
-    my $better_mby;
- LOOP: while () { # multiple errors possible
-        if ($use_mby
-            or (defined $CPAN::Config->{connect_to_internet_ok}
-                and $CPAN::Config->{connect_to_internet_ok})){
-            if ($overwrite_local) {
-                $CPAN::Frontend->myprint(qq{Trying to overwrite $mby\n});
-                $better_mby = CPAN::FTP->localize($m,$mby,3,1);
-                $overwrite_local = 0;
-                $use_mby=1 if $mby;
-            } elsif ( ! -f $mby ) {
-                $CPAN::Frontend->myprint(qq{You have no $mby\n  I'm trying to fetch one\n});
-                $better_mby = CPAN::FTP->localize($m,$mby,3,1);
-                $use_mby=1 if $mby;
-            } elsif ( -M $mby > 60 ) {
-                $CPAN::Frontend->myprint(qq{Your $mby is older than 60 days,\n  I'm trying }.
-                                         qq{to fetch a new one\n});
-                $better_mby = CPAN::FTP->localize($m,$mby,3,1);
-                $use_mby=1 if $mby;
-            } elsif (-s $mby == 0) {
-                $CPAN::Frontend->myprint(qq{You have an empty $mby,\n  I'm trying to fetch a better one\n});
-                $better_mby = CPAN::FTP->localize($m,$mby,3,1);
-                $use_mby=1 if $mby;
-            } else {
-                last LOOP;
-            }
-            if ($better_mby) {
-                $mby = $better_mby;
-            }
-        } elsif (not @{$urllist||[]}
-                 and (not defined $CPAN::Config->{connect_to_internet_ok}
-                      or not $CPAN::Config->{connect_to_internet_ok})) {
-            $CPAN::Frontend->myprint(qq{CPAN needs access to at least one CPAN mirror.
+      }
 
-As you did not allow me to connect to the internet you need to supply
-a valid CPAN URL now.\n\n});
+      # Now get it from the Internet or complain
+      if ( $CPAN::Config->{connect_to_internet_ok} ) {
+        $CPAN::Frontend->myprint(qq{Trying to fetch a mirror list from the Internet\n});
+        eval { CPAN::FTP->localize($m,$mby,3,1) }
+          or $CPAN::Frontend->mywarn(<<'HERE');
+We failed to get a copy of the mirror list from the Internet.
+You will need to provide CPAN mirror URLs yourself.
+HERE
+        $CPAN::Frontend->myprint("\n");
+      }
+      else {
+        $CPAN::Frontend->mywarn(<<'HERE');
+You will need to provide CPAN mirror URLs yourself or set 
+'o conf connect_to_internet_ok 1' and try again.
+HERE
+      }
+    }
 
-            my @default = map {"file://$_"} grep {-e} "/home/ftp/pub/CPAN", "/home/ftp/pub/PAUSE";
-            my $ans = prompt("Please enter the URL of your CPAN mirror",shift @default);
-            if ($ans) {
-                push @$urllist, $ans;
-                next LOOP;
-            }
-        } else {
-            last LOOP;
-        }
+    # if we finally have a good local MIRRORED.BY, get on with picking
+    if (-f $mby && -s _ > 0){
+        $CPAN::Config->{urllist} =
+          $args{auto_pick} ? auto_mirrored_by($mby) : choose_mirrored_by($mby);
+        return 1;
     }
-    if ($use_mby){
-        read_mirrored_by($mby);
-    } else {
-        if (not defined $CPAN::Config->{connect_to_internet_ok}
-            or not $CPAN::Config->{connect_to_internet_ok}) {
-            $CPAN::Frontend->myprint("Configuration does not allow connecting to the internet.\n");
-        }
-        $CPAN::Frontend->myprint("Current set of CPAN URLs:\n");
-        map { $CPAN::Frontend->myprint("  $_\n") } @$urllist;
-    }
-    $CPAN::Frontend->myprint("Now you have a chance to add any additional CPAN URLs\n");
-    bring_your_own();
-    $CPAN::Config->{urllist} = $urllist;
+
+    return;
 }
 
 sub find_exe {
@@ -1552,7 +1572,6 @@ sub picklist {
         if ($require_nonempty && !@nums) {
             $CPAN::Frontend->mywarn("$empty_warning\n");
         }
-        $CPAN::Frontend->myprint("\n");
 
         # a blank line continues...
         unless (@nums){
@@ -1598,29 +1617,26 @@ sub display_some {
     return $pos;
 }
 
-sub read_mirrored_by {
+sub auto_mirrored_by {
     my $local = shift or return;
-    my(%all,$url,$expected_size,$default,$ans,$host,
-       $dst,$country,$continent,@location);
-    my $fh = FileHandle->new;
-    $fh->open($local) or die "Couldn't open $local: $!";
-    local $/ = "\012";
-    while (<$fh>) {
-        ($host) = /^([\w\.\-]+)/ unless defined $host;
-        next unless defined $host;
-        next unless /\s+dst_(dst|location)/;
-        /location\s+=\s+\"([^\"]+)/ and @location = (split /\s*,\s*/, $1) and
-            ($continent, $country) = @location[-1,-2];
-        $continent =~ s/\s\(.*//;
-        $continent =~ s/\W+$//; # if Jarkko doesn't know latitude/longitude
-        /dst_dst\s+=\s+\"([^\"]+)/  and $dst = $1;
-        next unless $host && $dst && $continent && $country;
-        $all{$continent}{$country}{$dst} = CPAN::Mirrored::By->new($continent,$country,$dst);
-        undef $host;
-        $dst=$continent=$country="";
-    }
-    $fh->close;
-    $CPAN::Config->{urllist} ||= [];
+    local $|=1;
+    $CPAN::Frontend->myprint("Searching for the best CPAN mirrors (please be patient) ...");
+    my $mirrors = CPAN::Mirrors->new($local);
+    my $cnt = 0;
+    my @best = $mirrors->best_mirrors(
+      how_many => 5,
+      callback => sub { $CPAN::Frontend->myprint(".") },
+    );
+    my $urllist = [ map { $_->url } @best ];
+    push @$urllist, grep { /^file:/ } @{$CPAN::Config->{urllist}};
+    $CPAN::Frontend->myprint(" done!\n\n");
+    return $urllist;
+}
+
+sub choose_mirrored_by {
+    my $local = shift or return;
+    my ($default);
+    my $mirrors = CPAN::Mirrors->new($local);
     my @previous_urls = @{$CPAN::Config->{urllist}};
 
     $CPAN::Frontend->myprint($prompts{urls_picker_intro});
@@ -1629,7 +1645,7 @@ sub read_mirrored_by {
     my $no_previous_warn =
         "Sorry! since you don't have any existing picks, you must make a\n" .
             "geographic selection.";
-    my $offer_cont = [sort keys %all];
+    my $offer_cont = [sort $mirrors->continents];
     if (@previous_urls) {
         push @$offer_cont, "(edit previous picks)";
         $default = @$offer_cont;
@@ -1646,7 +1662,7 @@ sub read_mirrored_by {
     # return unless @cont;
 
     foreach $cont (@cont) {
-        my @c = sort keys %{$all{$cont}};
+        my @c = sort $mirrors->countries($cont);
         @cont{@c} = map ($cont, 0..$#c);
         @c = map ("$_ ($cont)", @c) if @cont > 1;
         push (@countries, @c);
@@ -1664,14 +1680,18 @@ sub read_mirrored_by {
                                $no_previous_warn);
         %seen = map (($_ => 1), @previous_urls);
         # hmmm, should take list of defaults from CPAN::Config->{'urllist'}...
-        foreach $country (@countries) {
+        foreach my $country (@countries) {
             next if $country =~ /edit previous picks/;
             (my $bare_country = $country) =~ s/ \(.*\)//;
-            my @u = sort keys %{$all{$cont{$bare_country}}{$bare_country}};
+            my @u;
+            for my $m ( $mirrors->mirrors($bare_country) ) {
+              push @u, $m->ftp if $m->ftp;
+              push @u, $m->http if $m->http;
+            }
             @u = grep (! $seen{$_}, @u);
             @u = map ("$_ ($bare_country)", @u)
                 if @countries > 1;
-            push (@urls, @u);
+            push (@urls, sort @u);
         }
     }
     push (@urls, map ("$_ (previous pick)", @previous_urls));
@@ -1686,17 +1706,20 @@ put them on one line, separated by blanks, hyphenated ranges allowed
 
     @urls = picklist (\@urls, $prompt, $default);
     foreach (@urls) { s/ \(.*\)//; }
-    if (@urls) {
-        $urllist = \@urls;
-    } else {
-        push @$urllist, @urls;
-    }
+    return [ @urls ];
 }
 
 sub bring_your_own {
+    my $urllist = [ @{$CPAN::Config->{urllist}} ];
     my %seen = map (($_ => 1), @$urllist);
     my($ans,@urls);
     my $eacnt = 0; # empty answers
+    $CPAN::Frontend->myprint(<<'HERE');
+
+Now you can enter your own CPAN URLs by hand. A local CPAN mirror can be
+listed using a 'file:' URL like 'file:///path/to/cpan/'
+
+HERE
     do {
         my $prompt = "Enter another URL or RETURN to quit:";
         unless (%seen) {
@@ -1708,6 +1731,9 @@ Please enter your CPAN site:};
 
         if ($ans) {
             $ans =~ s|/?\z|/|; # has to end with one slash
+            # XXX This manipulation is odd.  Shouldn't we check that $ans is
+            # a directory before converting to file:///?  And we need /// below,
+            # too, don't we?  -- dagolden, 2009-11-05
             $ans = "file:$ans" unless $ans =~ /:/; # without a scheme is a file:
             if ($ans =~ /^\w+:\/./) {
                 push @urls, $ans unless $seen{$ans}++;
@@ -1735,11 +1761,14 @@ later if you\'re sure it\'s right.\n},
 
     @$urllist = CPAN::_uniq(@$urllist, @urls);
     $CPAN::Config->{urllist} = $urllist;
-    # xxx delete or comment these out when you're happy that it works
-    $CPAN::Frontend->myprint("New urllist\n");
-    for ( @$urllist ) { $CPAN::Frontend->myprint("  $_\n") };
 }
 
+sub _print_urllist {
+    $CPAN::Frontend->myprint("New urllist\n");
+    for ( @{$CPAN::Config->{urllist} || []} ) { 
+      $CPAN::Frontend->myprint("  $_\n") 
+    };
+}
 
 sub _strip_spaces {
     $_[0] =~ s/^\s+//;  # no leading spaces
@@ -1753,6 +1782,7 @@ sub prompt ($;$) {
     my $ans = _real_prompt(@_);
 
     _strip_spaces($ans);
+    $CPAN::Frontend->myprint("\n");
 
     return $ans;
 }

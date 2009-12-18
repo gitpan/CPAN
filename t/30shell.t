@@ -432,7 +432,7 @@ is($CPAN::Config->{histsize},100,"histsize is 100 after testing");
     my $ret = opendir $dh, $dir;
     ok($ret, "directory $dir exists");
     my @dirent = grep { -f _f"$dir/$_" } readdir $dh;
-    ok(0==@dirent, "directory $dir contains no files. dirent[@dirent] should be empty");
+    ok(@dirent<=1, "directory $dir contains max 1 file. dirent[@dirent]");
 }
 local_utils::cleanup_dot_cpan();
 
@@ -442,7 +442,13 @@ __END__
 #E:(?s:Enter 'h' for help.*?cpan[^>]*>)
 ########
 #P:o conf init urllist
-#E:(MIRR).+?y\]
+#E:(?s:Would you like me to automatically choose.+?yes\])
+########
+#P:n
+#E:Would you like to pick from the CPAN mirror list.+?yes(\])
+########
+#P:y
+#E:Shall I use the cached mirror list.+?yes(\])
 ########
 #P:y
 #E:continent.+?(\])
@@ -457,7 +463,13 @@ __END__
 #E:(?s:New urllist.+?commit.+?(!).+?\])
 ########
 #P:o conf init urllist
-#E:MIRR.+?(\])
+#E:(?s:Would you like me to automatically choose.+?yes\])
+########
+#P:n
+#E:Would you like to pick from the CPAN mirror list.+?yes(\])
+########
+#P:y
+#E:Shall I use the cached mirror list.+?yes(\])
 ########
 #P:y
 #E:continent.+?(\])
@@ -484,14 +496,14 @@ __END__
 #P:o conf urllist pop
 ########
 #P:o conf urllist
-#E:programming(?s:.+)linuxforum
+#E:programming(?s:.+)hknet
 ########
 #P:o conf urllist push PUSH
 ########
 #P:o conf urllist unshift UNSHIFT
 ########
 #P:o conf urllist
-#E:UNSHIFT(?s:.+)programming(?s:.+)linuxforum(?s:.+)PUSH
+#E:UNSHIFT(?s:.+)programming(?s:.+)hknet(?s:.+)PUSH
 ########
 #P:o conf urllist ONE TWO
 ########
