@@ -14,6 +14,7 @@ distroprefs/ADAMK.Test-Inline.yml
 distroprefs/ADIE.Test-Class.yml
 distroprefs/ADIE.Test-Exception.yml
 distroprefs/AGENT.OpenResty.yml
+distroprefs/AGRUNDMA.HTTP-Body.yml
 distroprefs/AGRUNDMA.POE-Loop-EV.yml
 distroprefs/AMICHAUER.Unicode-Lite.yml
 distroprefs/ANDK.CPAN-Test-Dummy-Perl5-Build-Fails.yml
@@ -88,6 +89,7 @@ distroprefs/DJKERNEN.Mail-IMAPClient.yml
 distroprefs/DKWILSON.Tk-DKW.yml
 distroprefs/DLAND.Crypt-SSLeay.yml
 distroprefs/DMAKI.Class-DBI-Plugin-DateTime.yml
+distroprefs/DMAKI.Data-Localize.yml
 distroprefs/DMAKI.DateTime-X.yml
 distroprefs/DMAKI.File-Extract.yml
 distroprefs/DMAKI.Xango.yml
@@ -445,6 +447,7 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-ConfReq-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Expect-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Failearly-1.02.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.06.tar.gz
+t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-TimeSkew-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.03.zip
 t/CPAN/authors/id/A/AN/ANDK/cpantestdummies/CHECKSUMS

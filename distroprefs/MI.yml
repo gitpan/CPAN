@@ -57,6 +57,7 @@ match:
     |BLBLACK/MooseX-SimpleConfig-\d
     |BLBLACK/Term-Spinner-\d
     |BOBMATH/Crypt-CAST5_PP-\d
+    |BOBTFISH/Catalyst-Action-REST-\d
     |BOBTFISH/Catalyst-Plugin-Authentication-\d
     |BOBTFISH/Catalyst-Plugin-Session-State-Cookie-\d
     |BOBTFISH/Catalyst-Plugin-Session-State-URI-\d
@@ -122,6 +123,7 @@ match:
     |DMAKI/Catalyst-Model-HTML-FormFu-\d
     |DMAKI/Danga-Socket-Callback-\d
     |DMAKI/Data-Decode-\d
+    |DMAKI/Data-Localize-\d
     |DMAKI/Data-Throttler-Memcached-\d
     |DMAKI/Data-Visitor-Encode-\d
     |DMAKI/DateTime-.+-\d
