@@ -94,7 +94,6 @@ distribution: !!perl/hash:CPAN::Distribution
     COMMANDID: 78
     FAILED: ''
     TEXT: YES
-  prereq_pm_detected: 1
   unwrapped: !!perl/hash:CPAN::Distrostatus
     COMMANDID: 78
     FAILED: ''
@@ -532,6 +531,12 @@ __END__
 ########
 #P:o conf histsize 101
 #E:.  histsize.+?101
+########
+#P:o conf tar_verbosity v
+#E:.  tar_verbosity.+?v
+########
+#P:o conf perl5lib_verbosity v
+#E:.  perl5lib_verbosity.+?v
 ########
 #P:o conf commit
 #E:commit: wrote.+?MyConfig

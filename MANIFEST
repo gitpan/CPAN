@@ -60,6 +60,7 @@ distroprefs/CDENT.Kwiki-Test.yml
 distroprefs/CERNEY.Tk-IDElayout.yml
 distroprefs/CHANG-LIU.XML-Node.yml
 distroprefs/CHARTGRP.Chart.yml
+distroprefs/CHGEUER.Crypt-RIPEMD160.yml
 distroprefs/CHISEL.Zucchini.yml
 distroprefs/CHOCOLATE.Scalar-Util-Clone.yml
 distroprefs/CLACO.Class-Accessor-Grouped.yml
@@ -80,7 +81,6 @@ distroprefs/DAXIM.Yahoo-Photos.yml
 distroprefs/DBRIAN.XML-SimpleObject.yml
 distroprefs/DBROBINS.Net-SSH-Perl.yml
 distroprefs/DCANTRELL.Devel-CheckOS.yml
-distroprefs/DCONWAY.Parse-RecDescent.yml
 distroprefs/DCOPPIT.Mail-Mbox-MessageParser.yml
 distroprefs/DDUMONT.Tk-ObjScanner.yml
 distroprefs/DHARRIS.DB_File-Lock.yml
