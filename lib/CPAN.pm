@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.94_57';
+$CPAN::VERSION = '1.94_58';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -823,15 +823,14 @@ Please make sure the directory exists and is writable.
     if (!$RUN_DEGRADED && !$self->{LOCKFH}) {
         my $fh;
         unless ($fh = FileHandle->new("+>>$lockfile")) {
-            if ($! =~ /Permission/) {
-                $CPAN::Frontend->mywarn(qq{
+            $CPAN::Frontend->mywarn(qq{
 
 Your configuration suggests that CPAN.pm should use a working
 directory of
     $CPAN::Config->{cpan_home}
 Unfortunately we could not create the lock file
     $lockfile
-due to permission problems.
+due to '$!'.
 
 Please make sure that the configuration variable
     \$CPAN::Config->{cpan_home}
@@ -839,8 +838,7 @@ points to a directory where you can write a .lock file. You can set
 this variable in either a CPAN/MyConfig.pm or a CPAN/Config.pm in your
 \@INC path;
 });
-                return suggest_myconfig;
-            }
+            return suggest_myconfig;
         }
         my $sleep = 1;
         while (!CPAN::_flock($fh, LOCK_EX|LOCK_NB)) {

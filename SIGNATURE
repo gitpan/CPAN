@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.61.
+signed via the Module::Signature module, version 0.63.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,10 +14,10 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 7b7e0c4090ec6bc4ff475e8147a6c7603eecbffb Changes
+SHA1 44df2d3ac4ca2bcefc6e22fef5da2c3e775c4f13 Changes
 SHA1 f5d14d036b486033dca35a84b5d580b6b9497646 MANIFEST
 SHA1 0b40175f2edffe21a12bcf9d642d466db80c3289 MANIFEST.SKIP
-SHA1 cc0fdfb4513b5c4e58555b9cae3ebaff5867bbf7 META.yml
+SHA1 13e18121504ec855a592648811bcb49923a76eb9 META.yml
 SHA1 8d63647ca0e2f0fd68711406384c012c557d11f1 Makefile.PL
 SHA1 37e858c51409a297ef5d3fb35dc57cd3b57f9a4d PAUSE2003.pub
 SHA1 af016003ad503ed078c5f8254521d13a3e0c494f PAUSE2005.pub
@@ -393,7 +393,7 @@ SHA1 eeaec00a7b15e8e0dc0ef86b7d92949a70efbd34 distroprefs/ZOOLEIKA.SVG-Plot.yml
 SHA1 efbe8e6882a2caa0d741b113959a706830ab5882 inc/Test/Builder.pm
 SHA1 ae1d68262bedc2475e2c6fd478d99b259b4fb109 inc/Test/More.pm
 SHA1 7fb159a2bb86d02af66d5705c6bfac7f6c77b497 lib/App/Cpan.pm
-SHA1 958f35102ed944d8bec483dec04c93ba0dc69f95 lib/CPAN.pm
+SHA1 733d923742acae79f865035a8d446c7e149a377c lib/CPAN.pm
 SHA1 ca47203e0e6479e2be6fac33069ea2cd09d463ec lib/CPAN/API/HOWTO.pod
 SHA1 31fe6809bca43dc74f54ecf6a6ace8706b5ed226 lib/CPAN/Admin.pm
 SHA1 232a68acad75a7a1bbfee1d9c35289414ffd53d9 lib/CPAN/Author.pm
@@ -423,12 +423,12 @@ SHA1 969739e8816ade7a1f9d8e4d9bcd6cdb083f4f19 lib/CPAN/Module.pm
 SHA1 6faf2d6787bcb6c6d2a205f59a92d78e73fc7f14 lib/CPAN/Nox.pm
 SHA1 e18c032c69ccafc2d224ae6dfbb0b60628c7848a lib/CPAN/Prompt.pm
 SHA1 0c9b1d0608a05018daa7d5c3d171d15b95fc5c83 lib/CPAN/Queue.pm
-SHA1 6b3023b5d64d7d402f85ef5d806053a67f9f166c lib/CPAN/Shell.pm
+SHA1 9b30dc9573eae0743d57cc2b17f99562b3495188 lib/CPAN/Shell.pm
 SHA1 513c94460f62918a1f02ee32bbc32afdfd300c56 lib/CPAN/Tarzip.pm
 SHA1 c572134ef16d4cfdbee4e23f1946062fb5fff5fe lib/CPAN/URL.pm
 SHA1 2492ea05e3fd53d03876bdf112cadca009e65418 lib/CPAN/Version.pm
 SHA1 1d314b6ddb9d81fe419f215a14dc5ded351ecfef scripts/cpan
-SHA1 ce8f1c86172c6cd2698c27f6f76864de724a1282 t/00signature.t
+SHA1 f8c3db13e1839e6a871c680a5a3d3885087b03d0 t/00signature.t
 SHA1 215dace24b507de20011d36cbe2d16ddea78bcf3 t/01loadme.t
 SHA1 11b0e1300cef04885330d292a52296a44ed689d2 t/02nox.t
 SHA1 4f58adf390660cddecf31274a838e48e65dca940 t/03pkgs.t
@@ -436,10 +436,10 @@ SHA1 db989880fa813b7eb4883cd8a741349af58df65d t/04clean_load.t
 SHA1 6799037363cbb460183f1b483784055cb96c7e40 t/10version.t
 SHA1 b3acc2d4482cf82cd1ba3fa642ccdc24fe14edc4 t/11mirroredby.t
 SHA1 eaf6b7dcf742c669055e7ba1cb0f18443d31adc7 t/12cpan.t
-SHA1 c5697c558df9cc12e8a1fb42b9d4eeb2eeae0c6a t/13tarzip.t
+SHA1 511fea181221011f1cbf76dc54714d3ac6ec9b7e t/13tarzip.t
 SHA1 54e904dc7362af2710b130bafbf7b3ea6e2ddbb8 t/14forkbomb.t
 SHA1 e0e62c08ee1152d64d70180a6a06199ec13b05b1 t/30shell.coverage
-SHA1 902fa635226beee35cfce2bf341f50bbbc1c4650 t/30shell.t
+SHA1 6c16569a627dd27011ceacb9a240f61e244b3521 t/30shell.t
 SHA1 8b2bd048a7ea0b6e47bf59a01d743ba1fb431d94 t/31sessions.t
 SHA1 874c4086a55b6d3f2856b47d1be8e39c61bd05ab t/41distribution.t
 SHA1 5acddcbee26d5bd075119d309efae14c6f8f8ff7 t/42distroprefs.t
@@ -487,7 +487,7 @@ SHA1 8a00e60e767af838833dea621abe9683cd360e5d t/yaml_code.yml
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.10 (GNU/Linux)
 
-iEYEARECAAYFAkv6zzoACgkQ7IA58KMXwV2iSQCbBh/kqtrUHNOzyrIyGePI2UmV
-VRkAoJLbsgRsGwVu/lRuSbHtCepT2Vvz
-=GmAk
+iEYEARECAAYFAkwi+9IACgkQ7IA58KMXwV2H0QCgpS4HM4cL8jqRt2SKdHilNDqR
+gUEAn0SVnc+ECtbjtN4Ry4OfKKyZxFnF
+=Ayug
 -----END PGP SIGNATURE-----
