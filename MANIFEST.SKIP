@@ -14,6 +14,7 @@
 ^DIST
 ^MANIFEST.bak
 ^MIRRORED.BY
+^MYMETA.yml$
 ^Makefile(.old)?$
 ^TAGS
 ^\.
@@ -83,3 +84,4 @@ cpanstats.db
 ^distroprefs/I[A-KMO-Z]*\.dd$
 ^ttt
 .DS_Store
+^cpandb

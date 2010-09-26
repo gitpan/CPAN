@@ -111,6 +111,8 @@ match:
     |CLKAO/SVK-v\d
     |CTBROWN/MooseX-Meta-Attribute-Lvalue-\d
     |CWEST/JSAN-\d
+    |DANJOU/Net-Google-DataAPI-\d
+    |DANJOU/Net-Google-Spreadsheets-\d
     |DAXIM/Mediawiki-Blame-\d
     |DCOPPIT/Benchmark-Timer-\d
     |DCOPPIT/Getargs-Long-\d
@@ -400,6 +402,8 @@ pl:
     reuse: 1
     talk:
       - "Auto-install"
+      - "y\n"
+      - "Add.*?to the prerequisites"
       - "y\n"
 # for very old bundled AutoInstall:
       - "Do you wish to install"
