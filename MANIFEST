@@ -9,6 +9,7 @@ distroprefs/ACH.Tk-Contrib.yml
 distroprefs/ACHIMRU.Lingua-Sentence.yml
 distroprefs/ADAMK.Chart-Math-Axis.yml
 distroprefs/ADAMK.Image-Delivery.yml
+distroprefs/ADAMK.List-MoreUtils.yml
 distroprefs/ADAMK.PPI.yml
 distroprefs/ADAMK.Test-ClassAPI.yml
 distroprefs/ADAMK.Test-Inline.yml
@@ -138,6 +139,7 @@ distroprefs/FLORA.File-Extractor.yml
 distroprefs/FLORA.Net_SSLeay.yml
 distroprefs/FLUFFY.Class-MethodMaker.yml
 distroprefs/FOTANGO.Data-Structure-Util.yml
+distroprefs/FREW.DBIx-Class.yml
 distroprefs/GAAS.Data-Dump.yml
 distroprefs/GAAS.Font-AFM.yml
 distroprefs/GAAS.HTML-Parser.yml
@@ -358,7 +360,6 @@ distroprefs/SHAY.Filter-Crypto.yml
 distroprefs/SHEVEK.Mail-Karmasphere-Client.yml
 distroprefs/SLANNING.Ogre.yml
 distroprefs/SPROUT.DBM-Deep.yml
-distroprefs/SPROUT.JE.yml
 distroprefs/SREZIC.Tk-Autoscroll.yml
 distroprefs/SREZIC.Tk-HistEntry.yml
 distroprefs/SREZIC.Tk-Pod.yml
