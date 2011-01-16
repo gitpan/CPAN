@@ -449,7 +449,7 @@ __END__
 #E:(?s:Would you like me to automatically choose.+?yes\])
 ########
 #P:n
-#E:Would you like to pick from the CPAN mirror list.+?yes(\])
+#E:Would you like to.+?pick.+?mirror.+?list.+?yes(\])
 ########
 #P:y
 #E:Shall I use the cached mirror list.+?yes(\])
@@ -470,7 +470,7 @@ __END__
 #E:(?s:Would you like me to automatically choose.+?yes\])
 ########
 #P:n
-#E:Would you like to pick from the CPAN mirror list.+?yes(\])
+#E:Would you like to.+?pick.+?mirror.+?list.+?yes(\])
 ########
 #P:y
 #E:Shall I use the cached mirror list.+?yes(\])
@@ -530,7 +530,9 @@ __END__
 #E:(?s:.*?configure.as.much.as.possible.automatically.*?\])
 ########
 #P:yesplease
-#E:commit: wrote.+?MyConfig
+#E:(commit: wrote.+?MyConfig|You.do.not.have.write.permission)
+########
+#P:# manual
 ########
 #P:# o debug all
 ########
@@ -584,12 +586,6 @@ __END__
 #P:foo
 #E:
 ########
-#P:o conf init bzip2
-#E:Where.+?bzip2.+?(\?)
-########
-#P:foo
-#E:
-########
 #P:o conf init cache_metadata
 #E:Cache.+?(\])
 ########
@@ -606,30 +602,6 @@ __END__
 #E:directory.+?(\])
 ########
 #P:/tmp/must_be_a_createable_absolute_path/../
-#E:
-########
-#P:o conf init curl
-#E:Where.+?(\?)
-########
-#P:foo
-#E:
-########
-#P:o conf init gpg
-#E:Where.+?(\?)
-########
-#P:foo
-#E:
-########
-#P:o conf init gzip
-#E:Where.+?(\?)
-########
-#P:foo
-#E:
-########
-#P:o conf init lynx
-#E:Where.+?(\?)
-########
-#P:foo
 #E:
 ########
 #P:o conf init make_arg
@@ -680,18 +652,6 @@ __END__
 #P:foo
 #E:
 ########
-#P:o conf init ncftp
-#E:............(\])
-########
-#P:foo
-#E:
-########
-#P:o conf init ncftpget
-#E:............(\])
-########
-#P:foo
-#E:
-########
 #P:o conf init pager
 #E:............(\])
 ########
@@ -728,12 +688,6 @@ __END__
 #P:y
 #E:
 ########
-#P:o conf init tar
-#E:Where.+?(\?)
-########
-#P:foo
-#E:
-########
 #P:o conf init term_is_latin
 #E:............(\])
 ########
@@ -746,34 +700,10 @@ __END__
 #P:n
 #E:
 ########
-#P:o conf init unzip
-#E:............(\])
-########
-#P:foo
-#E:
-########
-#P:o conf init wget
-#E:............(\])
-########
-#P:foo
-#E:
-########
 #P:o conf init commandnumber_in_prompt
 #E:command[\S\s]+?number[\S\s]+?............(\])
 ########
 #P:y
-#E:
-########
-#P:o conf init ftp
-#E:............(\])
-########
-#P:foo
-#E:
-########
-#P:o conf init make
-#E:............(\])
-########
-#P:foo
 #E:
 ########
 #P:o conf init ftp_passive

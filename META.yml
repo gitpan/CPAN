@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               CPAN
-version:            1.94_62
+version:            1.94_63
 abstract:           query, download and build perl modules from CPAN sites
 author:
     - Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>
@@ -15,8 +15,8 @@ requires:
     Archive::Zip:        0
     Compress::Bzip2:     0
     Compress::Zlib:      0
-    CPAN::Checksums:     0
     Data::Dumper:        0
+    Digest::MD5:         0
     Digest::SHA:         0
     ExtUtils::CBuilder:  0
     File::Copy:          0
@@ -27,6 +27,7 @@ requires:
     IO::Compress::Base:  0
     IO::Zlib:            0
     LWP::UserAgent:      0
+    MIME::Base64:        0
     Module::Build:       0
     Module::Signature:   0
     Net::FTP:            0
@@ -40,6 +41,7 @@ requires:
     Text::Glob:          0
     Text::ParseWords:    0
     Text::Wrap:          0
+    YAML:                0
     YAML::Syck:          0
 resources:
     repository:  git://github.com/andk/cpanpm.git
@@ -47,7 +49,7 @@ no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.5706
+generated_by:       ExtUtils::MakeMaker version 6.5705
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4
