@@ -263,6 +263,7 @@ distroprefs/MBARBON.Alien-wxWidgets.yml
 distroprefs/MCEGLOWS.Bloom-Filter.yml
 distroprefs/MCRAWFOR.REST-Client.yml
 distroprefs/METZZO.Java.yml
+distroprefs/MFX.Compress-LZO.yml
 distroprefs/MI.yml
 distroprefs/MIKER.IPtables-IPv4-DBTarpit.yml
 distroprefs/MInoinc.yml
@@ -319,7 +320,6 @@ distroprefs/OVID.TAPx-Parser.yml
 distroprefs/OVID.Test-JSON.yml
 distroprefs/OWEN.PDF-Labels.yml
 distroprefs/PAJAS.XML-LibXML.yml
-distroprefs/PARDUS.File-MimeInfo.yml
 distroprefs/PCIMPRICH.XML-SAX-ExpatXS.yml
 distroprefs/PDCAWLEY.Class-Inner.yml
 distroprefs/PETDANCE.HTML-Tidy.yml
@@ -389,6 +389,8 @@ distroprefs/SZABGAB.Spreadsheet-ParseExcel.yml
 distroprefs/TBONE.HTTP-File.yml
 distroprefs/TELS.Devel-Size.yml
 distroprefs/TELS.Math-BigInt-GMP.yml
+distroprefs/THOSPEL.Graph-Layout-Aesthetic.yml
+distroprefs/THOSPEL.Heap-Simple-Perl.yml
 distroprefs/TIMB.Apache-Status-DBI.yml
 distroprefs/TIMB.DBI.yml
 distroprefs/TIMB.GoferTransport-http.yml
@@ -443,6 +445,7 @@ lib/CPAN/Distrostatus.pm
 lib/CPAN/Exception/blocked_urllist.pm
 lib/CPAN/Exception/RecursiveDependency.pm
 lib/CPAN/Exception/yaml_not_installed.pm
+lib/CPAN/Exception/yaml_process_error.pm
 lib/CPAN/FirstTime.pm
 lib/CPAN/FTP.pm
 lib/CPAN/FTP/netrc.pm
@@ -475,6 +478,7 @@ PAUSE2009.pub
 PAUSE2011.pub
 README
 scripts/cpan
+scripts/cpan-mirrors
 SIGNATURE			Public-key signature (added by MakeMaker)
 SlayMakefile
 t/00signature.t
