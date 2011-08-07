@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '1.97_51';
+$CPAN::VERSION = '1.9800';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -1700,8 +1700,9 @@ literal backslash.
 C<autobundle> writes a bundle file into the
 C<$CPAN::Config-E<gt>{cpan_home}/Bundle> directory. The file contains
 a list of all modules that are both available from CPAN and currently
-installed within @INC. The name of the bundle file is based on the
-current date and a counter.
+installed within @INC. Duplicates of each distribution are suppressed.
+The name of the bundle file is based on the current date and a
+counter.
 
 Return value: path to the written file.
 
@@ -1720,6 +1721,31 @@ configured or YAML not installed, no stats are provided.
 mkmyconfig() writes your own CPAN::MyConfig file into your C<~/.cpan/>
 directory so that you can save your own preferences instead of the
 system-wide ones.
+
+=head2 r [Module|/Regexp/]...
+
+scans current perl installation for modules that have a newer version
+available on CPAN and provides a list of them. If called without
+argument, all potential upgrades are listed; if called with arguments
+the list is filtered to the modules and regexps given as arguments.
+
+The listing looks something like this:
+
+  Package namespace         installed    latest  in CPAN file
+  CPAN                        1.94_64    1.9600  ANDK/CPAN-1.9600.tar.gz
+  CPAN::Reporter               1.1801    1.1902  DAGOLDEN/CPAN-Reporter-1.1902.tar.gz
+  YAML                           0.70      0.73  INGY/YAML-0.73.tar.gz
+  YAML::Syck                     1.14      1.17  AVAR/YAML-Syck-1.17.tar.gz
+  YAML::Tiny                     1.44      1.50  ADAMK/YAML-Tiny-1.50.tar.gz
+  CGI                            3.43      3.55  MARKSTOS/CGI.pm-3.55.tar.gz
+  Module::Build::YAML            1.40      1.41  DAGOLDEN/Module-Build-0.3800.tar.gz
+  TAP::Parser::Result::YAML      3.22      3.23  ANDYA/Test-Harness-3.23.tar.gz
+  YAML::XS                       0.34      0.35  INGY/YAML-LibYAML-0.35.tar.gz
+
+It suppresses duplicates in the column C<in CPAN file> such that
+distributions with many upgradeable modules are listed only once.
+
+Note that the list is not sorted.
 
 =head2 recent ***EXPERIMENTAL COMMAND***
 
@@ -1779,7 +1805,7 @@ approach will likely remain.
 
 B<Note>: See also L<recent>
 
-=head2 upgrade [Module|/Regex/]...
+=head2 upgrade [Module|/Regexp/]...
 
 The C<upgrade> command first runs an C<r> command with the given
 arguments and then installs the newest versions of all modules that
@@ -1898,7 +1924,7 @@ Example:
   o conf shell
 
 If KEY starts and ends with a slash, the string in between is
-treated as a regular expression and only keys matching this regex
+treated as a regular expression and only keys matching this regexp
 are displayed
 
 Example:
