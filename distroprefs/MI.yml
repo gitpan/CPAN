@@ -57,6 +57,7 @@ match:
     |BLBLACK/MooseX-LazyLogDispatch-\d
     |BLBLACK/MooseX-SimpleConfig-\d
     |BLBLACK/Term-Spinner-\d
+    |BLUET/MojoX-Session-Store-Redis-\d
     |BOBMATH/Crypt-CAST5_PP-\d
     |BOBTFISH/Catalyst-Action-REST-\d
     |BOBTFISH/Catalyst-Plugin-Authentication-\d
@@ -148,6 +149,7 @@ match:
     |DRPROLIX/Catalyst-Helper-View-TT-Bootstrap-\d
     |DSNOPEK/POE-Component-MessageQueue-\d
     |ECARROLL/MooseX-Types-DateTimeX-\d
+    |EDALY/Text-GenderFromName-\d
     |EDENC/MooseX-Role-Cmd-\d
     |EKAWAS/MOSES-MOBY-\d
     |ELLIOTJS/Task-Perl-Critic-IncludingOptionalDependencies-
@@ -234,7 +236,8 @@ match:
     |LAMMEL/MooseX-Log-Log4perl-\d
     |LAYE/AI-MaxEntropy-\d
     |LBROCARD/Devel-ebug-HTTP-\d
-    |LBROCARD/Test-WWW-Mechanize-Catalyst-\d 
+    |LBROCARD/Test-WWW-Mechanize-Catalyst-\d
+    |LOGIE/DBIx-Class-IndexSearch-Dezi-\d
     |LONERR/CatalystX-Widget-Paginator-\d
     |LORN/LWP-Curl-\d
     |LSAUNDERS/DBIx-Class-Fixtures-\d
@@ -255,6 +258,7 @@ match:
     |MIKI/HTML-Feature-\d
     |MIKI/Lingua-JA-Expand-\d
     |MIKI/Lingua-JA-TFIDF-\d
+    |MINIMAL/MojoX-MongoDB
     |MITREHC/HoneyClient-Agent-\d
     |MITREHC/HoneyClient-Manager-\d
     |MITREHC/HoneyClient-Util-\d
@@ -296,6 +300,7 @@ match:
     |MSTROUT/Task-Catalyst-Tutorial-\d
     |NEKOKAK/DBIx-Class-Stash-\d
     |NEKOKAK/DBIx-Class-TableNames-\d
+    |NEKOKAK/Geography-JapanesePrefectures-Walker-\d
     |NEMUX/Net-UCP-\d
     |NUFFIN/Catalyst-Plugin-Session-State-Cookie-\d
     |NUFFIN/MooseX-Getopt-\d
@@ -384,8 +389,8 @@ match:
     |TOMYHERO/Catalyst-Plugin-Config-Multi-\d
     |TOMYHERO/Catalyst-Plugin-ConfigLoader-Multi-\d
     |TRAVAIL/DBIx-Class-Schema-Slave-\d
+    |VICTORI/perlbal-plugin-backendheaders-\d
     |YAPPO/Class-Component-\d
-    |YAPPO/Geo-Coordinates-Converter-\d
     |YAPPO/HTTP-Engine-\d
     |YAPPO/Lingua-JA-Summarize-Extract-\d
     |YARON/WWW-Monitor-\d

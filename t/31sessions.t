@@ -1,6 +1,95 @@
+#!/usr/bin/perl
+
+# use 5.010;
+use strict;
+use warnings;
+
+=head1 NAME
+
+
+
+=head1 SYNOPSIS
+
+
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+our @opt;
+BEGIN { @opt = <<'=back' =~ /B<--(\S+)>/g;
+
+=item B<--debug!>
+
+Noise
+
+=item B<--help|h!>
+
+This help
+
+=item B<--pause!>
+
+After every session make a pause, waiting for an ENTER keypress.
+
+=item B<--session=s@>
+
+execute only the session with this name.
+
+=item B<--verbose|v!>
+
+display the actual output of all executed commands
+
+=back
+}
+
+=head1 DESCRIPTION
+
+
+
+=cut
+
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+BEGIN {
+    push @INC, qw(       );
+}
+
+use Dumpvalue;
+use File::Basename qw(dirname);
+use File::Path qw(mkpath);
+use File::Spec;
+use File::Temp;
+use Getopt::Long;
+use Pod::Usage;
+use Hash::Util qw(lock_keys);
+
+our %Opt;
+my %limit_to_sessions;
+my $cnt;
+
 $|=1;
 BEGIN {
+    $cnt = 0;
     unshift @INC, './lib', './t';
+
+    lock_keys %Opt, map { /([^=!\|]+)/ } @opt;
+    GetOptions(\%Opt,
+               @opt,
+              ) or pod2usage(1);
+
+    if ($Opt{help}) {
+        pod2usage(0);
+        exit;
+    }
+    if ($Opt{session}) {
+        %limit_to_sessions = map {($_=>1)} @{$Opt{session}};
+    }
+    if ($Opt{debug}) {
+        require YAML::Syck;
+    }
 
     require local_utils;
     local_utils::cleanup_dot_cpan();
@@ -58,6 +147,7 @@ BEGIN {
         my $p;
         my(@path) = split /$Config::Config{path_sep}/, $ENV{PATH};
         require CPAN::FirstTime;
+        my $pair;
         for $pair (@pairs) {
             my($prg,$module) = @$pair;
             next if $CPAN::META->has_inst($module);
@@ -75,7 +165,6 @@ BEGIN {
     }
 }
 
-use strict;
 use File::Copy qw(cp);
 use File::Spec;
 use Test::More;
@@ -128,6 +217,19 @@ EOF
 
     @SESSIONS =
         (
+         {
+          name => "rm while degraded",
+          perl_mm_use_default => 0,
+          pairs =>
+          [
+           "test CPAN::Test::Dummy::Perl5::Make" => "00_load.t\\b.*\\bok",
+           "test CPAN::Test::Dummy::Perl5::Make" => "Has already been tested successfully",
+           "! print \$::tmp_build_dir=CPAN::Shell->expand('Module','CPAN::Test::Dummy::Perl5::Make')->distribution->{build_dir}, \$/" => ".",
+           "! use File::Path qw(rmtree); rmtree \$::tmp_build_dir, 0; print 'rmtreeed',\$/" => "rmtreeed",
+           "test CPAN::Test::Dummy::Perl5::Make" => "00_load.t\\b.*\\bok",
+           "force test CPAN::Test::Dummy::Perl5::Make" => "00_load.t\\b.*\\bok",
+          ]
+         },
          {
           name => "urllist empty",
           perl_mm_use_default => 0,
@@ -325,8 +427,10 @@ EOF
          },
         );
 
-    my $cnt;
-    for my $session (@SESSIONS) {
+ SESSION_CNT: for my $session (@SESSIONS) {
+        if (%limit_to_sessions) {
+            next SESSION_CNT unless $limit_to_sessions{$session->{name}};
+        }
         $cnt++;
         if (my $requires = $session->{requires}) {
             for my $req (@$requires) {
@@ -350,8 +454,11 @@ is($CPAN::Config->{'7yYQS7'} => 'vGcVJQ');
 our $VERBOSE = $ENV{VERBOSE} || 0;
 my $devnull = File::Spec->devnull;
 
-for my $si (0..$#SESSIONS) {
+SESSION_RUN: for my $si (0..$#SESSIONS) {
     my $session = $SESSIONS[$si];
+    if (%limit_to_sessions) {
+        next SESSION_RUN unless $limit_to_sessions{$session->{name}};
+    }
     my $system = $session->{system} || $default_system;
     # warn "# DEBUG: name[$session->{name}]system[$system]";
     ok($session->{name}, "opening new session '$session->{name}'");
@@ -373,6 +480,11 @@ for my $si (0..$#SESSIONS) {
     close SYSTEM or mydiag "error while running '$system' on '$session->{name}'";
     my $content = do {local *FH; open FH, "test.out" or die; local $/; <FH>};
     my(@chunks) = split /$prompt_re/, $content;
+    diag sprintf "DEBUG: All chunks of new session\n%s", YAML::Syck::Dump(@chunks) if $Opt{debug};
+    if ($Opt{pause}) {
+        diag "Press ENTER to continue";
+        <>;
+    }
     # shift @chunks;
     # warn sprintf "# DEBUG: pairs[%d]chunks[%d]", scalar @{$session->{pairs}}, scalar @chunks;
     for (my $i = 0; 2*$i < $#{$session->{pairs}}; $i++) {
@@ -380,7 +492,12 @@ for my $si (0..$#SESSIONS) {
         my($expect) = $session->{pairs}[2*$i+1];
         my($actual) = $chunks[$i+1];
         $actual =~ s{t\\00}{t/00}g if ($^O eq 'MSWin32');
-        diag("cmd[$command]expect[$expect]actual[$actual]") if $VERBOSE;
+        if ($VERBOSE) {
+            diag("cmd[$command]expect[$expect]actual[$actual]");
+        }
+        if ($Opt{verbose}) {
+            diag $actual;
+        }
         my $success = like($actual,"/$expect/","cmd[$command]");
         if (!$success) {
             require Dumpvalue;
