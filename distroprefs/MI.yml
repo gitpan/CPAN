@@ -109,6 +109,7 @@ match:
     |CLACO/Handel-\d
     |CLKAO/AnyMQ-\d
     |CLKAO/Finance-TW-TAIFEX-\d
+    |CLKAO/IO-Digest-\d
     |CLKAO/PerlIO-via-dynamic-\d
     |CLKAO/Pushmi-v\d
     |CLKAO/RunApp-\d
@@ -352,7 +353,6 @@ match:
     |SARTAK/Acme-Aspartame-\d
     |SARTAK/App-Nopaste-\d
     |SARTAK/Carp-REPL-\d
-    |SARTAK/Class-Method-Modifiers-\d
     |SARTAK/Date-Extract-\d
     |SARTAK/IO-Socket-Telnet-\d
     |SARTAK/IncPatch-\d

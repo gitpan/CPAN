@@ -23,14 +23,25 @@ $VERSION = sprintf "%.3f", 1 + substr(q$Rev: 146 $,4)/1000;
 
 my $version_diff = 0; # we'll have to die if this becomes true
 my $version_from;
+my $is_trial = 1;
+my $version;
 {
   local $^W;
   $ExtUtils::MakeMaker::VERSION = eval $ExtUtils::MakeMaker::VERSION;
 }
 if ($HAVE_FILE_SPEC) {
   $version_from = File::Spec->catfile(qw(lib CPAN.pm));
+} else {
+  $version_from = "lib/CPAN.pm";
+}
+unshift @INC, "lib";
+require $version_from;
+$version = $CPAN::VERSION;
+if ($is_trial) {
+    $version .= "-TRIAL";
+}
+{
   my $version_set_manually = 1; # not by SVN
-
   if ($ARGV[0] && $ARGV[0] eq "--setversion") {
     die "Your perl is a bit dated[$]].\nDo not make a release with it\n" if $] < 5.008;
     die "Your MakeMaker is a bit dated[$ExtUtils::MakeMaker::VERSION].\nDo not make a release with it\n"
@@ -45,13 +56,11 @@ if ($HAVE_FILE_SPEC) {
 
     if ($version_set_manually) {
       # we must control that the VERSION in CPAN.pm is the same as in the Makefile
-      unshift @INC, "lib";
-      require $version_from;
       open my $fh, "make the-release-name|" or die;
       my $have_version;
       while (<$fh>) {
-        next unless /^version\s+([\d\._]+)/;
-        $have_version = eval $1;
+        next unless /^version\s+([\d\._]+(?:-TRIAL)?)/;
+        $have_version = $1;
       }
       die "could not determine current version from Makefile" unless $have_version;
       eval q{
@@ -169,7 +178,7 @@ my @sign = (MM->can("signature_target") ? (SIGN => 1) : ());
 WriteMakefile(
               INSTALLDIRS  => 'perl',  # as it is coming with perl
               NAME         => 'CPAN',
-              VERSION_FROM => $version_from,
+              VERSION      => $version,
               EXE_FILES    => [qw(scripts/cpan)],
               PREREQ_PM    => $prereq_pm,
               ($ExtUtils::MakeMaker::VERSION >= 6.3002 ?
