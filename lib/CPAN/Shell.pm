@@ -626,9 +626,12 @@ sub _reload_this {
     if ($must_reload) {
         my $fh = FileHandle->new($file) or
             $CPAN::Frontend->mydie("Could not open $file: $!");
-        local($/);
-        local $^W = 1;
-        my $content = <$fh>;
+        my $content;
+        {
+            local($/);
+            local $^W = 1;
+            $content = <$fh>;
+        }
         CPAN->debug(sprintf("reload file[%s] content[%s...]",$file,substr($content,0,128)))
             if $CPAN::DEBUG;
         delete $INC{$f};
@@ -1103,6 +1106,9 @@ sub failed {
     } else {
         $scope = "this session";
     }
+    ### XXX need to flag optional modules as '(optional)' if they are
+    # from recommends/suggests -- i.e. *show* failure, but make it clear
+    # it was failure of optional module -- xdg, 2012-04-01
     if (@failed) {
         my $print;
         my $debug = 0;
@@ -1814,9 +1820,9 @@ to find objects with matching identifiers.
             $CPAN::Frontend->mydie("Panic: obj[$serialized] cannot meth[$meth]");
         } elsif ($obj->$meth()) {
             CPAN::Queue->delete($s);
-            CPAN->debug("From queue deleted. meth[$meth]s[$s]") if $CPAN::DEBUG;
+            CPAN->debug("Succeeded and deleted from queue. pragma[@pragma]meth[$meth][s][$s]") if $CPAN::DEBUG;
         } else {
-            CPAN->debug("Failed. pragma[@pragma]meth[$meth]") if $CPAN::DEBUG;
+            CPAN->debug("Failed. pragma[@pragma]meth[$meth]s[$s]") if $CPAN::DEBUG;
         }
 
         $obj->undelay;

@@ -4,7 +4,7 @@ use vars qw( $VERSION @ST_PREFS );
 BEGIN {$CPAN::Config_loaded=1}
 BEGIN {$CPAN::Config_loaded=1} # keep old perls with -w quiet
 use ExtUtils::MakeMaker qw(:DEFAULT);
-use File::Path;
+use File::Path; # maybe not needed???
 eval { require File::Spec; };
 my $HAVE_FILE_SPEC = !$@;
 eval { require YAML::Syck; };
@@ -17,13 +17,9 @@ my $HAVE_MAKE = basename($Config::Config{make}) eq "make"; # file-scoped!
 @ST_PREFS = qw(
               );
 
-
-my $Id = q$Id: Makefile.PL 146 2005-08-09 04:25:21Z k $;
-$VERSION = sprintf "%.3f", 1 + substr(q$Rev: 146 $,4)/1000;
-
 my $version_diff = 0; # we'll have to die if this becomes true
 my $version_from;
-my $is_trial = 0;
+my $is_trial = 1;
 my $version;
 {
   local $^W;
@@ -55,7 +51,7 @@ if ($is_trial) {
     die "Not everything checked in or out?\n====\n$dirty====\n" if $dirty;
 
     if ($version_set_manually) {
-      # we must control that the VERSION in CPAN.pm is the same as in the Makefile
+      # we must control that the VERSION in this .pm is the same as in the Makefile
       open my $fh, "make the-release-name|" or die;
       my $have_version;
       while (<$fh>) {
@@ -93,12 +89,17 @@ my $prereq_pm = {
 if ($^O eq "darwin") {
   $prereq_pm->{'File::HomeDir'} = 0.69;
 }
+if ($] < 5.008) {
+  $prereq_pm->{'IO::Scalar'} = 0;
+}
 
 # if they have one of these we declare it as prereq for better reporting
 for my $interesting_module (qw(
         Archive::Tar
         Archive::Zip
         CPAN::Checksums
+        CPAN::Meta
+        CPAN::Meta::YAML
         Compress::Bzip2
         Compress::Zlib
         Data::Dumper
@@ -113,6 +114,7 @@ for my $interesting_module (qw(
         HTTP::Tiny
         IO::Compress::Base
         IO::Zlib
+        JSON::PP
         LWP::UserAgent
         MIME::Base64
         Module::Build
@@ -165,31 +167,32 @@ if ($HAVE_FILE_SPEC) {
 
 ####-Note-for-repository-users-####
 Please try
-  make testdistros
+  make touchtestdistros
 before running 'make test'
-It builds various missing pieces
+It should build NotInChecksums-0.000.tar.gz
+  and correct timestamps for tarballs from the repository
+  and thus enable a smooth 'make test' experience
 ####-Note-for-repository-users-####
 
 EOW
     }
 }
 my @sign = (MM->can("signature_target") ? (SIGN => 1) : ());
-# warn "sign[@sign]";
 WriteMakefile(
               INSTALLDIRS  => 'perl',  # as it is coming with perl
               NAME         => 'CPAN',
               VERSION      => $version,
-              EXE_FILES    => [qw(scripts/cpan)],
+              EXE_FILES    => [qw(scripts/cpan scripts/cpan-mirrors)],
               PREREQ_PM    => $prereq_pm,
               ($ExtUtils::MakeMaker::VERSION >= 6.3002 ?
                (LICENSE      => "perl") : (),
               ),
               ($ExtUtils::MakeMaker::VERSION >= 6.48 ?
-               (MIN_PERL_VERSION => '5.004') : (),
+               (MIN_PERL_VERSION => '5.006002') : (),
               ),
-              clean        => {
-                               FILES => "lib/CPAN/Config.pm t/dot-cpan/FTPstats.yml",
-                              },
+              clean => {
+                        FILES => "lib/CPAN/Config.pm t/dot-cpan/FTPstats.yml",
+                       },
               @sign,
               ($] >= 5.005 ?
                (
@@ -277,7 +280,7 @@ kwalify-distroprefs-slaymake:
 	$(PERL) `dirname $(PERL)`/slaymake validate
 
 kwalify-distroprefs-straight:
-	$(PERL) -Ilib -le 'use YAML::Syck;use CPAN::Kwalify;use Kwalify qw(validate);use Data::Dumper;{my $$errors = 0; my $$files = 0; my $$perrors = 0;my $$distroprefs_path = $$INC{"CPAN/Kwalify.pm"};$$distroprefs_path =~ s{\.pm$$}{/distroprefs.yml};my $$schema = LoadFile($$distroprefs_path);for my $$yml (glob("distroprefs/*.yml")) {$$files++;my $$data = eval { LoadFile($$yml) };if (!$$data or $$@) {$$perrors++;warn "Parse error in $$yml: $$@\n";next;}$$errors++ if (!validate($$schema, $$data));}if ($$perrors||$$errors) { die "Found $$perrors parse errors and $$errors validate errors in $$files files" }else { warn "Validation OK ($$files files).\n" }}'
+	-$(PERL) -Ilib -le 'use YAML::Syck;use CPAN::Kwalify;use Kwalify qw(validate);use Data::Dumper;{my $$errors = 0; my $$files = 0; my $$perrors = 0;my $$distroprefs_path = $$INC{"CPAN/Kwalify.pm"};$$distroprefs_path =~ s{\.pm$$}{/distroprefs.yml};my $$schema = LoadFile($$distroprefs_path);for my $$yml (glob("distroprefs/*.yml")) {$$files++;my $$data = eval { LoadFile($$yml) };if (!$$data or $$@) {$$perrors++;warn "Parse error in $$yml: $$@\n";next;}$$errors++ if (!validate($$schema, $$data));}if ($$perrors||$$errors) { die "Found $$perrors parse errors and $$errors validate errors in $$files files" }else { warn "Validation OK ($$files files).\n" }}'
 
 setversion:
 	$(PERL) Makefile.PL --setversion
@@ -295,10 +298,6 @@ release :: disttest
 	ls -l $(DISTVNAME).tar$(SUFFIX)
 	rm -rf $(DISTVNAME)
 	$(NOECHO) $(ECHO) '#### Suggested next steps:'
-	$(NOECHO) $(ECHO) '  lftp pause.perl.org'
-	$(NOECHO) $(ECHO) '    cd incoming'
-	$(NOECHO) $(ECHO) '    put $(DISTVNAME).tar$(SUFFIX)'
-	$(NOECHO) $(ECHO) '    quit'
 	$(NOECHO) $(ECHO) '  git push --tags origin master'
 
 snapshot : Makefile no_CR META.yml README testdistros all tardist
@@ -365,9 +364,9 @@ export-armor-batch-signing-key:
 howto-release:
 	@$(ECHO) make ci dist \&\& make release
 
-META.yml META.json: metafile
+META.yml: metafile
 	$(CP) $(DISTVNAME)/META.yml  ./META.yml
-	$(CP) $(DISTVNAME)/META.json  ./META.json
+	-$(CP) $(DISTVNAME)/META.json  ./META.json
 
 install-devel-cover-unless-uptodate:
 	$(PERL) -Ilib -MCPAN -e 'CPAN::Shell->install("/home/src/perl/devel-cover/SVN/.") unless CPAN::Shell->expand("Module","Devel::Cover")->uptodate'
@@ -385,7 +384,7 @@ testcover: testdistros install-devel-cover-unless-uptodate
 man:
 	$(PERL)doc -F lib/CPAN.pm
 
-testdistros: \
+TESTDISTROS = \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-1.03.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-DepeFails-1.02.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Build-Fails-1.03.tar.gz \
@@ -400,8 +399,16 @@ testdistros: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.06.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-TimeSkew-1.00.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz \
-	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.03.zip \
-        t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.03.zip
+
+NOTINCHECKSUMS = \
+	t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz
+
+testdistros: $(TESTDISTROS) $(NOTINCHECKSUMS)
+
+touchtestdistros: $(NOTINCHECKSUMS)
+	touch $(TESTDISTROS)
+
 
 # sorry, unix centric (and only makes sense on a working copy of the
 # repository; else 'make test TEST_FILES=t/30shell.t TEST_VERBOSE=1'
@@ -696,7 +703,7 @@ disttest :
 distdir ::
 	touch $(DISTVNAME)/SIGNATURE && $(CP) $(DISTVNAME)/SIGNATURE ./SIGNATURE
 	$(CP) $(DISTVNAME)/META.yml  ./META.yml
-	$(CP) $(DISTVNAME)/META.json  ./META.json
+	-$(CP) $(DISTVNAME)/META.json  ./META.json
 	$(CP) $(DISTVNAME)/MANIFEST  ./MANIFEST
 
 }

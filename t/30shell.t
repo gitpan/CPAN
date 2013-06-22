@@ -246,7 +246,7 @@ is($CPAN::Config->{histsize},100,"histsize is 100 before testing");
 
 my $prompt = "cpan>";
 my $prompt_re = "cpan[^>]*>"; # note: replicated in DATA!
-my $default_timeout = 240;
+my $default_timeout = $ENV{CPAN_EXPECT_TIMEOUT} || 240;
 
 $|=1;
 if ($ENV{CPAN_RUN_SHELL_TEST_WITHOUT_EXPECT}) {
@@ -467,8 +467,9 @@ __END__
 #P:
 #E:(?s:New urllist.+?commit.+?(!).+?\])
 ########
+#C:the answer depends on Net::Ping availability
 #P:o conf init urllist
-#E:(?s:Would you like me to automatically choose.+?yes\])
+#E:(?s:Would you like me to automatically choose.+?yes\]|Autoselection disabled)
 ########
 #P:n
 #E:Would you like to.+?pick.+?mirror.+?list.+?yes(\])
@@ -961,7 +962,7 @@ __END__
 #E:\}.+?CPAN::Distributio.
 ########
 #P:make CPAN::Test::Dummy::Perl5::BuildOrMake
-#E:(?s:Running Build.*?Creating new.*?Build\s+-- OK)
+#E:(?s:Build\s+-- OK)
 #R:Module::Build
 #C:second try
 ########
@@ -973,7 +974,7 @@ __END__
 #E:\}.+?CPAN::Distributio.
 ########
 #P:notest test ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
-#E:Running Build[\s\S]*?Creating new[\s\S]*?Build\s+-- OK[\s\S]+?Skipping test
+#E:Build\s+-- OK[\s\S]+?Skipping test
 #R:Module::Build
 ########
 #P:dump ANDK/CPAN-Test-Dummy-Perl5-BuildOrMake-1.02.tar.gz
@@ -1245,12 +1246,12 @@ To add a new distro, the following steps must be taken:
 
 =head2 Problems
 
-When you set up a new working copy of the SVN repository, you first
-have to run 'make testdistros' to get the pseudo distros that are not
-in the repository. This makes too many testdistros, so you must run
-'svk st' and see which are marked with 'M'. You must revert those and
-then the 30shell test should succeed. I'm sure this can be fixed but
-haven't yet found out how.
+With SVN we had the problem that when you set up a new working copy of
+the SVN repository, you first had to run 'make testdistros' to get the
+pseudo distros that were not in the repository. This made too many
+testdistros, so you had to run 'svk st' and see which were marked with
+'M'. Then you had to revert those and then the 30shell test should
+succeed. This has now been corrected for git repos.
 
 =cut
 

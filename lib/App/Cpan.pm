@@ -1,9 +1,10 @@
 package App::Cpan;
 
-use 5.008;
 use strict;
 use warnings;
 use vars qw($VERSION);
+
+use if $] < 5.008 => "IO::Scalar";
 
 $VERSION = '1.61';
 
@@ -579,7 +580,12 @@ my @skip_lines = (
 
 sub _get_cpanpm_last_line
 	{
-	open my($fh), "<", \ $scalar;
+	my $fh;
+	if ($] < 5.008) {
+		$fh = IO::Scalar->new(\ $scalar);
+        } else {
+		eval q{open $fh, "<", \\ $scalar;};
+        }
 
 	my @lines = <$fh>;
 
