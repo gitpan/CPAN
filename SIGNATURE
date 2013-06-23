@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.73.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,11 +14,12 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 7f79d4802f64acbb51902b7a8c2b93599eb9dd2c Changes
+SHA1 48fb9598e6026d4a42046592c00cc3e9435bc176 Changes
 SHA1 b150a34ceceee20892c129b448e3615f1c5363d8 MANIFEST
 SHA1 b6090836ca09eab96f277125f15e3ae70283a29f MANIFEST.SKIP
-SHA1 7c944e9a1d323784e2202278edfea0fcc7fda21f META.yml
-SHA1 6abf33d1a1a0db8e9f2df05d03d744e3e894ef5c Makefile.PL
+SHA1 3f86c949d5d09d3847e3a3fa5362c14a647f1078 META.json
+SHA1 050925eb5133f7a0d7dfc5511e286282bf0bd667 META.yml
+SHA1 97c7bda265fecd1f4a7c3d798931c6c32d0f5b3f Makefile.PL
 SHA1 37e858c51409a297ef5d3fb35dc57cd3b57f9a4d PAUSE2003.pub
 SHA1 af016003ad503ed078c5f8254521d13a3e0c494f PAUSE2005.pub
 SHA1 a3941566358617b918e0bb7b5c4c2638f451a9d8 PAUSE2007.pub
@@ -494,7 +495,7 @@ SHA1 eeaec00a7b15e8e0dc0ef86b7d92949a70efbd34 distroprefs/ZOOLEIKA.SVG-Plot.yml
 SHA1 efbe8e6882a2caa0d741b113959a706830ab5882 inc/Test/Builder.pm
 SHA1 ae1d68262bedc2475e2c6fd478d99b259b4fb109 inc/Test/More.pm
 SHA1 cb18a43fba72caa9bb2e610c36fa49281e8cd220 lib/App/Cpan.pm
-SHA1 9769531a1ad84c71f1c1a0ba51f92aca6e77c11a lib/CPAN.pm
+SHA1 ee600faff5ca7ddfd347cd18eab1ea5f9c90be77 lib/CPAN.pm
 SHA1 ca47203e0e6479e2be6fac33069ea2cd09d463ec lib/CPAN/API/HOWTO.pod
 SHA1 31fe6809bca43dc74f54ecf6a6ace8706b5ed226 lib/CPAN/Admin.pm
 SHA1 6fb69eb53cb9c31db0f9c93bcaa580e65d561d8b lib/CPAN/Author.pm
@@ -578,7 +579,7 @@ SHA1 1ee88e2392d9f4edb55b2393b9b03c73b5d821c4 t/CPAN/authors/id/A/AN/ANDK/CPAN-T
 SHA1 34487a296483ebe6caf4ad4dc145296fa5baf644 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-TimeSkew-1.00.tar.gz
 SHA1 35b9020b23e004f349e14fd2cd79b16b94b8c8a9 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz
 SHA1 a424441767925cd6eb4db35098a896ac15b42991 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.03.zip
-SHA1 dcbb383433966886f655c79b32cab59f1b735766 t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz
+SHA1 54faf9fd1e8ecc2a4d8703dbd0e76faafe6abfb0 t/CPAN/authors/id/A/AN/ANDK/NotInChecksums-0.000.tar.gz
 SHA1 1a5b3cc1fbd14373bc8f1820fdb2e981052d4b70 t/CPAN/authors/id/A/AN/ANDK/cpantestdummies/CHECKSUMS
 SHA1 5bc14cda7abdb6306caec36f804dfba54b113e80 t/CPAN/authors/id/A/AN/ANDK/patches/CHECKSUMS
 SHA1 1aee1bed21f0e9755d693419e810ec75543eb0b7 t/CPAN/authors/id/A/AN/CHECKSUMS
@@ -598,7 +599,7 @@ SHA1 8a00e60e767af838833dea621abe9683cd360e5d t/yaml_code.yml
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iEYEARECAAYFAlHGB20ACgkQ7IA58KMXwV0kawCgiGnkNr+hcLYf62Rj7ZoWtZ5x
-vFIAoPZBjWYxevflFlsSmepUQeia6NyO
-=1B5E
+iEYEARECAAYFAlHGleoACgkQ7IA58KMXwV0EXwCdGe2vxd0ggNG7xFdn5VlIfV3I
+D8MAn1YUukXTDgo/o8G8TvKC76lSvIvw
+=B8Os
 -----END PGP SIGNATURE-----
