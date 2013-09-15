@@ -70,7 +70,7 @@ sub normalize {
     } elsif (
         $s =~ tr|/|| == 1
         or
-        $s !~ m|[A-Z]/[A-Z-]{2}/[A-Z-]{2,}/|
+        $s !~ m|[A-Z]/[A-Z-0-9]{2}/[A-Z-0-9]{2,}/|
        ) {
         return $s if $s =~ m:^N/A|^Contact Author: ;
         $s =~ s|^(.)(.)([^/]*/)(.+)$|$1/$1$2/$1$2$3$4|;
@@ -1074,7 +1074,7 @@ sub _exefile_stanza {
             $fh->open($script_file)
                 or Carp::croak("Could not open script '$script_file': $!");
             local $/ = "\n";
-            # name parsen und prereq
+            # parse name and prereq
             my($state) = "poddir";
             my($name, $prereq) = ("", "");
             while (<$fh>) {
@@ -2554,6 +2554,21 @@ sub _make_command {
     }
 }
 
+sub _make_install_make_command {
+    my ($self) = @_;
+    my $mimc =
+        CPAN::HandleConfig->prefs_lookup($self, q{make_install_make_command});
+    return $self->_make_command() unless $mimc;
+
+    # Quote the "make install" make command on Windows, where it is commonly
+    # found in, e.g., C:\Program Files\... and therefore needs quoting. We can't
+    # do this in general because the command maybe "sudo make..." (i.e. a
+    # program with arguments), but that is unlikely to be the case on Windows.
+    $mimc = CPAN::HandleConfig->safe_quote($mimc) if $^O eq 'MSWin32';
+
+    return $mimc;
+}
+
 #-> sub CPAN::Distribution::follow_prereqs ;
 sub follow_prereqs {
     my($self) = shift;
@@ -2749,7 +2764,7 @@ sub unsat_prereq {
 
             # if they have not specified a version, we accept any installed one
             if ( $available_file
-                and ( # a few quick shortcurcuits
+                and ( # a few quick short circuits
                      not defined $need_version
                      or $need_version eq '0'    # "==" would trigger warning when not numeric
                      or $need_version eq "undef"
@@ -3013,7 +3028,7 @@ sub read_meta {
 # XXX This should be DEPRECATED -- dagolden, 2011-02-05
 sub read_yaml {
     my($self) = @_;
-    my $meta_file = $self->pick_meta_file;
+    my $meta_file = $self->pick_meta_file('\.yml$');
     $self->debug("meta_file[$meta_file]") if $CPAN::DEBUG;
     return unless $meta_file;
     my $yaml;
@@ -3706,10 +3721,7 @@ sub install {
                          );
         
     } else {
-        my($make_install_make_command) =
-            CPAN::HandleConfig->prefs_lookup($self,
-                                             q{make_install_make_command})
-                  || $self->_make_command();
+        my($make_install_make_command) = $self->_make_install_make_command();
         $system = sprintf("%s install %s",
                           $make_install_make_command,
                           $CPAN::Config->{make_install_arg},
@@ -4144,7 +4156,7 @@ sub reports {
     }
     $CPAN::Frontend->myprint("DONE\n\n");
     my $yaml = $resp->content;
-    # was fuer ein Umweg!
+    # what a long way round!
     my $fh = File::Temp->new(
                              dir      => File::Spec->tmpdir,
                              template => 'cpan_reports_XXXX',

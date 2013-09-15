@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 =head1 NAME
 
-CPAN::Mirrors - Get CPAN miror information and select a fast one
+CPAN::Mirrors - Get CPAN mirror information and select a fast one
 
 =head1 SYNOPSIS
 
@@ -58,9 +58,7 @@ sub new {
         geography    => {},
     }, $class;
 
-    if( defined $file ) {
-        $self->parse_mirrored_by( $file );
-    }
+    $self->parse_mirrored_by( $file );
 
     return $self;
 }

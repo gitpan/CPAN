@@ -65,7 +65,6 @@ match:
     |CGUINE/Games-Sudoku-SudokuTk-\d         # hangs: seen with 0.07 and 0.09
     |CLACO/AxKit-XSP-                        # looped in a readline
     |CLEACH/Net-FTPSSL-\d                    # asks questions during test without prompt()
-    |CORION/MozRepl-RemoteObject-\d          # hangs after 01-array.t
     |CORION/WWW-Mechanize-Shell-0.[45]       # hangs every so often in t/13-command-au.t
     |CORLISS/CursesForms-\d
     |CORLISS/CursesWidgets-\d
@@ -140,7 +139,6 @@ match:
     |KAZUHO/Server-Starter-0.11              # hangs
     |KESTEB/POE-Component-Client-Stomp-0.05.tar.gz # hangs in t/02_basic.t with 5.10 proper
     |KMACLEOD/XML-Grove-0.46alpha.tar.gz     # (1999) seems to be unmaintained
-    |KMCGRAIL/Mail-SpamAssassin-3.3.2        # asks a new question
     |KMX/Alien-IUP-v?\d                      # not analysed slowness and CPU hog; then again questions being asked
     |KNI/IPC-MPS-\d                          # asks questions
     |KNORR/Tk-Image-Cut-0.07.tar.gz          # hangs
@@ -216,7 +214,6 @@ match:
     |xxxRVOSA/Bio-Phylo-\d                      # hangs after 03-node.t with v5.15.0-241-g0a044a7/2b65/
     |RYBSKEJ/forks-0.25
     |SAKOHT/RMI-v?0.\d                       # hangs due to regression in 5.13.11-412, module is not to blame
-    |SALVA/Net-OpenSSH-0                     # asks for a password during test
     |SAMV/Lingua-Translate-                  # hangs often
     |SANKO/Alien-FLTK-\d                     # downloads with waiting time risk
     |SAPER/CPAN-Dependency-0.1[25]           # hangs in t/02internals: strace select(16, [4 8], NULL, NULL, NULL <unfinished ...>
@@ -255,7 +252,6 @@ match:
     |VINSWORLD/Net-Syslogd-0.0\d.            # asks question from 04 to 06
     |VINSWORLD/Cisco-Management-0.05         # asks question
     |VPARSEVAL/Mail-MboxParser-0.55.tar.gz   # hangs during some test
-    |VPIT/IPC-MorseSignals-\d                # hangs too often (see Todo)
     |WONKO/CGI-Application-Dispatch          # endless loop
     |WSMITH/RPC-Oracle-\d                    # asks username for Oracle
     |WSMITH/Email-Folder-Exchange-\d         # asks questions
