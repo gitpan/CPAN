@@ -75,6 +75,7 @@ if ($is_trial) {
 # for 5.004_05 I installed all of them manually despite errors;
 # version hints as of 2006-02
 my $prereq_pm = {
+                 'CPAN::Meta::Requirements' => '2',
                  'File::Spec' => 0,   # KWILLIAMS; requires
                                       # Scalar::Util;
                                       # PathTools-3.16.tar.gz
@@ -276,6 +277,7 @@ verify-changes-date:
 verify-changes-version:
 	@$(PERL) -ne '$$ok++,exit if /\b$(VERSION)\b/; END{die "Alert: did not find <$(VERSION)> in Changes file" unless $$ok}' Changes
 
+# requires Slay::Makefile
 kwalify-distroprefs-slaymake:
 	$(PERL) `dirname $(PERL)`/slaymake validate
 
@@ -401,6 +403,8 @@ TESTDISTROS = \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Features-1.06.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-TimeSkew-1.00.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq-1.00.tar.gz \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq-1.00.tar.gz \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-Zip-1.03.zip
 
 NOTINCHECKSUMS = \
@@ -443,7 +447,7 @@ testshell-with-protocol-twice: testdistros
 # testdistros
 #
 
-# TimeSkey has Makefile.PL missing here because it gets the timestamp
+# TimeSkew has Makefile.PL missing here because it gets the timestamp
 # of the Makefile.PL set to the future which confuses make
 t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-TimeSkew-1.00.tar.gz: \
 	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-TimeSkew/Changes \
@@ -631,6 +635,34 @@ t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz: 
 		$(PERL) Makefile.PL && \
 		$(MAKE) dist && \
 		mv CPAN-Test-Dummy-Perl5-Make-UnsatPrereq-1.00.tar.gz .. && \
+		$(MAKE) clean
+	ls -l $@
+
+t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq-1.00.tar.gz: \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq/Changes \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq/MANIFEST \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq/Makefile.PL \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq/README \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq/lib/CPAN/Test/Dummy/Perl5/Make/CircularPrereq.pm \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq/t/00_load.t
+	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq/ && \
+		$(PERL) Makefile.PL && \
+		$(MAKE) dist && \
+		mv CPAN-Test-Dummy-Perl5-Make-CircularPrereq-1.00.tar.gz .. && \
+		$(MAKE) clean
+	ls -l $@
+
+t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq-1.00.tar.gz: \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq/Changes \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq/MANIFEST \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq/Makefile.PL \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq/README \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq/lib/CPAN/Test/Dummy/Perl5/Make/OptionalPrereq.pm \
+	t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq/t/00_load.t
+	cd t/CPAN/authors/id/A/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq/ && \
+		$(PERL) Makefile.PL && \
+		$(MAKE) dist && \
+		mv CPAN-Test-Dummy-Perl5-Make-OptionalPrereq-1.00.tar.gz .. && \
 		$(MAKE) clean
 	ls -l $@
 

@@ -220,11 +220,27 @@ EOF
     @SESSIONS =
         (
          {
+          name => "recommends",
+          perl_mm_use_default => 0,
+          pairs =>
+          [
+           "o conf recommends_policy 1" => ".",
+           "test CPAN::Test::Dummy::Perl5::Make::OptionalPrereq" => join
+           ("",
+            "Running\\smake\\sfor\\sA/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-OptionalPrereq[\\s\\S]+",
+            "Circular.+?requires,optional[\\s\\S]+",
+            "00_load.t.+?ok[\\s\\S]+",
+            "Running\\smake\\sfor\\sA/AN/ANDK/CPAN-Test-Dummy-Perl5-Make-CircularPrereq[\\s\\S]+",
+            "00_load.t.+?ok[\\s\\S]+",
+           ),
+          ]
+         },
+         {
           name => "simple make call on a configure_requires",
           perl_mm_use_default => 0,
           pairs =>
           [
-           "make CPAN::Test::Dummy::Perl5::Make::ConfReq" => "make -- OK",
+           "make CPAN::Test::Dummy::Perl5::Make::ConfReq" => "make(?:\\.exe)? -- OK",
           ]
          },
          {
