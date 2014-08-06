@@ -2,7 +2,7 @@
 # vim: ts=4 sts=4 sw=4:
 use strict;
 package CPAN;
-$CPAN::VERSION = '2.05';
+$CPAN::VERSION = '2.06';
 $CPAN::VERSION =~ s/_//;
 
 # we need to run chdir all over and we would get at wrong libraries
@@ -1013,6 +1013,18 @@ sub has_usable {
                                 require CPAN::Meta;
                                 unless (CPAN::Version->vge(CPAN::Meta->VERSION, 2.110350)) {
                                     for ("Will not use CPAN::Meta, need version 2.110350\n") {
+                                        $CPAN::Frontend->mywarn($_);
+                                        die $_;
+                                    }
+                                }
+                            },
+                           ],
+
+               'CPAN::Meta::Requirements' => [
+                            sub {
+                                require CPAN::Meta::Requirements;
+                                unless (CPAN::Version->vge(CPAN::Meta::Requirements->VERSION, 2.120920)) {
+                                    for ("Will not use CPAN::Meta::Requirements, need version 2.120920\n") {
                                         $CPAN::Frontend->mywarn($_);
                                         die $_;
                                     }
@@ -2272,8 +2284,7 @@ C<ask/no>, CPAN.pm asks the user and sets the default accordingly.
 
 =head2 Configuration for individual distributions (I<Distroprefs>)
 
-(B<Note:> This feature has been introduced in CPAN.pm 1.8854 and is
-still considered beta quality)
+(B<Note:> This feature has been introduced in CPAN.pm 1.8854)
 
 Distributions on CPAN usually behave according to what we call the
 CPAN mantra. Or since the advent of Module::Build we should talk about
