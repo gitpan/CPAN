@@ -23,6 +23,9 @@ match:
     |.+Business-PayPal-API-\d                # author writes to me he considers the test does not lend itself to automated testing
     |.*Mojolicious-Plugin-HamlRenderer       # last release 20120604, rather take MojoX-Renderer-Haml which came 2012-08-14 (the two bite each other)
     |.*/Unix-Syslog-\d                       # noisy test suite
+    |.*/Alt-CPAN-Uploader-tinyua-0.000001    # not conforming installation policy as of Alt-0.19
+    |.*/Alt-Module-Runtime-ButEUMM-0.001     # not conforming installation policy as of Alt-0.19
+    |.*/Alt-common-sense-TOBYINK-0.001       # not conforming installation policy as of Alt-0.19
     |AMBS/Lingua/Lingua-PT-Speaker-0.10.tar.gz # does not use prompt() and no $|
     |ADAMK/Acme-Mom-Yours-\d                 # blocks the smoker for too long
     |ADAMK/Perl-Dist-\d                      # probably removed all my Config.pms (?)
@@ -34,7 +37,7 @@ match:
     |ALVAROL/PerlCryptLib-1                  # hangs when searching header files
     |ANDREWF/Template-Plugin-Latex-3         # hangs with 3.02
     |ANONWB/WWW-Patent-Page-\d               # downloads something largish
-    |APOCAL/Bundle-POE-All-1.02.tar.gz       # broken idea of what a bundle is
+    |APOCAL/Task-POE-All-1.102.tar.gz        # havoc of a task
     |ASNMTAP/ASNMTAP-\d                      # switches to cpanplus and then hangs
     |AUDREYT/DBD-SQLite-Amalgamation-3.5.8.tar.gz # test t/08create_functionhangs with 33430
     |AVAR/Sendmail-PMilter-\d                # asks questions
@@ -105,8 +108,8 @@ match:
     |HOPCROFTS/Nagios-WebTransact-\d         # asks for a server and port
     |IMACAT/DbFramework-\d                   # asks questions but I have not time
     |IMACAT/arclog-3.\d                      # one test (01-exhaust) hangs with several perls
+    |INA/Modern/Open/Modern-Open-\d          # Message-ID: <87zjfc7itv.fsf at cvrsnica.herceg.de>
     |ISHIGAKI/PPM-Make-\d                    # asks questions
-    |ISHIGAKI/Module-New-\d                  # hangs after 00_load.t
     |IVAN/Business-OnlinePayment-eSelectPlus-\d # hangs with 5.14.0-357
     |JANL/Net-Server-0.99.6.1                # hangs
     |JANPAZ/Font-TFM-\d                      # asks for path to tfm files

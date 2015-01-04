@@ -202,7 +202,7 @@ END {
 }
 our(@SESSIONS, $default_system, $prompt_re);
 BEGIN {
-    my $cwd = Cwd::cwd;
+    my $cwd = CPAN::anycwd();
 
     #  2>&1 is no solution. I intertwingled them, I missed a few "ok"
     $default_system = join(" ", map { "\"$_\"" } run_shell_cmd_lit($cwd))." > test.out";
@@ -219,6 +219,14 @@ EOF
 
     @SESSIONS =
         (
+         {
+          name => "illegal-regexp",
+          perl_mm_use_default => 0,
+          pairs =>
+          [
+           "o conf /*list/" => "Cannot parse",
+          ]
+         },
          {
           name => "notest-test-dep",
           perl_mm_use_default => 0,

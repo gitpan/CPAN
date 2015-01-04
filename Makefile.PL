@@ -166,7 +166,7 @@ if ($HAVE_FILE_SPEC) {
 if ($HAVE_FILE_SPEC) {
     my $have_distroprefs = -d "distroprefs";
     my $have_notinchecksums = -f File::Spec->catdir("t","CPAN","authors","id","A","AN","ANDK","NotInChecksums-0.000.tar.gz");
-    if ($have_distroprefs && !$have_notinchecksums) {
+    if ($HAVE_MAKE && $have_distroprefs && !$have_notinchecksums) {
         warn <<EOW;
 
 ####-Note-for-repository-users-####
@@ -195,7 +195,7 @@ WriteMakefile(
                (MIN_PERL_VERSION => '5.006002') : (),
               ),
               clean => {
-                        FILES => "lib/CPAN/Config.pm t/dot-cpan/FTPstats.yml",
+                        FILES => "lib/CPAN/Config.pm t/dot-cpan/FTPstats.yml cpan-home",
                        },
               @sign,
               ($] >= 5.005 ?
