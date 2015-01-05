@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+generated_by: 'ExtUtils::MakeMaker version 7.0505, CPAN::Meta::Converter version 2.143240'
 keywords:
   - CPAN
   - module
@@ -31,6 +31,7 @@ requires:
   Data::Dumper: '0'
   Digest::MD5: '0'
   Digest::SHA: '0'
+  Expect: '0'
   ExtUtils::CBuilder: '0'
   File::Copy: '0'
   File::HomeDir: '0'
@@ -59,6 +60,6 @@ requires:
   YAML::Syck: '0'
   YAML::XS: '0'
   perl: '5.006002'
-resources:
-  repository: git://github.com/andk/cpanpm.git
-version: 2.06-TRIAL
+resources: {}
+version: 2.08-TRIAL
+

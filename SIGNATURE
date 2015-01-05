@@ -14,12 +14,12 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 6b825b2e4353e73ece45bae507dda45dbd17ec36 Changes
+SHA1 e240239b7499e278729863831be7d944da01fcc1 Changes
 SHA1 5b021d27ffa12685bf5c6dd69fa264d24ce5a883 MANIFEST
 SHA1 1dc21cfb89ca195386b503e7f8b184da810ca6b9 MANIFEST.SKIP
-SHA1 cc5a0e263786447e42491c117e198d2e650c774e META.json
-SHA1 ef2e6718ce3d0be9d390977dac794d7b46a4cdd2 META.yml
-SHA1 6c315a744b50f7b207094f921990f0c5117d94a0 Makefile.PL
+SHA1 825568cf16685ea9ee9e5e762e861ebf9f0a9549 META.json
+SHA1 b3dd71ddbfaf564075928cb8c622cb1496fa2b70 META.yml
+SHA1 bddb4d2a192746916c82d32b13fa8fe29c8bec46 Makefile.PL
 SHA1 37e858c51409a297ef5d3fb35dc57cd3b57f9a4d PAUSE2003.pub
 SHA1 af016003ad503ed078c5f8254521d13a3e0c494f PAUSE2005.pub
 SHA1 a3941566358617b918e0bb7b5c4c2638f451a9d8 PAUSE2007.pub
@@ -507,7 +507,7 @@ SHA1 eeaec00a7b15e8e0dc0ef86b7d92949a70efbd34 distroprefs/ZOOLEIKA.SVG-Plot.yml
 SHA1 efbe8e6882a2caa0d741b113959a706830ab5882 inc/Test/Builder.pm
 SHA1 ae1d68262bedc2475e2c6fd478d99b259b4fb109 inc/Test/More.pm
 SHA1 f3cb4b43e6925f44e2f9a2b328710d65a6bb5bee lib/App/Cpan.pm
-SHA1 3c02b42fc5aac1fc5b38a2e244e69a4a23307bfd lib/CPAN.pm
+SHA1 7cbfcaf8a74721912afaddbbd35646e245208a3d lib/CPAN.pm
 SHA1 ca47203e0e6479e2be6fac33069ea2cd09d463ec lib/CPAN/API/HOWTO.pod
 SHA1 31fe6809bca43dc74f54ecf6a6ace8706b5ed226 lib/CPAN/Admin.pm
 SHA1 54dc00bf88137aa025575762ecedeadb4469a590 lib/CPAN/Author.pm
@@ -573,12 +573,12 @@ SHA1 9be4468ee9ba5f7d23272aeac48cab8032d23a03 t/70_critic.t
 SHA1 b2ccf7d2ad1d2ee704a4af3f47ca213205c2330e t/71_minimumversion.t
 SHA1 7663c0a605bddffc8db056cb6ef6c37b7d280663 t/97-compile.t
 SHA1 e5b47b15bcaaa4501a6152bd151655d8b3b5d37f t/97-cpan1-test-mirror/authors/01mailrc.txt.gz
-SHA1 de06adcdf7f6638f82cf6b76ef22c565d39d6fe9 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/CHECKSUMS
-SHA1 27ed0ee7e8b63156c06e9ba0ee3352033bef9e44 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Make-Fails.tgz
-SHA1 b32b0d29b35e252afe88bf63340da7bb6f7587ee t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Prereq-Fails.tgz
-SHA1 e340f7dfb29c2e9f07bebd7de3a25bba3d778a40 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Test-Fails.tgz
-SHA1 8997a7edbcea5c2fc3a80767121345b64badbd66 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Unsupported-OS.tgz
-SHA1 a9156c3d5d5c9f13afd7c0ae4b1a761f733bca7c t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Works-Fine.tgz
+SHA1 a7fb486bcd27fe142e2c15a9b8968b79a36faaef t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/CHECKSUMS
+SHA1 04a44df9e2bab47841ba1c21d9560d5f4c11bf1a t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Make-Fails.tgz
+SHA1 e6f923f2485a4c89ad1b18d40cd05aeef0145845 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Prereq-Fails.tgz
+SHA1 bb5beebc1d891ea06d08f32c4e58267d82c0c578 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Test-Fails.tgz
+SHA1 38e0fc7aeb02c39ec2706c210fef631d1a610ad3 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Unsupported-OS.tgz
+SHA1 ef356ac3a8d0415e9305c89d85cabe10160a4296 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Local-Works-Fine.tgz
 SHA1 a54bc916c6fe69dc4c193166657cbec5c7919068 t/97-cpan1-test-mirror/authors/id/B/BU/BUSTER/Make.pl
 SHA1 401781c51aaf6ac4868038ddbd8e351454ede4e9 t/97-cpan1-test-mirror/modules/02packages.details.txt
 SHA1 69ef564a87dcacb312f3b2753b85edc9ccc50757 t/97-cpan1-test-mirror/modules/03modlist.data.gz
@@ -635,7 +635,7 @@ SHA1 8a00e60e767af838833dea621abe9683cd360e5d t/yaml_code.yml
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAlSpiv8ACgkQ7IA58KMXwV0v/QCgxW0feCxtMW/3CMB07/TWtG4A
-HH0AnirJiJlj40CUZHHzJOyDRDZhnLPv
-=rPJI
+iEYEARECAAYFAlSqLmwACgkQ7IA58KMXwV18tgCfR1iYwZSboIWiu3fzX3vq50lx
+vPYAoJf1dTlQqjGd93thMHokSU9xH0rM
+=qkl/
 -----END PGP SIGNATURE-----

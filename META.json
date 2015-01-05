@@ -4,7 +4,7 @@
       "Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0505, CPAN::Meta::Converter version 2.143240",
    "keywords" : [
       "CPAN",
       "module",
@@ -46,6 +46,7 @@
             "Data::Dumper" : "0",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
+            "Expect" : "0",
             "ExtUtils::CBuilder" : "0",
             "File::Copy" : "0",
             "File::HomeDir" : "0",
@@ -78,10 +79,7 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "url" : "git://github.com/andk/cpanpm.git"
-      }
-   },
-   "version" : "2.06-TRIAL"
+   "resources" : {},
+   "version" : "2.08-TRIAL"
 }
+
